@@ -1,16 +1,18 @@
-import { Toaster } from "@/components/ui/sonner";
-
 import {
+	createRootRouteWithContext,
 	HeadContent,
 	Outlet,
 	Scripts,
-	createRootRouteWithContext,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { ActiveTabProvider } from "@/components/active-tab-context";
+import Sidebar from "@/components/sidebar";
+import Socials from "@/components/socials";
+import { Toaster } from "@/components/ui/sonner";
 import Header from "../components/header";
 import appCss from "../index.css?url";
 
-export interface RouterAppContext {}
+export type RouterAppContext = {};
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
 	head: () => ({
@@ -44,12 +46,21 @@ function RootDocument() {
 				<HeadContent />
 			</head>
 			<body>
-				<div className="grid h-svh grid-rows-[auto_1fr]">
-					<Header />
-					<Outlet />
-				</div>
+				<ActiveTabProvider>
+					<div className="grid h-svh grid-rows-[auto_auto_1fr]">
+						<Header />
+						<Socials />
+						<div className="mx-[104px] grid grid-cols-[20%_60%_20%]">
+							<div className="hidden md:block">
+								<Sidebar />
+							</div>
+							<Outlet />
+						</div>
+					</div>
+				</ActiveTabProvider>
+
 				<Toaster richColors />
-				<TanStackRouterDevtools position="bottom-left" />
+				<TanStackRouterDevtools position="bottom-right" />
 				<Scripts />
 			</body>
 		</html>

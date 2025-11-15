@@ -18,14 +18,14 @@ body {
 :root {
 	--radius: 0.625rem;
 	--background: #f4f4f4;
-	--foreground: #ececec;
+	--foreground: #021404;
 	--card: oklch(1 0 0);
 	--card-foreground: oklch(0.145 0 0);
 	--popover: oklch(1 0 0);
 	--popover-foreground: oklch(0.145 0 0);
 	--primary: #040c01;
 	--primary-foreground: oklch(0.985 0 0);
-	--secondary: oklch(0.97 0 0);
+	--secondary: #ececec;
 	--secondary-foreground: oklch(0.205 0 0);
 	--muted: oklch(0.97 0 0);
 	--muted-foreground: oklch(0.556 0 0);
@@ -129,4 +129,9 @@ body {
 	body {
 		@apply bg-background text-foreground;
 	}
+}
+
+.cust-scrollbar {
+	scrollbar-color: hsla(0, 0%, 61%, 0.5) transparent;
+	scrollbar-width: thin;
 }

@@ -2,7 +2,9 @@
 	"name": "sportsdey-server",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-06-15",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
 	"vars": {
 		"NODE_ENV": "production"
 		// Add public environment variables here
@@ -11,7 +13,6 @@
 	// For sensitive data, use:
 	// wrangler secret put SECRET_NAME
 	// Don't add secrets to "vars" - they're visible in the dashboard!
-
 	// To set up D1 database:
 	// 1. Run: wrangler login
 	// 2. Run: wrangler d1 create your-database-name
@@ -22,11 +23,19 @@
 	// wrangler d1 migrations apply YOUR_DB_NAME --local
 	"d1_databases": [
 		{
-			"binding": "DB",
-			"database_name": "YOUR_DB_NAME",
-			"database_id": "YOUR_DB_ID",
+  		"binding": "DB",
+			"database_name": "sportsdey_db",
+			"database_id": "15eaaf0e-6285-47f5-97dd-7c9615975707",
+			"remote": true,
 			"preview_database_id": "local-test-db",
 			"migrations_dir": "./src/db/migrations"
+		}
+	],
+	"kv_namespaces": [
+		{
+			"binding": "sportsdey_ns",
+			"id": "18eb61e1ab0b45858d6ae792b4694ee0",
+			"remote": true
 		}
 	]
 }
