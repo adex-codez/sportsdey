@@ -10,6 +10,7 @@
     "cf-typegen": "wrangler types --env-interface Env"
   },
   "dependencies": {
+    "@radix-ui/react-popover": "^1.1.15",
     "@tailwindcss/vite": "^4.1.8",
     "@tanstack/react-form": "^1.23.5",
     "@tanstack/react-query": "^5.85.5",

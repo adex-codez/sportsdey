@@ -50,8 +50,8 @@ function RootDocument() {
 					<div className="grid h-svh grid-rows-[auto_auto_1fr]">
 						<Header />
 						<Socials />
-						<div className="mx-[104px] grid grid-cols-[20%_60%_20%]">
-							<div className="hidden md:block">
+						<div className="mx-4 grid md:gap-8 lg:mx-[104px] lg:grid-cols-[20%_80%]">
+							<div className="hidden lg:block">
 								<Sidebar />
 							</div>
 							<Outlet />

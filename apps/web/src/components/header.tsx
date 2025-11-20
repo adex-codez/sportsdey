@@ -17,10 +17,8 @@ export default function Header() {
 		{ to: "/", label: "Football", icon: FootballIcon },
 		{ to: "/basketball", label: "Basketball", icon: BasketballIcon },
 		{ to: "/tennis", label: "Tennis", icon: TennisIcon },
-		{ to: "/volleyball", label: "Volleyball", icon: VolleyballIcon },
-		{ to: "/ice-hockey", label: "Ice Hockey", icon: IceHockeyIcon },
-		{ to: "/baseball", label: "Baseball", icon: BaseballIcon },
 		{ to: "/boxing", label: "Boxing", icon: BoxingIcon },
+		{ to: "/ufc", label: "UFC", icon: BaseballIcon },
 	] as const;
 	const [open, setOpen] = useState(false);
 	const menuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -52,10 +50,10 @@ export default function Header() {
 	}, [open]);
 
 	return (
-		<div className="flex h-[140px] w-full flex-col justify-center overflow-x-hidden bg-primary px-4 py-1 text-foreground md:h-20 md:flex-row md:items-center md:justify-between md:px-[104px]">
-			<div className="flex justify-between">
+		<div className="flex h-[140px] w-full overflow-x-hidden bg-primary px-4 py-1 text-foreground lg:h-20 lg:flex-row lg:items-center lg:justify-between lg:px-[104px]">
+			<div className="justify-between lg:flex">
 				<button
-					className="md:hidden"
+					className="lg:hidden"
 					type="button"
 					onClick={() => setOpen(!open)}
 					ref={menuButtonRef}
@@ -65,7 +63,7 @@ export default function Header() {
 				>
 					<Menu width={36} height={36} color="#f4f4f4" />
 				</button>
-				<div className="flex justify-center">
+				<div className="flex justify-center self-center">
 					{" "}
 					<img
 						src="sportsdey-logo.png"
@@ -73,20 +71,34 @@ export default function Header() {
 						alt="sportsdey's logo"
 					/>
 				</div>
-				<div />
+				<div className="lg:hidden" />
 			</div>
 
-			<nav className="cust-scrollbar flex gap-4 overflow-x-auto py-4 font-medium text-base">
-				{links.map(({ to, label, icon: Icon }) => {
-					return (
-						<Link key={to} to={to} className="flex shrink-0 gap-2">
-							<Icon />
-							<p className="text-secondary">{label}</p>
-						</Link>
-					);
-				})}
-			</nav>
-			<div className="hidden gap-2 md:flex">
+			<div className="flex justify-center lg:block">
+				<nav className="cust-scrollbar flex gap-4 overflow-x-auto py-4 font-medium">
+					{links.map(({ to, label, icon: Icon }) => {
+						return (
+							<Link
+								key={to}
+								to={to}
+								className="flex shrink-0 gap-2 pb-2"
+								activeProps={{
+									className:
+										"flex shrink-0 gap-2 pb-2 border-b-2 text-accent border-accent rounded-",
+								}}
+								inactiveProps={{
+									className: "flex shrink-0 gap-2 pb-2 text-secondary",
+								}}
+							>
+								<Icon />
+								<p>{label}</p>
+							</Link>
+						);
+					})}
+				</nav>
+			</div>
+
+			<div className="hidden gap-2 lg:flex">
 				<Button className="flex gap-2 rounded-full bg-[#FFFFFF33]">
 					<WorldIcon />
 					EN

@@ -1,0 +1,5266 @@
+{
+  "competitions": [
+    {
+      "competition": {
+        "id": "sr:competition:594",
+        "name": "National League",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:148",
+        "name": "New Zealand"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:182819",
+              "name": "Wellington Phoenix FC Reserve",
+              "abbreviation": "WEP",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:599896",
+              "name": "Coastal Spirit FC",
+              "abbreviation": "COA",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:592980",
+              "name": "Christchurch United FC",
+              "abbreviation": "CHR",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:887143",
+              "name": "Western Suburbs FC",
+              "abbreviation": "WES",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:42580",
+              "name": "Miramar Rangers",
+              "abbreviation": "MIR",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:6909",
+              "name": "Auckland City FC",
+              "abbreviation": "ACI",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1236583",
+              "name": "Auckland FC Reserves",
+              "abbreviation": "AUC",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:329249",
+              "name": "Wellington Olympic",
+              "abbreviation": "WEL",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:786778",
+              "name": "Auckland United FC",
+              "abbreviation": "AUC",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:390338",
+              "name": "Birkenhead United AFC",
+              "abbreviation": "BIR",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:19252",
+        "name": "TT Premier League",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:527",
+        "name": "Trinidad and Tobago"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:473489",
+              "name": "AC Port Of Spain",
+              "abbreviation": "POR",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:255843",
+              "name": "Police FC",
+              "abbreviation": "POL",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:34232",
+        "name": "NCAA, Division I National Championship, Women",
+        "gender": "women"
+      },
+      "category": {
+        "id": "sr:category:26",
+        "name": "USA"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:452233",
+              "name": "Alabama Crimson Tide",
+              "abbreviation": "ALA",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:475424",
+              "name": "Northwestern Wildcats",
+              "abbreviation": "NOR",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:475190",
+              "name": "UCF Knights",
+              "abbreviation": "UCF",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:493044",
+              "name": "Maine Black Bears",
+              "abbreviation": "MAI",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:452485",
+              "name": "Kansas Jayhawks",
+              "abbreviation": "KAN",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:452303",
+              "name": "California Baptist Lancers",
+              "abbreviation": "CAL",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:452251",
+              "name": "Arkansas Razorbacks",
+              "abbreviation": "ARK",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:452349",
+              "name": "Dartmouth Big Green",
+              "abbreviation": "DAR",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:475112",
+              "name": "Virginia Cavaliers",
+              "abbreviation": "VIR",
+              "qualifier": "home",
+              "score": 5
+            },
+            {
+              "id": "sr:competitor:452445",
+              "name": "High Point Panthers",
+              "abbreviation": "HIG",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:475214",
+              "name": "Texas Tech Red Raiders",
+              "abbreviation": "TEX",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:475142",
+              "name": "UTSA Roadrunners",
+              "abbreviation": "UTS",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:475092",
+              "name": "West Virginia Mountaineers",
+              "abbreviation": "WES",
+              "qualifier": "home",
+              "score": 5
+            },
+            {
+              "id": "sr:competitor:475104",
+              "name": "Wagner Seahawks",
+              "abbreviation": "WAG",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:475236",
+              "name": "TCU Horned Frogs",
+              "abbreviation": "TCU",
+              "qualifier": "home",
+              "score": 7
+            },
+            {
+              "id": "sr:competitor:452431",
+              "name": "Grambling State Tigers",
+              "abbreviation": "GRA",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:493034",
+              "name": "LSU Tigers",
+              "abbreviation": "LSU",
+              "qualifier": "home",
+              "score": 4
+            },
+            {
+              "id": "sr:competitor:452453",
+              "name": "Houston Christian Huskies",
+              "abbreviation": "HCR",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:475138",
+              "name": "Vanderbilt Commodores",
+              "abbreviation": "VAN",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:475228",
+              "name": "Tennessee Tech Golden Eagles",
+              "abbreviation": "TEN",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:452289",
+              "name": "BYU Cougars",
+              "abbreviation": "BYU",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:475150",
+              "name": "Utah State Aggies",
+              "abbreviation": "UTA",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:452265",
+              "name": "Baylor Bears",
+              "abbreviation": "BAY",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:475216",
+              "name": "Texas State Bobcats",
+              "abbreviation": "TEX",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:475074",
+              "name": "Wisconsin Badgers",
+              "abbreviation": "WIS",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:475080",
+              "name": "Western Michigan Broncos",
+              "abbreviation": "WES",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:475252",
+              "name": "Stanford Cardinal",
+              "abbreviation": "SU",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:452291",
+              "name": "Cal Poly Mustangs",
+              "abbreviation": "CAL",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:452335",
+              "name": "Colorado Buffaloes",
+              "abbreviation": "COL",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:475148",
+              "name": "Utah Valley Wolverines",
+              "abbreviation": "UVU",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:475098",
+              "name": "Washington Huskies",
+              "abbreviation": "UW",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:492992",
+              "name": "Montana Grizzlies",
+              "abbreviation": "MON",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:851",
+        "name": "Int. Friendly Games",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:4",
+        "name": "International"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:21814",
+              "name": "Grenada",
+              "abbreviation": "GRN",
+              "qualifier": "home",
+              "score": 4
+            },
+            {
+              "id": "sr:competitor:21803",
+              "name": "Virgin Islands, U.S.",
+              "abbreviation": "VIR",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:4820",
+              "name": "Colombia",
+              "abbreviation": "COL",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:4741",
+              "name": "Australia",
+              "abbreviation": "AUS",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:4722",
+              "name": "Venezuela",
+              "abbreviation": "VEN",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:4741",
+              "name": "Australia",
+              "abbreviation": "AUS",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:49224",
+        "name": "Kings Cup Brazil",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:2631",
+        "name": "SoccerSpecials"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1245124",
+              "name": "G3X FC",
+              "abbreviation": "G3X",
+              "qualifier": "home",
+              "score": 4
+            },
+            {
+              "id": "sr:competitor:1245122",
+              "name": "Furia FC",
+              "abbreviation": "FUR",
+              "qualifier": "away",
+              "score": 4
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:40533",
+        "name": "Liga Premier Serie A",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:12",
+        "name": "Mexico"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:421571",
+              "name": "Club Deportivo de Futbol Zitacuaro",
+              "abbreviation": "CLU",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:838728",
+              "name": "Lobos Ulmx",
+              "abbreviation": "LOB",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1215281",
+              "name": "Heroes de Zaci FC",
+              "abbreviation": "HER",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:290554",
+              "name": "Inter Playa Del Carmen",
+              "abbreviation": "CAR",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:36522",
+              "name": "Alacranes de Durango",
+              "abbreviation": "ACR",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:215050",
+              "name": "Cimarrones de Sonora FC",
+              "abbreviation": "CIM",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:40535",
+        "name": "Liga Premier Serie B",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:12",
+        "name": "Mexico"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:863915",
+              "name": "Gorilas de Juanacatlan",
+              "abbreviation": "GOR",
+              "qualifier": "home",
+              "score": 5
+            },
+            {
+              "id": "sr:competitor:1038331",
+              "name": "Acambaro FC",
+              "abbreviation": "ACA",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:45047",
+        "name": "National League, Women",
+        "gender": "women"
+      },
+      "category": {
+        "id": "sr:category:148",
+        "name": "New Zealand"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:513402",
+              "name": "Petone FC",
+              "abbreviation": "PET",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:293818",
+              "name": "Canterbury United Pride",
+              "abbreviation": "CAN",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:730045",
+              "name": "Auckland United FC",
+              "abbreviation": "AUC",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:293820",
+              "name": "Southern United",
+              "abbreviation": "SOU",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:513404",
+              "name": "Central Football",
+              "abbreviation": "CEN",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:585385",
+              "name": "Wellington United Diamonds",
+              "abbreviation": "WEL",
+              "qualifier": "away",
+              "score": 9
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:48507",
+        "name": "Australian Championship",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:34",
+        "name": "Australia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:189013",
+              "name": "Avondale FC",
+              "abbreviation": "AVO",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:364598",
+              "name": "Preston Lions FC",
+              "abbreviation": "PRL",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:2940",
+              "name": "Wollongong Wolves FC",
+              "abbreviation": "WOL",
+              "qualifier": "home",
+              "score": 5
+            },
+            {
+              "id": "sr:competitor:2941",
+              "name": "Marconi Stallions",
+              "abbreviation": "MAS",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:26176",
+        "name": "NCAA, Regular Season",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:26",
+        "name": "USA"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:460759",
+              "name": "Seattle Redhawks",
+              "abbreviation": "SEA",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:460717",
+              "name": "San Francisco Dons",
+              "abbreviation": "SAN",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:456895",
+              "name": "UC Santa Barbara Gauchos",
+              "abbreviation": "SAN",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:456891",
+              "name": "UC Irvine Anteaters",
+              "abbreviation": "IRV",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:1894",
+        "name": "A-League, Women",
+        "gender": "women"
+      },
+      "category": {
+        "id": "sr:category:34",
+        "name": "Australia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:174106",
+              "name": "Sydney FC",
+              "abbreviation": "SYD",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:174104",
+              "name": "Perth Glory FC",
+              "abbreviation": "PER",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:174100",
+              "name": "Melbourne Victory",
+              "abbreviation": "VIC",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:771208",
+              "name": "Central Coast Mariners",
+              "abbreviation": "CCM",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:1824",
+        "name": "Japan Football League",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:52",
+        "name": "Japan"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:38149",
+              "name": "Yokogawa Musashino FC",
+              "abbreviation": "MUS",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:162636",
+              "name": "Veertien Mie",
+              "abbreviation": "VEM",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1146929",
+              "name": "Asuka FC",
+              "abbreviation": "ASU",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:167420",
+              "name": "Maruyasu Okazaki",
+              "abbreviation": "MAO",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:42631",
+        "name": "Mulan Football League, Women",
+        "gender": "women"
+      },
+      "category": {
+        "id": "sr:category:793",
+        "name": "Chinese Taipei"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:698249",
+              "name": "Kaohsiung Attackers",
+              "abbreviation": "KAO",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:702865",
+              "name": "New Taipei Hang Yuen",
+              "abbreviation": "NEW",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1258245",
+              "name": "Valkyrie",
+              "abbreviation": "VAL",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:1258249",
+              "name": "Taichung Cherry Blossoms",
+              "abbreviation": "TAI",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1258251",
+              "name": "AC Taipei",
+              "abbreviation": "TAI",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:698489",
+              "name": "Taipei Xiongzan",
+              "abbreviation": "TAI",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:698247",
+              "name": "Taichung Blue Whale",
+              "abbreviation": "TAI",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:698491",
+              "name": "Hualian WFT",
+              "abbreviation": "HUA",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:2094",
+        "name": "J3 League",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:52",
+        "name": "Japan"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:79883",
+              "name": "AC Nagano Parceiro",
+              "abbreviation": "NAG",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:441260",
+              "name": "Tegevajaro Miyazaki",
+              "abbreviation": "TEG",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:21900",
+              "name": "FC Gifu",
+              "abbreviation": "GIF",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:245541",
+              "name": "Tochigi City FC",
+              "abbreviation": "TOC",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:281405",
+              "name": "Kochi United SC",
+              "abbreviation": "KOC",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:118478",
+              "name": "Vanraure Hachinohe FC",
+              "abbreviation": "VHА",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:204",
+        "name": "1. Liga",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:21",
+        "name": "Russia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:2340",
+              "name": "FC Ska-Khabarovsk",
+              "abbreviation": "SKA",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:7639",
+              "name": "FC Yenisey Krasnoyarsk",
+              "abbreviation": "YEN",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:1772",
+        "name": "WK-League",
+        "gender": "women"
+      },
+      "category": {
+        "id": "sr:category:291",
+        "name": "Republic of Korea"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:195558",
+              "name": "Hwacheon KSPO FC",
+              "abbreviation": "HWA",
+              "qualifier": "home",
+              "score": 4
+            },
+            {
+              "id": "sr:competitor:195552",
+              "name": "Seoul City WFC",
+              "abbreviation": "SEC",
+              "qualifier": "away",
+              "score": 3
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:48663",
+        "name": "Diski Challenge, Reserves",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:322",
+        "name": "South Africa"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:511870",
+              "name": "Durban City",
+              "abbreviation": "DUR",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:546743",
+              "name": "Chippa United FC",
+              "abbreviation": "CHI",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:834572",
+              "name": "Marumo Gallants",
+              "abbreviation": "MGL",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:509994",
+              "name": "Siwelele FC",
+              "abbreviation": "SIW",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:512064",
+              "name": "Golden Arrows",
+              "abbreviation": "GOL",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:764068",
+              "name": "AmaZulu",
+              "abbreviation": "AMA",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:629372",
+              "name": "Stellenbosch FC",
+              "abbreviation": "STB",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:619728",
+              "name": "Mamelodi Sundowns",
+              "abbreviation": "MAM",
+              "qualifier": "away",
+              "score": 3
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:42985",
+        "name": "AFC Women's Champions League",
+        "gender": "women"
+      },
+      "category": {
+        "id": "sr:category:393",
+        "name": "International Clubs"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:195554",
+              "name": "Suwon WFC",
+              "abbreviation": "SUW",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:249393",
+              "name": "Tokyo Verdy Beleza",
+              "abbreviation": "TVB",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:822",
+        "name": "U19 1. Liga",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:18",
+        "name": "Czechia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:44160",
+              "name": "FC Hradec Kralove",
+              "abbreviation": "HKR",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:44157",
+              "name": "FC Pardubice",
+              "abbreviation": "PAR",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:44165",
+              "name": "FC Viktoria Plzen",
+              "abbreviation": "VIK",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:44156",
+              "name": "SK Dynamo Ceske Budejovice",
+              "abbreviation": "DYN",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "not_started",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:44168",
+              "name": "FK Mlada Boleslav",
+              "abbreviation": "MLB",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:44158",
+              "name": "1. FC Slovacko",
+              "abbreviation": "SLO",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:105943",
+              "name": "Karvina",
+              "abbreviation": "MFK",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:44166",
+              "name": "FC Vysocina Jihlava",
+              "abbreviation": "VYS",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:43125",
+        "name": "Liga A1",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:85",
+        "name": "Malaysia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1282285",
+              "name": "Perlis Gsa FC",
+              "abbreviation": "PER",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:1273682",
+              "name": "Wan Tendong Stable",
+              "abbreviation": "WAN",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:748",
+        "name": "U19 European Championship, Qualification",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:392",
+        "name": "International Youth"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:22516",
+              "name": "Iceland",
+              "abbreviation": "ISL",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:22483",
+              "name": "Andorra",
+              "abbreviation": "AND",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:22513",
+              "name": "Greece",
+              "abbreviation": "GRE",
+              "qualifier": "home",
+              "score": 8
+            },
+            {
+              "id": "sr:competitor:22532",
+              "name": "Liechtenstein",
+              "abbreviation": "LIE",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:22505",
+              "name": "England",
+              "abbreviation": "ENG",
+              "qualifier": "home",
+              "score": 7
+            },
+            {
+              "id": "sr:competitor:22530",
+              "name": "Latvia",
+              "abbreviation": "LAT",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:22548",
+              "name": "Poland",
+              "abbreviation": "POL",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:22539",
+              "name": "Moldova",
+              "abbreviation": "MDA",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:22501",
+              "name": "Czechia",
+              "abbreviation": "CZE",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:22538",
+              "name": "Malta",
+              "abbreviation": "MLT",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:22499",
+              "name": "Croatia",
+              "abbreviation": "CRO",
+              "qualifier": "home",
+              "score": 8
+            },
+            {
+              "id": "sr:competitor:86046",
+              "name": "Gibraltar",
+              "abbreviation": "GBZ",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:22568",
+              "name": "Ukraine",
+              "abbreviation": "UKR",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:22540",
+              "name": "Montenegro",
+              "abbreviation": "MNE",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:22562",
+              "name": "Switzerland",
+              "abbreviation": "SUI",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:22554",
+              "name": "San Marino",
+              "abbreviation": "SMR",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "not_started",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:48183",
+        "name": "U19 National",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:11",
+        "name": "Hungary"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:345378",
+              "name": "Ferencvarosi TC",
+              "abbreviation": "FER",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:224766",
+              "name": "Puskas Akademia",
+              "abbreviation": "PUS",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:1072",
+        "name": "U23 Friendly Games",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:392",
+        "name": "International Youth"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:49023",
+              "name": "Bahrain",
+              "abbreviation": "BRN",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:6049",
+              "name": "Russia",
+              "abbreviation": "RUS",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "not_started",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:49102",
+              "name": "Thailand",
+              "abbreviation": "THA",
+              "qualifier": "home",
+              "score": 4
+            },
+            {
+              "id": "sr:competitor:49049",
+              "name": "India",
+              "abbreviation": "IND",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:14147",
+        "name": "MSFL",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:18",
+        "name": "Czechia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:24779",
+              "name": "FK Frydek-Mistek",
+              "abbreviation": "FRM",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:475010",
+              "name": "TJ Start Brno",
+              "abbreviation": "STA",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:6068",
+              "name": "FK Fotbal Trinec",
+              "abbreviation": "TRI",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:53137",
+              "name": "FK Hodonin",
+              "abbreviation": "HOD",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:14151",
+        "name": "CFL",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:18",
+        "name": "Czechia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:106317",
+              "name": "SK Petrin Plzen",
+              "abbreviation": "PLZ",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:602162",
+              "name": "FK Pribram B",
+              "abbreviation": "PRI",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:165784",
+              "name": "SK Aritma Prague",
+              "abbreviation": "ARI",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:307736",
+              "name": "Sokol Hostoun",
+              "abbreviation": "SOK",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:76771",
+              "name": "N. Byskovice",
+              "abbreviation": "NEB",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:424793",
+              "name": "FK Velke Hamry",
+              "abbreviation": "VEH",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:591013",
+              "name": "FK Pardubice B",
+              "abbreviation": "PAR",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:607062",
+              "name": "FK Mlada Boleslav B",
+              "abbreviation": "MLA",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:25418",
+              "name": "FK Kraluv Dvur",
+              "abbreviation": "KRD",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:24775",
+              "name": "Tj Jiskra Domazlice",
+              "abbreviation": "JIS",
+              "qualifier": "away",
+              "score": 5
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:607054",
+              "name": "FK Teplice B",
+              "abbreviation": "TEP",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:607060",
+              "name": "FC Hradec Kralove B",
+              "abbreviation": "HRA",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:40727",
+        "name": "Divize A",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:18",
+        "name": "Czechia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:53088",
+              "name": "SK Benesov",
+              "abbreviation": "BEN",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:24777",
+              "name": "SK Horovice",
+              "abbreviation": "HOR",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1174411",
+              "name": "FK Krimice",
+              "abbreviation": "KRI",
+              "qualifier": "home",
+              "score": 6
+            },
+            {
+              "id": "sr:competitor:1114069",
+              "name": "Tj Ligmet Milin",
+              "abbreviation": "LIG",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:40729",
+        "name": "Divize B",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:18",
+        "name": "Czechia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:106319",
+              "name": "SK Steti",
+              "abbreviation": "STE",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:342616",
+              "name": "SK Slany",
+              "abbreviation": "SLA",
+              "qualifier": "away",
+              "score": 5
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:564850",
+              "name": "SK Ujezd Praha 4",
+              "abbreviation": "UJE",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:106311",
+              "name": "FK Ostrov",
+              "abbreviation": "OST",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1056905",
+              "name": "FK Usti Nad Labem II",
+              "abbreviation": "UST",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:35256",
+              "name": "FK Meteor Prague VIII",
+              "abbreviation": "MET",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:924331",
+              "name": "Tj Spoje Praha",
+              "abbreviation": "SPO",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:355238",
+              "name": "FK Seko Louny",
+              "abbreviation": "SEK",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:2233",
+              "name": "FC Chomutov",
+              "abbreviation": "CHO",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:6067",
+              "name": "FK Banik Sokolov",
+              "abbreviation": "BAN",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "not_started",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:40731",
+        "name": "Divize C",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:18",
+        "name": "Czechia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:588621",
+              "name": "MFk Chrudim B",
+              "abbreviation": "MFK",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:6069",
+              "name": "FK Caslav",
+              "abbreviation": "CAS",
+              "qualifier": "away",
+              "score": 4
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1008869",
+              "name": "Horni Redice",
+              "abbreviation": "HOR",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:2231",
+              "name": "Svitavy",
+              "abbreviation": "SVI",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:216340",
+              "name": "Brandys Nad Labem",
+              "abbreviation": "BNL",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:53130",
+              "name": "FC Hlinsko",
+              "abbreviation": "HLI",
+              "qualifier": "away",
+              "score": 3
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:463817",
+              "name": "FK Prepere",
+              "abbreviation": "PRE",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:36487",
+              "name": "FK Dobrovice",
+              "abbreviation": "DOB",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:40733",
+        "name": "Divize D",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:18",
+        "name": "Czechia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:338869",
+              "name": "FC Slovan Havlickuv Brod",
+              "abbreviation": "SHB",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:43192",
+              "name": "FC Sparta Brno",
+              "abbreviation": "SBR",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:48289",
+        "name": "U19 Elite",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:25",
+        "name": "Switzerland"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:206259",
+              "name": "FC Zurich",
+              "abbreviation": "ZUR",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:1036823",
+              "name": "FC St. Gallen 1879",
+              "abbreviation": "STG",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1036829",
+              "name": "FC Luzern",
+              "abbreviation": "LUZ",
+              "qualifier": "home",
+              "score": 4
+            },
+            {
+              "id": "sr:competitor:1036827",
+              "name": "FC Thun Berner Oberland",
+              "abbreviation": "THU",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:19246",
+        "name": "1. League Women",
+        "gender": "women"
+      },
+      "category": {
+        "id": "sr:category:23",
+        "name": "Slovakia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:368390",
+              "name": "Partizan Bardejov",
+              "abbreviation": "PAR",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:385400",
+              "name": "FC Tatran Presov",
+              "abbreviation": "TAT",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:691",
+        "name": "Persha Liga",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:86",
+        "name": "Ukraine"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:43877",
+              "name": "FC Podillya Khmelnytskyi",
+              "abbreviation": "POK",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:1036073",
+              "name": "FC Ucsa Tarasivka",
+              "abbreviation": "UCS",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:3314",
+              "name": "FC Metalist Kharkiv",
+              "abbreviation": "MET",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:435158",
+              "name": "MFC Metalurh Zaporizhya",
+              "abbreviation": "ZAP",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:43336",
+              "name": "FSC Bukovyna Chernivtsi",
+              "abbreviation": "BUK",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:211970",
+              "name": "FC Ingulets Petrove",
+              "abbreviation": "ING",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:26388",
+        "name": "3. Lig, Group 2",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:254",
+        "name": "Turkiye Amateur"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1170647",
+              "name": "Turk Metal 1963",
+              "abbreviation": "MET",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:1271536",
+              "name": "Suvermez Kapadokyaspor",
+              "abbreviation": "SUV",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:3092",
+              "name": "Kahramanmarasspor",
+              "abbreviation": "KAH",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:174114",
+              "name": "12 Bingol Spor",
+              "abbreviation": "12B",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1170667",
+              "name": "Nigde Belediyesi Spor",
+              "abbreviation": "NIG",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:223430",
+              "name": "Kirikkale FK",
+              "abbreviation": "KIR",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:26390",
+        "name": "3. Lig, Group 3",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:254",
+        "name": "Turkiye Amateur"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:216872",
+              "name": "Duzcespor",
+              "abbreviation": "DUZ",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:498468",
+              "name": "Fatsa Belediyespor",
+              "abbreviation": "FAT",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:940809",
+              "name": "Karabuk Idmanyurdu Spor",
+              "abbreviation": "KAR",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:496544",
+              "name": "Karadeniz Eregli Belediye SK",
+              "abbreviation": "KAR",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:1365",
+        "name": "CLJ",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:47",
+        "name": "Poland"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:114729",
+              "name": "Odra Opole",
+              "abbreviation": "OOP",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:114685",
+              "name": "Legia Warszawa",
+              "abbreviation": "LWA",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:114683",
+              "name": "Bialystok",
+              "abbreviation": "JBI",
+              "qualifier": "home",
+              "score": 4
+            },
+            {
+              "id": "sr:competitor:114745",
+              "name": "Slask Wroclaw",
+              "abbreviation": "SWR",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:47952",
+        "name": "NB III",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:11",
+        "name": "Hungary"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1166629",
+              "name": "Nyiregyhaza Spartacus FC II",
+              "abbreviation": "NYI",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:380440",
+              "name": "Senyo Carnifex FC",
+              "abbreviation": "SEC",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:737003",
+              "name": "Kisvarda FC II",
+              "abbreviation": "KIS",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:588391",
+              "name": "Debreceni Eac",
+              "abbreviation": "DEB",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:275265",
+              "name": "Puskas Akademia FC II",
+              "abbreviation": "PUS",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:822456",
+              "name": "ETO Akademia",
+              "abbreviation": "ETO",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:43738",
+              "name": "Ujpest FC II",
+              "abbreviation": "UJP",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:294114",
+              "name": "Bicskei Tc",
+              "abbreviation": "BIC",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1031465",
+              "name": "Szeged-Csanad Grosics Akademia II",
+              "abbreviation": "SZE",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:226302",
+              "name": "Gyulai FC",
+              "abbreviation": "GYU",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:940363",
+              "name": "Vasas SC II",
+              "abbreviation": "VAS",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:44149",
+              "name": "Szegedi Vasutas SE",
+              "abbreviation": "SVA",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:36873",
+              "name": "MTK Budapest II",
+              "abbreviation": "MTK",
+              "qualifier": "home",
+              "score": 4
+            },
+            {
+              "id": "sr:competitor:43739",
+              "name": "Ferencvarosi TC II",
+              "abbreviation": "FER",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:55109",
+              "name": "Paksi FC II",
+              "abbreviation": "PAK",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:5125",
+              "name": "Pecsi MFC",
+              "abbreviation": "PEC",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:44142",
+              "name": "Eger SE",
+              "abbreviation": "EGR",
+              "qualifier": "home",
+              "score": 4
+            },
+            {
+              "id": "sr:competitor:1143417",
+              "name": "Ozd-Sajovolgye",
+              "abbreviation": "OZD",
+              "qualifier": "away",
+              "score": 4
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1158975",
+              "name": "Fuzesabony SC",
+              "abbreviation": "FUZ",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:374912",
+              "name": "Tiszafured Vse",
+              "abbreviation": "TIS",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "not_started",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:275249",
+              "name": "Debreceni VSC II",
+              "abbreviation": "DEB",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:44205",
+              "name": "Godolloi SK",
+              "abbreviation": "GOD",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:746571",
+              "name": "Tarpa SC",
+              "abbreviation": "TAR",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:25591",
+              "name": "Cigand SE",
+              "abbreviation": "CIG",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "not_started",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:213786",
+              "name": "FC Hatvan",
+              "abbreviation": "HAT",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:79721",
+              "name": "Tiszaujvaros",
+              "abbreviation": "TIS",
+              "qualifier": "away",
+              "score": 3
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:25614",
+              "name": "Putnok VSE",
+              "abbreviation": "PUT",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:44143",
+              "name": "Diosgyori Vtk II",
+              "abbreviation": "DIO",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "not_started",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:25610",
+              "name": "Mosonmagyarovari TE",
+              "abbreviation": "MOS",
+              "qualifier": "home",
+              "score": 5
+            },
+            {
+              "id": "sr:competitor:79713",
+              "name": "Balatonfuredi FC",
+              "abbreviation": "BAL",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:48235",
+        "name": "Superliga, Women",
+        "gender": "women"
+      },
+      "category": {
+        "id": "sr:category:77",
+        "name": "Romania"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:293954",
+              "name": "VASAS FEMINA FC",
+              "abbreviation": "ACS",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:53381",
+              "name": "AFC Universitatea Olimpia Cluj",
+              "abbreviation": "OLC",
+              "qualifier": "away",
+              "score": 9
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:48343",
+        "name": "U19 Division de Honor Juvenil",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:32",
+        "name": "Spain"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1045441",
+              "name": "Racing Club Zaragoza",
+              "abbreviation": "RCZ",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:525283",
+              "name": "CD San Francisco",
+              "abbreviation": "SF",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:445831",
+              "name": "Cordoba CF",
+              "abbreviation": "COR",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:222410",
+              "name": "Sevilla FC",
+              "abbreviation": "SEV",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "not_started",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:511996",
+              "name": "UE Cornella",
+              "abbreviation": "COR",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:936525",
+              "name": "CD Constancia",
+              "abbreviation": "CON",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:48213",
+        "name": "Srpska Liga",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:152",
+        "name": "Serbia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:458197",
+              "name": "FK Prva Iskra Baric",
+              "abbreviation": "PRV",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:43979",
+              "name": "FK Bask",
+              "abbreviation": "BAS",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:37125",
+              "name": "FK Teleoptik",
+              "abbreviation": "TEL",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:294330",
+              "name": "FK Brodarac",
+              "abbreviation": "BRO",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:294328",
+              "name": "FK Gsp Polet Dorcol",
+              "abbreviation": "GSP",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:965225",
+              "name": "Pkb Padinska Skela",
+              "abbreviation": "PKB",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:2537",
+        "name": "Vietnam Cup",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:366",
+        "name": "Vietnam"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:33126",
+              "name": "K. Khanh Hoa",
+              "abbreviation": "HOA",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:1121089",
+              "name": "Bac Ninh",
+              "abbreviation": "BAC",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:1327",
+        "name": "U19 1. Liga",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:23",
+        "name": "Slovakia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:110757",
+              "name": "Slovan Bratislava",
+              "abbreviation": "SBR",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:1268056",
+              "name": "MSK Fomat Martin U19",
+              "abbreviation": "MSK",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:853",
+        "name": "Club Friendly Games",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:393",
+        "name": "International Clubs"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:610880",
+              "name": "Csa Steaua Bucuresti",
+              "abbreviation": "CSA",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:25856",
+              "name": "FC Petrolul Ploiesti",
+              "abbreviation": "PPL",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:221210",
+              "name": "FC Uta Arad",
+              "abbreviation": "UTA",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:35293",
+              "name": "FC Corvinul Hunedoara 1921",
+              "abbreviation": "COR",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:2542",
+              "name": "VfL Bochum",
+              "abbreviation": "BOC",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:2581",
+              "name": "VfL 1899 Osnabruck",
+              "abbreviation": "OSN",
+              "qualifier": "away",
+              "score": 4
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:31977",
+        "name": "Goa Pro League",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:352",
+        "name": "India"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:391140",
+              "name": "Guardian Angel SC",
+              "abbreviation": "GUA",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:34217",
+              "name": "Dempo SC",
+              "abbreviation": "DSC",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "not_started",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1200269",
+              "name": "Clube de Salgaocar",
+              "abbreviation": "CLU",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:1198869",
+              "name": "Geno Sports Club",
+              "abbreviation": "GEN",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:19494",
+        "name": "Super League",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:829",
+        "name": "Malawi"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1120761",
+              "name": "Creck SC",
+              "abbreviation": "CRE",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:445459",
+              "name": "Malawi Armed Forces College FC",
+              "abbreviation": "MAF",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "not_started",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:18294",
+        "name": "Meistriliiga Women",
+        "gender": "women"
+      },
+      "category": {
+        "id": "sr:category:92",
+        "name": "Estonia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:372104",
+              "name": "Saku Sporting",
+              "abbreviation": "SAK",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:260875",
+              "name": "Tallinna FC Flora",
+              "abbreviation": "TFC",
+              "qualifier": "away",
+              "score": 6
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:725353",
+              "name": "JK Tabasalu",
+              "abbreviation": "TAB",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:473597",
+              "name": "FC Elva",
+              "abbreviation": "ELV",
+              "qualifier": "away",
+              "score": 5
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:916443",
+              "name": "Viimsi JK",
+              "abbreviation": "VII",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:153480",
+              "name": "Tartu JK Tammeka",
+              "abbreviation": "TAT",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:29684",
+        "name": "Eliteliga Vorarlberg",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:97",
+        "name": "Austria Amateur"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:106983",
+              "name": "Dornbirner SV",
+              "abbreviation": "DOR",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:742207",
+              "name": "SC Gofis",
+              "abbreviation": "GOF",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:672",
+        "name": "First League",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:296",
+        "name": "Armenia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:920989",
+              "name": "FC Syunik",
+              "abbreviation": "SYU",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:644788",
+              "name": "Lernayin Artsakh FC",
+              "abbreviation": "LER",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1175803",
+              "name": "FC Ararati Araks",
+              "abbreviation": "ARA",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:1036025",
+              "name": "Noah Yerevan 2",
+              "abbreviation": "NOA",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:819734",
+              "name": "FC BKMA Vagharshapat 2",
+              "abbreviation": "BKMA",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:470307",
+              "name": "FC Ararat-Armenia 2",
+              "abbreviation": "ARA",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:1127",
+        "name": "Primera Division Women",
+        "gender": "women"
+      },
+      "category": {
+        "id": "sr:category:32",
+        "name": "Spain"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:616674",
+              "name": "Alhama CF",
+              "abbreviation": "ALH",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:335007",
+              "name": "Madrid CFF",
+              "abbreviation": "MAD",
+              "qualifier": "away",
+              "score": 4
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:97",
+        "name": "2. Lig",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:254",
+        "name": "Turkiye Amateur"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:743099",
+              "name": "Arnavutkoy Belediyesi Genclik Ve Spor",
+              "abbreviation": "ARN",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:117190",
+              "name": "1461 Trabzon FK",
+              "abbreviation": "TRA",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:1307",
+        "name": "U19",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:86",
+        "name": "Ukraine"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:107707",
+              "name": "FC Dynamo Kyiv",
+              "abbreviation": "DYK",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:288413",
+              "name": "NK Veres Rivne",
+              "abbreviation": "VER",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "not_started",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:25841",
+        "name": "III Liga, Group 4",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:47",
+        "name": "Poland"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:354984",
+              "name": "Avia Swidnik",
+              "abbreviation": "AVI",
+              "qualifier": "home",
+              "score": 5
+            },
+            {
+              "id": "sr:competitor:38713",
+              "name": "MKS Czarni Polaniec",
+              "abbreviation": "CPO",
+              "qualifier": "away",
+              "score": 3
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1154833",
+              "name": "Wisla II Krakow",
+              "abbreviation": "WIS",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:38728",
+              "name": "MKS Podlasie Biala Podlaska",
+              "abbreviation": "PBP",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:253593",
+              "name": "Chelmianka Chelm",
+              "abbreviation": "CHM",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:38737",
+              "name": "KS Wisloka Debica",
+              "abbreviation": "WDE",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:36885",
+              "name": "Korona II Kielce SA",
+              "abbreviation": "KOR",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:307588",
+              "name": "Wislanie Skawina",
+              "abbreviation": "WIS",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:38731",
+              "name": "FKS Stal Krasnik",
+              "abbreviation": "SKR",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:38725",
+              "name": "KS Naprzod Jedrzejow",
+              "abbreviation": "NJE",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1031177",
+              "name": "Star Starachowice",
+              "abbreviation": "STA",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:720917",
+              "name": "Pogon Sokol Lubaczow",
+              "abbreviation": "POG",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:25839",
+        "name": "III Liga, Group 3",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:47",
+        "name": "Poland"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:215500",
+              "name": "Gornik Zabrze II",
+              "abbreviation": "ZII",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:821352",
+              "name": "Karkonosze Jelenia Gora",
+              "abbreviation": "KAR",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:583755",
+              "name": "LZS Starowice",
+              "abbreviation": "STA",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:399497",
+              "name": "Miedz Legnica II",
+              "abbreviation": "MIE",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:36768",
+              "name": "MKS Kluczbork",
+              "abbreviation": "KLU",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:36036",
+              "name": "KS Sleza Wroclaw",
+              "abbreviation": "SLE",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:216966",
+              "name": "GKS Pniowek Pawlowice",
+              "abbreviation": "PNP",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:461195",
+              "name": "Warta Gorzow Wielkopolski",
+              "abbreviation": "WAR",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:36036",
+              "name": "KS Sleza Wroclaw",
+              "abbreviation": "SLE",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:36768",
+              "name": "MKS Kluczbork",
+              "abbreviation": "KLU",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:25837",
+        "name": "III Liga, Group 2",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:47",
+        "name": "Poland"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:466305",
+              "name": "Pogon Szczecin II",
+              "abbreviation": "POS",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:1154821",
+              "name": "LKS Wybrzeze Rewalskie Rewal",
+              "abbreviation": "LKS",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1031171",
+              "name": "MKS Notec Czarnkow",
+              "abbreviation": "MKS",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:216334",
+              "name": "WDA Swiecie",
+              "abbreviation": "SWI",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1268316",
+              "name": "Gzs Tluchovia Tluchowo",
+              "abbreviation": "GZS",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:35609",
+              "name": "Elana Torun",
+              "abbreviation": "ETO",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:44060",
+              "name": "Sks Unia Swarzedz",
+              "abbreviation": "UNI",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:1268448",
+              "name": "KS Lipno Steszew",
+              "abbreviation": "LIP",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:457299",
+              "name": "MKS Viktoria Wrzesnia",
+              "abbreviation": "MKS",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:391584",
+              "name": "Lech II Poznan",
+              "abbreviation": "POZ",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "not_started",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:25835",
+        "name": "III Liga, Group 1",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:47",
+        "name": "Poland"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:36769",
+              "name": "ZKS Olimpia Elblag",
+              "abbreviation": "ELB",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:109831",
+              "name": "Lechia Tomaszow Mazowiecki",
+              "abbreviation": "TOM",
+              "qualifier": "away",
+              "score": 5
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:3128",
+              "name": "GKS Belchatow",
+              "abbreviation": "BEL",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:673713",
+              "name": "Wisla Plock II",
+              "abbreviation": "WIS",
+              "qualifier": "away",
+              "score": 4
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1036305",
+              "name": "KS Ck Troszyn",
+              "abbreviation": "TRO",
+              "qualifier": "home",
+              "score": 4
+            },
+            {
+              "id": "sr:competitor:355032",
+              "name": "GKS Wikielec",
+              "abbreviation": "GKS",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:609932",
+              "name": "KS Wasilkow",
+              "abbreviation": "WAS",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:734689",
+              "name": "Jagiellonia II Bialystok",
+              "abbreviation": "JAG",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:818648",
+              "name": "MKS Mlawianka Mlawa",
+              "abbreviation": "MKS",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:7914",
+              "name": "LKS 1926 Lomza",
+              "abbreviation": "LOM",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:3124",
+              "name": "Swit Nowy Dwor Mazowiecki",
+              "abbreviation": "NOW",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:37805",
+              "name": "Wigry Suwalki",
+              "abbreviation": "WIG",
+              "qualifier": "away",
+              "score": 3
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:611366",
+              "name": "Zabkovia Zabki",
+              "abbreviation": "ZAB",
+              "qualifier": "home",
+              "score": 4
+            },
+            {
+              "id": "sr:competitor:728523",
+              "name": "Widzew Lodz II",
+              "abbreviation": "WID",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:2053",
+        "name": "Lebanon Cup",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:428",
+        "name": "Lebanon"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:40657",
+              "name": "Al Ahed FC",
+              "abbreviation": "ALA",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:962179",
+              "name": "Reyady Abaseya",
+              "abbreviation": "REY",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:772",
+        "name": "Superliga",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:385",
+        "name": "Uzbekistan"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:40259",
+              "name": "PFK Dinamo Samarqand",
+              "abbreviation": "DIN",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:40267",
+              "name": "FC Andijon",
+              "abbreviation": "AND",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:186",
+        "name": "Super League 2",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:67",
+        "name": "Greece"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:291142",
+              "name": "Marko",
+              "abbreviation": "MAR",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:6345",
+              "name": "PAE PS Kalamata",
+              "abbreviation": "KAL",
+              "qualifier": "away",
+              "score": 3
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:3247",
+              "name": "Panionios Athens",
+              "abbreviation": "PAN",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:841826",
+              "name": "Olympiacos Piraeus B",
+              "abbreviation": "OLY",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:48711",
+        "name": "II Divisao, Women",
+        "gender": "women"
+      },
+      "category": {
+        "id": "sr:category:44",
+        "name": "Portugal"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:840590",
+              "name": "Sl Benfica B",
+              "abbreviation": "BEN",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:840586",
+              "name": "Sporting Cp B",
+              "abbreviation": "SPO",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:1093",
+        "name": "2. Liga, Division B, Group 1",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:21",
+        "name": "Russia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:337015",
+              "name": "FC Kuban Holding Pavlovskaya",
+              "abbreviation": "KHP",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:890445",
+              "name": "FC Pobeda Khasavyurt",
+              "abbreviation": "POB",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:776",
+        "name": "Pervaya Liga",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:91",
+        "name": "Belarus"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:36930",
+              "name": "FC Lida",
+              "abbreviation": "LID",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:36875",
+              "name": "FC Baranovichi",
+              "abbreviation": "BAR",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:697613",
+              "name": "FC Ostrovets",
+              "abbreviation": "OST",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:25848",
+              "name": "FC Volna Pinsk",
+              "abbreviation": "VOL",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "not_started",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:3352",
+              "name": "FC Belshina Bobruisk",
+              "abbreviation": "BEB",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:42969",
+              "name": "FC Osipovichi",
+              "abbreviation": "OSI",
+              "qualifier": "away",
+              "score": 3
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:43009",
+              "name": "Lokomotiv Gomel",
+              "abbreviation": "LG",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:1237907",
+              "name": "Bff Academy Minsk U19",
+              "abbreviation": "BFF",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:100887",
+              "name": "FC Minsk 2",
+              "abbreviation": "MIN",
+              "qualifier": "home",
+              "score": 7
+            },
+            {
+              "id": "sr:competitor:414943",
+              "name": "FC Gomel 2",
+              "abbreviation": "GOM",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:678",
+        "name": "Esiliiga",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:92",
+        "name": "Estonia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:815456",
+              "name": "FC Phoenix Johvi",
+              "abbreviation": "PHO",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:432665",
+              "name": "FC Tallinn",
+              "abbreviation": "TAL",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:1644",
+        "name": "Premier League",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:805",
+        "name": "Kenya"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:138496",
+              "name": "Tusker Football Club",
+              "abbreviation": "TUS",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:346122",
+              "name": "Kenya Police FC",
+              "abbreviation": "KEN",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "not_started",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:20808",
+        "name": "Serie A, Women",
+        "gender": "women"
+      },
+      "category": {
+        "id": "sr:category:31",
+        "name": "Italy"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:377720",
+              "name": "Sassuolo Calcio",
+              "abbreviation": "SAS",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:943869",
+              "name": "Ternana",
+              "abbreviation": "TER",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:1135",
+        "name": "Vtora Liga",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:78",
+        "name": "Bulgaria"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1038851",
+              "name": "FC Fratria Varna",
+              "abbreviation": "FRA",
+              "qualifier": "home",
+              "score": 5
+            },
+            {
+              "id": "sr:competitor:3284",
+              "name": "PFC Belasitsa Petrich",
+              "abbreviation": "BEL",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:515",
+        "name": "II Liga",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:47",
+        "name": "Poland"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:7693",
+              "name": "Zaglebie Sosnowiec",
+              "abbreviation": "ZAG",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:36766",
+              "name": "Sandecja Nowy Sacz",
+              "abbreviation": "NOW",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:54323",
+              "name": "Sokol Kleczew",
+              "abbreviation": "KLE",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:681381",
+              "name": "LKS Lodz II",
+              "abbreviation": "LKS",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:20226",
+        "name": "Super League, Women",
+        "gender": "women"
+      },
+      "category": {
+        "id": "sr:category:67",
+        "name": "Greece"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1054013",
+              "name": "AEK Athens",
+              "abbreviation": "AEK",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:1054043",
+              "name": "Panathinaikos",
+              "abbreviation": "PAN",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:721",
+        "name": "Prva Liga",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:152",
+        "name": "Serbia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:382284",
+              "name": "RFK Graficar Beograd",
+              "abbreviation": "GBE",
+              "qualifier": "home",
+              "score": 4
+            },
+            {
+              "id": "sr:competitor:401285",
+              "name": "FK Jedinstvo UB",
+              "abbreviation": "JED",
+              "qualifier": "away",
+              "score": 0
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:273511",
+              "name": "FK Trayal Krusevac",
+              "abbreviation": "TRK",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:5157",
+              "name": "FK Zemun",
+              "abbreviation": "ZEM",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:544925",
+              "name": "FK Fap",
+              "abbreviation": "FAP",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:1182955",
+              "name": "FK Dinamo Jug",
+              "abbreviation": "DIN",
+              "qualifier": "away",
+              "score": 3
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:34822",
+        "name": "3rd Division",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:8",
+        "name": "Denmark"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:22173",
+              "name": "Vejgaard BK",
+              "abbreviation": "VEJ",
+              "qualifier": "home",
+              "score": 3
+            },
+            {
+              "id": "sr:competitor:1378",
+              "name": "Holbaek B&I",
+              "abbreviation": "HBK",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:224",
+        "name": "2. Liga",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:23",
+        "name": "Slovakia"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:2399",
+              "name": "FK Inter Bratislava",
+              "abbreviation": "BRA",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:25488",
+              "name": "MFK Tatran Liptovsky Mikulas",
+              "abbreviation": "LIP",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:461815",
+              "name": "OFK Banik Lehota Pod Vtacnikom",
+              "abbreviation": "BLV",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:55575",
+              "name": "MSK Povazska Bystrica",
+              "abbreviation": "POV",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:7884",
+              "name": "MFK Stara Lubovna",
+              "abbreviation": "SLU",
+              "qualifier": "home",
+              "score": 0
+            },
+            {
+              "id": "sr:competitor:166150",
+              "name": "MSK Zilina B",
+              "abbreviation": "ZIB",
+              "qualifier": "away",
+              "score": 1
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:2401",
+              "name": "MSK Puchov",
+              "abbreviation": "PUC",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:219176",
+              "name": "OFK Dynamo Malzenice",
+              "abbreviation": "MAL",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:43831",
+        "name": "Wiener Stadtliga",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:97",
+        "name": "Austria Amateur"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:598076",
+              "name": "FAC Wien Amateure",
+              "abbreviation": "FAC",
+              "qualifier": "home",
+              "score": 2
+            },
+            {
+              "id": "sr:competitor:53743",
+              "name": "Hellas Kagran",
+              "abbreviation": "HEL",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:1133",
+        "name": "U19 Campeonato Nacional",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:44",
+        "name": "Portugal"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1105373",
+              "name": "Santa Clara SAD",
+              "abbreviation": "SAN",
+              "qualifier": "home",
+              "score": 1
+            },
+            {
+              "id": "sr:competitor:471001",
+              "name": "FC Alverca",
+              "abbreviation": "ALV",
+              "qualifier": "away",
+              "score": 2
+            }
+          ],
+          "match_status": "ended",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    },
+    {
+      "competition": {
+        "id": "sr:competition:26386",
+        "name": "3. Lig, Group 1",
+        "gender": "men"
+      },
+      "category": {
+        "id": "sr:category:254",
+        "name": "Turkiye Amateur"
+      },
+      "matches": [
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1037343",
+              "name": "Kucukcekmece Sinop Spor",
+              "abbreviation": "KSS",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:77627",
+              "name": "Silivrispor",
+              "abbreviation": "SIL",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:917467",
+              "name": "Bulvarspor",
+              "abbreviation": "BUL",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:1271526",
+              "name": "Kestel Cilek SK",
+              "abbreviation": "FET",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1037341",
+              "name": "Inegol Kafkas Genclikspor",
+              "abbreviation": "INE",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:1271530",
+              "name": "Inkilap Fsk",
+              "abbreviation": "INK",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:116294",
+              "name": "Cankaya FK",
+              "abbreviation": "CAN",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:170410",
+              "name": "Etimesgut Belediyespor",
+              "abbreviation": "ETB",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        },
+        {
+          "competitors": [
+            {
+              "id": "sr:competitor:1271528",
+              "name": "Galata SK",
+              "abbreviation": "GAL",
+              "qualifier": "home"
+            },
+            {
+              "id": "sr:competitor:44351",
+              "name": "Beykoz Ishakli SF",
+              "abbreviation": "BEY",
+              "qualifier": "away"
+            }
+          ],
+          "match_status": "postponed",
+          "clock": {
+            "played": "done"
+          }
+        }
+      ]
+    }
+  ]
+}

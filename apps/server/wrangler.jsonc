@@ -26,7 +26,7 @@
   		"binding": "DB",
 			"database_name": "sportsdey_db",
 			"database_id": "15eaaf0e-6285-47f5-97dd-7c9615975707",
-			"remote": true,
+			"remote": false,
 			"preview_database_id": "local-test-db",
 			"migrations_dir": "./src/db/migrations"
 		}
@@ -35,7 +35,7 @@
 		{
 			"binding": "sportsdey_ns",
 			"id": "18eb61e1ab0b45858d6ae792b4694ee0",
-			"remote": true
+			"remote": false
 		}
 	]
 }
