@@ -1,4 +1,5 @@
-const API_BASE_URL = process.env.VITE_API_URL || "http://localhost:3000/api";
+const API_BASE_URL =
+	process.env.VITE_SERVER_URL || "http://localhost:3000/api/";
 
 export async function apiRequest<T>(
 	endpoint: string,

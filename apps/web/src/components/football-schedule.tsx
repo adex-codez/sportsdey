@@ -1,26 +1,13 @@
-import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useFootballSchedule } from "@/hooks/use-fooball-schedule";
+import type { FiltersType } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { Filters } from "./filters";
+import { Accordion, AccordionItem, AccordionTrigger } from "./ui/accordion";
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
-const filters = [
-	{
-		id: 1,
-		filter: "all",
-	},
-	{
-		id: 2,
-		filter: "live",
-	},
-	{
-		id: 3,
-		filter: "finished",
-	},
-	{
-		id: 4,
-		filter: "upcoming",
-	},
-] satisfies { id: number; filter: string }[];
 const formatDate = (date: Date) => {
 	return new Intl.DateTimeFormat("en-US", {
 		weekday: "short",
@@ -32,36 +19,36 @@ const formatDate = (date: Date) => {
 const FootballSchedule = () => {
 	const [date, setDate] = useState<Date>(new Date());
 	const [open, setOpen] = useState(false);
-	const [currentFilter, setCurrentFilter] =
-		useState<(typeof filters)[number]["filter"]>("all");
+	const [currentFilter, setCurrentFilter] = useState<FiltersType>("all");
+	const [filterCount, setFilterCount] = useState({
+		allCount: 0,
+		liveCount: 0,
+		finishedCount: 0,
+		upcomingCount: 0,
+	});
+	const {
+		data: schedules,
+		isLoading,
+		// error,
+	} = useFootballSchedule(date.toISOString().split("T")[0], "en");
+	useEffect(() => {
+		console.log(schedules);
+	}, [schedules]);
+	if (isLoading || !schedules) {
+		return (
+			<div className="flex justify-center">
+				<Loader2 className="animate-spin" width={48} height={48} />
+			</div>
+		);
+	}
+
 	return (
 		<div>
 			<div className="items-center justify-between space-y-4 lg:flex">
-				<div className="flex flex-wrap justify-center gap-4">
-					{filters.map((filter) => (
-						<div
-							key={filter.id}
-							onClick={() => setCurrentFilter(filter.filter)}
-							className={cn(
-								"flex cursor-pointer items-center gap-2 rounded-2xl bg-white p-2 md:px-4 md:py-2",
-								filter.filter === currentFilter ? "bg-accent text-white" : null,
-							)}
-						>
-							<p>
-								{filter.filter.charAt(0).toUpperCase() +
-									filter.filter.slice(1)}{" "}
-							</p>
-							<div
-								className={cn(
-									"flex size-8 items-center justify-center rounded-full bg-primary text-secondary text-sm",
-									filter.filter === currentFilter ? "bg-[#456041]" : null,
-								)}
-							>
-								0
-							</div>
-						</div>
-					))}
-				</div>
+				<Filters
+					currentFilter={currentFilter}
+					setCurrentFilter={setCurrentFilter}
+				/>
 				<div className="flex justify-center lg:block">
 					<Popover open={open} onOpenChange={setOpen}>
 						<PopoverTrigger asChild>
@@ -83,9 +70,25 @@ const FootballSchedule = () => {
 					</Popover>
 				</div>
 			</div>
-			<div />
+			<div>
+				{schedules?.competitions.map((competition) => (
+					<Accordion
+						key={`${competition.competition.id}`}
+						type="single"
+						collapsible
+					>
+						<AccordionItem
+							value={`${competition.competition.id}`}
+							className="w-full rounded-2xl bg-white"
+						>
+							<AccordionTrigger>
+								{competition.competition.name}
+							</AccordionTrigger>
+						</AccordionItem>
+					</Accordion>
+				))}
+			</div>
 		</div>
 	);
 };
-
 export default FootballSchedule;

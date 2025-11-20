@@ -1,11 +1,5 @@
 import { Hono } from "hono";
-import type {
-	CompetitionGroup,
-	ScheduleRes,
-	TransformedCompetitor,
-	TransformedMatch,
-	TransformedResponse,
-} from "@/types/schedule";
+import type { ScheduleRes } from "@/types/schedule";
 import { transformFootballSchedule } from "@/utils/football";
 
 const footballRoute = new Hono<{ Bindings: Cloudflare.Env }>();

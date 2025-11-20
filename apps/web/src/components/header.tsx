@@ -6,9 +6,9 @@ import BaseballIcon from "@/logos/baseball.svg?react";
 import BasketballIcon from "@/logos/basketball.svg?react";
 import BoxingIcon from "@/logos/boxing.svg?react";
 import FootballIcon from "@/logos/football.svg?react";
-import IceHockeyIcon from "@/logos/icehockey.svg?react";
+// import IceHockeyIcon from "@/logos/icehockey.svg?react";
 import TennisIcon from "@/logos/tennis.svg?react";
-import VolleyballIcon from "@/logos/volleyball.svg?react";
+// import VolleyballIcon from "@/logos/volleyball.svg?react";
 import WorldIcon from "@/logos/world.svg?react";
 import { Button } from "./ui/button";
 
