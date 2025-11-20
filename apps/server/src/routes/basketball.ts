@@ -1,5 +1,4 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { transform } from "zod/mini";
 
 const basketballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 
@@ -306,5 +305,7 @@ basketballRoute.openapi(basketballScheduleRoute, async (c) => {
 		);
 	}
 });
+
+const gameSummaryRoute = createRoute({});
 
 export default basketballRoute;

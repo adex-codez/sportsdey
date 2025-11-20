@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 const filters = [
@@ -15,10 +17,10 @@ const filters = [
 		filter: "finished",
 	},
 	{
-		id: 1,
+		id: 4,
 		filter: "upcoming",
 	},
-];
+] satisfies { id: number; filter: string }[];
 const formatDate = (date: Date) => {
 	return new Intl.DateTimeFormat("en-US", {
 		weekday: "short",
@@ -27,23 +29,34 @@ const formatDate = (date: Date) => {
 	}).format(date);
 };
 
-const Schedule = () => {
+const FootballSchedule = () => {
 	const [date, setDate] = useState<Date>(new Date());
 	const [open, setOpen] = useState(false);
+	const [currentFilter, setCurrentFilter] =
+		useState<(typeof filters)[number]["filter"]>("all");
 	return (
 		<div>
 			<div className="items-center justify-between space-y-4 lg:flex">
-				<div className="flex justify-center gap-4 overflow-x-hidden lg:block">
+				<div className="flex flex-wrap justify-center gap-4">
 					{filters.map((filter) => (
 						<div
 							key={filter.id}
-							className="flex cursor-pointer items-center gap-2 rounded-2xl bg-white p-2 md:px-4 md:py-2"
+							onClick={() => setCurrentFilter(filter.filter)}
+							className={cn(
+								"flex cursor-pointer items-center gap-2 rounded-2xl bg-white p-2 md:px-4 md:py-2",
+								filter.filter === currentFilter ? "bg-accent text-white" : null,
+							)}
 						>
 							<p>
 								{filter.filter.charAt(0).toUpperCase() +
 									filter.filter.slice(1)}{" "}
 							</p>
-							<div className="flex size-8 items-center justify-center rounded-full bg-primary text-secondary text-sm">
+							<div
+								className={cn(
+									"flex size-8 items-center justify-center rounded-full bg-primary text-secondary text-sm",
+									filter.filter === currentFilter ? "bg-[#456041]" : null,
+								)}
+							>
 								0
 							</div>
 						</div>
@@ -59,12 +72,20 @@ const Schedule = () => {
 						<PopoverContent
 							className="w-auto overflow-hidden p-0"
 							align="start"
-						/>
+						>
+							<Calendar
+								mode="single"
+								selected={date}
+								onSelect={setDate}
+								required
+							/>
+						</PopoverContent>
 					</Popover>
 				</div>
 			</div>
+			<div />
 		</div>
 	);
 };
 
-export default Schedule;
+export default FootballSchedule;

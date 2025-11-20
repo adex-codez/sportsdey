@@ -50,8 +50,8 @@ export default function Header() {
 	}, [open]);
 
 	return (
-		<div className="flex h-[140px] w-full overflow-x-hidden bg-primary px-4 py-1 text-foreground lg:h-20 lg:flex-row lg:items-center lg:justify-between lg:px-[104px]">
-			<div className="justify-between lg:flex">
+		<div className="h-[140px] w-full overflow-x-hidden bg-primary px-4 py-1 text-foreground lg:flex lg:h-20 lg:flex-row lg:items-center lg:justify-between lg:px-[104px]">
+			<div className="flex justify-between">
 				<button
 					className="lg:hidden"
 					type="button"

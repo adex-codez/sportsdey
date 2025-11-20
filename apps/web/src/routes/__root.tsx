@@ -1,3 +1,5 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
 	createRootRouteWithContext,
 	HeadContent,
@@ -13,6 +15,15 @@ import Header from "../components/header";
 import appCss from "../index.css?url";
 
 export type RouterAppContext = {};
+
+export const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			staleTime: 10 * 1000,
+			gcTime: 5 * 10 * 1000,
+		},
+	},
+});
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
 	head: () => ({
@@ -46,22 +57,25 @@ function RootDocument() {
 				<HeadContent />
 			</head>
 			<body>
-				<ActiveTabProvider>
-					<div className="grid h-svh grid-rows-[auto_auto_1fr]">
-						<Header />
-						<Socials />
-						<div className="mx-4 grid md:gap-8 lg:mx-[104px] lg:grid-cols-[20%_80%]">
-							<div className="hidden lg:block">
-								<Sidebar />
+				<QueryClientProvider client={queryClient}>
+					<ActiveTabProvider>
+						<div className="grid h-svh grid-rows-[auto_auto_1fr]">
+							<Header />
+							<Socials />
+							<div className="mx-4 grid md:gap-8 lg:mx-[104px] lg:grid-cols-[20%_80%]">
+								<div className="hidden lg:block">
+									<Sidebar />
+								</div>
+								<Outlet />
 							</div>
-							<Outlet />
 						</div>
-					</div>
-				</ActiveTabProvider>
+					</ActiveTabProvider>
 
-				<Toaster richColors />
-				<TanStackRouterDevtools position="bottom-right" />
-				<Scripts />
+					<Toaster richColors />
+					<TanStackRouterDevtools position="bottom-right" />
+					<ReactQueryDevtools initialIsOpen={false} />
+					<Scripts />
+				</QueryClientProvider>
 			</body>
 		</html>
 	);
