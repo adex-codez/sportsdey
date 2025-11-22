@@ -10,7 +10,7 @@ function HomeComponent() {
 	const { tab } = useActiveTab();
 	return (
 		<div className="container mx-auto px-4 py-2">
-			{tab === "scores" ? <FootballSchedule /> : null}
+			{/*{tab === "scores" ? <FootballSchedule /> : null}*/}
 		</div>
 	);
 }

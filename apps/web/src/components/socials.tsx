@@ -23,7 +23,7 @@ const socials = [
 ];
 const Socials = () => {
 	return (
-		<div className="my-4 flex justify-center px-8 md:px-0">
+		<div className="my-4 hidden justify-center px-8 md:px-0 lg:flex">
 			<div className="flex h-10 items-center gap-6 rounded-full bg-primary px-6 py-6">
 				<p className="text-secondary text-sm md:text-base">
 					For more update follow us on:

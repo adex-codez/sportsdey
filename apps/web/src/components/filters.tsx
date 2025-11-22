@@ -9,7 +9,7 @@ export const Filters = ({
 	setCurrentFilter: (val: string) => void;
 }) => {
 	return (
-		<div className="flex flex-wrap justify-center gap-4">
+		<div className="hidden flex-wrap justify-center gap-4 lg:flex">
 			{filters.map((filter) => (
 				//biome-ignore lint: a11y/useKeyWithClickEvents
 				<div

@@ -7,7 +7,8 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { ActiveTabProvider } from "@/components/active-tab-context";
+import Footer from "@/components/footer";
+import { Providers } from "@/components/providers";
 import Sidebar from "@/components/sidebar";
 import Socials from "@/components/socials";
 import { Toaster } from "@/components/ui/sonner";
@@ -58,8 +59,8 @@ function RootDocument() {
 			</head>
 			<body>
 				<QueryClientProvider client={queryClient}>
-					<ActiveTabProvider>
-						<div className="grid h-svh grid-rows-[auto_auto_1fr]">
+					<Providers>
+						<div className="grid h-svh grid-rows-[auto_1fr_auto] lg:grid-rows-[auto_auto_1fr]">
 							<Header />
 							<Socials />
 							<div className="mx-4 grid md:gap-8 lg:mx-[104px] lg:grid-cols-[20%_80%]">
@@ -68,8 +69,9 @@ function RootDocument() {
 								</div>
 								<Outlet />
 							</div>
+							<Footer />
 						</div>
-					</ActiveTabProvider>
+					</Providers>
 
 					<Toaster richColors />
 					<TanStackRouterDevtools position="bottom-right" />
