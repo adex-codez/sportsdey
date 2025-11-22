@@ -1,4 +1,17 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import {
+	ErrorResponseSchema,
+	GameSummarySchema,
+	ScheduleData,
+	successResponseSchema,
+} from "@/schemas";
+import type { SportRadarGameSummary } from "@/types";
+import { transformTeamData } from "@/utils/basketball";
+import {
+	basketballScheduleParam,
+	basketballScheduleQuery,
+	gameIdParam,
+} from "@/validators";
 
 const basketballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 
@@ -34,114 +47,26 @@ interface SportRadarResponse {
 	games: SportRadarGame[];
 }
 
-// Define response schemas with proper typing
-const GameSchema = z.object({
-	id: z.string(),
-	status: z.enum([
-		"scheduled",
-		"created",
-		"inprogress",
-		"halftime",
-		"complete",
-		"closed",
-		"cancelled",
-		"delayed",
-		"postponed",
-		"time-tbd",
-		"if-necessary",
-		"unnecessary",
-	]),
-	home: z.object({
-		name: z.string(),
-		alias: z.string(),
-		points: z.number().nullable(),
-	}),
-	away: z.object({
-		name: z.string(),
-		alias: z.string(),
-		points: z.number().nullable(),
-	}),
-});
+// Schemas for the game summary
 
-const SuccessResponseSchema = z.object({
-	success: z.literal(true),
-	data: z.object({
-		league: z.string(),
-		games: z.array(GameSchema),
-	}),
-});
-
-const ErrorDetailSchema = z.object({
-	field: z.string(),
-	message: z.string(),
-	code: z.string(),
-});
-
-const ErrorResponseSchema = z.object({
-	success: z.literal(false),
-	error: z.string(),
-	details: z.array(ErrorDetailSchema),
-});
+// Game ID parameter validator
 
 // Create the route with proper parameter names that match the path
 const basketballScheduleRoute = createRoute({
 	method: "get",
 	path: "/schedule/{year}/{month}/{day}",
 	summary: "Get NBA schedule for a specific date",
-	description: "Retrieves NBA games scheduled for the specified date",
+	description:
+		"Retrieves NBA games scheduled for the specified date. Poll on the client for 5s to get near realtime updates about the schedules",
 	request: {
-		params: z.object({
-			year: z
-				.string()
-				.regex(/^\d{4}$/, "Year must be a 4-digit number")
-				.transform((val) => Number.parseInt(val, 10))
-				.refine((val) => val >= 1900, "Year must be at least 1900")
-				.openapi({
-					param: { name: "year", in: "path" },
-					description: "Year which the game was played",
-					example: "2025",
-				}),
-			month: z
-				.string()
-				.regex(/^(0?[1-9]|1[0-2])$/, "Month must be between 1-12")
-				.transform((val) => Number.parseInt(val, 10))
-				.openapi({
-					param: { name: "month", in: "path" },
-					description: "Month which the game was played",
-					example: "11",
-				}),
-			day: z
-				.string()
-				.regex(/^(0?[1-9]|[12]\d|3[01])$/, "Day must be between 1-31")
-				.transform((val) => Number.parseInt(val, 10))
-				.openapi({
-					param: { name: "day", in: "path" },
-					description: "Day which the game was played",
-					example: "19",
-				}),
-		}),
-		query: z.object({
-			language: z
-				.string()
-				.regex(
-					/^[a-z]{2}$/,
-					"Language must be a 2-letter language code (e.g., 'en', 'es', 'fr')",
-				)
-				.optional()
-				.default("en")
-				.openapi({
-					param: { name: "language", in: "query" },
-					description:
-						"Language you want the result to be in (e.g., 'en', 'es', 'fr'). Default is 'en'",
-					example: "en",
-				}),
-		}),
+		params: basketballScheduleParam,
+		query: basketballScheduleQuery,
 	},
 	responses: {
 		200: {
 			content: {
 				"application/json": {
-					schema: SuccessResponseSchema,
+					schema: successResponseSchema(ScheduleData),
 				},
 			},
 			description: "Successfully retrieved basketball games",
@@ -200,7 +125,10 @@ basketballRoute.openapi(basketballScheduleRoute, async (c) => {
 		const cachedData = (await c.env.sportsdey_ns.get(
 			"basketball_schedule",
 			"json",
-		)) as any;
+		)) as {
+			data: any;
+			expiresAt: number;
+		} | null;
 
 		if (cachedData && Date.now() <= cachedData.expiresAt) {
 			return c.json(
@@ -306,6 +234,187 @@ basketballRoute.openapi(basketballScheduleRoute, async (c) => {
 	}
 });
 
-const gameSummaryRoute = createRoute({});
+// Game Summary Route
+const gameSummaryRoute = createRoute({
+	method: "get",
+	path: "/game/{gameId}",
+	summary: "Get NBA game details with player statistics",
+	description:
+		"Retrieves detailed information about a specific NBA game including player statistics. If the game status is closed poll the server from the client every 2 min but if it isn't closed poll every 2 seconds",
+	request: {
+		params: gameIdParam,
+	},
+	responses: {
+		200: {
+			content: {
+				"application/json": {
+					schema: successResponseSchema(GameSummarySchema),
+				},
+			},
+			description: "Successfully retrieved game details",
+		},
+		400: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "Bad request - invalid game ID",
+		},
+		404: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "Game not found",
+		},
+		500: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "Internal server error",
+		},
+		502: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "Bad gateway - external API error",
+		},
+	},
+	tags: ["Basketball"],
+});
+
+basketballRoute.openapi(gameSummaryRoute, async (c) => {
+	try {
+		const { gameId } = c.req.valid("param");
+		const apiKey = c.env?.SPORTRADAR_API_KEY;
+
+		const cacheKey = `basketball_game_${gameId}`;
+		const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+			data: any;
+			expiresAt: number;
+		} | null;
+
+		if (cachedData && Date.now() <= cachedData.expiresAt) {
+			return c.json(
+				{
+					success: true as const,
+					data: cachedData.data,
+				},
+				200,
+			);
+		}
+
+		// Fetch from SportRadar API
+		const apiUrl = `https://api.sportradar.com/nba/trial/v8/en/games/${gameId}/summary.json?api_key=${apiKey}`;
+		const response = await fetch(apiUrl);
+
+		if (!response.ok) {
+			if (response.status === 404) {
+				return c.json(
+					{
+						success: false as const,
+						error: "Game not found",
+						details: [
+							{
+								field: "gameId",
+								message: `Game with ID ${gameId} was not found`,
+								code: "game_not_found",
+							},
+						],
+					},
+					404,
+				);
+			}
+
+			return c.json(
+				{
+					success: false as const,
+					error: "External API error",
+					details: [
+						{
+							field: "sportradar_api",
+							message: `SportRadar API returned status ${response.status}`,
+							code: "external_api_error",
+						},
+					],
+				},
+				502,
+			);
+		}
+
+		const gameData: SportRadarGameSummary = await response.json();
+
+		const transformedData = {
+			id: gameData.id,
+			status: gameData.status,
+			season: gameData.season,
+			clock: gameData.clock,
+			quarter: gameData.quarter,
+			statistics: gameData.statistics,
+			venue: {
+				id: gameData.venue.id,
+				name: gameData.venue.name,
+			},
+			home: {
+				scores:
+					gameData.home.scoring?.map((score) => ({
+						quarter: score.number,
+						points: score.points,
+					})) || [],
+				...transformTeamData(gameData.home),
+			},
+			away: {
+				scores:
+					gameData.away.scoring?.map((score) => ({
+						quarter: score.number,
+						points: score.points,
+					})) || [],
+				...transformTeamData(gameData.away),
+			},
+		};
+
+		await c.env.sportsdey_ns.put(
+			cacheKey,
+			JSON.stringify({
+				data: transformedData,
+				expiresAt:
+					transformedData.status === "closed"
+						? Date.now() + 2 * 60 * 1000
+						: Date.now() + 2 * 1000,
+			}),
+		);
+
+		return c.json(
+			{
+				success: true as const,
+				data: transformedData,
+			},
+			200,
+		);
+	} catch (error) {
+		console.error("Error fetching game summary:", error);
+		return c.json(
+			{
+				success: false as const,
+				error: "Internal server error",
+				details: [
+					{
+						field: "server",
+						message:
+							"An unexpected error occurred while processing your request",
+						code: "internal_error",
+					},
+				],
+			},
+			500,
+		);
+	}
+});
 
 export default basketballRoute;

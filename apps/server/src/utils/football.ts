@@ -1,8 +1,10 @@
 import type {
 	CompetitionGroup,
 	ScheduleRes,
+	TransformedCompetitor,
+	TransformedMatch,
 	TransformedResponse,
-} from "@/types/schedule";
+} from "@/types/football";
 
 export function transformFootballSchedule(
 	data: ScheduleRes,

@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import type { ScheduleRes } from "@/types/schedule";
+import type { ScheduleRes } from "@/types";
 import { transformFootballSchedule } from "@/utils/football";
 
 const footballRoute = new Hono<{ Bindings: Cloudflare.Env }>();

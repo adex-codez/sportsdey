@@ -21,6 +21,8 @@ dist/
 .vercel
 prisma/generated/
 
+match.json
+
 
 # deps
 node_modules/
