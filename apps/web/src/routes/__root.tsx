@@ -14,6 +14,8 @@ import Socials from "@/components/socials";
 import { Toaster } from "@/components/ui/sonner";
 import Header from "../components/header";
 import appCss from "../index.css?url";
+import { Provider } from "react-redux";
+import { store } from "@/store";
 
 export type RouterAppContext = {};
 
@@ -53,11 +55,12 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
 function RootDocument() {
 	return (
+		<Provider store={store}>
 		<html lang="en" className="dark">
 			<head>
 				<HeadContent />
 			</head>
-			<body>
+			<body suppressHydrationWarning>
 				<QueryClientProvider client={queryClient}>
 					<Providers>
 						<div className="grid h-svh grid-rows-[auto_1fr_auto] lg:grid-rows-[auto_auto_1fr]">
@@ -80,5 +83,6 @@ function RootDocument() {
 				</QueryClientProvider>
 			</body>
 		</html>
+		</Provider>
 	);
 }

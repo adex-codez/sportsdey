@@ -20,14 +20,16 @@
     "db:migrate": "turbo -F @sportsdey/db db:migrate"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.10.1",
     "dotenv": "^17.2.2",
+    "react-redux": "^9.2.0",
     "zod": "^4.1.11"
   },
   "devDependencies": {
-    "turbo": "^2.5.4",
     "@biomejs/biome": "^2.2.0",
+    "@types/node": "^22.13.11",
     "tsdown": "^0.15.5",
-    "@types/node": "^22.13.11"
+    "turbo": "^2.5.4"
   },
   "packageManager": "pnpm@10.10.0"
 }
