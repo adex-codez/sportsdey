@@ -135,7 +135,7 @@ const BasketballPage = () => {
   ];
 
   return (
-    <div className='space-y-4'>
+    <div className='space-y-4 mb-32 lg:mb-0'>
         <div className='w-full'>
             <FixtureFilterHeaders/>
         </div>
