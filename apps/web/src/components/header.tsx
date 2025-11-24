@@ -27,9 +27,9 @@ export default function Header() {
 	const { date, setDate } = useDateContext();
 	const weekDates = useWeekDates();
 
-	useEffect(() => {
-		console.log(date);
-	}, [date]);
+	// useEffect(() => {
+	// 	console.log(date);
+	// }, [date]);
 
 	useEffect(() => {
 		if (open) {
@@ -53,7 +53,7 @@ export default function Header() {
 
 	return (
 		<div className="fixed w-full lg:relative">
-			<div className="h-[60px] w-full bg-primary px-4 py-1 text-foreground lg:flex lg:h-[80px] lg:flex-row lg:items-center lg:justify-between lg:px-[10%] lg:py-1">
+			<div className="h-[60px] w-full bg-primary px-4 py-1 text-foreground lg:flex lg:h-20 lg:flex-row lg:items-center lg:justify-between lg:px-[10%] lg:py-1">
 				<div className="flex min-w-0 justify-between">
 					<button
 						className="lg:hidden"
@@ -82,7 +82,7 @@ export default function Header() {
 							{links.map(({ to, label, icon: Icon }) => (
 								<Link
 									key={to}
-									to={to}
+									to={to as string}
 									className="flex shrink-0 gap-2 pb-2"
 									activeProps={{
 										className:
@@ -200,11 +200,11 @@ export default function Header() {
 				</div>
 
 				<div className="flex w-[98vw] overflow-x-auto md:w-full md:justify-center">
-					<nav className="flex w-max items-center gap-4 border border-red-900 px-4 py-4">
+					<nav className="flex w-max items-center gap-4 border border-[#414141] px-4 py-4">
 						{links.map(({ to, label, icon: Icon }) => (
 							<Link
 								key={to}
-								to={to}
+								to={to as string}
 								className="flex shrink-0 gap-2 whitespace-nowrap"
 								activeProps={{
 									className:
