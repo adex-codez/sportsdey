@@ -1,6 +1,7 @@
 import { z } from "@hono/zod-openapi";
 
 export * from "./basketball";
+export * from "./tennis";
 export const successResponseSchema = <T extends z.ZodType>(data: T) =>
 	z.object({
 		success: z.literal(true),
