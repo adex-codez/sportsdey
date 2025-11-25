@@ -63,4 +63,5 @@ export type CompetitionGroup = {
 
 export type TransformedResponse = {
 	competitions: CompetitionGroup[];
+	total_matches: number;
 };
