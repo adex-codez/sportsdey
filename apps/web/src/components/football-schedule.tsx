@@ -1,5 +1,5 @@
-import { Loader2, Star } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
+import { useMemo, useState, useTransition } from "react";
 import { useFootballSchedule } from "@/hooks/use-fooball-schedule";
 import type { FiltersType } from "@/lib/data";
 import { formatTime } from "@/lib/utils";
@@ -17,6 +17,7 @@ import {
 const FootballSchedule = () => {
 	const { date, setDate } = useDateContext();
 	const [currentFilter, setCurrentFilter] = useState<FiltersType>("all");
+	const [isPending, startTransition] = useTransition();
 	const {
 		data: schedules,
 		isLoading,
@@ -70,33 +71,36 @@ const FootballSchedule = () => {
 			return schedules;
 		}
 
-		// Filter matches based on currentFilter
-		const getMatchStatus = (filter: FiltersType) => {
-			switch (filter) {
-				case "live":
-					return "live";
-				case "finished":
-					return "closed";
-				case "upcoming":
-					return "not_started";
-				default:
-					return null;
-			}
+		// More efficient status mapping
+		const statusMap: Record<FiltersType, string | null> = {
+			live: "live",
+			finished: "closed",
+			upcoming: "not_started",
+			all: null,
 		};
 
-		const targetStatus = getMatchStatus(currentFilter);
+		const targetStatus = statusMap[currentFilter];
 		if (!targetStatus) return schedules;
 
-		// Create filtered competitions with only matching matches
-		const filteredCompetitions = schedules.competitions
-			.map((competition) => ({
-				...competition,
-				matches: competition.matches.filter(
-					(match) => match.match_status === targetStatus,
-				),
-			}))
-			// Only include competitions that have matching matches
-			.filter((competition) => competition.matches.length > 0);
+		// Pre-filter and optimize the loop
+		const filteredCompetitions = [];
+
+		for (const competition of schedules.competitions) {
+			const matchingMatches = [];
+
+			for (const match of competition.matches) {
+				if (match.match_status === targetStatus) {
+					matchingMatches.push(match);
+				}
+			}
+
+			if (matchingMatches.length > 0) {
+				filteredCompetitions.push({
+					...competition,
+					matches: matchingMatches,
+				});
+			}
+		}
 
 		return {
 			...schedules,
@@ -106,22 +110,35 @@ const FootballSchedule = () => {
 
 	if (isLoading || !schedules) {
 		return (
-			<div className="flex justify-center">
+			<div className="flex flex-col items-center justify-center space-y-2">
 				<Loader2 className="animate-spin" width={48} height={48} />
+				<p className="text-gray-500 text-sm">Loading matches...</p>
 			</div>
 		);
 	}
+
+	const handleFilterChange = (filterValue: string) => {
+		startTransition(() => {
+			setCurrentFilter(filterValue as FiltersType);
+		});
+	};
 
 	return (
 		<div>
 			<div className="flex items-center justify-between space-y-4">
 				<Filters
 					currentFilter={currentFilter}
-					setCurrentFilter={setCurrentFilter}
+					setCurrentFilter={handleFilterChange}
 					filtersCount={filtersCount}
 				/>
 				<DatePicker date={date} setDate={setDate} />
 			</div>
+			{isPending && (
+				<div className="flex items-center justify-center py-4">
+					<Loader2 className="mr-2 animate-spin" width={20} height={20} />
+					<span className="text-gray-600 text-sm">Filtering matches...</span>
+				</div>
+			)}
 			<div className="space-y-4">
 				{filteredSchedules?.competitions.map((competition) => (
 					<Accordion
