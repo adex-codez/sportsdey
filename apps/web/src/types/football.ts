@@ -1,4 +1,5 @@
 export type FootballSchedule = {
+	total_matches: number;
 	competitions: {
 		competition: {
 			id: string;
