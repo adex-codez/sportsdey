@@ -53,6 +53,7 @@ export function transformFootballSchedule(
 		// Create match object
 		const match: TransformedMatch = {
 			competitors: competitorsWithScores,
+			start_time: sport_event.start_time,
 			match_status: sport_event_status.match_status,
 			clock: clock
 				? {

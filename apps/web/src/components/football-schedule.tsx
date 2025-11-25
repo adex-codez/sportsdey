@@ -1,10 +1,16 @@
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFootballSchedule } from "@/hooks/use-fooball-schedule";
 import type { FiltersType } from "@/lib/data";
-import { cn } from "@/lib/utils";
+import { formatTime } from "@/lib/utils";
+import { useDateContext } from "./date-context";
 import { Filters } from "./filters";
-import { Accordion, AccordionItem, AccordionTrigger } from "./ui/accordion";
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from "./ui/accordion";
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
@@ -17,7 +23,7 @@ const formatDate = (date: Date) => {
 };
 
 const FootballSchedule = () => {
-	const [date, setDate] = useState<Date>(new Date());
+	const { date, setDate } = useDateContext();
 	const [open, setOpen] = useState(false);
 	const [currentFilter, setCurrentFilter] = useState<FiltersType>("all");
 	const [filterCount, setFilterCount] = useState({
@@ -31,9 +37,6 @@ const FootballSchedule = () => {
 		isLoading,
 		// error,
 	} = useFootballSchedule(date.toISOString().split("T")[0], "en");
-	useEffect(() => {
-		console.log(schedules);
-	}, [schedules]);
 	if (isLoading || !schedules) {
 		return (
 			<div className="flex justify-center">
@@ -70,7 +73,7 @@ const FootballSchedule = () => {
 					</Popover>
 				</div>
 			</div>
-			<div>
+			<div className="space-y-4">
 				{schedules?.competitions.map((competition) => (
 					<Accordion
 						key={`${competition.competition.id}`}
@@ -79,11 +82,20 @@ const FootballSchedule = () => {
 					>
 						<AccordionItem
 							value={`${competition.competition.id}`}
-							className="w-full rounded-2xl bg-white"
+							className="w-full rounded-2xl bg-white px-4"
 						>
 							<AccordionTrigger>
 								{competition.competition.name}
 							</AccordionTrigger>
+							<AccordionContent>
+								<div>
+									{competition.matches.map((match, index) => (
+										<div className="flex justify-between" key={`${index}+1`}>
+											<p>{formatTime(new Date(match.start_time))}</p>
+										</div>
+									))}
+								</div>
+							</AccordionContent>
 						</AccordionItem>
 					</Accordion>
 				))}
