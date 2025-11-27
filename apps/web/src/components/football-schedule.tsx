@@ -158,18 +158,45 @@ const FootballSchedule = () => {
 								<div>
 									{competition.matches.map((match, index) => (
 										<div
-											className="flex justify-between border-gray-100 border-b px-4 py-4 hover:bg-gray-50"
+											className="flex flex-wrap items-center justify-between gap-4 border-gray-100 border-b px-4 py-4 hover:bg-gray-50"
 											key={`${index}+1`}
 										>
-											<p>{formatTime(new Date(match.start_time))}</p>
-											<div>
-												{match.competitors[0].name} vs{" "}
-												{match.competitors[1].name}
+											<div className="flex w-full justify-between lg:w-fit">
+												<p>{formatTime(new Date(match.start_time))}</p>
+												<div className="block lg:hidden">
+													<Favourite />
+												</div>
 											</div>
-											<div className="flex items-center gap-2">
-												<div className="rounded-lg bg-[#EBEBEB] px-2 py-1">
+											<div className="flex w-full justify-between space-y-4 text-sm lg:w-fit lg:items-center lg:justify-start">
+												<div className="gap-4 space-y-4 lg:flex">
+													<p className="wrap-break-word">
+														{match.competitors[0].name}
+													</p>
+													<span className="hidden font-medium text-sm lg:block">
+														VS
+													</span>
+													<p>{match.competitors[1].name}</p>
+												</div>
+
+												<div className="flex h-12 gap-6 rounded-sm bg-[#EBEBEB] px-3 py-1 lg:hidden">
+													<div className="flex flex-col items-center rounded-lg">
+														<p>1</p>
+														<p className="font-semibold">1.60</p>
+													</div>
+													<div className="flex flex-col items-center rounded-lg">
+														<p>X</p>
+														<p className="font-semibold">4.20</p>
+													</div>
+													<div className="">
+														<p>2</p>
+														<p className="font-semibold">4.20</p>
+													</div>
+												</div>
+											</div>
+											<div className="hidden items-center gap-2 lg:flex">
+												<div className="rounded-lg bg-[#EBEBEB] px-2 lg:py-1">
 													<p>
-														1{" "}
+														1
 														<span className="px-3 py-1 font-semibold">
 															1.60
 														</span>
@@ -185,7 +212,9 @@ const FootballSchedule = () => {
 														2 <span className="font-semibold">4.20</span>
 													</p>
 												</div>
-												<Favourite />
+												<div className="hidden lg:block">
+													<Favourite />
+												</div>
 											</div>
 										</div>
 									))}

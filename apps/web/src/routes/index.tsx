@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
 function HomeComponent() {
 	const { tab } = useActiveTab();
 	return (
-		<div className="container mx-auto px-4 py-2">
+		<div className="px-4 py-2 lg:container lg:mx-auto">
 			{tab === "scores" ? <FootballSchedule /> : null}
 		</div>
 	);
