@@ -1,6 +1,7 @@
 export type ScheduleRes = {
 	schedules: {
 		sport_event: {
+			start_time: string;
 			sport_event_context: {
 				category: {
 					id: string;
@@ -40,6 +41,7 @@ export type TransformedCompetitor = {
 
 export type TransformedMatch = {
 	competitors: TransformedCompetitor[];
+	start_time: string;
 	match_status: string;
 	clock?: {
 		played: string;
@@ -61,4 +63,5 @@ export type CompetitionGroup = {
 
 export type TransformedResponse = {
 	competitions: CompetitionGroup[];
+	total_matches: number;
 };

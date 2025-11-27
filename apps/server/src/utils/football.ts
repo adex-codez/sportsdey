@@ -53,6 +53,7 @@ export function transformFootballSchedule(
 		// Create match object
 		const match: TransformedMatch = {
 			competitors: competitorsWithScores,
+			start_time: sport_event.start_time,
 			match_status: sport_event_status.match_status,
 			clock: clock
 				? {
@@ -70,5 +71,8 @@ export function transformFootballSchedule(
 	// Convert Map to array
 	const competitions = Array.from(competitionMap.values());
 
-	return { competitions };
+	// Calculate total matches count
+	const total_matches = data.schedules.length;
+
+	return { competitions, total_matches };
 }

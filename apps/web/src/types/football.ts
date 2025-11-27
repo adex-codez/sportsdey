@@ -1,4 +1,5 @@
 export type FootballSchedule = {
+	total_matches: number;
 	competitions: {
 		competition: {
 			id: string;
@@ -17,6 +18,7 @@ export type FootballSchedule = {
 				qualifier: string;
 				score: number;
 			}[];
+			start_time: string;
 			match_status: string;
 			clock?: {
 				played: string;

@@ -4,9 +4,16 @@ import { cn } from "@/lib/utils";
 export const Filters = ({
 	currentFilter,
 	setCurrentFilter,
+	filtersCount,
 }: {
 	currentFilter: FiltersType;
 	setCurrentFilter: (val: string) => void;
+	filtersCount: {
+		allCount: number;
+		liveCount: number;
+		finishedCount: number;
+		upcomingCount: number;
+	};
 }) => {
 	return (
 		<div className="hidden flex-wrap justify-center gap-4 lg:flex">
@@ -16,7 +23,7 @@ export const Filters = ({
 					key={filter.id}
 					onClick={() => setCurrentFilter(filter.filter)}
 					className={cn(
-						"flex cursor-pointer items-center gap-2 rounded-2xl bg-white p-2 md:px-4 md:py-2",
+						"flex h-12 w-max cursor-pointer items-center gap-2 rounded-2xl bg-white px-4 text-xs",
 						filter.filter === currentFilter ? "bg-accent text-white" : null,
 					)}
 				>
@@ -26,11 +33,17 @@ export const Filters = ({
 					</p>
 					<div
 						className={cn(
-							"flex size-8 items-center justify-center rounded-full bg-primary text-secondary text-sm",
+							"flex size-6 items-center justify-center rounded-full bg-primary text-[9px] text-secondary",
 							filter.filter === currentFilter ? "bg-[#456041]" : null,
 						)}
 					>
-						0
+						{filter.filter === "all"
+							? filtersCount.allCount
+							: filter.filter === "live"
+								? filtersCount.liveCount
+								: filter.filter === "finished"
+									? filtersCount.finishedCount
+									: filtersCount.upcomingCount}
 					</div>
 				</div>
 			))}
