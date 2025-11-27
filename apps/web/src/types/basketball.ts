@@ -84,3 +84,31 @@ export type BasketballFilterHeadersProps =
   | "live"
   | "finished"
   | "upcoming";
+export interface DetailsImageProps {
+  competitionName: string;
+  competitionCountry: string;
+  hostTeamName: string;
+  guestTeamName: string;
+  hostTeamLogo: string;
+  guestTeamLogo: string;
+  guestTeamScore: number;
+  hostTeamScore: number;
+  matchStatus: string;
+}
+
+export interface Quarter {
+  id: string;
+  label: string;
+}
+
+export interface TeamData {
+  name: string;
+  quarterScores: number[];
+  total: number;
+}
+
+export interface QuarterScoreTableProps {
+  team1: TeamData;
+  team2: TeamData;
+  quarters: Quarter[];
+}

@@ -1,0 +1,189 @@
+import { cn } from "@/lib/utils"
+
+interface Player {
+  name: string
+  number: string
+  pts: number
+  fg: string
+  threePt: string
+  ft: string
+  reb: number
+  ast: number
+  to: number
+  stl: number
+  blk: number
+  oreb: number
+  dreb: number
+  pf: number
+  min: number
+  plusMinus: number
+}
+
+interface TeamTotals {
+  pts: number
+  fg: string
+  threePt: string
+  ft: string
+  reb: number
+  ast: number
+  to: number
+  stl: number
+  blk: number
+  oreb: number
+  dreb: number
+  pf: number
+  min: number
+  fgPct: number
+  threePtPct: number
+  ftPct: number
+}
+
+interface TeamStatsData {
+  teamName: string
+  teamLogo?: string
+  starters: Player[]
+  bench: Player[]
+  totals: TeamTotals
+}
+
+interface TeamStatsProps {
+  teams: TeamStatsData[]
+  className?: string
+}
+
+const statColumns = [
+  { key: "pts", label: "PTS" },
+  { key: "fg", label: "FG" },
+  { key: "threePt", label: "3PT" },
+  { key: "ft", label: "FT" },
+  { key: "reb", label: "REB" },
+  { key: "ast", label: "AST" },
+  { key: "to", label: "TO" },
+  { key: "stl", label: "STL" },
+  { key: "blk", label: "BLK" },
+  { key: "oreb", label: "OREB" },
+  { key: "dreb", label: "DREB" },
+  { key: "pf", label: "PF" },
+  { key: "min", label: "MIN" },
+  { key: "plusMinus", label: "+/-" },
+]
+
+function PlayerRow({ player }: { player: Player }) {
+  return (
+    <tr className="border-b border-[#C8C8C8] hover:bg-gray-300/50 transition-colors">
+      <td className="py-2 px-3 text-left border-r border-[#C8C8C8]">
+        <span className="text-primary text-[11px]">{player.name}</span>
+        <span className="ml-2 text-primary text-[11px]">#{player.number}</span>
+      </td>
+      <td className="py-2 px-2 text-center text-primary text-[11px]">{player.pts}</td>
+      <td className="py-2 px-2 text-center text-primary text-[11px]">{player.fg}</td>
+      <td className="py-2 px-2 text-center text-primary text-[11px]">{player.threePt}</td>
+      <td className="py-2 px-2 text-center text-primary text-[11px]">{player.ft}</td>
+      <td className="py-2 px-2 text-center text-primary text-[11px]">{player.reb}</td>
+      <td className="py-2 px-2 text-center text-primary text-[11px]">{player.ast}</td>
+      <td className="py-2 px-2 text-center text-primary text-[11px]">{player.to}</td>
+      <td className="py-2 px-2 text-center text-primary text-[11px]">{player.stl}</td>
+      <td className="py-2 px-2 text-center text-primary text-[11px]">{player.blk}</td>
+      <td className="py-2 px-2 text-center text-primary text-[11px]">{player.oreb}</td>
+      <td className="py-2 px-2 text-center text-primary text-[11px]">{player.dreb}</td>
+      <td className="py-2 px-2 text-center text-primary text-[11px]">{player.pf}</td>
+      <td className="py-2 px-2 text-center text-primary text-[11px]">{player.min}</td>
+      <td
+        className={cn(
+          "py-2 px-2 text-center text-[11px]",
+          player.plusMinus > 0 ? "text-emerald-400" : player.plusMinus < 0 ? "text-red-400" : "text-primary",
+        )}
+      >
+        {player.plusMinus > 0 ? `+${player.plusMinus}` : player.plusMinus}
+      </td>
+    </tr>
+  )
+}
+
+function SectionHeader({ title }: { title: string }) {
+  return (
+    <tr className="bg-zinc-[#C8C8C8] border-b border-t border-[#C8C8C8]">
+      <td className="py-2 px-3 text-left font-semibold text-primary border-r border-[#C8C8C8] text-xs">{title}</td>
+      {statColumns.map((col) => (
+        <td key={col.key} className="py-2 px-2 text-center text-primary text-[10px] font-semibold">
+          {col.label}
+        </td>
+      ))}
+    </tr>
+  )
+}
+
+function TeamTotalsRow({ totals }: { totals: TeamTotals }) {
+  return (
+    <>
+      <tr className="bg-white font-semibold">
+        <td className="py-2 px-3 text-left text-primary border-r border-[#C8C8C8] text-xs">TEAM</td>
+        <td className="py-2 px-2 text-center font-semibold text-[10px]">{totals.pts}</td>
+        <td className="py-2 px-2 text-center text-primary text-[10px]">{totals.fg}</td>
+        <td className="py-2 px-2 text-center text-primary text-[10px]">{totals.threePt}</td>
+        <td className="py-2 px-2 text-center text-primary text-[10px]">{totals.ft}</td>
+        <td className="py-2 px-2 text-center text-primary text-[10px]">{totals.reb}</td>
+        <td className="py-2 px-2 text-center text-primary text-[10px]">{totals.ast}</td>
+        <td className="py-2 px-2 text-center text-primary text-[10px]">{totals.to}</td>
+        <td className="py-2 px-2 text-center text-primary text-[10px]">{totals.stl}</td>
+        <td className="py-2 px-2 text-center text-primary text-[10px]">{totals.blk}</td>
+        <td className="py-2 px-2 text-center text-primary text-[10px]">{totals.oreb}</td>
+        <td className="py-2 px-2 text-center text-primary text-[10px]">{totals.dreb}</td>
+        <td className="py-2 px-2 text-center text-primary text-[10px]">{totals.pf}</td>
+        <td className="py-2 px-2 text-center text-primary text-[10px]">{totals.min}</td>
+        <td className="py-2 px-2 text-center text-primary text-[10px]">-</td>
+      </tr>
+      <tr className="border-b border-[#C8C8C8] font-semibold">
+        <td className="py-2 px-3 border-r border-[#C8C8C8]" />
+        <td className="py-2 px-2" />
+        <td className="py-2 px-2 text-center text-[10px]">{totals.fgPct}%</td>
+        <td className="py-2 px-2 text-center text-[10px]">{totals.threePtPct}%</td>
+        <td className="py-2 px-2 text-center text-[10px]">{totals.ftPct}%</td>
+        <td colSpan={10} />
+      </tr>
+    </>
+  )
+}
+
+function TeamStatsTable({ team }: { team: TeamStatsData }) {
+  return (
+    <div className="mb-4">
+      <div className="flex items-center gap-x-2 px-3 py-3">
+        {team.teamLogo && (
+          <img src={team.teamLogo || "/placeholder.svg"} alt={team.teamName} className="w-6 h-6 object-contain" />
+        )}
+        <h3 className="text-sm font-semibold text-primary">{team.teamName}</h3>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <tbody>
+            <SectionHeader title="Starters" />
+            {team.starters.map((player, idx) => (
+              <PlayerRow key={`starter-${idx}`} player={player} />
+            ))}
+            <SectionHeader title="Bench" />
+            {team.bench.map((player, idx) => (
+              <PlayerRow key={`bench-${idx}`} player={player} />
+            ))}
+            <TeamTotalsRow totals={team.totals} />
+          </tbody>
+        </table>
+      </div>
+      
+    </div>
+  )
+}
+
+export function TeamStats({ teams, className }: TeamStatsProps) {
+  return (
+    <div className={cn("bg-white rounded-lg", className)}>
+      <h2 className="text-sm font-semibold text-primary py-3 px-2 border-b border-b-[#C8C8C8]">Team stats</h2>
+      {teams.map((team, idx) => (
+        <TeamStatsTable key={idx} team={team} />
+      ))}
+      <p className="text-xs text-zinc-500 mt-2 px-3 py-2">
+        +/- denotes team&apos;s net points while the player is on the court
+      </p>
+    </div>
+  )
+}

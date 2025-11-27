@@ -1,12 +1,11 @@
-import BasketballPage from '@/components/BasketballPage'
-import { createFileRoute } from '@tanstack/react-router'
+import FixtureFilterHeaders from '@/shared/FixtureFilterHeaders'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/basketball')({
-  component: BasketballComponent,
+  component: () => <div className='w-full space-y-4'>
+    <div className='hidden w-full lg:block'>
+        <FixtureFilterHeaders/>
+      </div>
+    <Outlet />
+    </div>
 })
-
-function BasketballComponent() {
-  return <div className='w-full'>
-    <BasketballPage/>
-  </div>
-}
