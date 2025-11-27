@@ -5,7 +5,7 @@ const BasketBallScoreCard = ({ team1, team2, quarters }: QuarterScoreTableProps)
   const isTeam2Winner = team1.total < team2.total;
   return (
     <div className="w-full bg-white border-0 rounded-xl overflow-hidden">
-      {/* Header */}
+
       <div className="w-full px-4 py-2 flex items-center justify-between border-b border-gray-200">
         <div className="w-full">
 
@@ -21,7 +21,6 @@ const BasketBallScoreCard = ({ team1, team2, quarters }: QuarterScoreTableProps)
         </div>
       </div>
 
-      {/* Team 1 Scores */}
       <div className="bg-white text-[11px] flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
           <span className="text-primary text-[11px] font-medium">{team1.name}</span>
