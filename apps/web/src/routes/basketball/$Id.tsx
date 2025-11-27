@@ -1,3 +1,4 @@
+import BasketBallDetailsPage from '@/components/basketball-section/BasketBallDetailsPage'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/basketball/$Id')({
@@ -6,5 +7,5 @@ export const Route = createFileRoute('/basketball/$Id')({
 
 function RouteComponent() {
     const {Id} = Route.useParams()
-  return <div>Hello {Id}</div>
+  return <div><BasketBallDetailsPage/></div>
 }
