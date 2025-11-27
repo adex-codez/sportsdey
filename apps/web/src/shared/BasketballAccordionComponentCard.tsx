@@ -1,5 +1,6 @@
 // src/components/BasketballAccordionComponentCard.tsx
 import type { BasketballAccordionComponentCardProps, BasketballComponentHeaderProps, FavoritesState, MatchCardProps } from '@/types/basketball';
+import { Link } from '@tanstack/react-router';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -107,6 +108,7 @@ const BasketballAccordionComponentCard: React.FC<BasketballAccordionComponentCar
       {isExpanded && matches && (
         <div className="flex flex-col">
           {matches.map((match, index) => (
+            <Link to={`/basketball/$Id`} params={{Id: match.id!}}>
             <MatchCard 
               key={match.id || index} 
               team1={match.team1}
@@ -117,6 +119,7 @@ const BasketballAccordionComponentCard: React.FC<BasketballAccordionComponentCar
               isFavorite={favorites[index]}
               onFavoriteToggle={() => toggleFavorite(index)}
             />
+            </Link>
           ))}
         </div>
       )}

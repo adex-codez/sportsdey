@@ -1,12 +1,5 @@
-import BasketballPage from '@/components/BasketballPage'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/basketball')({
-  component: BasketballComponent,
+  component: () => <div className='w-full'><Outlet /></div>
 })
-
-function BasketballComponent() {
-  return <div className='w-full'>
-    <BasketballPage/>
-  </div>
-}
