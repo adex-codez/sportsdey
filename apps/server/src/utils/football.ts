@@ -140,8 +140,7 @@ export function transformTopScorers(
 	const pointsList = leadersData.lists?.filter(
 		(list: any) => list.type === "points",
 	);
-	console.log(`TransformTopScorers ${JSON.stringify(leadersData)}`);
-	if (!pointsList) return [];
+	if (!pointsList.leaders) return [];
 
 	return pointsList.leaders.slice(0, 3).map((leader: any) => {
 		const player = leader.players[0];
@@ -150,8 +149,6 @@ export function transformTopScorers(
 			team.datapoints.find((dp: any) => dp.type === "goals")?.value ?? 0;
 		const assists =
 			team.datapoints.find((dp: any) => dp.type === "assists")?.value ?? 0;
-
-		console.log(`TransformTopScorers ${player}`);
 
 		return {
 			id: player.id,

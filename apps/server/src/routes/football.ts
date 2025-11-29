@@ -259,7 +259,6 @@ footballRoute.openapi(
 
 			const standingsUrl = `${base.replace(/\/+$/, "")}/soccer/trial/v4/${langSegment}/seasons/${encodeURIComponent(seasonId)}/standings.json`;
 			const leadersUrl = `${base.replace(/\/+$/, "")}/soccer/trial/v4/${langSegment}/seasons/${encodeURIComponent(seasonId)}/leaders.json`;
-			console.log(leadersUrl);
 
 			// Parallel fetch with error handling
 			const [standingsResult, leadersResult] = await Promise.all([
@@ -268,18 +267,21 @@ footballRoute.openapi(
 			]);
 
 			if (!standingsResult.ok) {
+				const { status, ...error } = standingsResult.error!;
+				console.log(JSON.stringify(error));
 				return c.json(
 					{
 						success: false as const,
 						error: "External API error",
-						details: [...(standingsResult.ok ? [] : [standingsResult.error])],
+						details: [...(standingsResult.ok ? [] : [error])],
 					},
-					standingsResult.error?.status === 500 ? 500 : 400,
+					status === 500 ? 500 : 400,
 				);
 			}
 
 			if (!leadersResult.ok) {
-				const { status, ...error } = leadersResult.error;
+				const { status, ...error } = leadersResult.error!;
+				console.log(JSON.stringify(error));
 				return c.json(
 					{
 						success: false as const,
