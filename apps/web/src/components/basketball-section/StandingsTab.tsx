@@ -167,7 +167,6 @@ function FormsView({
   )
 }
 
-// Main component
 function StandingsTab({ teams, className, onSeeAllClick }: StandingsTableProps) {
   const [activeFilter, setActiveFilter] = useState<FilterType>("all")
 
