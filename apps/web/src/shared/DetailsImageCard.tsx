@@ -14,6 +14,8 @@ interface DetailsImageCardProps extends DetailsImageProps{
   matchStatus: string;
   isFavorite?: boolean,
   onFavoriteToggle?: () => {};
+  activeTab: string
+  setActiveTab: (id:string)=> void
 }
 
 const DetailsImageCard = ({competitionName,
@@ -26,8 +28,10 @@ const DetailsImageCard = ({competitionName,
   hostTeamScore,
   isFavorite = false,
   onFavoriteToggle,
+  activeTab,
+  setActiveTab,
   matchStatus}: DetailsImageCardProps) => {
-      const [activeTab, setActiveTab] = useState('info');
+
 
   const gameTabs = [
     { id: 'info', label: 'Info' },
