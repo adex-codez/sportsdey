@@ -398,7 +398,6 @@ basketballRoute.openapi(gameSummaryRoute, async (c) => {
 			200,
 		);
 	} catch (error) {
-		console.error("Error fetching game summary:", error);
 		return c.json(
 			{
 				success: false as const,
