@@ -112,3 +112,21 @@ export interface QuarterScoreTableProps {
   team2: TeamData;
   quarters: Quarter[];
 }
+
+export type FilterType = "all" | "home" | "away" | "forms";
+
+export type MatchResult = "W" | "L" | "D";
+
+export interface TeamStanding {
+  position: number;
+  name: string;
+  played: number;
+  wins: number;
+  losses: number;
+  streak: number | string;
+  gamesBehind: number | string;
+  diff: string;
+  pct: string;
+  isHighlighted?: boolean;
+  lastFiveResults?: MatchResult[];
+}
