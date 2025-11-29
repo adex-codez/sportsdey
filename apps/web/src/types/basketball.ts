@@ -6,15 +6,19 @@ export type MatchStatus =
   | "Q3"
   | "Q4"
   | "HT"
-  | "OT"
-  | "UPCOMING";
-
+  | "OT";
+export interface SetScore {
+  games: number;
+  tiebreak?: number;
+}
 export interface Match {
   team1: string;
   team2: string;
-  score1: number;
-  score2: number;
-  status?: MatchStatus;
+  score1?: number;
+  score2?: number;
+  player1Sets?: SetScore[];
+  player2Sets?: SetScore[];
+  status?: MatchStatus | string;
   id?: string;
   date?: string;
   time?: string;
@@ -33,9 +37,12 @@ export interface BasketballComponentHeaderProps {
 export interface MatchCardProps {
   team1: string;
   team2: string;
-  score1: number;
-  score2: number;
-  status?: MatchStatus;
+  player1Sets?: SetScore[];
+  player2Sets?: SetScore[];
+  score1?: number;
+  score2?: number;
+  status?: MatchStatus | string;
+  time?: string;
   isFavorite?: boolean;
   onFavoriteToggle?: () => void;
 }

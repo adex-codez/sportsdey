@@ -1,7 +1,7 @@
 // src/components/BasketballAccordionComponentCard.tsx
-import type { BasketballAccordionComponentCardProps, BasketballComponentHeaderProps, FavoritesState, MatchCardProps } from '@/types/basketball';
-import { Link } from '@tanstack/react-router';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import type { BasketballAccordionComponentCardProps, BasketballComponentHeaderProps, FavoritesState, MatchCardProps, SetScore } from '@/types/basketball';
+import { Link, useRouter } from '@tanstack/react-router';
+import { ChevronDown, ChevronRight, Star } from 'lucide-react';
 import React, { useState } from 'react';
 
 
@@ -43,28 +43,89 @@ const MatchCard: React.FC<MatchCardProps> = ({
   team2,
   score1,
   score2,
+  player1Sets,
+  player2Sets,
   status = "FT",
   isFavorite = false,
+  time,
   onFavoriteToggle
 }) => {
-    const isTeam1Winner = score1 > score2;
-  const isTeam2Winner = score2 > score1;
+  const { state } = useRouter();
+  const pathname = state.location.pathname;
+  const isTennisRoute = pathname.includes('/tennis') || pathname.includes('tennis');
+
+
+  const renderSetScore = (set: SetScore, isWinner: boolean) => {
+    return (
+      <span className={isWinner ? "font-semibold" : ""}>
+        {set.games}
+        {set.tiebreak !== undefined && <sup className="text-[9px] align-super ml-0.5 font-medium">{set.tiebreak}</sup>}
+      </span>
+    )
+  }
+
+  const calculateSetsWon = (playerSets: SetScore[], opponentSets: SetScore[]) => {
+    let wins = 0
+    for (let i = 0; i < playerSets.length; i++) {
+      if (playerSets[i].games > opponentSets[i]?.games) wins++
+    }
+    return wins
+  }
 
   return (
-    <div className="grid cursor-pointer grid-cols-[40px_1fr_40px] items-center gap-x-4 px-5 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors last:border-b-0">
-      <div className="text-xs text-[#6C7073] font-medium">{status}</div>
-      <div className="flex flex-col gap-2 text-xs">
-        <div className="flex justify-between items-center">
-          <span className={`text-primary ${isTeam1Winner ? 'font-bold' : 'font-normal'}`}>{team1}</span>
-          <span className={`text-primary min-w-10 text-right ${isTeam1Winner ? 'font-bold' : 'font-normal'}`}>{score1}</span>
+   <div className="grid cursor-pointer grid-cols-[50px_1fr_40px] items-center gap-x-4 px-5 py-3.5 border-b border-border hover:bg-muted/30 transition-colors last:border-b-0">
+      <div className={`text-xs font-medium flex items-center justify-center w-[35px] h-[35px] rounded-[10px] ${status !== "FT" && status !== time  ? "bg-[#0E8F1A] text-white" : "text-muted-foreground"}`}>{status}</div>
+
+      {isTennisRoute && player1Sets && player2Sets ? (
+        <div className="flex flex-col gap-1.5 text-sm">
+          <div className="flex justify-between items-center">
+            <span
+              className={`text-foreground ${calculateSetsWon(player1Sets, player2Sets) > calculateSetsWon(player2Sets, player1Sets) ? "font-semibold" : ""}`}
+            >
+              {team1}
+            </span>
+            <div className="flex gap-3 min-w-20 justify-end font-mono text-foreground">
+              {player1Sets.map((set, idx) => (
+                <span key={idx} className="w-4 text-center">
+                  {renderSetScore(set, set.games > (player2Sets[idx]?.games ?? 0))}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="flex justify-between items-center">
+            <span
+              className={`text-foreground ${calculateSetsWon(player2Sets, player1Sets) > calculateSetsWon(player1Sets, player2Sets) ? "font-semibold" : ""}`}
+            >
+              {team2}
+            </span>
+            <div className="flex gap-3 min-w-20 justify-end font-mono text-foreground">
+              {player2Sets.map((set, idx) => (
+                <span key={idx} className="w-4 text-center">
+                  {renderSetScore(set, set.games > (player1Sets[idx]?.games ?? 0))}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="flex justify-between items-center">
-         <span className={`text-primary ${isTeam2Winner ? 'font-bold' : 'font-normal'}`}>{team2}</span>
-          <span className={`text-primary min-w-10 text-right ${isTeam2Winner ? 'font-bold' : 'font-normal'}`}>{score2}</span>
+      ) : (
+        <div className="flex flex-col gap-1.5 text-sm">
+          <div className="flex justify-between items-center">
+            <span className={`text-foreground ${(score1 ?? 0) > (score2 ?? 0) ? "font-semibold" : ""}`}>{team1}</span>
+            <span className="text-foreground min-w-10 text-right font-semibold">{score1}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className={`text-foreground ${(score2 ?? 0) > (score1 ?? 0) ? "font-semibold" : ""}`}>{team2}</span>
+            <span className="text-foreground min-w-10 text-right font-semibold">{score2}</span>
+          </div>
         </div>
-      </div>
-      <button 
-        onClick={onFavoriteToggle}
+      )}
+      
+<button 
+        onClick={(e) => {
+    e.stopPropagation();    
+    e.preventDefault();        
+    onFavoriteToggle?.();
+  }}
         className={`text-xl border-none bg-transparent cursor-pointer transition-colors ${
           isFavorite ? 'text-yellow-400' : 'text-[#C8C8C8] hover:text-yellow-400'
         }`}
@@ -75,7 +136,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
   );
 };
 
-const BasketballAccordionComponentCard: React.FC<BasketballAccordionComponentCardProps> = ({
+const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
   country,
   league,
   flag,
@@ -93,6 +154,19 @@ const BasketballAccordionComponentCard: React.FC<BasketballAccordionComponentCar
     }));
   };
 
+   const { state } = useRouter();
+  const pathname = state.location.pathname;
+  const getRoutePath= () => {
+    let routePath = ""
+    if(pathname.includes('/basketball') || pathname.includes('basketball')){
+      routePath = `/basketball/$Id`;
+    }
+    if(pathname.includes('/tennis') || pathname.includes('tennis')){
+      routePath =`/tennis/$Id`;
+  }
+  return routePath
+}
+
   return (
     <div className='w-full bg-white rounded-2xl overflow-hidden shadow-sm'>
       <BasketballComponentHeader 
@@ -108,14 +182,17 @@ const BasketballAccordionComponentCard: React.FC<BasketballAccordionComponentCar
       {isExpanded && matches && (
         <div className="flex flex-col">
           {matches.map((match, index) => (
-            <Link to={`/basketball/$Id`} params={{Id: match.id!}}>
+            <Link to={`${getRoutePath()}`} params={{Id: match.id!}}>
             <MatchCard 
-              key={match.id || index} 
+              key={match.id || index}
               team1={match.team1}
               team2={match.team2}
+              time={match.time}
+              player1Sets={match.player1Sets}
+              player2Sets={match.player2Sets}
               score1={match.score1}
               score2={match.score2}
-              status={match.status}
+              status={match.status ? match.status : match.time}
               isFavorite={favorites[index]}
               onFavoriteToggle={() => toggleFavorite(index)}
             />
@@ -127,5 +204,5 @@ const BasketballAccordionComponentCard: React.FC<BasketballAccordionComponentCar
   );
 };
 
-export default BasketballAccordionComponentCard;
+export default SportAccordionCard;
 export { BasketballComponentHeader, MatchCard };
