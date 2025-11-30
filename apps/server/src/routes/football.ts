@@ -10,6 +10,7 @@ import type { ScheduleRes } from "@/types";
 import type { StandingsRes, TeamStanding } from "@/types/football";
 import { fetchWithErrorHandling } from "@/utils";
 import {
+	getLast5Matches,
 	transformFootballMatchInfo,
 	transformFootballSchedule,
 	transformTopScorers,
@@ -75,6 +76,24 @@ footballRoute.openapi(
 			date,
 		)}/schedules.json`;
 
+		const cachedData = (await c.env.sportsdey_ns.get(
+			`football_schedule_${date}`,
+			"json",
+		)) as {
+			data: any;
+			expiresAt: number;
+		} | null;
+
+		if (cachedData && Date.now() <= cachedData.expiresAt) {
+			return c.json(
+				{
+					success: true as const,
+					data: cachedData.data,
+				},
+				200,
+			);
+		}
+
 		try {
 			const upstream = await fetch(url, {
 				headers: { "x-api-key": apiKey, Accept: "application/json" },
@@ -101,6 +120,14 @@ footballRoute.openapi(
 
 			// Transform the data before returning
 			const transformedData = transformFootballSchedule(data);
+
+			await c.env.sportsdey_ns.put(
+				`football_schedule_${date}`,
+				JSON.stringify({
+					data: transformedData,
+					expiresAt: Date.now() + 5000,
+				}),
+			);
 
 			return c.json(
 				{
@@ -195,6 +222,25 @@ footballRoute.openapi(
 			id,
 		)}/summary.json`;
 
+		const cachedData = (await c.env.sportsdey_ns.get(
+			`match_${id}`,
+			"json",
+		)) as {
+			data: any;
+			expiresAt: number;
+		} | null;
+
+		if (cachedData && Date.now() <= cachedData.expiresAt) {
+			console.log(`cachedData ${cachedData}`);
+			return c.json(
+				{
+					success: true as const,
+					data: cachedData.data,
+				},
+				200,
+			);
+		}
+
 		try {
 			const upstream = await fetch(url, {
 				headers: { "x-api-key": apiKey, Accept: "application/json" },
@@ -260,41 +306,72 @@ footballRoute.openapi(
 			const standingsUrl = `${base.replace(/\/+$/, "")}/soccer/trial/v4/${langSegment}/seasons/${encodeURIComponent(seasonId)}/standings.json`;
 			const leadersUrl = `${base.replace(/\/+$/, "")}/soccer/trial/v4/${langSegment}/seasons/${encodeURIComponent(seasonId)}/leaders.json`;
 
-			// Parallel fetch with error handling
-			const [standingsResult, leadersResult] = await Promise.all([
+			const [homeTeamId, awayTeamId] = data.sport_event.competitors.map(
+				(c: any) => c.id,
+			);
+
+			const homeSummaryUrl = `${base.replace(/\/+$/, "")}/soccer/trial/v4/${langSegment}/competitors/${encodeURIComponent(homeTeamId)}/summaries.json`;
+			const awaySummaryUrl = `${base.replace(/\/+$/, "")}/soccer/trial/v4/${langSegment}/competitors/${encodeURIComponent(awayTeamId)}/summaries.json`;
+
+			const [
+				standingsResult,
+				leadersResult,
+				homeSummaryResult,
+				awaySummaryResult,
+			] = await Promise.all([
 				fetchWithErrorHandling(standingsUrl, apiKey),
 				fetchWithErrorHandling(leadersUrl, apiKey),
+				fetchWithErrorHandling(homeSummaryUrl, apiKey),
+				fetchWithErrorHandling(awaySummaryUrl, apiKey),
 			]);
 
-			if (!standingsResult.ok) {
-				const { status, ...error } = standingsResult.error!;
-				console.log(JSON.stringify(error));
+			if (!homeSummaryResult.ok) {
+				const { status, ...error } = homeSummaryResult.error!;
 				return c.json(
 					{
 						success: false as const,
 						error: "External API error",
-						details: [...(standingsResult.ok ? [] : [error])],
+						details: [error],
 					},
-					status === 500 ? 500 : 400,
+					status === 500 ? 500 : status === 400 ? 400 : 502,
 				);
 			}
-
-			if (!leadersResult.ok) {
-				const { status, ...error } = leadersResult.error!;
-				console.log(JSON.stringify(error));
+			if (!awaySummaryResult.ok) {
+				const { status, ...error } = awaySummaryResult.error!;
 				return c.json(
 					{
 						success: false as const,
 						error: "External API error",
-						details: [...(leadersResult.ok ? [] : [error])],
+						details: [error],
 					},
-					status === 500 ? 500 : 400,
+					status === 500 ? 500 : status === 400 ? 400 : 502,
+				);
+			}
+			if (!standingsResult.ok) {
+				const { status, ...error } = standingsResult.error!;
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [error],
+					},
+					status === 500 ? 500 : status === 400 ? 400 : 502,
+				);
+			}
+			if (!leadersResult.ok) {
+				const { status, ...error } = leadersResult.error!;
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [error],
+					},
+					status === 500 ? 500 : status === 400 ? 400 : 502,
 				);
 			}
 
 			const standingsData = standingsResult.data as StandingsRes;
 			const leadersData = leadersResult.data;
-			console.log(leadersData);
 
 			const standingsArr = standingsData.standings;
 			const filteredStandings: TeamStanding[] = standingsArr
@@ -326,10 +403,27 @@ footballRoute.openapi(
 
 			const topScorers = transformTopScorers(leadersData);
 
-			const transformedData = transformFootballMatchInfo(
-				data,
-				filteredStandings,
-				topScorers,
+			const last5HomeResults = getLast5Matches(
+				homeSummaryResult.data,
+				homeTeamId,
+			);
+			const last5AwayResults = getLast5Matches(
+				awaySummaryResult.data,
+				awayTeamId,
+			);
+
+			const transformedData = {
+				...transformFootballMatchInfo(data, filteredStandings, topScorers),
+				last5_home_results: last5HomeResults,
+				last5_away_results: last5AwayResults,
+			};
+
+			await c.env.sportsdey_ns.put(
+				`match_${id}`,
+				JSON.stringify({
+					data: transformedData,
+					expiresAt: Date.now() + 5000,
+				}),
 			);
 
 			return c.json(

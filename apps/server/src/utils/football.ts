@@ -163,3 +163,33 @@ export function transformTopScorers(
 		};
 	});
 }
+
+export function getLast5Matches(summaryData: any, teamId: string) {
+	return (summaryData.summaries ?? []).slice(0, 5).map((match: any) => {
+		const home = match.sport_event.competitors.find(
+			(c: any) => c.qualifier === "home",
+		);
+		const away = match.sport_event.competitors.find(
+			(c: any) => c.qualifier === "away",
+		);
+		const homeScore = match.sport_event_status.home_score;
+		const awayScore = match.sport_event_status.away_score;
+		let result: "win" | "draw" | "loss";
+		if (home.id === teamId) {
+			if (homeScore > awayScore) result = "win";
+			else if (homeScore < awayScore) result = "loss";
+			else result = "draw";
+		} else {
+			if (awayScore > homeScore) result = "win";
+			else if (awayScore < homeScore) result = "loss";
+			else result = "draw";
+		}
+		return {
+			match_id: match.sport_event.id,
+			date: match.sport_event.start_time,
+			opponent: home.id === teamId ? away.name : home.name,
+			result,
+			score: `${homeScore}-${awayScore}`,
+		};
+	});
+}
