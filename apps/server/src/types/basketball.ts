@@ -71,6 +71,34 @@ interface SportRadarScoring {
 	sequence: number;
 }
 
+export interface SportRadarStreak {
+	type: "win" | "loss";
+	length: number;
+}
+
+export interface SportRadarStandingsTeam {
+	id: string;
+	name: string;
+	market: string;
+	wins: number;
+	losses: number;
+	games_back?: number;
+	point_diff?: number;
+	win_pct?: number;
+	streak?: SportRadarStreak;
+}
+
+export interface SportRadarStandingsConference {
+	name: string;
+	divisions: {
+		teams: SportRadarStandingsTeam[];
+	}[];
+}
+
+export interface SportRadarStandingsResponse {
+	conferences: SportRadarStandingsConference[];
+}
+
 export type SportRadarGameSummary = {
 	id: string;
 	status: string;
@@ -81,7 +109,6 @@ export type SportRadarGameSummary = {
 		id: string;
 		name: string;
 	};
-	statistics: SportRadarTeamStatistics;
 	home: SportRadarTeam;
 	away: SportRadarTeam;
 };
