@@ -1,707 +1,355 @@
 {
-  "success": true,
-  "data": {
-    "id": "0f4e0806-28ed-40e9-97d1-f12c9b48bf92",
-    "status": "closed",
-    "season": {
-      "id": "a7c6c8ee-c5ba-4a1a-abf5-723e1539f81b",
-      "year": 2025,
-      "type": "REG",
-      "name": "Regular Season"
-    },
-    "clock": "00:00",
-    "quarter": 4,
-    "venue": {
-      "id": "aecd8da6-0404-599c-a792-4b33fb084a2a",
-      "name": "Kia Center"
-    },
-    "home": {
-      "scores": [
-        {
-          "quarter": 1,
-          "points": 30
-        },
-        {
-          "quarter": 2,
-          "points": 31
-        },
-        {
-          "quarter": 3,
-          "points": 32
-        },
-        {
-          "quarter": 4,
-          "points": 36
-        }
-      ],
-      "name": "Orlando Magic",
-      "points": 129,
-      "starters": [
-        {
-          "full_name": "Wendell Carter Jr.",
-          "statistics": {
-            "field_goals_made": 3,
-            "pls_min": 13,
-            "field_goals_att": 11,
-            "field_goals_pct": 27.3,
-            "three_points_made": 1,
-            "three_points_att": 3,
-            "three_points_pct": 33.3,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 7,
-            "offensive_rebounds": 1,
-            "defensive_rebounds": 6,
-            "assists": 6,
-            "steals": 1,
-            "blocks": 0,
-            "turnovers": 0,
-            "personal_fouls": 4,
-            "minutes_played": "31:42"
-          }
-        },
-        {
-          "full_name": "Franz Wagner",
-          "statistics": {
-            "field_goals_made": 5,
-            "pls_min": 16,
-            "field_goals_att": 13,
-            "field_goals_pct": 38.5,
-            "three_points_made": 0,
-            "three_points_att": 2,
-            "three_points_pct": 0,
-            "free_throws_made": 10,
-            "free_throws_att": 12,
-            "free_throws_pct": 83.3,
-            "rebounds": 6,
-            "offensive_rebounds": 1,
-            "defensive_rebounds": 5,
-            "assists": 3,
-            "steals": 1,
-            "blocks": 0,
-            "turnovers": 1,
-            "personal_fouls": 2,
-            "minutes_played": "29:54"
-          }
-        },
-        {
-          "full_name": "Desmond Bane",
-          "statistics": {
-            "field_goals_made": 5,
-            "pls_min": 13,
-            "field_goals_att": 15,
-            "field_goals_pct": 33.3,
-            "three_points_made": 3,
-            "three_points_att": 6,
-            "three_points_pct": 50,
-            "free_throws_made": 2,
-            "free_throws_att": 2,
-            "free_throws_pct": 100,
-            "rebounds": 7,
-            "offensive_rebounds": 1,
-            "defensive_rebounds": 6,
-            "assists": 5,
-            "steals": 1,
-            "blocks": 0,
-            "turnovers": 2,
-            "personal_fouls": 0,
-            "minutes_played": "30:49"
-          }
-        },
-        {
-          "full_name": "Tristan da Silva",
-          "statistics": {
-            "field_goals_made": 7,
-            "pls_min": 20,
-            "field_goals_att": 17,
-            "field_goals_pct": 41.2,
-            "three_points_made": 3,
-            "three_points_att": 6,
-            "three_points_pct": 50,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 8,
-            "offensive_rebounds": 3,
-            "defensive_rebounds": 5,
-            "assists": 1,
-            "steals": 0,
-            "blocks": 0,
-            "turnovers": 0,
-            "personal_fouls": 2,
-            "minutes_played": "30:17"
-          }
-        },
-        {
-          "full_name": "Jalen Suggs",
-          "statistics": {
-            "field_goals_made": 8,
-            "pls_min": 12,
-            "field_goals_att": 15,
-            "field_goals_pct": 53.3,
-            "three_points_made": 5,
-            "three_points_att": 9,
-            "three_points_pct": 55.6,
-            "free_throws_made": 2,
-            "free_throws_att": 2,
-            "free_throws_pct": 100,
-            "rebounds": 3,
-            "offensive_rebounds": 1,
-            "defensive_rebounds": 2,
-            "assists": 7,
-            "steals": 2,
-            "blocks": 2,
-            "turnovers": 3,
-            "personal_fouls": 1,
-            "minutes_played": "26:15"
-          }
-        }
-      ],
-      "bench": [
-        {
-          "full_name": "Goga Bitadze",
-          "statistics": {
-            "field_goals_made": 3,
-            "pls_min": 15,
-            "field_goals_att": 3,
-            "field_goals_pct": 100,
-            "three_points_made": 0,
-            "three_points_att": 0,
-            "three_points_pct": 0,
-            "free_throws_made": 4,
-            "free_throws_att": 4,
-            "free_throws_pct": 100,
-            "rebounds": 6,
-            "offensive_rebounds": 1,
-            "defensive_rebounds": 5,
-            "assists": 3,
-            "steals": 2,
-            "blocks": 0,
-            "turnovers": 1,
-            "personal_fouls": 2,
-            "minutes_played": "16:18"
-          }
-        },
-        {
-          "full_name": "Jase Richardson",
-          "statistics": {
-            "field_goals_made": 1,
-            "pls_min": 10,
-            "field_goals_att": 1,
-            "field_goals_pct": 100,
-            "three_points_made": 1,
-            "three_points_att": 1,
-            "three_points_pct": 100,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 1,
-            "offensive_rebounds": 0,
-            "defensive_rebounds": 1,
-            "assists": 1,
-            "steals": 0,
-            "blocks": 0,
-            "turnovers": 0,
-            "personal_fouls": 0,
-            "minutes_played": "4:45"
-          }
-        },
-        {
-          "full_name": "Jamal Cain",
-          "statistics": {
-            "field_goals_made": 2,
-            "pls_min": 10,
-            "field_goals_att": 2,
-            "field_goals_pct": 100,
-            "three_points_made": 1,
-            "three_points_att": 1,
-            "three_points_pct": 100,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 0,
-            "offensive_rebounds": 0,
-            "defensive_rebounds": 0,
-            "assists": 1,
-            "steals": 0,
-            "blocks": 0,
-            "turnovers": 1,
-            "personal_fouls": 2,
-            "minutes_played": "4:45"
-          }
-        },
-        {
-          "full_name": "Tyus Jones",
-          "statistics": {
-            "field_goals_made": 0,
-            "pls_min": -3,
-            "field_goals_att": 1,
-            "field_goals_pct": 0,
-            "three_points_made": 0,
-            "three_points_att": 0,
-            "three_points_pct": 0,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 1,
-            "offensive_rebounds": 0,
-            "defensive_rebounds": 1,
-            "assists": 0,
-            "steals": 0,
-            "blocks": 0,
-            "turnovers": 0,
-            "personal_fouls": 0,
-            "minutes_played": "5:04"
-          }
-        },
-        {
-          "full_name": "Jonathan Isaac",
-          "statistics": {
-            "field_goals_made": 4,
-            "pls_min": 2,
-            "field_goals_att": 4,
-            "field_goals_pct": 100,
-            "three_points_made": 1,
-            "three_points_att": 1,
-            "three_points_pct": 100,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 7,
-            "offensive_rebounds": 3,
-            "defensive_rebounds": 4,
-            "assists": 1,
-            "steals": 0,
-            "blocks": 2,
-            "turnovers": 0,
-            "personal_fouls": 0,
-            "minutes_played": "15:45"
-          }
-        },
-        {
-          "full_name": "Anthony Black",
-          "statistics": {
-            "field_goals_made": 4,
-            "pls_min": 16,
-            "field_goals_att": 9,
-            "field_goals_pct": 44.4,
-            "three_points_made": 1,
-            "three_points_att": 3,
-            "three_points_pct": 33.3,
-            "free_throws_made": 3,
-            "free_throws_att": 4,
-            "free_throws_pct": 75,
-            "rebounds": 4,
-            "offensive_rebounds": 1,
-            "defensive_rebounds": 3,
-            "assists": 4,
-            "steals": 4,
-            "blocks": 0,
-            "turnovers": 2,
-            "personal_fouls": 3,
-            "minutes_played": "29:19"
-          }
-        },
-        {
-          "full_name": "Jett Howard",
-          "statistics": {
-            "field_goals_made": 3,
-            "pls_min": 16,
-            "field_goals_att": 3,
-            "field_goals_pct": 100,
-            "three_points_made": 2,
-            "three_points_att": 2,
-            "three_points_pct": 100,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 1,
-            "offensive_rebounds": 0,
-            "defensive_rebounds": 1,
-            "assists": 0,
-            "steals": 1,
-            "blocks": 0,
-            "turnovers": 0,
-            "personal_fouls": 1,
-            "minutes_played": "15:07"
-          }
-        }
-      ],
-      "statistics": {
-        "field_goals_made": 45,
-        "field_goals_att": 94,
-        "field_goals_pct": 47.9,
-        "three_points_made": 18,
-        "three_points_att": 34,
-        "three_points_pct": 52.9,
-        "free_throws_made": 21,
-        "free_throws_att": 24,
-        "free_throws_pct": 87.5,
-        "rebounds": 0,
-        "offensive_rebounds": 12,
-        "defensive_rebounds": 39,
-        "assists": 32,
-        "steals": 12,
-        "blocks": 4,
-        "turnovers": 0
-      }
-    },
-    "away": {
-      "scores": [
-        {
-          "quarter": 1,
-          "points": 24
-        },
-        {
-          "quarter": 2,
-          "points": 25
-        },
-        {
-          "quarter": 3,
-          "points": 27
-        },
-        {
-          "quarter": 4,
-          "points": 25
-        }
-      ],
-      "name": "LA Clippers",
-      "points": 101,
-      "starters": [
-        {
-          "full_name": "Kris Dunn",
-          "statistics": {
-            "field_goals_made": 2,
-            "pls_min": -16,
-            "field_goals_att": 5,
-            "field_goals_pct": 40,
-            "three_points_made": 0,
-            "three_points_att": 1,
-            "three_points_pct": 0,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 3,
-            "offensive_rebounds": 0,
-            "defensive_rebounds": 3,
-            "assists": 3,
-            "steals": 1,
-            "blocks": 0,
-            "turnovers": 1,
-            "personal_fouls": 1,
-            "minutes_played": "24:31"
-          }
-        },
-        {
-          "full_name": "John Collins",
-          "statistics": {
-            "field_goals_made": 4,
-            "pls_min": -18,
-            "field_goals_att": 8,
-            "field_goals_pct": 50,
-            "three_points_made": 0,
-            "three_points_att": 1,
-            "three_points_pct": 0,
-            "free_throws_made": 1,
-            "free_throws_att": 2,
-            "free_throws_pct": 50,
-            "rebounds": 4,
-            "offensive_rebounds": 0,
-            "defensive_rebounds": 4,
-            "assists": 0,
-            "steals": 1,
-            "blocks": 1,
-            "turnovers": 1,
-            "personal_fouls": 2,
-            "minutes_played": "24:44"
-          }
-        },
-        {
-          "full_name": "James Harden",
-          "statistics": {
-            "field_goals_made": 8,
-            "pls_min": -20,
-            "field_goals_att": 16,
-            "field_goals_pct": 50,
-            "three_points_made": 5,
-            "three_points_att": 11,
-            "three_points_pct": 45.5,
-            "free_throws_made": 10,
-            "free_throws_att": 12,
-            "free_throws_pct": 83.3,
-            "rebounds": 5,
-            "offensive_rebounds": 1,
-            "defensive_rebounds": 4,
-            "assists": 8,
-            "steals": 2,
-            "blocks": 0,
-            "turnovers": 5,
-            "personal_fouls": 1,
-            "minutes_played": "30:56"
-          }
-        },
-        {
-          "full_name": "Kobe Sanders",
-          "statistics": {
-            "field_goals_made": 2,
-            "pls_min": -3,
-            "field_goals_att": 8,
-            "field_goals_pct": 25,
-            "three_points_made": 1,
-            "three_points_att": 4,
-            "three_points_pct": 25,
-            "free_throws_made": 1,
-            "free_throws_att": 1,
-            "free_throws_pct": 100,
-            "rebounds": 2,
-            "offensive_rebounds": 0,
-            "defensive_rebounds": 2,
-            "assists": 0,
-            "steals": 0,
-            "blocks": 2,
-            "turnovers": 5,
-            "personal_fouls": 4,
-            "minutes_played": "26:25"
-          }
-        },
-        {
-          "full_name": "Ivica Zubac",
-          "statistics": {
-            "field_goals_made": 7,
-            "pls_min": -8,
-            "field_goals_att": 16,
-            "field_goals_pct": 43.8,
-            "three_points_made": 0,
-            "three_points_att": 0,
-            "three_points_pct": 0,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 19,
-            "offensive_rebounds": 5,
-            "defensive_rebounds": 14,
-            "assists": 0,
-            "steals": 0,
-            "blocks": 0,
-            "turnovers": 1,
-            "personal_fouls": 2,
-            "minutes_played": "31:34"
-          }
-        }
-      ],
-      "bench": [
-        {
-          "full_name": "Cam Christie",
-          "statistics": {
-            "field_goals_made": 1,
-            "pls_min": -11,
-            "field_goals_att": 4,
-            "field_goals_pct": 25,
-            "three_points_made": 1,
-            "three_points_att": 1,
-            "three_points_pct": 100,
-            "free_throws_made": 3,
-            "free_throws_att": 4,
-            "free_throws_pct": 75,
-            "rebounds": 1,
-            "offensive_rebounds": 0,
-            "defensive_rebounds": 1,
-            "assists": 0,
-            "steals": 1,
-            "blocks": 0,
-            "turnovers": 0,
-            "personal_fouls": 2,
-            "minutes_played": "12:00"
-          }
-        },
-        {
-          "full_name": "Jahmyl Telfort",
-          "statistics": {
-            "field_goals_made": 0,
-            "pls_min": -10,
-            "field_goals_att": 1,
-            "field_goals_pct": 0,
-            "three_points_made": 0,
-            "three_points_att": 1,
-            "three_points_pct": 0,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 0,
-            "offensive_rebounds": 0,
-            "defensive_rebounds": 0,
-            "assists": 0,
-            "steals": 0,
-            "blocks": 0,
-            "turnovers": 0,
-            "personal_fouls": 1,
-            "minutes_played": "4:45"
-          }
-        },
-        {
-          "full_name": "Yanic Konan Niederhauser",
-          "statistics": {
-            "field_goals_made": 3,
-            "pls_min": -13,
-            "field_goals_att": 3,
-            "field_goals_pct": 100,
-            "three_points_made": 0,
-            "three_points_att": 0,
-            "three_points_pct": 0,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 1,
-            "offensive_rebounds": 1,
-            "defensive_rebounds": 0,
-            "assists": 1,
-            "steals": 0,
-            "blocks": 1,
-            "turnovers": 1,
-            "personal_fouls": 1,
-            "minutes_played": "10:37"
-          }
-        },
-        {
-          "full_name": "Nicolas Batum",
-          "statistics": {
-            "field_goals_made": 1,
-            "pls_min": -4,
-            "field_goals_att": 1,
-            "field_goals_pct": 100,
-            "three_points_made": 1,
-            "three_points_att": 1,
-            "three_points_pct": 100,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 2,
-            "offensive_rebounds": 0,
-            "defensive_rebounds": 2,
-            "assists": 0,
-            "steals": 1,
-            "blocks": 0,
-            "turnovers": 1,
-            "personal_fouls": 1,
-            "minutes_played": "8:43"
-          }
-        },
-        {
-          "full_name": "Bogdan Bogdanovic",
-          "statistics": {
-            "field_goals_made": 2,
-            "pls_min": -7,
-            "field_goals_att": 9,
-            "field_goals_pct": 22.2,
-            "three_points_made": 2,
-            "three_points_att": 6,
-            "three_points_pct": 33.3,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 1,
-            "offensive_rebounds": 1,
-            "defensive_rebounds": 0,
-            "assists": 3,
-            "steals": 0,
-            "blocks": 0,
-            "turnovers": 1,
-            "personal_fouls": 2,
-            "minutes_played": "21:13"
-          }
-        },
-        {
-          "full_name": "Brook Lopez",
-          "statistics": {
-            "field_goals_made": 1,
-            "pls_min": -7,
-            "field_goals_att": 4,
-            "field_goals_pct": 25,
-            "three_points_made": 1,
-            "three_points_att": 2,
-            "three_points_pct": 50,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 0,
-            "offensive_rebounds": 0,
-            "defensive_rebounds": 0,
-            "assists": 0,
-            "steals": 0,
-            "blocks": 2,
-            "turnovers": 0,
-            "personal_fouls": 2,
-            "minutes_played": "5:49"
-          }
-        },
-        {
-          "full_name": "Chris Paul",
-          "statistics": {
-            "field_goals_made": 2,
-            "pls_min": -12,
-            "field_goals_att": 6,
-            "field_goals_pct": 33.3,
-            "three_points_made": 0,
-            "three_points_att": 2,
-            "three_points_pct": 0,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 2,
-            "offensive_rebounds": 0,
-            "defensive_rebounds": 2,
-            "assists": 4,
-            "steals": 1,
-            "blocks": 0,
-            "turnovers": 4,
-            "personal_fouls": 0,
-            "minutes_played": "23:04"
-          }
-        },
-        {
-          "full_name": "Kobe Brown",
-          "statistics": {
-            "field_goals_made": 3,
-            "pls_min": -11,
-            "field_goals_att": 8,
-            "field_goals_pct": 37.5,
-            "three_points_made": 3,
-            "three_points_att": 6,
-            "three_points_pct": 50,
-            "free_throws_made": 0,
-            "free_throws_att": 0,
-            "free_throws_pct": 0,
-            "rebounds": 3,
-            "offensive_rebounds": 2,
-            "defensive_rebounds": 1,
-            "assists": 1,
-            "steals": 0,
-            "blocks": 0,
-            "turnovers": 1,
-            "personal_fouls": 1,
-            "minutes_played": "15:39"
-          }
-        }
-      ],
-      "statistics": {
-        "field_goals_made": 36,
-        "field_goals_att": 89,
-        "field_goals_pct": 40.4,
-        "three_points_made": 14,
-        "three_points_att": 36,
-        "three_points_pct": 38.9,
-        "free_throws_made": 15,
-        "free_throws_att": 19,
-        "free_throws_pct": 78.9,
-        "rebounds": 0,
-        "offensive_rebounds": 10,
-        "defensive_rebounds": 33,
-        "assists": 20,
-        "steals": 7,
-        "blocks": 6,
-        "turnovers": 0
-      }
-    }
-  }
+	"generated_at": "2025-12-02T03:47:16+00:00",
+	"sport_event": {
+		"id": "sr:sport_event:51041587",
+		"start_time": "2024-07-04T11:05:00+00:00",
+		"start_time_confirmed": true,
+		"sport_event_context": {
+			"sport": {
+				"id": "sr:sport:5",
+				"name": "Tennis"
+			},
+			"category": {
+				"id": "sr:category:3",
+				"name": "ATP"
+			},
+			"competition": {
+				"id": "sr:competition:2555",
+				"name": "Wimbledon Men Singles",
+				"parent_id": "sr:competition:2553",
+				"type": "singles",
+				"gender": "men",
+				"level": "grand_slam"
+			},
+			"season": {
+				"id": "sr:season:107797",
+				"name": "Wimbledon Men Singles 2024",
+				"start_date": "2024-06-24",
+				"end_date": "2024-07-14",
+				"year": "2024",
+				"competition_id": "sr:competition:2555"
+			},
+			"stage": {
+				"order": 2,
+				"type": "cup",
+				"phase": "stage_1_playoff",
+				"start_date": "2024-07-01",
+				"end_date": "2024-07-14",
+				"year": "2024"
+			},
+			"round": {
+				"name": "round_of_64"
+			},
+			"groups": [
+				{
+					"id": "sr:cup:150657",
+					"name": "2024 Wimbledon, London, Great Britain"
+				}
+			],
+			"mode": {
+				"best_of": 5
+			}
+		},
+		"coverage": {
+			"type": "sport_event",
+			"sport_event_properties": {
+				"enhanced_stats": true,
+				"detailed_serve_outcomes": false,
+				"play_by_play": false
+			}
+		},
+		"competitors": [
+			{
+				"id": "sr:competitor:157808",
+				"name": "Harris, Lloyd",
+				"country": "South Africa",
+				"country_code": "ZAF",
+				"abbreviation": "HAR",
+				"qualifier": "home",
+				"bracket_number": 13
+			},
+			{
+				"id": "sr:competitor:808628",
+				"name": "Shelton, Ben",
+				"country": "USA",
+				"country_code": "USA",
+				"abbreviation": "SHE",
+				"qualifier": "away",
+				"seed": 14,
+				"bracket_number": 16
+			}
+		],
+		"venue": {
+			"id": "sr:venue:1894",
+			"name": "Court 18",
+			"city_name": "London",
+			"country_name": "England",
+			"country_code": "ENG",
+			"timezone": "Europe/London"
+		},
+		"channels": [
+			{
+				"name": "SRF zwei HD - Hot Bird 1/2/3/4/6 (13.0E)"
+			},
+			{
+				"name": "Sky Sports NFL HD - Astra 2A/2B/2D (28.2E)"
+			},
+			{
+				"name": "Sky Sports Main Event HD - Astra 2A/2B/2D (28.2E)"
+			},
+			{
+				"name": "Eurosport 2 UK HD - Eurobird 1 / Astra 2A/2B/2D (28.2E)"
+			},
+			{
+				"name": "Sky Sports Cricket HD - Astra 2A/2B/2D (28.2E)"
+			},
+			{
+				"name": "SKY Sport Uno IT - Hot Bird 1/2/3/4/6 (13.0E) - SkyItalia - 1786"
+			},
+			{
+				"name": "RSI La 2 HD - Hot Bird 1/2/3/4/6 (13.0E)"
+			},
+			{
+				"name": "RTS2 - Eutelsat W2 (16.0E) - Total TV"
+			},
+			{
+				"name": "M. DEP1 - Astra 1C-1H / 2C (19.2E)"
+			},
+			{
+				"name": "SRF info HD - Hot Bird 1/2/3/4/6 (13.0E)"
+			},
+			{
+				"name": "TV3 Sport DK - Astra 4A & SES 5 (4.9E)"
+			},
+			{
+				"name": "TV 2/Bornholm - Astra 4A & SES 5 (4.9E)"
+			},
+			{
+				"name": "TV 2/Fyn - Astra 4A & SES 5 (4.9E)"
+			},
+			{
+				"name": "TV 2/Lorry - Astra 4A & SES 5 (4.9E)"
+			},
+			{
+				"name": "TV 2/Midt-Vest - Astra 4A & SES 5 (4.9E)"
+			},
+			{
+				"name": "novasports3 HD - Hot Bird 1/2/3/4/6 (13.0E)"
+			},
+			{
+				"name": "novasports1 HD - Hot Bird 1/2/3/4/6 (13.0E)"
+			},
+			{
+				"name": "Novasports News HD - Hot Bird 1/2/3/4/6 (13.0E)"
+			},
+			{
+				"name": "Sky Sport 1 (D) - Astra 1C-1H / 2C (19.2E) - SKY - 3153"
+			},
+			{
+				"name": "Sky Sport 2 (D) - Astra 1C-1H / 2C (19.2E) - SKY - 5725"
+			},
+			{
+				"name": "Sky Sport 3 (D) - (19.2E)"
+			},
+			{
+				"name": "Sky Sport 4 - (19.2E)"
+			},
+			{
+				"name": "Sky Sport Uno HD - Hot Bird 1/2/3/4/6 (13.0E)"
+			},
+			{
+				"name": "Sky Sport Calcio HD - Hot Bird 1/2/3/4/6 (13.0E)"
+			},
+			{
+				"name": "Sky Sports Golf HD - Astra 2A/2B/2D (28.2E)"
+			},
+			{
+				"name": "NOVA Sport 1 HD CZ - Thor 2/3 (1.0W)"
+			},
+			{
+				"name": "TV 2/Fri - Astra 4A & SES 5 (4.9E)"
+			},
+			{
+				"name": "M. DEP1 HD - Astra 1C-1H / 2C (19.2E) - DIGITAL+ - 6139"
+			},
+			{
+				"name": "M. DEP2 HD - Astra 1C-1H / 2C (19.2E) - DIGITAL+ - 2521"
+			},
+			{
+				"name": "Bein Sports HD 2 TR - Türksat 1C / Eurasiasat 1 (42.0E)"
+			},
+			{
+				"name": "Bein Sports HD 3 TR - Türksat 1C / Eurasiasat 1 (42.0E)"
+			},
+			{
+				"name": "Sky Sport News SD - Astra 1C-1H / 2C (19.2E)"
+			},
+			{
+				"name": "RTS Deux HD - Hot Bird 1/2/3/4/6 (13.0E)"
+			},
+			{
+				"name": "Sport TV1 HD - Hispasat 1B/1C/1D (30.0 W) - NOS PT"
+			},
+			{
+				"name": "Sport TV2 HD - Hispasat 1B/1C/1D (30.0 W) - NOS PT"
+			},
+			{
+				"name": "C More Live - Thor 2/3 (1.0W) - Telenor - 5063"
+			},
+			{
+				"name": "C More Tennis HD - Thor 2/3 (1.0W) - Telenor - 234"
+			},
+			{
+				"name": "TV4 Sport Live 2 HD - Thor 2/3 (1.0W)"
+			},
+			{
+				"name": "TV4 Sport Live 3 HD - Thor 2/3 (1.0W)"
+			},
+			{
+				"name": "TV4 Sport Live 4 HD - Thor 2/3 (1.0W)"
+			},
+			{
+				"name": "TV 2 Sport Premium 4 HD - Thor 2/3 (1.0W) - Telenor"
+			},
+			{
+				"name": "C More Sport - Thor 2/3 (1.0W) - Telenor - 239"
+			},
+			{
+				"name": "beIN SPORT Max 4 HD FR - Astra 1C-1H / 2C (19.2E)"
+			},
+			{
+				"name": "MTV Urheilu 1 HD - Thor 2/3 (1.0W)"
+			},
+			{
+				"name": "beIN SPORT Max10 HD FR - Astra 1C-1H / 2C (19.2E)"
+			},
+			{
+				"name": "Sky Sport HD 1 (D) - Astra 1C-1H / 2C (19.2E)"
+			},
+			{
+				"name": "TV3 Max DK - Astra 4A & SES 5 (4.9E)"
+			},
+			{
+				"name": "SporTV 2 HD South America - (43.1W)"
+			},
+			{
+				"name": "ESPN+ BR South America - (43.1W)"
+			},
+			{
+				"name": "Sky Sport Arena IT HD - Hot Bird 1/2/3/4/6 (13.0E)"
+			},
+			{
+				"name": "ESPN BR South America - (43.1W)"
+			},
+			{
+				"name": "M. DEP2 - Astra 1C-1H / 2C (19.2E)"
+			},
+			{
+				"name": "Sport Klub 1 SRB - (16.0E)"
+			},
+			{
+				"name": "Sky Sports PL HD - Astra 2A/2B/2D (28.2E)"
+			},
+			{
+				"name": "beIN Sports 1 HD FR - Astra 1C-1H / 2C (19.2E)"
+			},
+			{
+				"name": "Sky Sport HD 2 (D) - Astra 1C-1H / 2C (19.2E)"
+			},
+			{
+				"name": "SportKlub 1 HD SRB - Eutelsat W2 (16.0E)"
+			},
+			{
+				"name": "SportKlub 2 HD SRB - Eutelsat W2 (16.0E)"
+			},
+			{
+				"name": "SportKlub 3 HD SRB - Eutelsat W2 (16.0E)"
+			},
+			{
+				"name": "NOVA Sport 1 HD CZ - Astra 1D/3A (23.5E)"
+			},
+			{
+				"name": "Sky Sport HD 3 (D) - Astra 1C-1H / 2C (19.2E)"
+			},
+			{
+				"name": "Sky Sport HD 4 (D) - Astra 1C-1H / 2C (19.2E)"
+			},
+			{
+				"name": "Sky Sport HD 5 (D) - Astra 1C-1H / 2C (19.2E)"
+			},
+			{
+				"name": "NOVA Sport 2 HD CZ - Astra 1D/3A (23.5E)"
+			},
+			{
+				"name": "Eurosport Norge HD - Thor 2/3 (1.0W)"
+			},
+			{
+				"name": "Kanal 9 SE HD - Thor 2/3 (1.0W)"
+			},
+			{
+				"name": "Eurosport 1 SE HD - Thor 2/3 (1.0W)"
+			},
+			{
+				"name": "Sky Sport News HD - Astra 1C-1H / 2C (19.2E)"
+			},
+			{
+				"name": "NOVA Sport 2 HD CZ - Thor 2/3 (1.0W)"
+			},
+			{
+				"name": "ESPN Deportes"
+			},
+			{
+				"name": "ESPN US (DirecTV SAT (DVB-S))"
+			},
+			{
+				"name": "ESPN+"
+			}
+		],
+		"estimated": true
+	},
+	"sport_event_status": {
+		"status": "closed",
+		"match_status": "ended",
+		"home_score": 2,
+		"away_score": 3,
+		"period_scores": [
+			{
+				"home_score": 6,
+				"away_score": 4,
+				"type": "set",
+				"number": 1
+			},
+			{
+				"home_score": 6,
+				"away_score": 7,
+				"type": "set",
+				"number": 2,
+				"home_tiebreak_score": 5,
+				"away_tiebreak_score": 7
+			},
+			{
+				"home_score": 7,
+				"away_score": 6,
+				"type": "set",
+				"number": 3,
+				"home_tiebreak_score": 7,
+				"away_tiebreak_score": 5
+			},
+			{
+				"home_score": 3,
+				"away_score": 6,
+				"type": "set",
+				"number": 4
+			},
+			{
+				"home_score": 6,
+				"away_score": 7,
+				"type": "set",
+				"number": 5,
+				"home_tiebreak_score": 7,
+				"away_tiebreak_score": 10
+			}
+		],
+		"winner_id": "sr:competitor:808628"
+	}
 }

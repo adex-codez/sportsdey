@@ -42,3 +42,8 @@ export const TennisScheduleData = z.object({
 	total_matches: z.number(),
 	competitions: z.array(TennisCompetitionGroupSchema),
 });
+
+export const TennisMatchInfoData = z.object({
+	TennisMatchSchema,
+	venue: z.string(),
+});

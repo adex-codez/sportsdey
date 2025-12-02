@@ -44,3 +44,13 @@ export const tennisScheduleQuery = z.object({
 			example: "en",
 		}),
 });
+
+export const tennisGameIdParam = z.object({
+	gameId: z
+		.string()
+		.min(1, "Game ID is required")
+		.openapi({
+			param: { name: "gameId", in: "path" },
+			description: "The id for the tennis game you want to get info about.",
+		}),
+});
