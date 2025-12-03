@@ -7,6 +7,7 @@ import {
 import type { SportRadarTennisResponse } from "@/types";
 import { transformTennisData } from "@/utils/tennis";
 import { tennisScheduleParam, tennisScheduleQuery } from "@/validators";
+import { jsonZodErrorFormatter } from "@/utils/zod";
 
 const tennisRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 
@@ -137,6 +138,6 @@ tennisRoute.openapi(tennisScheduleRoute, async (c) => {
 			500,
 		);
 	}
-});
+}, jsonZodErrorFormatter);
 
 export default tennisRoute;

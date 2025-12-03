@@ -12,6 +12,7 @@ import {
 	basketballScheduleQuery,
 	gameIdParam,
 } from "@/validators";
+import { jsonZodErrorFormatter } from "@/utils/zod";
 
 const basketballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 
@@ -215,7 +216,7 @@ basketballRoute.openapi(basketballScheduleRoute, async (c) => {
 			200,
 		);
 	} catch (error) {
-		console.error("Error fetching basketball schedule:", error);
+
 		return c.json(
 			{
 				success: false as const,
@@ -232,7 +233,7 @@ basketballRoute.openapi(basketballScheduleRoute, async (c) => {
 			500,
 		);
 	}
-});
+}, jsonZodErrorFormatter);
 
 // Game Summary Route
 const gameSummaryRoute = createRoute({
@@ -414,6 +415,6 @@ basketballRoute.openapi(gameSummaryRoute, async (c) => {
 			500,
 		);
 	}
-});
+}, jsonZodErrorFormatter);
 
 export default basketballRoute;

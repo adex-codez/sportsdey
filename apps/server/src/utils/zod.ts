@@ -2,7 +2,6 @@ import type { Context } from "hono";
 
 export function jsonZodErrorFormatter(result: any, c: Context) {
 	if (result.success === true) {
-		console.log(result);
 		return;
 	}
 	try {
@@ -81,7 +80,6 @@ export function jsonZodErrorFormatter(result: any, c: Context) {
 			400,
 		);
 	} catch (error) {
-		console.error("Error in jsonZodErrorFormatter:", error);
 		return c.json(
 			{
 				success: false,

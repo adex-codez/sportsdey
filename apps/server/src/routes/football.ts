@@ -15,6 +15,7 @@ import {
 	transformFootballSchedule,
 	transformTopScorers,
 } from "@/utils/football";
+import { jsonZodErrorFormatter } from "@/utils/zod";
 
 const footballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 
@@ -154,6 +155,7 @@ footballRoute.openapi(
 			);
 		}
 	},
+	jsonZodErrorFormatter
 );
 
 footballRoute.openapi(
@@ -451,6 +453,7 @@ footballRoute.openapi(
 			);
 		}
 	},
+	jsonZodErrorFormatter
 );
 
 export default footballRoute;
