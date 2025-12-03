@@ -5,6 +5,10 @@ import {
 	TennisMatchInfoData,
 	TennisScheduleData,
 } from "@/schemas";
+import type { SportRadarTennisResponse } from "@/types";
+import { transformTennisData } from "@/utils/tennis";
+import { tennisScheduleParam, tennisScheduleQuery } from "@/validators";
+import { jsonZodErrorFormatter } from "@/utils/zod";
 import type {
 	SportRadarTennisGameResponse,
 	SportRadarTennisResponse,
@@ -145,7 +149,7 @@ tennisRoute.openapi(tennisScheduleRoute, async (c) => {
 			500,
 		);
 	}
-});
+}, jsonZodErrorFormatter);
 
 const tennisGameRoute = createRoute({
 	method: "get",

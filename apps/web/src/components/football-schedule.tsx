@@ -1,5 +1,5 @@
 import { Loader2 } from "lucide-react";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useFootballSchedule } from "@/hooks/use-fooball-schedule";
 import type { FiltersType } from "@/lib/data";
 import { formatTime } from "@/lib/utils";
@@ -24,8 +24,12 @@ const FootballSchedule = () => {
 		// error,
 	} = useFootballSchedule(date.toISOString().split("T")[0], "en");
 
+	useEffect(() => {
+		console.log(schedules);
+	}, []);
+
 	const filtersCount = useMemo(() => {
-		if (!schedules) {
+		if (!schedules!.data) {
 			return {
 				allCount: 0,
 				liveCount: 0,
@@ -34,12 +38,12 @@ const FootballSchedule = () => {
 			};
 		}
 
-		const allCount = schedules.total_matches;
+		const allCount = schedules!.data.total_matches;
 		let liveCount = 0;
 		let finishedCount = 0;
 		let upcomingCount = 0;
 
-		schedules.competitions.forEach((competition) => {
+		schedules!.data.competitions.forEach((competition) => {
 			competition.matches.forEach((match) => {
 				switch (match.match_status) {
 					case "live":
@@ -64,11 +68,11 @@ const FootballSchedule = () => {
 	}, [schedules]);
 
 	const filteredSchedules = useMemo(() => {
-		if (!schedules) return null;
+		if (!schedules!.data) return null;
 
 		// If showing all matches, return original data
 		if (currentFilter === "all") {
-			return schedules;
+			return schedules!.data;
 		}
 
 		// More efficient status mapping
@@ -80,12 +84,12 @@ const FootballSchedule = () => {
 		};
 
 		const targetStatus = statusMap[currentFilter];
-		if (!targetStatus) return schedules;
+		if (!targetStatus) return schedules!.data;
 
 		// Pre-filter and optimize the loop
 		const filteredCompetitions = [];
 
-		for (const competition of schedules.competitions) {
+		for (const competition of schedules!.data.competitions) {
 			const matchingMatches = [];
 
 			for (const match of competition.matches) {
@@ -108,7 +112,7 @@ const FootballSchedule = () => {
 		};
 	}, [schedules, currentFilter]);
 
-	if (isLoading || !schedules) {
+	if (isLoading || !schedules!.data) {
 		return (
 			<div className="flex flex-col items-center justify-center space-y-2">
 				<Loader2 className="animate-spin" width={48} height={48} />

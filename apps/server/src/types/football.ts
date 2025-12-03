@@ -94,6 +94,14 @@ export type TopScorer = {
 	assists: number;
 };
 
+export type MatchResultSummary = {
+	match_id: string;
+	date: string;
+	opponent: string;
+	result: "win" | "draw" | "loss";
+	score: string;
+};
+
 export type TransformedMatchInfo = {
 	competition: {
 		id: string;
@@ -121,6 +129,8 @@ export type TransformedMatchInfo = {
 	status: string;
 	standings?: TeamStanding[];
 	top_scorers?: TopScorer[];
+	last5_home_results?: MatchResultSummary[];
+	last5_away_results?: MatchResultSummary[];
 };
 
 // export type MatchSummaryRes = {
