@@ -155,7 +155,6 @@ footballRoute.openapi(
 			);
 		}
 	},
-	jsonZodErrorFormatter
 );
 
 footballRoute.openapi(
@@ -453,7 +452,7 @@ footballRoute.openapi(
 			);
 		}
 	},
-	jsonZodErrorFormatter
+	jsonZodErrorFormatter,
 );
 
 export default footballRoute;
