@@ -140,8 +140,7 @@ export function transformTopScorers(
 	const pointsList = leadersData.lists?.filter(
 		(list: any) => list.type === "points",
 	);
-	console.log(`TransformTopScorers ${JSON.stringify(leadersData)}`);
-	if (!pointsList) return [];
+	if (!pointsList.leaders) return [];
 
 	return pointsList.leaders.slice(0, 3).map((leader: any) => {
 		const player = leader.players[0];
@@ -150,8 +149,6 @@ export function transformTopScorers(
 			team.datapoints.find((dp: any) => dp.type === "goals")?.value ?? 0;
 		const assists =
 			team.datapoints.find((dp: any) => dp.type === "assists")?.value ?? 0;
-
-		console.log(`TransformTopScorers ${player}`);
 
 		return {
 			id: player.id,
@@ -163,6 +160,36 @@ export function transformTopScorers(
 			},
 			gs: goals,
 			assists,
+		};
+	});
+}
+
+export function getLast5Matches(summaryData: any, teamId: string) {
+	return (summaryData.summaries ?? []).slice(0, 5).map((match: any) => {
+		const home = match.sport_event.competitors.find(
+			(c: any) => c.qualifier === "home",
+		);
+		const away = match.sport_event.competitors.find(
+			(c: any) => c.qualifier === "away",
+		);
+		const homeScore = match.sport_event_status.home_score;
+		const awayScore = match.sport_event_status.away_score;
+		let result: "win" | "draw" | "loss";
+		if (home.id === teamId) {
+			if (homeScore > awayScore) result = "win";
+			else if (homeScore < awayScore) result = "loss";
+			else result = "draw";
+		} else {
+			if (awayScore > homeScore) result = "win";
+			else if (awayScore < homeScore) result = "loss";
+			else result = "draw";
+		}
+		return {
+			match_id: match.sport_event.id,
+			date: match.sport_event.start_time,
+			opponent: home.id === teamId ? away.name : home.name,
+			result,
+			score: `${homeScore}-${awayScore}`,
 		};
 	});
 }
