@@ -1,6 +1,9 @@
 import type { SportRadarPlayer, SportRadarTeam } from "@/types";
 
-export function transformTeamData(teamData: SportRadarTeam) {
+export function transformTeamData(
+	teamData: SportRadarTeam,
+	skipPoints: boolean,
+) {
 	const activePlayers = teamData.players.filter(
 		(player: SportRadarPlayer) => !player.not_playing_reason,
 	);
@@ -15,9 +18,33 @@ export function transformTeamData(teamData: SportRadarTeam) {
 
 	return {
 		name: `${teamData.market} ${teamData.name}`,
-		points: teamData.points,
+		...(skipPoints ? {} : { points: teamData.points }),
+		...transformTeamStatistics(teamData),
 		starters,
 		bench,
+	};
+}
+
+export function transformTeamStatistics(teamData: SportRadarTeam) {
+	return {
+		statistics: {
+			field_goals_made: teamData.statistics?.field_goals_made || 0,
+			field_goals_att: teamData.statistics?.field_goals_att || 0,
+			field_goals_pct: teamData.statistics?.field_goals_pct || 0,
+			three_points_made: teamData.statistics?.three_points_made || 0,
+			three_points_att: teamData.statistics?.three_points_att || 0,
+			three_points_pct: teamData.statistics?.three_points_pct || 0,
+			free_throws_made: teamData.statistics?.free_throws_made || 0,
+			free_throws_att: teamData.statistics?.free_throws_att || 0,
+			free_throws_pct: teamData.statistics?.free_throws_pct || 0,
+			rebounds: teamData.statistics?.rebounds || 0,
+			offensive_rebounds: teamData.statistics?.offensive_rebounds || 0,
+			defensive_rebounds: teamData.statistics?.defensive_rebounds || 0,
+			assists: teamData.statistics?.assists || 0,
+			steals: teamData.statistics?.steals || 0,
+			blocks: teamData.statistics?.blocks || 0,
+			turnovers: teamData.statistics?.turnovers || 0,
+		},
 	};
 }
 
@@ -43,6 +70,7 @@ export function transformPlayer(player: SportRadarPlayer) {
 			blocks: player.statistics?.blocks || 0,
 			turnovers: player.statistics?.turnovers || 0,
 			personal_fouls: player.statistics?.personal_fouls || 0,
+			minutes_played: player.statistics?.minutes || 0,
 		},
 	};
 }

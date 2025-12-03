@@ -9,11 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TennisRouteImport } from './routes/tennis'
 import { Route as BasketballRouteImport } from './routes/basketball'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TennisIndexRouteImport } from './routes/tennis.index'
 import { Route as BasketballIndexRouteImport } from './routes/basketball.index'
 import { Route as BasketballIdRouteImport } from './routes/basketball/$Id'
 
+const TennisRoute = TennisRouteImport.update({
+  id: '/tennis',
+  path: '/tennis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BasketballRoute = BasketballRouteImport.update({
   id: '/basketball',
   path: '/basketball',
@@ -23,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const TennisIndexRoute = TennisIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TennisRoute,
 } as any)
 const BasketballIndexRoute = BasketballIndexRouteImport.update({
   id: '/',
@@ -38,36 +50,62 @@ const BasketballIdRoute = BasketballIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/basketball': typeof BasketballRouteWithChildren
+  '/tennis': typeof TennisRouteWithChildren
   '/basketball/$Id': typeof BasketballIdRoute
   '/basketball/': typeof BasketballIndexRoute
+  '/tennis/': typeof TennisIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/basketball/$Id': typeof BasketballIdRoute
   '/basketball': typeof BasketballIndexRoute
+  '/tennis': typeof TennisIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/basketball': typeof BasketballRouteWithChildren
+  '/tennis': typeof TennisRouteWithChildren
   '/basketball/$Id': typeof BasketballIdRoute
   '/basketball/': typeof BasketballIndexRoute
+  '/tennis/': typeof TennisIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/basketball' | '/basketball/$Id' | '/basketball/'
+  fullPaths:
+    | '/'
+    | '/basketball'
+    | '/tennis'
+    | '/basketball/$Id'
+    | '/basketball/'
+    | '/tennis/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/basketball/$Id' | '/basketball'
-  id: '__root__' | '/' | '/basketball' | '/basketball/$Id' | '/basketball/'
+  to: '/' | '/basketball/$Id' | '/basketball' | '/tennis'
+  id:
+    | '__root__'
+    | '/'
+    | '/basketball'
+    | '/tennis'
+    | '/basketball/$Id'
+    | '/basketball/'
+    | '/tennis/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BasketballRoute: typeof BasketballRouteWithChildren
+  TennisRoute: typeof TennisRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tennis': {
+      id: '/tennis'
+      path: '/tennis'
+      fullPath: '/tennis'
+      preLoaderRoute: typeof TennisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/basketball': {
       id: '/basketball'
       path: '/basketball'
@@ -81,6 +119,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/tennis/': {
+      id: '/tennis/'
+      path: '/'
+      fullPath: '/tennis/'
+      preLoaderRoute: typeof TennisIndexRouteImport
+      parentRoute: typeof TennisRoute
     }
     '/basketball/': {
       id: '/basketball/'
@@ -113,9 +158,21 @@ const BasketballRouteWithChildren = BasketballRoute._addFileChildren(
   BasketballRouteChildren,
 )
 
+interface TennisRouteChildren {
+  TennisIndexRoute: typeof TennisIndexRoute
+}
+
+const TennisRouteChildren: TennisRouteChildren = {
+  TennisIndexRoute: TennisIndexRoute,
+}
+
+const TennisRouteWithChildren =
+  TennisRoute._addFileChildren(TennisRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BasketballRoute: BasketballRouteWithChildren,
+  TennisRoute: TennisRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

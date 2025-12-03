@@ -2,14 +2,23 @@ import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
 	ErrorResponseSchema,
 	GameSummarySchema,
+	GameTeamStatsSchema,
 	ScheduleData,
+	StandingsSchema,
 	successResponseSchema,
 } from "@/schemas";
-import type { SportRadarGameSummary } from "@/types";
+import type {
+	SportRadarGameSummary,
+	SportRadarStandingsConference,
+	SportRadarStandingsResponse,
+	SportRadarStandingsTeam,
+} from "@/types";
 import { transformTeamData } from "@/utils/basketball";
 import {
 	basketballScheduleParam,
 	basketballScheduleQuery,
+	basketballStandingsParam,
+	basketballStandingsQuery,
 	gameIdParam,
 } from "@/validators";
 import { jsonZodErrorFormatter } from "@/utils/zod";
@@ -235,7 +244,162 @@ basketballRoute.openapi(basketballScheduleRoute, async (c) => {
 	}
 }, jsonZodErrorFormatter);
 
-// Game Summary Route
+const basketballStandingsRoute = createRoute({
+	method: "get",
+	path: "/standings/{season}",
+	summary: "Get NBA standings for a season and type",
+	description: "Retrieves NBA standings, filtered by conference and paginated.",
+	request: {
+		params: basketballStandingsParam,
+		query: basketballStandingsQuery,
+	},
+	responses: {
+		200: {
+			content: {
+				"application/json": {
+					schema: successResponseSchema(StandingsSchema),
+				},
+			},
+			description: "Successfully retrieved standings",
+		},
+		400: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "Bad request",
+		},
+		500: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "Internal server error",
+		},
+		502: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "External API error",
+		},
+	},
+	tags: ["Basketball"],
+});
+
+basketballRoute.openapi(basketballStandingsRoute, async (c) => {
+	try {
+		const { season } = c.req.valid("param");
+		const { conference, limit, offset } = c.req.valid("query");
+		const cacheKey = `basketball_standings_${season}_REG`;
+		const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+			data: SportRadarStandingsResponse;
+			expiresAt: number;
+		} | null;
+
+		let standingsData: SportRadarStandingsResponse;
+		if (cachedData && Date.now() <= cachedData.expiresAt) {
+			standingsData = cachedData.data;
+		} else {
+			const apiKey = c.env?.SPORTRADAR_API_KEY;
+			const apiUrl = `https://api.sportradar.com/nba/trial/v8/en/seasons/${season}/REG/standings.json?api_key=${apiKey}`;
+			const response = await fetch(apiUrl);
+			if (!response.ok) {
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [
+							{
+								field: "sportradar_api",
+								message: `SportRadar API returned status ${response.status}`,
+								code: "external_api_error",
+							},
+						],
+					},
+					502,
+				);
+			}
+			standingsData = (await response.json()) as SportRadarStandingsResponse;
+			// await c.env.sportsdey_ns.put(
+			// 	cacheKey,
+			// 	JSON.stringify({
+			// 		data: standingsData,
+			// 		expiresAt: Date.now() + 2 * 60 * 1000,
+			// 	}),
+			// );
+		}
+
+		// Filter by conference (ignore divisions)
+		const conferenceData = (standingsData.conferences || []).filter(
+			(conf: SportRadarStandingsConference) =>
+				conf.name ===
+				(conference === "eastern"
+					? "EASTERN CONFERENCE"
+					: "WESTERN CONFERENCE"),
+		);
+		console.log(conferenceData);
+		if (!conferenceData) {
+			return c.json(
+				{
+					success: false as const,
+					error: "Conference not found",
+					details: [
+						{
+							field: "conference",
+							message: `Conference '${conference}' not found in standings data`,
+							code: "conference_not_found",
+						},
+					],
+				},
+				400,
+			);
+		}
+
+		const teams = conferenceData[0]?.divisions.flatMap((division) =>
+			division.teams.map((team: SportRadarStandingsTeam) => ({
+				id: team.id,
+				name: `${team.market} ${team.name}`,
+				wins: team.wins,
+				losses: team.losses,
+				played: team.wins + team.losses,
+				streak:
+					team.streak?.type === "win"
+						? team.streak.length
+						: team.streak?.type === "loss"
+							? -team.streak.length
+							: 0,
+				gb: team.games_back ?? 0,
+				diff: team.point_diff ?? 0,
+				win_pct: team.win_pct ?? 0,
+			})),
+		);
+
+		const paginatedTeams = teams!.slice(offset, offset + limit);
+
+		return c.json({ success: true as const, data: paginatedTeams }, 200);
+	} catch (error) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Internal server error",
+				details: [
+					{
+						field: "server",
+						message:
+							"An unexpected error occurred while processing your request",
+						code: "internal_error",
+					},
+				],
+			},
+			500,
+		);
+	}
+});
+
 const gameSummaryRoute = createRoute({
 	method: "get",
 	path: "/game/{gameId}",
@@ -357,7 +521,6 @@ basketballRoute.openapi(gameSummaryRoute, async (c) => {
 			season: gameData.season,
 			clock: gameData.clock,
 			quarter: gameData.quarter,
-			statistics: gameData.statistics,
 			venue: {
 				id: gameData.venue.id,
 				name: gameData.venue.name,
@@ -368,7 +531,7 @@ basketballRoute.openapi(gameSummaryRoute, async (c) => {
 						quarter: score.number,
 						points: score.points,
 					})) || [],
-				...transformTeamData(gameData.home),
+				...transformTeamData(gameData.home, false),
 			},
 			away: {
 				scores:
@@ -376,7 +539,7 @@ basketballRoute.openapi(gameSummaryRoute, async (c) => {
 						quarter: score.number,
 						points: score.points,
 					})) || [],
-				...transformTeamData(gameData.away),
+				...transformTeamData(gameData.away, false),
 			},
 		};
 
@@ -416,5 +579,163 @@ basketballRoute.openapi(gameSummaryRoute, async (c) => {
 		);
 	}
 }, jsonZodErrorFormatter);
+
+const gameTeamStatsRoute = createRoute({
+	method: "get",
+	path: "/game/{gameId}/stats",
+	summary: "Get Team Stats for a nba game.",
+	description:
+		"It allows you to view the teams stats for both the home and away team for a particular game. poll the server every 5 seconds",
+	request: {
+		params: gameIdParam,
+	},
+	responses: {
+		200: {
+			content: {
+				"application/json": {
+					schema: successResponseSchema(GameTeamStatsSchema),
+				},
+			},
+			description: "Successfully retrieved game details",
+		},
+		400: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "Bad request - invalid game ID",
+		},
+		404: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "Team stats not found",
+		},
+		500: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "Internal server error",
+		},
+		502: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "Bad gateway - external API error",
+		},
+	},
+	tags: ["Basketball"],
+});
+
+basketballRoute.openapi(gameTeamStatsRoute, async (c) => {
+	try {
+		const { gameId } = c.req.valid("param");
+		const apiKey = c.env?.SPORTRADAR_API_KEY;
+
+		const cacheKey = `basketball_game_${gameId}_stats`;
+		const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+			data: any;
+			expiresAt: number;
+		} | null;
+
+		if (cachedData && Date.now() <= cachedData.expiresAt) {
+			return c.json(
+				{
+					success: true as const,
+					data: cachedData.data,
+				},
+				200,
+			);
+		}
+
+		// Fetch from SportRadar API
+		const apiUrl = `https://api.sportradar.com/nba/trial/v8/en/games/${gameId}/summary.json?api_key=${apiKey}`;
+		const response = await fetch(apiUrl);
+
+		if (!response.ok) {
+			if (response.status === 404) {
+				return c.json(
+					{
+						success: false as const,
+						error: "Game not found",
+						details: [
+							{
+								field: "gameId",
+								message: `Game with ID ${gameId} was not found`,
+								code: "game_not_found",
+							},
+						],
+					},
+					404,
+				);
+			}
+
+			return c.json(
+				{
+					success: false as const,
+					error: "External API error",
+					details: [
+						{
+							field: "sportradar_api",
+							message: `SportRadar API returned status ${response.status}`,
+							code: "external_api_error",
+						},
+					],
+				},
+				502,
+			);
+		}
+
+		const gameData: SportRadarGameSummary = await response.json();
+
+		const transformedData = {
+			home: {
+				...transformTeamData(gameData.home, true),
+			},
+			away: {
+				...transformTeamData(gameData.away, true),
+			},
+		};
+
+		await c.env.sportsdey_ns.put(
+			cacheKey,
+			JSON.stringify({
+				data: transformedData,
+				expiresAt: Date.now() + 5 * 1000,
+			}),
+		);
+
+		return c.json(
+			{
+				success: true as const,
+				data: transformedData,
+			},
+			200,
+		);
+	} catch (error) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Internal server error",
+				details: [
+					{
+						field: "server",
+						message:
+							"An unexpected error occurred while processing your request",
+						code: "internal_error",
+					},
+				],
+			},
+			500,
+		);
+	}
+});
 
 export default basketballRoute;
