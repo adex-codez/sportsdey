@@ -6,20 +6,20 @@ type ApiSuccessResponse<T> = {
 };
 
 type ApiErrorResponse = {
-  error: string
-  details: [
-    {
-      field: string,
-      message: string,
-      code:
-    }
-  ]
-}
+	error: string;
+	details: [
+		{
+			field: string;
+			message: string;
+			code: string;
+		},
+	];
+};
 
 export async function apiRequest<T>(
 	endpoint: string,
 	options: RequestInit = {},
-): Promise<ApiSuccessResponse<T>> {
+): Promise<T> {
 	const url = `${API_BASE_URL}${endpoint}`;
 
 	const config: RequestInit = {
@@ -30,15 +30,15 @@ export async function apiRequest<T>(
 		...options,
 	};
 
-	try {
-		const response = await fetch(url, config);
+	const response = await fetch(url, config);
 
-		if (!response.ok) {
-			throw new Error(`API Error: ${response.status} ${response.statusText}`);
-		}
-		const json = (await response.json()) as ApiSuccessResponse<T>;
-		return json.data;
-	} catch (error) {
-		throw error;
+	if (!response.ok) {
+		const data = (await response.json()) as ApiErrorResponse;
+		throw {
+			status: response.status,
+			...data,
+		};
 	}
+	const json = (await response.json()) as ApiSuccessResponse<T>;
+	return json.data;
 }

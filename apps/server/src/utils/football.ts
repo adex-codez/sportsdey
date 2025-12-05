@@ -109,7 +109,7 @@ export function transformFootballMatchInfo(
 			stadium: event.venue?.name ?? "",
 			capacity: event.venue?.capacity ?? 0,
 		},
-		status: status.match_status,
+		status: status.status === "closed" ? "finished" : status.status,
 	};
 
 	// Add clock only if status is not "ended" and clock exists

@@ -125,3 +125,15 @@ export const GameTeamStatsSchema = z.object({
 	home: TeamStatsSchema,
 	away: TeamStatsSchema,
 });
+
+export const VideoSchema = z.object({
+	videoEmbedUrl: z.string(),
+	publishedAt: z.string(),
+	title: z.string(),
+});
+
+export const VideoResponseSchema = z.object({
+	nextPageToken: z.string().optional(),
+	prevPageToken: z.string().optional(),
+	videos: z.array(VideoSchema),
+});

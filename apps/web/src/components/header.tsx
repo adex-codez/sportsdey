@@ -52,7 +52,7 @@ export default function Header() {
 	}, [open]);
 
 	return (
-		<div className="sticky not-[lg]:top-0 w-full z-30 lg:static">
+		<div className="sticky not-[lg]:top-0 z-30 w-full lg:static">
 			<div className="h-[60px] w-full bg-primary px-4 py-1 text-foreground lg:flex lg:h-20 lg:flex-row lg:items-center lg:justify-between lg:px-[10%] lg:py-1">
 				<div className="flex min-w-0 justify-between">
 					<button
@@ -68,7 +68,7 @@ export default function Header() {
 					</button>
 					<div className="flex min-w-0 justify-center self-center">
 						<img
-							src="sportsdey-logo.png"
+							src="/sportsdey-logo.png"
 							className="h-10"
 							alt="sportsdey's logo"
 						/>

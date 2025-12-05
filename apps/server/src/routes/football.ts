@@ -16,7 +16,6 @@ import {
 	transformTopScorers,
 } from "@/utils/football";
 import { jsonZodErrorFormatter } from "@/utils/zod";
-
 const footballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 
 footballRoute.openapi(
@@ -231,16 +230,15 @@ footballRoute.openapi(
 			expiresAt: number;
 		} | null;
 
-		if (cachedData && Date.now() <= cachedData.expiresAt) {
-			console.log(`cachedData ${cachedData}`);
-			return c.json(
-				{
-					success: true as const,
-					data: cachedData.data,
-				},
-				200,
-			);
-		}
+		// if (cachedData && Date.now() <= cachedData.expiresAt) {
+		// 	return c.json(
+		// 		{
+		// 			success: true as const,
+		// 			data: cachedData.data,
+		// 		},
+		// 		200,
+		// 	);
+		// }
 
 		try {
 			const upstream = await fetch(url, {
@@ -300,8 +298,7 @@ footballRoute.openapi(
 			const data: any = await upstream.json();
 
 			const seasonId = data.sport_event.sport_event_context.season.id;
-			console.log(seasonId);
-			const competitionId = data.sport_event.sport_event_context.groups[0].id;
+			// const competitionId = data.sport_event.sport_event_context.groups[0].id;
 			const teamIds = data.sport_event.competitors.map((c: any) => c.id);
 
 			const standingsUrl = `${base.replace(/\/+$/, "")}/soccer/trial/v4/${langSegment}/seasons/${encodeURIComponent(seasonId)}/standings.json`;
@@ -375,11 +372,10 @@ footballRoute.openapi(
 			const leadersData = leadersResult.data;
 
 			const standingsArr = standingsData.standings;
-			const filteredStandings: TeamStanding[] = standingsArr
+			const filteredStandings = standingsArr
 				.filter((standing) => standing.type === "total")
 				.flatMap((standing) =>
 					standing.groups
-						.filter((group) => group.id === competitionId)
 						.flatMap((group) =>
 							group.standings
 								.filter((team: any) => teamIds.includes(team.competitor.id))
@@ -402,6 +398,7 @@ footballRoute.openapi(
 				)
 				.sort((a: TeamStanding, b: TeamStanding) => a.position - b.position);
 
+
 			const topScorers = transformTopScorers(leadersData);
 
 			const last5HomeResults = getLast5Matches(
@@ -423,7 +420,8 @@ footballRoute.openapi(
 				`match_${id}`,
 				JSON.stringify({
 					data: transformedData,
-					expiresAt: Date.now() + 5000,
+					expiresAt: transformedData.status === "finished" ? Date.now() + (2 * 60 * 1000 ) :  Date.now() + 5000,
+
 				}),
 			);
 
