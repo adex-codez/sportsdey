@@ -86,3 +86,19 @@ export const basketballStandingsQuery = z.object({
 				"Offset controls the number of teams to skip when showing the data",
 		}),
 });
+
+export const basketballVideosQuery = z.object({
+	query: z.string().openapi({
+		param: { name: "query", in: "query" },
+		description: "The search query for the videos",
+		example: "Lakers vs Warriors",
+	}),
+	pageToken: z
+		.string()
+		.optional()
+		.openapi({
+			param: { name: "pageToken", in: "query" },
+			description: "The token for the next or previous page of results",
+			example: "CAUQAA",
+		}),
+});

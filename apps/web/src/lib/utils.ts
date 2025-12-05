@@ -10,3 +10,53 @@ export function formatTime(date: Date): string {
 	const minutes = String(date.getMinutes()).padStart(2, "0");
 	return `${hours}:${minutes}`;
 }
+
+// async function searchYouTubeVideos(topic) {
+// 	const API_KEY = "YOUR_API_KEY"; // Replace with your actual API key
+// 	const BASE_URL = "https://www.googleapis.com/youtube/v3/search";
+
+// 	// Construct the URL for the API request
+// 	// - part=snippet: Specifies that the API response will include the snippet resource property.
+// 	// - q=${topic}: Sets the search query to your desired topic.
+// 	// - type=video: Restricts the search to only retrieve video resources.
+// 	// - maxResults=5: Limits the number of results to 5 (you can adjust this).
+// 	// - key=${API_KEY}: Your YouTube Data API key.
+// 	const url = `${BASE_URL}?part=snippet&q=${encodeURIComponent(topic)}&type=video&maxResults=5&key=${API_KEY}`;
+
+// 	try {
+// 		const response = await fetch(url); // Make the API request
+// 		const data = await response.json(); // Parse the JSON response
+
+// 		if (data.items && data.items.length > 0) {
+// 			console.log(`Found videos for topic: "${topic}"`);
+// 			data.items.forEach((item) => {
+// 				const videoId = item.id.videoId;
+// 				const videoTitle = item.snippet.title;
+// 				console.log(`Video ID: ${videoId}, Title: "${videoTitle}"`);
+
+// 				// Now you have the videoId, which you can use to embed the video.
+// 				// For example, to create an iframe:
+// 				// const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+// 				// console.log(`Embed URL: ${embedUrl}`);
+
+// 				// You would typically dynamically add this to your HTML:
+// 				// const iframe = document.createElement('iframe');
+// 				// iframe.width = "560";
+// 				// iframe.height = "315";
+// 				// iframe.src = embedUrl;
+// 				// iframe.frameBorder = "0";
+// 				// iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+// 				// iframe.allowFullscreen = true;
+// 				// document.getElementById('video-container').appendChild(iframe); // Assuming you have a div with id 'video-container'
+// 			});
+// 		} else {
+// 			console.log(`No videos found for topic: "${topic}"`);
+// 		}
+// 	} catch (error) {
+// 		console.error("Error fetching YouTube videos:", error);
+// 	}
+// }
+
+// // Example usage:
+// // searchYouTubeVideos('JavaScript tutorial');
+// // searchYouTubeVideos('cute cats');

@@ -5,6 +5,7 @@ import {
 	GameTeamStatsSchema,
 	ScheduleData,
 	StandingsSchema,
+	VideoResponseSchema,
 	successResponseSchema,
 } from "@/schemas";
 import type {
@@ -20,6 +21,7 @@ import {
 	basketballScheduleQuery,
 	basketballStandingsParam,
 	basketballStandingsQuery,
+	basketballVideosQuery,
 	gameIdParam,
 } from "@/validators";
 
@@ -721,6 +723,163 @@ basketballRoute.openapi(
 				JSON.stringify({
 					data: transformedData,
 					expiresAt: Date.now() + 5 * 1000,
+				}),
+			);
+
+			return c.json(
+				{
+					success: true as const,
+					data: transformedData,
+				},
+				200,
+			);
+		} catch (error) {
+			return c.json(
+				{
+					success: false as const,
+					error: "Internal server error",
+					details: [
+						{
+							field: "server",
+							message:
+								"An unexpected error occurred while processing your request",
+							code: "internal_error",
+						},
+					],
+				},
+				500,
+			);
+		}
+	},
+	jsonZodErrorFormatter,
+);
+
+const basketballVideosRoute = createRoute({
+	method: "get",
+	path: "/videos",
+	summary: "Get YouTube videos for a basketball match",
+	description:
+		"Retrieves YouTube videos related to a specific basketball match query, ordered by date. If there is only nextPageToken that means that's the first set of videos. If there is only prevPageToken that means that's the last set of videos. If both nextPageToken and prevPageToken are present then there are more videos available",
+	request: {
+		query: basketballVideosQuery,
+	},
+	responses: {
+		200: {
+			content: {
+				"application/json": {
+					schema: successResponseSchema(VideoResponseSchema),
+				},
+			},
+			description: "Successfully retrieved videos",
+		},
+		400: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "Bad request",
+		},
+		500: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "Internal server error",
+		},
+		502: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "External API error",
+		},
+	},
+	tags: ["Basketball"],
+});
+
+basketballRoute.openapi(
+	basketballVideosRoute,
+	async (c) => {
+		try {
+			const { query, pageToken } = c.req.valid("query");
+			const apiKey = c.env?.YOUTUBE_API_KEY;
+
+			if (!apiKey) {
+				return c.json(
+					{
+						success: false as const,
+						error: "Configuration error",
+						details: [
+							{
+								field: "YOUTUBE_API_KEY",
+								message: "YouTube API key is missing",
+								code: "missing_api_key",
+							},
+						],
+					},
+					500,
+				);
+			}
+
+			const cacheKey = `basketball_videos_${query}_${pageToken || "first"}`;
+			const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+				data: any;
+				expiresAt: number;
+			} | null;
+
+			if (cachedData && Date.now() <= cachedData.expiresAt) {
+				return c.json(
+					{
+						success: true as const,
+						data: cachedData.data,
+					},
+					200,
+				);
+			}
+
+			let apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&order=date&key=${apiKey}&maxResults=10`;
+			if (pageToken) {
+				apiUrl += `&pageToken=${pageToken}`;
+			}
+
+			const response = await fetch(apiUrl);
+
+			if (!response.ok) {
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [
+							{
+								field: "youtube_api",
+								message: `YouTube API returned status ${response.status}`,
+								code: "external_api_error",
+							},
+						],
+					},
+					502,
+				);
+			}
+
+			const data: any = await response.json();
+			const transformedData = {
+				nextPageToken: data.nextPageToken,
+				prevPageToken: data.prevPageToken,
+				videos: data.items.map((item: any) => ({
+					videoEmbedUrl: `https://www.youtube.com/embed/${item.id.videoId}`,
+					publishedAt: item.snippet.publishedAt,
+					title: item.snippet.title,
+				})),
+			};
+
+			await c.env.sportsdey_ns.put(
+				cacheKey,
+				JSON.stringify({
+					data: transformedData,
+					expiresAt: Date.now() + 10 * 60 * 1000, // Cache for 10 minutes
 				}),
 			);
 
