@@ -461,7 +461,7 @@ footballRoute.openapi(
 		path: "/videos",
 		summary: "Get YouTube videos for a football match",
 		description:
-			"Retrieves YouTube videos related to a specific football match query, ordered by date. If there is only nextPageToken that means that's the first set of videos. If there is only prevPageToken that means that's the last set of videos. If both nextPageToken and prevPageToken are present then there are more videos available",
+			"Retrieves YouTube videos related to a specific football match query, ordered by date. If there is only nextPageToken that means that's the first set of videos. If there is only prevPageToken that means that's the last set of videos. If both nextPageToken and prevPageToken are present then there are more videos available. You can pass any of the two to the pageToken query so for pagination",
 		request: {
 			query: footballVideosQuery,
 		},

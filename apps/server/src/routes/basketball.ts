@@ -759,7 +759,7 @@ const basketballVideosRoute = createRoute({
 	path: "/videos",
 	summary: "Get YouTube videos for a basketball match",
 	description:
-		"Retrieves YouTube videos related to a specific basketball match query, ordered by date. If there is only nextPageToken that means that's the first set of videos. If there is only prevPageToken that means that's the last set of videos. If both nextPageToken and prevPageToken are present then there are more videos available",
+		"Retrieves YouTube videos related to a specific basketball match query, ordered by date. If there is only nextPageToken that means that's the first set of videos. If there is only prevPageToken that means that's the last set of videos. If both nextPageToken and prevPageToken are present then there are more videos available. You can pass any of the two to the pageToken query so for pagination",
 	request: {
 		query: basketballVideosQuery,
 	},
@@ -869,7 +869,7 @@ basketballRoute.openapi(
 				nextPageToken: data.nextPageToken,
 				prevPageToken: data.prevPageToken,
 				videos: data.items.map((item: any) => ({
-					videoEmbedUrl: `https://www.youtube.com/embed/${item.id.videoId}`,
+					videoId: item.id.videoId,
 					publishedAt: item.snippet.publishedAt,
 					title: item.snippet.title,
 				})),
