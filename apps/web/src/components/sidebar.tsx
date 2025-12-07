@@ -3,6 +3,9 @@ import { useEffect, useState, type PropsWithChildren } from "react";
 import { cn } from "@/lib/utils";
 import { useActiveTab } from "./active-tab-context";
 import { Button } from "./ui/button";
+import { useNavigate } from "@tanstack/react-router";
+import { SPORTS } from "@/lib/constants";
+import { useCurrentSport } from "@/hooks/use-current-sport";
 
 const SidebarItem = ({
 	children,
@@ -27,6 +30,8 @@ const SidebarItem = ({
 const Sidebar = () => {
 	const { tab, setTab } = useActiveTab();
 	const [isIframeLoading, setIsIframeLoading] = useState(true);
+	const navigate = useNavigate();
+	const currentSport = useCurrentSport();
 
 	useEffect(() => {
 		const timer = setTimeout(() => setIsIframeLoading(false), 5000);
@@ -43,6 +48,16 @@ const Sidebar = () => {
 							"cursor-pointer",
 							tab === "scores" ? "font-semibold text-accent" : null,
 						)}
+						onClick={() => {
+							setTab("scores");
+							const target =
+								currentSport === SPORTS.TENNIS
+									? "/tennis"
+									: currentSport === SPORTS.BASKETBALL
+										? "/basketball"
+										: "/";
+							navigate({ to: target });
+						}}
 					>
 						Scores
 					</li>
@@ -60,6 +75,10 @@ const Sidebar = () => {
 							"cursor-pointer",
 							tab === "news" ? "font-semibold text-accent" : null,
 						)}
+						onClick={() => {
+							setTab("news");
+							navigate({ to: "/news", search: { sports: currentSport } });
+						}}
 					>
 						News
 					</li>

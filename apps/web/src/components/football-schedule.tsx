@@ -71,12 +71,10 @@ const FootballSchedule = () => {
 	const filteredSchedules = useMemo(() => {
 		if (!schedules) return null;
 
-		// If showing all matches, return original data
 		if (currentFilter === "all") {
 			return schedules;
 		}
 
-		// More efficient status mapping
 		const statusMap: Record<FiltersType, string | null> = {
 			live: "live",
 			finished: "closed",
@@ -87,7 +85,6 @@ const FootballSchedule = () => {
 		const targetStatus = statusMap[currentFilter];
 		if (!targetStatus) return schedules;
 
-		// Pre-filter and optimize the loop
 		const filteredCompetitions = [];
 
 		for (const competition of schedules.competitions) {
