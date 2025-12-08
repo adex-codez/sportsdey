@@ -68,10 +68,11 @@ const statColumns = [
   { key: "plusMinus", label: "+/-" },
 ]
 
+
 function PlayerRow({ player }: { player: Player }) {
   return (
     <tr className="border-b border-[#C8C8C8] hover:bg-gray-300/50 transition-colors">
-      <td className="py-2 px-3 text-left border-r border-[#C8C8C8]">
+      <td className="py-2 px-3 text-left border-r border-[#C8C8C8] sticky left-0 bg-white z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
         <span className="text-primary text-[11px]">{player.name}</span>
         <span className="ml-2 text-primary text-[11px]">#{player.number}</span>
       </td>
@@ -102,8 +103,8 @@ function PlayerRow({ player }: { player: Player }) {
 
 function SectionHeader({ title }: { title: string }) {
   return (
-    <tr className="bg-zinc-[#C8C8C8] border-b border-t border-[#C8C8C8]">
-      <td className="py-2 px-3 text-left font-semibold text-primary border-r border-[#C8C8C8] text-xs">{title}</td>
+    <tr className="bg-white border-b border-t border-[#C8C8C8]">
+      <td className="py-2 px-3 text-left font-semibold text-primary border-r border-[#C8C8C8] text-xs sticky left-0 bg-white z-10">{title}</td>
       {statColumns.map((col) => (
         <td key={col.key} className="py-2 px-2 text-center text-primary text-[10px] font-semibold">
           {col.label}
@@ -117,7 +118,7 @@ function TeamTotalsRow({ totals }: { totals: TeamTotals }) {
   return (
     <>
       <tr className="bg-white font-semibold">
-        <td className="py-2 px-3 text-left text-primary border-r border-[#C8C8C8] text-xs">TEAM</td>
+        <td className="py-2 px-3 text-left text-primary border-r border-[#C8C8C8] text-xs sticky left-0 bg-white z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">TEAM</td>
         <td className="py-2 px-2 text-center font-semibold text-[10px]">{totals.pts}</td>
         <td className="py-2 px-2 text-center text-primary text-[10px]">{totals.fg}</td>
         <td className="py-2 px-2 text-center text-primary text-[10px]">{totals.threePt}</td>
@@ -134,7 +135,7 @@ function TeamTotalsRow({ totals }: { totals: TeamTotals }) {
         <td className="py-2 px-2 text-center text-primary text-[10px]">-</td>
       </tr>
       <tr className="border-b border-[#C8C8C8] font-semibold">
-        <td className="py-2 px-3 border-r border-[#C8C8C8]" />
+        <td className="py-2 px-3 border-r border-[#C8C8C8] sticky left-0 bg-white z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" />
         <td className="py-2 px-2" />
         <td className="py-2 px-2 text-center text-[10px]">{totals.fgPct}%</td>
         <td className="py-2 px-2 text-center text-[10px]">{totals.threePtPct}%</td>
@@ -145,42 +146,48 @@ function TeamTotalsRow({ totals }: { totals: TeamTotals }) {
   )
 }
 
-function TeamStatsTable({ team }: { team: TeamStatsData }) {
-  return (
-    <div className="mb-4">
-      <div className="flex items-center gap-x-2 px-3 py-3">
-        {team.teamLogo && (
-          <img src={team.teamLogo || "/placeholder.svg"} alt={team.teamName} className="w-6 h-6 object-contain" />
-        )}
-        <h3 className="text-sm font-semibold text-primary">{team.teamName}</h3>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <tbody>
-            <SectionHeader title="Starters" />
-            {team.starters.map((player, idx) => (
-              <PlayerRow key={`starter-${idx}`} player={player} />
-            ))}
-            <SectionHeader title="Bench" />
-            {team.bench.map((player, idx) => (
-              <PlayerRow key={`bench-${idx}`} player={player} />
-            ))}
-            <TeamTotalsRow totals={team.totals} />
-          </tbody>
-        </table>
-      </div>
-      
-    </div>
-  )
-}
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 export function TeamStats({ teams, className }: TeamStatsProps) {
   return (
     <div className={cn("bg-white rounded-lg", className)}>
       <h2 className="text-sm font-semibold text-primary py-3 px-2 border-b border-b-[#C8C8C8]">Team stats</h2>
-      {teams.map((team, idx) => (
-        <TeamStatsTable key={idx} team={team} />
-      ))}
+      <Accordion type="multiple" className="w-full">
+        {teams.map((team, idx) => (
+          <AccordionItem key={idx} value={`item-${idx}`} className="border-b border-[#C8C8C8]">
+            <AccordionTrigger className="px-3 py-3 hover:no-underline hover:bg-gray-50">
+              <div className="flex items-center gap-x-2">
+                {team.teamLogo && (
+                  <img src={team.teamLogo || "/placeholder.svg"} alt={team.teamName} className="w-6 h-6 object-contain" />
+                )}
+                <h3 className="text-sm font-semibold text-primary">{team.teamName}</h3>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="overflow-x-auto pb-4 max-w-[calc(100vw-2rem)] md:max-w-none">
+                <table className="w-full text-sm">
+                  <tbody>
+                    <SectionHeader title="Starters" />
+                    {team.starters.map((player, idx) => (
+                      <PlayerRow key={`starter-${idx}`} player={player} />
+                    ))}
+                    <SectionHeader title="Bench" />
+                    {team.bench.map((player, idx) => (
+                      <PlayerRow key={`bench-${idx}`} player={player} />
+                    ))}
+                    <TeamTotalsRow totals={team.totals} />
+                  </tbody>
+                </table>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
       <p className="text-xs text-zinc-500 mt-2 px-3 py-2">
         +/- denotes team&apos;s net points while the player is on the court
       </p>

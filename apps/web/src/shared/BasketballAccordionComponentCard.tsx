@@ -14,26 +14,26 @@ const BasketballComponentHeader: React.FC<BasketballComponentHeaderProps> = ({
   imageUrl
 }) => {
   return (
-    <div 
+    <div
       className='w-full flex justify-between items-center border-b px-5 py-4 cursor-pointer transition-colors'
       onClick={onToggle}
     >
       <div className='flex gap-x-3 items-center'>
         {flag ? (
-          <img src={flag} alt={`${country} flag`} className='w-6 h-6 rounded-full'/>
+          <img src={flag} alt={`${country} flag`} className='w-6 h-6 rounded-full' />
         ) : imageUrl ? (
-          <img src={imageUrl} alt={`${country} flag`} className='w-6 h-6 rounded-full'/>
+          <img src={imageUrl} alt={`${country} flag`} className='w-6 h-6 rounded-full' />
         ) : (
-          <img src={`/${country}.png`} alt={`${country} flag`} className='w-6 h-6 rounded-full'/>
+          <img src={`/${country}.png`} alt={`${country} flag`} className='w-6 h-6 rounded-full' />
         )}
         <div className='inline-flex items-center gap-x-1 text-sm'>
           <p className='font-bold text-primary'>{country}</p>
           -
           <p className='text-primary font-bold'>{league}</p>
         </div>
-   
+
       </div>
-      <span className={`text-xs text-primary`}>{isExpanded ? <ChevronRight/> : <ChevronDown/>}</span>
+      <span className={`text-xs text-primary`}>{isExpanded ? <ChevronRight /> : <ChevronDown />}</span>
     </div>
   );
 };
@@ -73,8 +73,8 @@ const MatchCard: React.FC<MatchCardProps> = ({
   }
 
   return (
-   <div className="grid cursor-pointer grid-cols-[50px_1fr_40px] items-center gap-x-4 px-5 py-3.5 border-b border-border hover:bg-muted/30 transition-colors last:border-b-0">
-      <div className={`text-xs font-medium flex items-center justify-center w-[35px] h-[35px] rounded-[10px] ${status !== "FT" && status !== time  ? "bg-[#0E8F1A] text-white" : "text-muted-foreground"}`}>{status}</div>
+    <div className="grid cursor-pointer grid-cols-[50px_1fr_40px] items-center gap-x-4 px-5 py-3.5 border-b border-border hover:bg-muted/30 transition-colors last:border-b-0">
+      <div className={`text-xs font-medium flex items-center justify-center w-[35px] h-[35px] rounded-[10px] ${status !== "FT" && status !== time ? "bg-[#0E8F1A] text-white" : "text-muted-foreground"}`}>{status}</div>
 
       {isTennisRoute && player1Sets && player2Sets ? (
         <div className="flex flex-col gap-1.5 text-sm">
@@ -119,16 +119,15 @@ const MatchCard: React.FC<MatchCardProps> = ({
           </div>
         </div>
       )}
-      
-<button 
+
+      <button
         onClick={(e) => {
-    e.stopPropagation();    
-    e.preventDefault();        
-    onFavoriteToggle?.();
-  }}
-        className={`text-xl border-none bg-transparent cursor-pointer transition-colors ${
-          isFavorite ? 'text-yellow-400' : 'text-[#C8C8C8] hover:text-yellow-400'
-        }`}
+          e.stopPropagation();
+          e.preventDefault();
+          onFavoriteToggle?.();
+        }}
+        className={`text-xl border-none bg-transparent cursor-pointer transition-colors ${isFavorite ? 'text-yellow-400' : 'text-[#C8C8C8] hover:text-yellow-400'
+          }`}
       >
         ★
       </button>
@@ -154,22 +153,22 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
     }));
   };
 
-   const { state } = useRouter();
+  const { state } = useRouter();
   const pathname = state.location.pathname;
-  const getRoutePath= () => {
+  const getRoutePath = () => {
     let routePath = ""
-    if(pathname.includes('/basketball') || pathname.includes('basketball')){
+    if (pathname.includes('/basketball') || pathname.includes('basketball')) {
       routePath = `/basketball/$Id`;
     }
-    if(pathname.includes('/tennis') || pathname.includes('tennis')){
-      routePath =`/tennis/$Id`;
+    if (pathname.includes('/tennis') || pathname.includes('tennis')) {
+      routePath = `/tennis/$Id`;
+    }
+    return routePath
   }
-  return routePath
-}
 
   return (
     <div className='w-full bg-white rounded-2xl overflow-hidden shadow-sm'>
-      <BasketballComponentHeader 
+      <BasketballComponentHeader
         flag={flag}
         country={country}
         league={league}
@@ -178,24 +177,24 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
         onToggle={() => setIsExpanded(!isExpanded)}
         imageUrl={imageUrl}
       />
-      
+
       {isExpanded && matches && (
         <div className="flex flex-col">
           {matches.map((match, index) => (
-            <Link to={`${getRoutePath()}`} params={{Id: match.id!}}>
-            <MatchCard 
-              key={match.id || index}
-              team1={match.team1}
-              team2={match.team2}
-              time={match.time}
-              player1Sets={match.player1Sets}
-              player2Sets={match.player2Sets}
-              score1={match.score1}
-              score2={match.score2}
-              status={match.status ? match.status : match.time}
-              isFavorite={favorites[index]}
-              onFavoriteToggle={() => toggleFavorite(index)}
-            />
+            <Link to={`${getRoutePath()}`} params={{ Id: match.id! }}>
+              <MatchCard
+                key={match.id || index}
+                team1={match.team1}
+                team2={match.team2}
+                time={match.time}
+                player1Sets={match.player1Sets}
+                player2Sets={match.player2Sets}
+                score1={match.score1}
+                score2={match.score2}
+                status={match.status ? match.status : match.time}
+                isFavorite={favorites[index]}
+                onFavoriteToggle={() => toggleFavorite(index)}
+              />
             </Link>
           ))}
         </div>

@@ -20,6 +20,10 @@
     "db:migrate": "turbo -F @sportsdey/db db:migrate"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.5",
+    "@mui/material": "^7.3.5",
     "@reduxjs/toolkit": "^2.10.1",
     "dotenv": "^17.2.2",
     "react-redux": "^9.2.0",

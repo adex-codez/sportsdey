@@ -59,7 +59,7 @@ export default function Header() {
 	}, [open]);
 
 	return (
-		<div className="sticky not-[lg]:top-0 z-30 w-full lg:static">
+		<div className="sticky not-[lg]:top-0 z-30 w-full pb-4 lg:pb-0 lg:static">
 			<div className="h-[60px] w-full bg-primary px-4 py-1 text-foreground lg:flex lg:h-20 lg:flex-row lg:items-center lg:justify-between lg:px-[10%] lg:py-1">
 				<div className="flex min-w-0 justify-between">
 					<button

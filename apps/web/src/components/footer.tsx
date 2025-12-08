@@ -24,12 +24,12 @@ const bottomBarItems = [
 		icon: Bet,
 	},
 	{
-		id: 1,
+		id: 4,
 		item: "news",
 		icon: News,
 	},
 	{
-		id: 1,
+		id: 5,
 		item: "lives",
 		icon: Lives,
 	},
@@ -39,7 +39,7 @@ const currentSport = useCurrentSport();
 	const { tab, setTab } = useActiveTab();
 	const router = useRouter();
 	return (
-		<div className="fixed bottom-0 left-0 flex w-full justify-between rounded-t-3xl bg-primary px-8 py-4 lg:hidden">
+		<div className="fixed bottom-0 z-20 left-0 flex w-full justify-between rounded-t-3xl bg-primary px-8 py-4 lg:hidden">
 			{bottomBarItems.map(({ id, icon: Icon, item }) => (
 				<div
 					key={id}

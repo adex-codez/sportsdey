@@ -42,8 +42,8 @@ const tennisLeagues: League[] = [
       {
         team1: "Kuperstein Alex",
         team2: "Kai Wehnelt",
-        player1Sets: [{ games: 1 }, { games: 7, tiebreak: 7 }, { games: 2 }],
-        player2Sets: [{ games: 6 }, { games: 6, tiebreak: 4 }, { games: 1 }],
+        player1Sets: [{ games: 1 }, { games: 7, tiebreak: 7 }, { games: 2 }, { games: 6 }],
+        player2Sets: [{ games: 6 }, { games: 6, tiebreak: 4 }, { games: 1 }, { games: 5 }],
         status: "FT",
       },
       {
