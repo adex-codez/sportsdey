@@ -14,6 +14,7 @@ import { Route as BasketballRouteImport } from './routes/basketball'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TennisIndexRouteImport } from './routes/tennis.index'
 import { Route as BasketballIndexRouteImport } from './routes/basketball.index'
+import { Route as TennisIdRouteImport } from './routes/tennis/$Id'
 import { Route as BasketballIdRouteImport } from './routes/basketball/$Id'
 
 const TennisRoute = TennisRouteImport.update({
@@ -41,6 +42,11 @@ const BasketballIndexRoute = BasketballIndexRouteImport.update({
   path: '/',
   getParentRoute: () => BasketballRoute,
 } as any)
+const TennisIdRoute = TennisIdRouteImport.update({
+  id: '/$Id',
+  path: '/$Id',
+  getParentRoute: () => TennisRoute,
+} as any)
 const BasketballIdRoute = BasketballIdRouteImport.update({
   id: '/$Id',
   path: '/$Id',
@@ -52,12 +58,14 @@ export interface FileRoutesByFullPath {
   '/basketball': typeof BasketballRouteWithChildren
   '/tennis': typeof TennisRouteWithChildren
   '/basketball/$Id': typeof BasketballIdRoute
+  '/tennis/$Id': typeof TennisIdRoute
   '/basketball/': typeof BasketballIndexRoute
   '/tennis/': typeof TennisIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/basketball/$Id': typeof BasketballIdRoute
+  '/tennis/$Id': typeof TennisIdRoute
   '/basketball': typeof BasketballIndexRoute
   '/tennis': typeof TennisIndexRoute
 }
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   '/basketball': typeof BasketballRouteWithChildren
   '/tennis': typeof TennisRouteWithChildren
   '/basketball/$Id': typeof BasketballIdRoute
+  '/tennis/$Id': typeof TennisIdRoute
   '/basketball/': typeof BasketballIndexRoute
   '/tennis/': typeof TennisIndexRoute
 }
@@ -77,16 +86,18 @@ export interface FileRouteTypes {
     | '/basketball'
     | '/tennis'
     | '/basketball/$Id'
+    | '/tennis/$Id'
     | '/basketball/'
     | '/tennis/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/basketball/$Id' | '/basketball' | '/tennis'
+  to: '/' | '/basketball/$Id' | '/tennis/$Id' | '/basketball' | '/tennis'
   id:
     | '__root__'
     | '/'
     | '/basketball'
     | '/tennis'
     | '/basketball/$Id'
+    | '/tennis/$Id'
     | '/basketball/'
     | '/tennis/'
   fileRoutesById: FileRoutesById
@@ -134,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BasketballIndexRouteImport
       parentRoute: typeof BasketballRoute
     }
+    '/tennis/$Id': {
+      id: '/tennis/$Id'
+      path: '/$Id'
+      fullPath: '/tennis/$Id'
+      preLoaderRoute: typeof TennisIdRouteImport
+      parentRoute: typeof TennisRoute
+    }
     '/basketball/$Id': {
       id: '/basketball/$Id'
       path: '/$Id'
@@ -159,10 +177,12 @@ const BasketballRouteWithChildren = BasketballRoute._addFileChildren(
 )
 
 interface TennisRouteChildren {
+  TennisIdRoute: typeof TennisIdRoute
   TennisIndexRoute: typeof TennisIndexRoute
 }
 
 const TennisRouteChildren: TennisRouteChildren = {
+  TennisIdRoute: TennisIdRoute,
   TennisIndexRoute: TennisIndexRoute,
 }
 

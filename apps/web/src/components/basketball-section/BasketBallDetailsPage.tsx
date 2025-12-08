@@ -168,7 +168,7 @@ const standingsData: TeamStanding[] = [
   },
 ]
 
-  export const sampleTeams = [
+export const sampleTeams = [
   {
     teamName: "Detroit Pistons",
     teamLogo: "/Pistons.png",
@@ -548,7 +548,7 @@ const standingsData: TeamStanding[] = [
 ]
 
 const BasketBallDetailsPage = () => {
-        const [activeTab, setActiveTab] = useState('info');
+  const [activeTab, setActiveTab] = useState('info');
   const quarters: Quarter[] = [
     { id: 'q1', label: 'Q1' },
     { id: 'q2', label: 'Q2' },
@@ -568,24 +568,31 @@ const BasketBallDetailsPage = () => {
     total: 113,
   };
 
+  const gameTabs = [
+    { id: 'info', label: 'Info' },
+    { id: 'standings', label: 'Standings' },
+    { id: 'team-stats', label: 'Team Stats' },
+    { id: 'videos', label: 'Videos' },
+    { id: 'news', label: 'News' }
+  ];
 
-const renderTabContent = () => {
+  const renderTabContent = () => {
     switch (activeTab) {
       case 'info':
         return (
-         <InfoTab/>
+          <InfoTab />
         );
-      
+
       case 'standings':
         return (
-         <StandingsTab teams={standingsData} onSeeAllClick={() => console.log("See all forms clicked")}/>
+          <StandingsTab teams={standingsData} onSeeAllClick={() => console.log("See all forms clicked")} />
         );
-      
+
       case 'team-stats':
         return (
-        <TeamStats teams={sampleTeams}/>
+          <TeamStats teams={sampleTeams} />
         );
-      
+
       case 'videos':
         return (
           <div className="space-y-4">
@@ -593,7 +600,7 @@ const renderTabContent = () => {
             <div className="grid grid-cols-2 gap-4">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="bg-gray-800 rounded-lg overflow-hidden hover:ring-2 ring-blue-500 transition cursor-pointer">
-                  <div className="h-32 bg-gradient-to-br from-blue-900 to-gray-900 flex items-center justify-center">
+                  <div className="h-32 bg-linear-to-br from-blue-900 to-gray-900 flex items-center justify-center">
                     <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                     </svg>
@@ -607,7 +614,7 @@ const renderTabContent = () => {
             </div>
           </div>
         );
-      
+
       case 'news':
         return (
           <div className="space-y-4">
@@ -625,20 +632,20 @@ const renderTabContent = () => {
             </div>
           </div>
         );
-      
+
       default:
         return null;
     }
   };
   return (
-    <div className='w-full space-y-3 pb-28 lg:pb-10'>
-        <div className='py-4 lg:py-0'>
-         <DetailsImageCard activeTab={activeTab} setActiveTab={setActiveTab} competitionCountry='USA' competitionName='NBA' hostTeamName='Detroit Pistons' hostTeamLogo='/Pistons.png' matchStatus='finished' hostTeamScore={121} guestTeamScore={131} guestTeamLogo='/Bulls.png' guestTeamName='Chicago Bulls'/>
-        </div>
+    <div className='w-full max-w-screen space-y-3 pb-28 lg:pb-10'>
+      <div className='py-4 lg:py-0'>
+        <DetailsImageCard gameTabs={gameTabs} activeTab={activeTab} setActiveTab={setActiveTab} competitionCountry='USA' competitionName='NBA' hostTeamName='Detroit Pistons' hostTeamLogo='/Pistons.png' matchStatus='finished' hostTeamScore={121} guestTeamScore={131} guestTeamLogo='/Bulls.png' guestTeamName='Chicago Bulls' />
+      </div>
       <div>
         {renderTabContent()}
       </div>
-        <div><ImportantUpdate/></div>
+      <div><ImportantUpdate /></div>
     </div>
   )
 }

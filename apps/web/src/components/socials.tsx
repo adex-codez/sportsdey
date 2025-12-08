@@ -13,11 +13,11 @@ const socials = [
 		icon: X,
 	},
 	{
-		id: 1,
+		id: 3,
 		icon: Instagram,
 	},
 	{
-		id: 1,
+		id: 4,
 		icon: Telegram,
 	},
 ];
