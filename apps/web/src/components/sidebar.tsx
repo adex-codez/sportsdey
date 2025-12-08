@@ -1,8 +1,11 @@
-import { ChevronRight } from "lucide-react";
-import type { PropsWithChildren } from "react";
+import { ChevronRight, Loader2 } from "lucide-react";
+import { useEffect, useState, type PropsWithChildren } from "react";
 import { cn } from "@/lib/utils";
 import { useActiveTab } from "./active-tab-context";
 import { Button } from "./ui/button";
+import { useNavigate } from "@tanstack/react-router";
+import { SPORTS } from "@/lib/constants";
+import { useCurrentSport } from "@/hooks/use-current-sport";
 
 const SidebarItem = ({
 	children,
@@ -13,7 +16,7 @@ const SidebarItem = ({
 	icon?: React.ReactNode;
 }>) => {
 	return (
-		<div className="rounded-2xl bg-white">
+		<div className="overflow-hidden rounded-2xl bg-white">
 			<div className="flex items-center justify-between px-6 py-4">
 				<p className="font-semibold text-primary text-xl">{heading}</p>
 				{Icon && Icon}
@@ -26,6 +29,24 @@ const SidebarItem = ({
 
 const Sidebar = () => {
 	const { tab, setTab } = useActiveTab();
+	const [isIframeLoading, setIsIframeLoading] = useState(true);
+	const navigate = useNavigate();
+	const currentSport = useCurrentSport();
+
+	useEffect(() => {
+		const timer = setTimeout(() => setIsIframeLoading(false), 5000);
+		return () => clearTimeout(timer);
+	}, []);
+
+	useEffect(() => {
+		window.addEventListener("message", (event) => {
+			const iframe = document.getElementById("betting-widget-wrapper");
+		if (iframe) {
+			iframe.style.height = "200px";
+		}
+		});	
+	}, []);
+
 
 	return (
 		<div className="space-y-8">
@@ -36,6 +57,16 @@ const Sidebar = () => {
 							"cursor-pointer",
 							tab === "scores" ? "font-semibold text-accent" : null,
 						)}
+						onClick={() => {
+							setTab("scores");
+							const target =
+								currentSport === SPORTS.TENNIS
+									? "/tennis"
+									: currentSport === SPORTS.BASKETBALL
+										? "/basketball"
+										: "/";
+							navigate({ to: target });
+						}}
 					>
 						Scores
 					</li>
@@ -53,20 +84,36 @@ const Sidebar = () => {
 							"cursor-pointer",
 							tab === "news" ? "font-semibold text-accent" : null,
 						)}
+						onClick={() => {
+							setTab("news");
+							navigate({ to: "/news", search: { sports: currentSport } });
+						}}
 					>
 						News
 					</li>
 				</ul>
 			</SidebarItem>
-			<SidebarItem heading="Betting Tips">
-				<ul className="space-y-4 px-6 py-6">
-					<li className="cursor-pointer">Value Bets</li>
-					<li className="cursor-pointer">Trends</li>
-					<li className="cursor-pointer">Streaks</li>
-					<li className="cursor-pointer">Daily Acca</li>
-				</ul>
-			</SidebarItem>
 
+			<div className="relative h-[200px] w-full rounded-2xl bg-white">
+				<div id="betting-widget-wrapper">
+				{isIframeLoading && (
+					<div className="absolute inset-0 flex items-center justify-center">
+						<Loader2 className="h-8 w-8 animate-spin text-primary" />
+					</div>
+				)}
+				<iframe
+					src="https://bet.sportsdey.com/?mode=widget"
+					title="sportsdey betting tips widget"
+					className={cn(
+						"h-full w-full cust-scrollbar rounded-2xl transition-opacity duration-500",
+						isIframeLoading ? "opacity-0" : "opacity-100",
+					)}
+					id="betting-widget"
+					onLoad={() => setIsIframeLoading(false)}
+				/>
+				</div>
+				
+			</div>
 			<SidebarItem heading="My Teams" icon={<ChevronRight />}>
 				<div>
 					<p className="px-6 py-6 text-sm">

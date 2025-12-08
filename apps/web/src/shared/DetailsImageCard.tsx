@@ -1,6 +1,6 @@
-import { TabNavigation } from '@/components/ui/tab-navigation';
-import type { DetailsImageProps } from '@/types/basketball'
-import React, { useState } from 'react'
+import React, { useState } from "react";
+import { TabNavigation } from "@/components/ui/tab-navigation";
+import type { DetailsImageProps } from "@/types/basketball";
 
 interface DetailsImageCardProps extends DetailsImageProps {
   competitionName: string;

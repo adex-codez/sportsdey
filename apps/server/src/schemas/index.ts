@@ -20,3 +20,15 @@ export const ErrorResponseSchema = z.object({
 	error: z.string(),
 	details: z.array(ErrorDetailSchema).nullable(),
 });
+
+export const VideoSchema = z.object({
+	videoEmbedUrl: z.string(),
+	publishedAt: z.string(),
+	title: z.string(),
+});
+
+export const VideoResponseSchema = z.object({
+	nextPageToken: z.string().optional(),
+	prevPageToken: z.string().optional(),
+	videos: z.array(VideoSchema),
+});

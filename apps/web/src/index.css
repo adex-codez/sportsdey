@@ -128,11 +128,23 @@ body {
 		@apply border-border outline-ring/50;
 	}
 	body {
-		@apply bg-background text-foreground;
+		@apply bg-background text-foreground text-sm;
 	}
 }
 
 .cust-scrollbar {
 	scrollbar-color: hsla(0, 0%, 61%, 0.5) transparent;
 	scrollbar-width: thin;
+}
+
+.betting-widget-wrapper {
+    width: 100%;
+}
+
+#betting-widget {
+    width: 100%;
+    border: none;
+    display: block;
+    min-height: 200px; 
+    overflow: hidden; 
 }

@@ -11,14 +11,25 @@ import TennisIcon from "@/logos/tennis.svg?react";
 import WorldIcon from "@/logos/world.svg?react";
 import { useDateContext } from "./date-context";
 import { Button } from "./ui/button";
+import { useCurrentSport } from "@/hooks/use-current-sport";
+import { SPORTS } from "@/lib/constants";
+import { useActiveTab } from "./active-tab-context";
 
 export default function Header() {
+	const currentSport = useCurrentSport();
+	const { setTab } = useActiveTab();
+
 	const links = [
-		{ to: "/", label: "Football", icon: FootballIcon },
-		{ to: "/basketball", label: "Basketball", icon: BasketballIcon },
-		{ to: "/tennis", label: "Tennis", icon: TennisIcon },
-		{ to: "/boxing", label: "Boxing", icon: BoxingIcon },
-		{ to: "/ufc", label: "UFC", icon: BaseballIcon },
+		{ to: "/", label: "Football", icon: FootballIcon, sport: SPORTS.FOOTBALL },
+		{
+			to: "/basketball",
+			label: "Basketball",
+			icon: BasketballIcon,
+			sport: SPORTS.BASKETBALL,
+		},
+		{ to: "/tennis", label: "Tennis", icon: TennisIcon, sport: SPORTS.TENNIS },
+		{ to: "/boxing", label: "Boxing", icon: BoxingIcon, sport: "boxing" },
+		{ to: "/ufc", label: "UFC", icon: BaseballIcon, sport: "ufc" },
 	] as const;
 
 	const [open, setOpen] = useState(false);
@@ -26,10 +37,6 @@ export default function Header() {
 	const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 	const { date, setDate } = useDateContext();
 	const weekDates = useWeekDates();
-
-	// useEffect(() => {
-	// 	console.log(date);
-	// }, [date]);
 
 	useEffect(() => {
 		if (open) {
@@ -52,7 +59,7 @@ export default function Header() {
 	}, [open]);
 
 	return (
-		<div className="sticky not-[lg]:top-0 w-full z-30 lg:static">
+		<div className="sticky not-[lg]:top-0 z-30 w-full lg:static">
 			<div className="h-[60px] w-full bg-primary px-4 py-1 text-foreground lg:flex lg:h-20 lg:flex-row lg:items-center lg:justify-between lg:px-[10%] lg:py-1">
 				<div className="flex min-w-0 justify-between">
 					<button
@@ -68,7 +75,7 @@ export default function Header() {
 					</button>
 					<div className="flex min-w-0 justify-center self-center">
 						<img
-							src="sportsdey-logo.png"
+							src="/sportsdey-logo.png"
 							className="h-10"
 							alt="sportsdey's logo"
 						/>
@@ -79,18 +86,17 @@ export default function Header() {
 				<div className="hidden min-w-0 lg:flex">
 					<div className="overflow-x-auto">
 						<nav className="cust-scrollbar flex w-max gap-4 py-4 font-medium">
-							{links.map(({ to, label, icon: Icon }) => (
+							{links.map(({ to, label, icon: Icon, sport }) => (
 								<Link
 									key={to}
 									to={to as string}
-									className="flex shrink-0 gap-2 pb-2"
-									activeProps={{
-										className:
-											"flex shrink-0 gap-2 pb-2 border-b-2 text-accent border-accent",
-									}}
-									inactiveProps={{
-										className: "flex shrink-0 gap-2 pb-2 text-secondary",
-									}}
+									onClick={() => setTab("scores")}
+									className={cn(
+										"flex shrink-0 gap-2 pb-2",
+										currentSport === sport
+											? "border-accent border-b-2 text-accent"
+											: "text-secondary",
+									)}
 								>
 									<Icon />
 									<p>{label}</p>
@@ -200,20 +206,18 @@ export default function Header() {
 				</div>
 
 				<div className="flex w-[98vw] overflow-x-auto md:w-full md:justify-center">
-					<nav className="flex w-max items-center gap-4 border border-[#414141] px-4 py-4">
-						{links.map(({ to, label, icon: Icon }) => (
+					<nav className="flex w-max items-center gap-4 border border-[#414141] md:border-0 px-4 py-4">
+						{links.map(({ to, label, icon: Icon, sport }) => (
 							<Link
 								key={to}
 								to={to as string}
-								className="flex shrink-0 gap-2 whitespace-nowrap"
-								activeProps={{
-									className:
-										"flex-shrink-0 flex gap-2 bg-[#202120] text-secondary border-accent border-2 whitespace-nowrap rounded-full py-2 px-4",
-								}}
-								inactiveProps={{
-									className:
-										"flex-shrink-0 flex gap-2 text-secondary whitespace-nowrap",
-								}}
+								onClick={() => setTab("scores")}
+								className={cn(
+									"flex shrink-0 gap-2 whitespace-nowrap",
+									currentSport === sport
+										? "flex-shrink-0 flex gap-2 bg-[#202120] text-secondary border-accent border-2 whitespace-nowrap rounded-full py-2 px-4"
+										: "flex-shrink-0 flex gap-2 text-secondary whitespace-nowrap",
+								)}
 							>
 								<Icon />
 								<p>{label}</p>

@@ -42,7 +42,7 @@ const TennisScoreTable = ({ players, className, onSeeAllClick }: TennisScoreTabl
                                         {score}
                                     </td>
                                 ))}
-                                {/* Fill empty cells if periods are less than 5 */}
+
                                 {Array.from({ length: 5 - player.periodScores.length }).map((_, i) => (
                                     <td key={`empty-${i}`} className="text-center py-4 px-2"></td>
                                 ))}

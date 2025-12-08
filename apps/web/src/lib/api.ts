@@ -1,5 +1,20 @@
 const API_BASE_URL =
-	process.env.VITE_SERVER_URL || "http://localhost:3000/api/";
+	import.meta.env.VITE_SERVER_URL;
+
+type ApiSuccessResponse<T> = {
+	data: T;
+};
+
+type ApiErrorResponse = {
+	error: string;
+	details: [
+		{
+			field: string;
+			message: string;
+			code: string;
+		},
+	];
+};
 
 export async function apiRequest<T>(
 	endpoint: string,
@@ -15,15 +30,15 @@ export async function apiRequest<T>(
 		...options,
 	};
 
-	try {
-		const response = await fetch(url, config);
+	const response = await fetch(url, config);
 
-		if (!response.ok) {
-			throw new Error(`API Error: ${response.status} ${response.statusText}`);
-		}
-
-		return await response.json();
-	} catch (error) {
-		throw error;
+	if (!response.ok) {
+		const data = (await response.json()) as ApiErrorResponse;
+		throw {
+			status: response.status,
+			...data,
+		};
 	}
+	const json = (await response.json()) as ApiSuccessResponse<T>;
+	return json.data;
 }

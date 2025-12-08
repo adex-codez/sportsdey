@@ -1,5 +1,6 @@
+import { Link } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useFootballSchedule } from "@/hooks/use-fooball-schedule";
 import type { FiltersType } from "@/lib/data";
 import { formatTime } from "@/lib/utils";
@@ -23,6 +24,10 @@ const FootballSchedule = () => {
 		isLoading,
 		// error,
 	} = useFootballSchedule(date.toISOString().split("T")[0], "en");
+
+	useEffect(() => {
+		console.log(schedules);
+	}, []);
 
 	const filtersCount = useMemo(() => {
 		if (!schedules) {
@@ -66,12 +71,10 @@ const FootballSchedule = () => {
 	const filteredSchedules = useMemo(() => {
 		if (!schedules) return null;
 
-		// If showing all matches, return original data
 		if (currentFilter === "all") {
 			return schedules;
 		}
 
-		// More efficient status mapping
 		const statusMap: Record<FiltersType, string | null> = {
 			live: "live",
 			finished: "closed",
@@ -82,7 +85,6 @@ const FootballSchedule = () => {
 		const targetStatus = statusMap[currentFilter];
 		if (!targetStatus) return schedules;
 
-		// Pre-filter and optimize the loop
 		const filteredCompetitions = [];
 
 		for (const competition of schedules.competitions) {
@@ -108,7 +110,7 @@ const FootballSchedule = () => {
 		};
 	}, [schedules, currentFilter]);
 
-	if (isLoading || !schedules) {
+	if (isLoading) {
 		return (
 			<div className="flex flex-col items-center justify-center space-y-2">
 				<Loader2 className="animate-spin" width={48} height={48} />
@@ -157,66 +159,71 @@ const FootballSchedule = () => {
 							<AccordionContent className="cursor-pointer overflow-hidden">
 								<div>
 									{competition.matches.map((match, index) => (
-										<div
-											className="flex flex-wrap items-center justify-between gap-4 border-gray-100 border-b px-4 py-4 hover:bg-gray-50"
+										<Link
+											to={`/index/${match.sport_event_id}`}
 											key={`${index}+1`}
 										>
-											<div className="flex w-full justify-between lg:w-fit">
-												<p>{formatTime(new Date(match.start_time))}</p>
-												<div className="block lg:hidden">
-													<Favourite />
-												</div>
-											</div>
-											<div className="flex w-full justify-between space-y-4 text-sm lg:w-fit lg:items-center lg:justify-start">
-												<div className="gap-4 space-y-4 lg:flex">
-													<p className="wrap-break-word">
-														{match.competitors[0].name}
-													</p>
-													<span className="hidden font-medium text-sm lg:block">
-														VS
-													</span>
-													<p>{match.competitors[1].name}</p>
+											<div className="flex flex-wrap items-center justify-between gap-4 border-gray-100 border-b px-4 py-4 hover:bg-gray-50">
+												<div className="flex w-full justify-between lg:w-fit">
+													<p>{formatTime(new Date(match.start_time))}</p>
+													<div className="block lg:hidden">
+														<Favourite />
+													</div>
 												</div>
 
-												<div className="flex h-12 gap-6 rounded-sm bg-[#EBEBEB] px-3 py-1 lg:hidden">
-													<div className="flex flex-col items-center rounded-lg">
-														<p>1</p>
-														<p className="font-semibold">1.60</p>
-													</div>
-													<div className="flex flex-col items-center rounded-lg">
-														<p>X</p>
-														<p className="font-semibold">4.20</p>
-													</div>
-													<div className="">
-														<p>2</p>
-														<p className="font-semibold">4.20</p>
-													</div>
-												</div>
-											</div>
-											<div className="hidden items-center gap-2 lg:flex">
-												<div className="rounded-lg bg-[#EBEBEB] px-2 lg:py-1">
-													<p>
-														1
-														<span className="px-3 py-1 font-semibold">
-															1.60
+												<div className="flex w-full justify-between space-y-4 text-sm lg:w-fit lg:items-center lg:justify-start lg:space-y-0">
+													<div className="items-center gap-4 space-y-4 lg:flex lg:space-y-0">
+														<p className="wrap-break-word">
+															{match.competitors[0].name}
+														</p>
+														<span className="hidden font-medium text-sm lg:block">
+															VS
 														</span>
-													</p>
+														<p className="wrap-break-word">
+															{match.competitors[1].name}
+														</p>
+													</div>
+
+													<div className="flex h-12 gap-6 rounded-sm bg-[#EBEBEB] px-3 py-1 lg:hidden">
+														<div className="flex flex-col items-center rounded-lg">
+															<p>1</p>
+															<p className="font-semibold">1.60</p>
+														</div>
+														<div className="flex flex-col items-center rounded-lg">
+															<p>X</p>
+															<p className="font-semibold">4.20</p>
+														</div>
+														<div className="">
+															<p>2</p>
+															<p className="font-semibold">4.20</p>
+														</div>
+													</div>
 												</div>
-												<div className="rounded-lg bg-[#EBEBEB] px-2 py-1">
-													<p>
-														X <span className="font-semibold">4.20</span>
-													</p>
-												</div>
-												<div className="rounded-lg bg-[#EBEBEB] px-2 py-1">
-													<p>
-														2 <span className="font-semibold">4.20</span>
-													</p>
-												</div>
-												<div className="hidden lg:block">
-													<Favourite />
+												<div className="hidden items-center gap-2 lg:flex">
+													<div className="rounded-lg bg-[#EBEBEB] px-2 lg:py-1">
+														<p>
+															1
+															<span className="px-3 py-1 font-semibold">
+																1.60
+															</span>
+														</p>
+													</div>
+													<div className="rounded-lg bg-[#EBEBEB] px-2 py-1">
+														<p>
+															X <span className="font-semibold">4.20</span>
+														</p>
+													</div>
+													<div className="rounded-lg bg-[#EBEBEB] px-2 py-1">
+														<p>
+															2 <span className="font-semibold">4.20</span>
+														</p>
+													</div>
+													<div className="hidden lg:block">
+														<Favourite />
+													</div>
 												</div>
 											</div>
-										</div>
+										</Link>
 									))}
 								</div>
 							</AccordionContent>

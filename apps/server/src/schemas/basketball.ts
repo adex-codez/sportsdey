@@ -62,19 +62,6 @@ export const TeamSchema = z.object({
 	points: z.number(),
 	starters: z.array(PlayerSchema),
 	bench: z.array(PlayerSchema),
-});
-
-export const GameSummarySchema = z.object({
-	id: z.string(),
-	status: z.string(),
-	season: z.object({
-		id: z.string(),
-		year: z.number(),
-		type: z.string(),
-		name: z.string(),
-	}),
-	clock: z.string(),
-	quarter: z.number(),
 	statistics: z.object({
 		minutes: z.string(),
 		field_goals_made: z.number(),
@@ -95,6 +82,48 @@ export const GameSummarySchema = z.object({
 		turnovers: z.number(),
 		personal_fouls: z.number(),
 	}),
+});
+
+export const GameSummarySchema = z.object({
+	id: z.string(),
+	status: z.string(),
+	season: z.object({
+		id: z.string(),
+		year: z.number(),
+		type: z.string(),
+		name: z.string(),
+	}),
+	clock: z.string(),
+	quarter: z.number(),
+
 	home: TeamSchema,
 	away: TeamSchema,
 });
+export const StandingsSchema = z.object({
+	data: z.array(
+		z.object({
+			id: z.string(),
+			name: z.string(),
+			wins: z.number(),
+			losses: z.number(),
+			played: z.number(),
+			streak: z.number(),
+			gb: z.number(),
+			diff: z.number(),
+			win_pct: z.number(),
+		}),
+	),
+});
+
+export const TeamStatsSchema = z.object({
+	name: z.string(),
+	starters: z.array(PlayerSchema),
+	bench: z.array(PlayerSchema),
+});
+
+export const GameTeamStatsSchema = z.object({
+	home: TeamStatsSchema,
+	away: TeamStatsSchema,
+});
+
+

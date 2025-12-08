@@ -44,3 +44,26 @@ export const tennisScheduleQuery = z.object({
 			example: "en",
 		}),
 });
+
+export const tennisGameIdParam = z.object({
+	gameId: z
+		.string()
+		.min(1, "Game ID is required")
+		.openapi({
+			param: { name: "gameId", in: "path" },
+			description: "The id for the tennis game you want to get info about.",
+		}),
+});
+
+export const tennisVideosQuery = z.object({
+	query: z.string().openapi({
+		param: { name: "query", in: "query" },
+		description: "The search query for the videos",
+		example: "Alcaraz vs Djokovic",
+	}),
+	pageToken: z.string().optional().openapi({
+		param: { name: "pageToken", in: "query" },
+		description: "The token for the next or previous page of results",
+		example: "CAUQAA",
+	}),
+});

@@ -61,6 +61,28 @@ export const TransformedMatchInfoSchema = z.object({
 			}),
 		)
 		.optional(),
+	last5_home_results: z
+		.array(
+			z.object({
+				match_id: z.string(),
+				date: z.string(),
+				opponent: z.string(),
+				result: z.enum(["win", "draw", "loss"]),
+				score: z.string(),
+			}),
+		)
+		.optional(),
+	last5_away_results: z
+		.array(
+			z.object({
+				match_id: z.string(),
+				date: z.string(),
+				opponent: z.string(),
+				result: z.enum(["win", "draw", "loss"]),
+				score: z.string(),
+			}),
+		)
+		.optional(),
 });
 
 export const TransformedResponseSchema = z.object({
@@ -100,3 +122,5 @@ export const TransformedResponseSchema = z.object({
 	),
 	total_matches: z.number(),
 });
+
+
