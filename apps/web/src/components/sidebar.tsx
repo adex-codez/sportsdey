@@ -38,6 +38,15 @@ const Sidebar = () => {
 		return () => clearTimeout(timer);
 	}, []);
 
+	useEffect(() => {
+		window.addEventListener("message", (event) => {
+			const iframe = document.getElementById("betting-widget-wrapper");
+		if (iframe) {
+			iframe.style.height = "200px";
+		}
+		});	
+	}, []);
+
 
 	return (
 		<div className="space-y-8">
@@ -86,6 +95,7 @@ const Sidebar = () => {
 			</SidebarItem>
 
 			<div className="relative h-[200px] w-full rounded-2xl bg-white">
+				<div id="betting-widget-wrapper">
 				{isIframeLoading && (
 					<div className="absolute inset-0 flex items-center justify-center">
 						<Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -98,11 +108,12 @@ const Sidebar = () => {
 						"h-full w-full cust-scrollbar rounded-2xl transition-opacity duration-500",
 						isIframeLoading ? "opacity-0" : "opacity-100",
 					)}
-					id="sportsIframe"
+					id="betting-widget"
 					onLoad={() => setIsIframeLoading(false)}
 				/>
+				</div>
+				
 			</div>
-
 			<SidebarItem heading="My Teams" icon={<ChevronRight />}>
 				<div>
 					<p className="px-6 py-6 text-sm">

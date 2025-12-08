@@ -60,8 +60,8 @@ const currentSport = useCurrentSport();
 						tab === item ? "text-accent" : "text-secondary",
 					)}
 				>
-					<Icon />
-					<p className="text-secondary">
+					<Icon color={tab === item ? "#1baa04" : "#ececec"} fill={tab === item ? "#1baa04" : "#ececec"} />
+					<p className={cn("text-secondary", tab === item ? "text-accent" : "text-secondary")}>
 						{item.charAt(0).toUpperCase() + item.slice(1).toLowerCase()}
 					</p>
 				</div>
