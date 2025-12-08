@@ -29,7 +29,7 @@ function RouteComponent() {
 
 	return (
 		<div className="">
-			<div className="mb-6 flex flex-wrap gap-4">
+			<div className="mb-6 flex flex-wrap gap-4 py-4">
 				{tabs.map((tab) => (
 					// biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
 					<div

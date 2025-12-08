@@ -4,6 +4,8 @@ import Lives from "@/logos/live.svg?react";
 import News from "@/logos/news.svg?react";
 import Score from "@/logos/score.svg?react";
 import { useActiveTab } from "./active-tab-context";
+import { useCurrentSport } from "@/hooks/use-current-sport";
+import { useRouter } from "@tanstack/react-router";
 
 const bottomBarItems = [
 	{
@@ -33,15 +35,29 @@ const bottomBarItems = [
 	},
 ];
 const Footer = () => {
-	const { tab } = useActiveTab();
+const currentSport = useCurrentSport();
+	const { tab, setTab } = useActiveTab();
+	const router = useRouter();
 	return (
 		<div className="fixed bottom-0 left-0 flex w-full justify-between rounded-t-3xl bg-primary px-8 py-4 lg:hidden">
 			{bottomBarItems.map(({ id, icon: Icon, item }) => (
 				<div
 					key={id}
+					onClick={() => {
+							setTab(item);
+							if(item === "scores") {
+									router.navigate({ to: currentSport === "tennis" ? "/tennis" : currentSport === "basketball" ? "/basketball" : "/" });	
+							}
+							if(item === "news") {
+									router.navigate({ to: "/news" });	
+							}
+							// if(item === "lives") {
+							// 		router.navigate({ to: "/lives" });	
+							// }
+					}}
 					className={cn(
 						"flex flex-col items-center space-y-2",
-						tab === item ? "text-secondary" : "text-accent",
+						tab === item ? "text-accent" : "text-secondary",
 					)}
 				>
 					<Icon />

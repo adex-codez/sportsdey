@@ -38,7 +38,6 @@ export default function Header() {
 	const { date, setDate } = useDateContext();
 	const weekDates = useWeekDates();
 
-
 	useEffect(() => {
 		if (open) {
 			document.documentElement.classList.add("overflow-hidden");
@@ -207,7 +206,7 @@ export default function Header() {
 				</div>
 
 				<div className="flex w-[98vw] overflow-x-auto md:w-full md:justify-center">
-					<nav className="flex w-max items-center gap-4 border border-[#414141] px-4 py-4">
+					<nav className="flex w-max items-center gap-4 border border-[#414141] md:border-0 px-4 py-4">
 						{links.map(({ to, label, icon: Icon, sport }) => (
 							<Link
 								key={to}

@@ -1,5 +1,5 @@
 const API_BASE_URL =
-	process.env.VITE_SERVER_URL || "http://localhost:3000/api/";
+	import.meta.env.VITE_SERVER_URL;
 
 type ApiSuccessResponse<T> = {
 	data: T;
