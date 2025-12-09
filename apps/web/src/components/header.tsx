@@ -28,8 +28,8 @@ export default function Header() {
 			sport: SPORTS.BASKETBALL,
 		},
 		{ to: "/tennis", label: "Tennis", icon: TennisIcon, sport: SPORTS.TENNIS },
-		{ to: "/boxing", label: "Boxing", icon: BoxingIcon, sport: "boxing" },
-		{ to: "/ufc", label: "UFC", icon: BaseballIcon, sport: "ufc" },
+		// { to: "/boxing", label: "Boxing", icon: BoxingIcon, sport: "boxing" },
+		// { to: "/ufc", label: "UFC", icon: BaseballIcon, sport: "ufc" },
 	] as const;
 
 	const [open, setOpen] = useState(false);
@@ -206,7 +206,8 @@ export default function Header() {
 				</div>
 
 				<div className="flex w-[98vw] overflow-x-auto md:w-full md:justify-center">
-					<nav className="flex w-max items-center gap-4 border border-[#414141] md:border-0 px-4 py-4">
+					{/* <nav className="flex w-max items-center justify-center gap-4 border border-[#414141] md:border-0 px-4 py-4"> */}
+					<nav className="flex w-max items-center justify-center gap-4 px-4 py-4">
 						{links.map(({ to, label, icon: Icon, sport }) => (
 							<Link
 								key={to}

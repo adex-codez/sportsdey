@@ -42,12 +42,6 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 				title: "sportsdey",
 			},
 		],
-		links: [
-			{
-				rel: "stylesheet",
-				href: appCss,
-			},
-		],
 	}),
 
 	component: RootDocument,
@@ -56,33 +50,34 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 function RootDocument() {
 	return (
 		<Provider store={store}>
-		<html lang="en" className="dark">
-			<head>
-				<HeadContent />
-			</head>
-			<body suppressHydrationWarning>
-				<QueryClientProvider client={queryClient}>
-					<Providers>
-						<div className="grid h-svh grid-rows-[auto_1fr_auto] lg:grid-rows-[auto_auto_1fr]">
-							<Header />
-							<Socials />
-							<div className="mx-4 grid md:gap-8 lg:mx-[104px] lg:grid-cols-[20%_80%]">
-								<div className="hidden lg:block">
-									<Sidebar />
+			<html lang="en" className="dark">
+				<head>
+					<HeadContent />
+					<link rel="stylesheet" href={appCss} />
+				</head>
+				<body suppressHydrationWarning>
+					<QueryClientProvider client={queryClient}>
+						<Providers>
+							<div className="grid h-svh grid-rows-[auto_1fr_auto] lg:grid-rows-[auto_auto_1fr]">
+								<Header />
+								<Socials />
+								<div className="mx-4 grid md:gap-8 lg:mx-[104px] lg:grid-cols-[20%_80%]">
+									<div className="hidden lg:block">
+										<Sidebar />
+									</div>
+									<Outlet />
 								</div>
-								<Outlet />
+								<Footer />
 							</div>
-							<Footer />
-						</div>
-					</Providers>
+						</Providers>
 
-					<Toaster richColors />
-					<TanStackRouterDevtools position="bottom-right" />
-					<ReactQueryDevtools initialIsOpen={false} />
-					<Scripts />
-				</QueryClientProvider>
-			</body>
-		</html>
+						<Toaster richColors />
+						<TanStackRouterDevtools position="bottom-right" />
+						<ReactQueryDevtools initialIsOpen={false} />
+						<Scripts />
+					</QueryClientProvider>
+				</body>
+			</html>
 		</Provider>
 	);
 }

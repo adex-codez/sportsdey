@@ -1,172 +1,17 @@
 import DetailsImageCard from '@/shared/DetailsImageCard'
 import type { Quarter, TeamData, TeamStanding } from '@/types/basketball';
+import type { BasketballStanding, BasketballGameDetails } from '@/types/api';
+import { apiRequest } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
 import { TeamStats } from './TeamStats';
 import ImportantUpdate from '@/shared/ImportantUpdate';
 import { useState } from 'react';
 import InfoTab from './InfoTab';
 import StandingsTab from './StandingsTab';
+import { useParams } from '@tanstack/react-router';
 
 
-const standingsData: TeamStanding[] = [
-  {
-    position: 1,
-    name: "Pistons",
-    played: 18,
-    wins: 15,
-    losses: 8,
-    streak: "-2",
-    gamesBehind: "-",
-    diff: "+127",
-    pct: "0.8734",
-    lastFiveResults: ["W", "W", "W", "L", "W"],
-  },
-  {
-    position: 2,
-    name: "Raptors",
-    played: 18,
-    wins: 15,
-    losses: 8,
-    streak: "-2",
-    gamesBehind: "2.5",
-    diff: "+127",
-    pct: "0.8734",
-    lastFiveResults: ["W", "W", "L", "L", "W"],
-  },
-  {
-    position: 3,
-    name: "Heat",
-    played: 18,
-    wins: 15,
-    losses: 8,
-    streak: "-2",
-    gamesBehind: "2.5",
-    diff: "+127",
-    pct: "0.8734",
-    lastFiveResults: ["W", "W", "W", "L", "W"],
-  },
-  {
-    position: 4,
-    name: "Detroit Pistons",
-    played: 18,
-    wins: 15,
-    losses: 8,
-    streak: "-2",
-    gamesBehind: "2.5",
-    diff: "+127",
-    pct: "0.8734",
-    isHighlighted: true,
-    lastFiveResults: ["W", "W", "W", "L", "W"],
-  },
-  {
-    position: 5,
-    name: "Knicks",
-    played: 18,
-    wins: 15,
-    losses: 8,
-    streak: "-2",
-    gamesBehind: "2.5",
-    diff: "+127",
-    pct: "0.8734",
-    lastFiveResults: ["W", "W", "W", "L", "W"],
-  },
-  {
-    position: 6,
-    name: "Cavaliers",
-    played: 18,
-    wins: 15,
-    losses: 8,
-    streak: "-2",
-    gamesBehind: "2.5",
-    diff: "+127",
-    pct: "0.8734",
-    lastFiveResults: ["W", "L", "L", "L", "W"],
-  },
-  {
-    position: 7,
-    name: "Chicago Bulls",
-    played: 18,
-    wins: 15,
-    losses: 8,
-    streak: "-2",
-    gamesBehind: "2.5",
-    diff: "+127",
-    pct: "0.8734",
-    isHighlighted: true,
-    lastFiveResults: ["W", "W", "W", "L", "W"],
-  },
-  {
-    position: 8,
-    name: "Hawks",
-    played: 18,
-    wins: 15,
-    losses: 8,
-    streak: "-2",
-    gamesBehind: "2.5",
-    diff: "+127",
-    pct: "0.8734",
-    lastFiveResults: ["W", "L", "L", "L", "W"],
-  },
-  {
-    position: 9,
-    name: "Magic",
-    played: 18,
-    wins: 15,
-    losses: 8,
-    streak: "-2",
-    gamesBehind: "2.5",
-    diff: "+127",
-    pct: "0.8734",
-    lastFiveResults: ["W", "W", "W", "L", "W"],
-  },
-  {
-    position: 10,
-    name: "Celtics",
-    played: 18,
-    wins: 15,
-    losses: 8,
-    streak: "-2",
-    gamesBehind: "2.5",
-    diff: "+127",
-    pct: "0.8734",
-    lastFiveResults: ["W", "L", "L", "L", "W"],
-  },
-  {
-    position: 11,
-    name: "Bulls",
-    played: 18,
-    wins: 15,
-    losses: 8,
-    streak: "-2",
-    gamesBehind: "2.5",
-    diff: "+127",
-    pct: "0.8734",
-    lastFiveResults: ["W", "L", "W", "L", "W"],
-  },
-  {
-    position: 12,
-    name: "76ers",
-    played: 18,
-    wins: 15,
-    losses: 8,
-    streak: "-2",
-    gamesBehind: "2.5",
-    diff: "+127",
-    pct: "0.8734",
-    lastFiveResults: ["W", "L", "L", "L", "W"],
-  },
-  {
-    position: 13,
-    name: "Bucks",
-    played: 18,
-    wins: 15,
-    losses: 8,
-    streak: "-2",
-    gamesBehind: "2.5",
-    diff: "+127",
-    pct: "0.8734",
-    lastFiveResults: ["W", "W", "W", "L", "W"],
-  },
-]
+
 
 export const sampleTeams = [
   {
@@ -548,6 +393,7 @@ export const sampleTeams = [
 ]
 
 const BasketBallDetailsPage = () => {
+  const { Id } = useParams({ from: '/basketball/$Id' });
   const [activeTab, setActiveTab] = useState('info');
   const quarters: Quarter[] = [
     { id: 'q1', label: 'Q1' },
@@ -568,6 +414,12 @@ const BasketBallDetailsPage = () => {
     total: 113,
   };
 
+  const { data: gameDetails, isLoading: isGameLoading } = useQuery({
+    queryKey: ['basketball', 'game', Id],
+    queryFn: () => apiRequest<BasketballGameDetails>(`/api/basketball/game/${Id}`),
+    enabled: !!Id,
+  });
+
   const gameTabs = [
     { id: 'info', label: 'Info' },
     { id: 'standings', label: 'Standings' },
@@ -575,6 +427,27 @@ const BasketBallDetailsPage = () => {
     { id: 'videos', label: 'Videos' },
     { id: 'news', label: 'News' }
   ];
+
+  const [standingsLimit, setStandingsLimit] = useState(13);
+
+  const { data: standingsData, isLoading: isStandingsLoading } = useQuery({
+    queryKey: ['basketball', 'standings', '2025', 'western', standingsLimit],
+    queryFn: () => apiRequest<BasketballStanding[]>(`/api/basketball/standings/2025?conference=western&limit=${standingsLimit}&offset=0`),
+  });
+
+  const teamStandings: TeamStanding[] = standingsData?.map((team, index) => ({
+    position: index + 1,
+    name: team.name,
+    played: team.played,
+    wins: team.wins,
+    losses: team.losses,
+    streak: String(team.streak),
+    gamesBehind: String(team.gb),
+    diff: String(team.diff),
+    pct: String(team.win_pct),
+    lastFiveResults: []
+  })) || [];
+
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -585,7 +458,11 @@ const BasketBallDetailsPage = () => {
 
       case 'standings':
         return (
-          <StandingsTab teams={standingsData} onSeeAllClick={() => console.log("See all forms clicked")} />
+          isStandingsLoading ? <div className="text-center text-gray-500">Loading standings...</div> :
+            <StandingsTab
+              teams={teamStandings}
+              onSeeAllClick={standingsLimit <= 13 ? () => setStandingsLimit(30) : undefined}
+            />
         );
 
       case 'team-stats':
@@ -637,10 +514,30 @@ const BasketBallDetailsPage = () => {
         return null;
     }
   };
+
+  if (isGameLoading) {
+    return <div className="flex justify-center items-center h-screen text-white">Loading game details...</div>;
+  }
+
   return (
     <div className='w-full max-w-screen space-y-3 pb-28 lg:pb-10'>
       <div className='py-4 lg:py-0'>
-        <DetailsImageCard gameTabs={gameTabs} activeTab={activeTab} setActiveTab={setActiveTab} competitionCountry='USA' competitionName='NBA' hostTeamName='Detroit Pistons' hostTeamLogo='/Pistons.png' matchStatus='finished' hostTeamScore={121} guestTeamScore={131} guestTeamLogo='/Bulls.png' guestTeamName='Chicago Bulls' />
+        {gameDetails && (
+          <DetailsImageCard
+            gameTabs={gameTabs}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            competitionCountry={gameDetails.venue.name || "International"} // Fallback/Incorrect mapping? Venue name isn't country.
+            competitionName={gameDetails.season.name}
+            hostTeamName={gameDetails.home.name}
+            hostTeamLogo='/placeholder.png' // API missing logo
+            matchStatus={gameDetails.status === 'closed' ? 'FT' : gameDetails.status}
+            hostTeamScore={gameDetails.home.points}
+            guestTeamScore={gameDetails.away.points}
+            guestTeamLogo='/placeholder.png' // API missing logo
+            guestTeamName={gameDetails.away.name}
+          />
+        )}
       </div>
       <div>
         {renderTabContent()}
