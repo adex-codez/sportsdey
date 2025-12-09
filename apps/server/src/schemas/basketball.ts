@@ -61,8 +61,8 @@ export const PlayerSchema = z.object({
 export const TeamSchema = z.object({
 	name: z.string(),
 	points: z.number(),
-	starters: z.array(PlayerSchema),
-	bench: z.array(PlayerSchema),
+	starters: z.array(PlayerSchema).optional(),
+	bench: z.array(PlayerSchema).optional(),
 	statistics: z.object({
 		minutes: z.string(),
 		field_goals_made: z.number(),
@@ -82,7 +82,7 @@ export const TeamSchema = z.object({
 		blocks: z.number(),
 		turnovers: z.number(),
 		personal_fouls: z.number(),
-	}),
+	}).optional(),
 });
 
 export const GameSummarySchema = z.object({
