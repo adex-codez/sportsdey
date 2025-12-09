@@ -103,6 +103,7 @@ export type SportRadarGameSummary = {
 	id: string;
 	status: string;
 	season: SportRadarSeason;
+	scheduled: string;
 	clock: string;
 	quarter: number;
 	venue: {
