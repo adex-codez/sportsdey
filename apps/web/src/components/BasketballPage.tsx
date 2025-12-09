@@ -1,154 +1,85 @@
-import BasketballAccordionComponentCard from '@/shared/BasketballAccordionComponentCard'
-import FixtureFilterHeaders from '@/shared/FixtureFilterHeaders';
+import { apiRequest } from '@/lib/api';
+import BasketballAccordionComponentCard from '@/shared/BasketballAccordionComponentCard';
 import { useAppSelector } from '@/store/hook';
-import type { League, Match } from '@/types/basketball';
-import React from 'react'
+import type { RootState } from '@/store';
+import type { BasketballScheduleData } from '@/types/api';
+import type { League } from '@/types/basketball';
+import { useQuery } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
+
+const formatDate = (date: Date) => {
+  return {
+    year: date.getFullYear(),
+    month: date.getMonth() + 1,
+    day: date.getDate()
+  }
+}
 
 const BasketballPage = () => {
-    const nbaMatches: Match[] = [
-    { 
-      id: 'nba-1',
-      team1: "Detroit Pistons", 
-      team2: "Chicago Bulls", 
-      score1: 124, 
-      score2: 113, 
-      status: "FT" 
-    },
-    { 
-      id: 'nba-2',
-      team1: "Charlotte Hornets", 
-      team2: "Milwaukee Bucks", 
-      score1: 111, 
-      score2: 100, 
-      status: "FT" 
-    },
-    { 
-      id: 'nba-3',
-      team1: "New York Knicks", 
-      team2: "Orlando Magic", 
-      score1: 107, 
-      score2: 124, 
-      status: "FT" 
-    },
-    { 
-      id: 'nba-4',
-      team1: "Boston Celtics", 
-      team2: "Memphis Grizzlies", 
-      score1: 131, 
-      score2: 95, 
-      status: "FT" 
-    },
-    { 
-      id: 'nba-5',
-      team1: "Miami Heat", 
-      team2: "Cleveland Cavaliers", 
-      score1: 116, 
-      score2: 130, 
-      status: "FT" 
-    },
-    { 
-      id: 'nba-6',
-      team1: "Houstons Rockets", 
-      team2: "Washington Wizards", 
-      score1: 135, 
-      score2: 113, 
-      status: "FT" 
-    },
-    { 
-      id: 'nba-7',
-      team1: "New Orleans Pelicans", 
-      team2: "Portland Trail Blazers", 
-      score1: 117, 
-      score2: 125, 
-      status: "FT" 
-    },
-    { 
-      id: 'nba-8',
-      team1: "San Antonio Spurs", 
-      team2: "Golden State Warriors", 
-      score1: 120, 
-      score2: 123, 
-      status: "FT" 
-    },
-    { 
-      id: 'nba-9',
-      team1: "Dallas Mavericks", 
-      team2: "Phoenix Suns", 
-      score1: 114, 
-      score2: 123, 
-      status: "FT" 
-    }
-  ];
+  const selectedDateString = useAppSelector((state: RootState) => state.date.selectedDate);
+  const selectedDate = new Date(selectedDateString);
+  const { year, month, day } = formatDate(selectedDate);
 
-  const lnbMatches: Match[] = [
-    { 
-      id: 'lnb-1',
-      team1: "Peñarol", 
-      team2: "San Martín de Corrientes", 
-      score1: 75, 
-      score2: 72, 
-      status: "FT" 
-    }
-  ];
+  const { data: scheduleData, isLoading } = useQuery({
+    queryKey: ['basketball', 'schedule', year, month, day],
+    queryFn: () => apiRequest<BasketballScheduleData>(`/api/basketball/schedule/${year}/${month}/${day}?language=en`),
+  });
 
-  const euroleagueMatches: Match[] = [
-    { 
-      id: 'euro-1',
-      team1: "Real Madrid", 
-      team2: "Barcelona", 
-      score1: 88, 
-      score2: 92, 
-      status: "FT" 
-    },
-    { 
-      id: 'euro-2',
-      team1: "Olympiacos", 
-      team2: "Fenerbahce", 
-      score1: 78, 
-      score2: 81, 
-      status: "FT" 
-    }
-  ];
 
-  const leagues: League[] = [
-    {
-      id: 'usa-nba',
-      country: 'USA',
-      leagueName: 'NBA',
-      flag: '/USA.png',
-      matches: nbaMatches
-    },
-    {
-      id: 'arg-lnb',
-      country: 'Argentina',
-      leagueName: 'LNB',
-      flag: '/Argentina.png',
-      matches: lnbMatches
-    },
-    {
-      id: 'euro-league',
-      country: 'Europe',
-      leagueName: 'Euroleague',
-      flag: '/International.png',
-      matches: euroleagueMatches
-    }
-  ];
+
+  const LEAGUE_METADATA: Record<string, { country: string; flag: string }> = {
+    "NBA": { country: "USA", flag: "/USA.png" },
+    "LNB": { country: "Argentina", flag: "/Argentina.png" },
+    "Euroleague": { country: "Europe", flag: "/International.png" },
+  };
+
+  const dynamicLeague: League | null = scheduleData ? {
+    id: `league-${scheduleData.league}`,
+    country: LEAGUE_METADATA[scheduleData.league]?.country || "International",
+    leagueName: scheduleData.league,
+    flag: LEAGUE_METADATA[scheduleData.league]?.flag || "/placeholder.png",
+    matches: scheduleData.games.map((game) => {
+      const formatTime = (dateStr?: string) => {
+        if (!dateStr) return undefined;
+        try {
+          return new Date(dateStr).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        } catch {
+          return undefined;
+        }
+      };
+
+      return {
+        id: game.id,
+        team1: game.home.name,
+        team2: game.away.name,
+        score1: game.home.points ?? 0,
+        score2: game.away.points ?? 0,
+        status: game.status === 'closed' ? 'FT' : game.status,
+        time: formatTime(game.scheduledTime || game.time) || "00:00"
+      };
+    })
+  } : null;
+
+  const leagues: League[] = dynamicLeague ? [dynamicLeague] : [];
+
+  console.log(leagues);
 
   return (
     <div className='space-y-4 mb-32 lg:mb-0'>
-        {/* <div className='w-full'>
-            <FixtureFilterHeaders/>
-        </div> */}
-        {leagues.map((league) => (
-          <BasketballAccordionComponentCard
-            key={league.id}
-            country={league.country}
-            league={league.leagueName}
-            flag={league.flag}
-            matches={league.matches}
-            imageUrl={league.imageUrl}
-          />
-        ))}
+      {isLoading && <div className="flex flex-col items-center justify-center space-y-2">
+        <Loader2 className="animate-spin" width={24} height={24} />
+        <p className="text-gray-500 text-sm">Loading matches...</p>
+      </div>}
+      {!isLoading && leagues.map((league, index) => (
+        <BasketballAccordionComponentCard
+          key={league.id || index}
+          country={league.country}
+          league={league.leagueName}
+          flag={league.flag}
+          matches={league.matches}
+          imageUrl={league.imageUrl}
+        />
+      ))}
     </div>
   )
 }
