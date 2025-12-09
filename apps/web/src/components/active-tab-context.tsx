@@ -6,7 +6,7 @@ import {
 	useState,
 } from "react";
 
-type Tabs = "scores" | "favourites" | "news";
+type Tabs = "scores" | "favourites" | "news" | "betting";
 
 type ActiveTabContextType = {
 	tab: Tabs;

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TennisRouteImport } from './routes/tennis'
 import { Route as NewsRouteImport } from './routes/news'
+import { Route as BettingRouteImport } from './routes/betting'
 import { Route as BasketballRouteImport } from './routes/basketball'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TennisIndexRouteImport } from './routes/tennis.index'
@@ -26,6 +27,11 @@ const TennisRoute = TennisRouteImport.update({
 const NewsRoute = NewsRouteImport.update({
   id: '/news',
   path: '/news',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BettingRoute = BettingRouteImport.update({
+  id: '/betting',
+  path: '/betting',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BasketballRoute = BasketballRouteImport.update({
@@ -62,6 +68,7 @@ const BasketballIdRoute = BasketballIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/basketball': typeof BasketballRouteWithChildren
+  '/betting': typeof BettingRoute
   '/news': typeof NewsRoute
   '/tennis': typeof TennisRouteWithChildren
   '/basketball/$Id': typeof BasketballIdRoute
@@ -71,6 +78,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/betting': typeof BettingRoute
   '/news': typeof NewsRoute
   '/basketball/$Id': typeof BasketballIdRoute
   '/index/$gameId': typeof IndexGameIdRoute
@@ -81,6 +89,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/basketball': typeof BasketballRouteWithChildren
+  '/betting': typeof BettingRoute
   '/news': typeof NewsRoute
   '/tennis': typeof TennisRouteWithChildren
   '/basketball/$Id': typeof BasketballIdRoute
@@ -93,6 +102,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/basketball'
+    | '/betting'
     | '/news'
     | '/tennis'
     | '/basketball/$Id'
@@ -102,6 +112,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/betting'
     | '/news'
     | '/basketball/$Id'
     | '/index/$gameId'
@@ -111,6 +122,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/basketball'
+    | '/betting'
     | '/news'
     | '/tennis'
     | '/basketball/$Id'
@@ -122,6 +134,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BasketballRoute: typeof BasketballRouteWithChildren
+  BettingRoute: typeof BettingRoute
   NewsRoute: typeof NewsRoute
   TennisRoute: typeof TennisRouteWithChildren
   IndexGameIdRoute: typeof IndexGameIdRoute
@@ -141,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/news'
       fullPath: '/news'
       preLoaderRoute: typeof NewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/betting': {
+      id: '/betting'
+      path: '/betting'
+      fullPath: '/betting'
+      preLoaderRoute: typeof BettingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/basketball': {
@@ -216,6 +236,7 @@ const TennisRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BasketballRoute: BasketballRouteWithChildren,
+  BettingRoute: BettingRoute,
   NewsRoute: NewsRoute,
   TennisRoute: TennisRouteWithChildren,
   IndexGameIdRoute: IndexGameIdRoute,

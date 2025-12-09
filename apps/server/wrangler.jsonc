@@ -6,7 +6,8 @@
 		"nodejs_compat"
 	],
 	"vars": {
-		"NODE_ENV": "production"
+		"NODE_ENV": "production",
+		"CORS_ORIGIN": "https://sportsdey.adeaduratimilehin.workers.dev"
 		// Add public environment variables here
 		// Example: "CORS_ORIGIN": "https://your-domain.com"
 	},

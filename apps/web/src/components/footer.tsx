@@ -49,7 +49,10 @@ const currentSport = useCurrentSport();
 									router.navigate({ to: currentSport === "tennis" ? "/tennis" : currentSport === "basketball" ? "/basketball" : "/" });	
 							}
 							if(item === "news") {
-									router.navigate({ to: "/news" });	
+router.navigate({ to: "/news", search: { sports: currentSport } });
+							}
+							if(item === "betting") {
+								router.navigate({to: "/betting"})
 							}
 							// if(item === "lives") {
 							// 		router.navigate({ to: "/lives" });	
