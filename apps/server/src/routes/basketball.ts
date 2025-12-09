@@ -24,6 +24,7 @@ import {
 	basketballVideosQuery,
 	gameIdParam,
 } from "@/validators";
+import { transform } from "zod";
 
 const basketballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 
@@ -556,6 +557,8 @@ basketballRoute.openapi(
 					...transformTeamData(gameData.away, false,gameData.status === "scheduled" ? true : false),
 				},
 			};
+
+			console.log(transformedData)
 
 			await c.env.sportsdey_ns.put(
 				cacheKey,
