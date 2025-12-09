@@ -15,6 +15,7 @@ export const ScheduledGameSchema = z.object({
 		"if-necessary",
 		"unnecessary",
 	]),
+	scheduledTime: z.string(),
 	home: z.object({
 		name: z.string(),
 		alias: z.string(),

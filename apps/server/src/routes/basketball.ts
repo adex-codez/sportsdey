@@ -40,6 +40,7 @@ const validateActualDate = (year: number, month: number, day: number) => {
 interface SportRadarGame {
 	id: string;
 	status: string;
+	scheduled: string
 	home_points?: number;
 	away_points?: number;
 	home: {
@@ -200,6 +201,7 @@ basketballRoute.openapi(
 				games: data.games.map((game) => ({
 					id: game.id,
 					status: game.status,
+					scheduledTime: game.scheduled,
 					home: {
 						name: game.home.name,
 						alias: game.home.alias,
