@@ -38,7 +38,7 @@ interface TeamTotals {
   ftPct: number
 }
 
-interface TeamStatsData {
+export interface TeamStatsData {
   teamName: string
   teamLogo?: string
   starters: Player[]
@@ -49,6 +49,7 @@ interface TeamStatsData {
 interface TeamStatsProps {
   teams: TeamStatsData[]
   className?: string
+  isLoading?: boolean
 }
 
 const statColumns = [

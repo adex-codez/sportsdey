@@ -74,7 +74,9 @@ const MatchCard: React.FC<MatchCardProps> = ({
 
   return (
     <div className="grid cursor-pointer grid-cols-[50px_1fr_40px] items-center gap-x-4 px-5 py-3.5 border-b border-border hover:bg-muted/30 transition-colors last:border-b-0">
-      <div className={`text-xs font-medium flex items-center justify-center w-[35px] h-[35px] rounded-[10px] ${status !== "FT" && status !== time ? "bg-[#0E8F1A] text-white" : "text-muted-foreground"}`}>{status}</div>
+      <div className={`text-xs font-medium flex items-center justify-center w-[35px] h-[35px] rounded-[10px] ${status !== "FT" && status !== "scheduled" && status !== time ? "bg-[#0E8F1A] text-white" : "text-muted-foreground"}`}>
+        {status === "scheduled" && time ? time : status}
+      </div>
 
       {isTennisRoute && player1Sets && player2Sets ? (
         <div className="flex flex-col gap-1.5 text-sm">
@@ -181,9 +183,8 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
       {isExpanded && matches && (
         <div className="flex flex-col">
           {matches.map((match, index) => (
-            <Link to={`${getRoutePath()}`} params={{ Id: match.id! }}>
+            <Link key={match.id || index} to={`${getRoutePath()}`} params={{ Id: match.id! }}>
               <MatchCard
-                key={match.id || index}
                 team1={match.team1}
                 team2={match.team2}
                 time={match.time}

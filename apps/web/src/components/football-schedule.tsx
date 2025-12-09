@@ -113,7 +113,7 @@ const FootballSchedule = () => {
 	if (isLoading) {
 		return (
 			<div className="flex flex-col items-center justify-center space-y-2">
-				<Loader2 className="animate-spin" width={48} height={48} />
+				<Loader2 className="animate-spin" width={24} height={24} />
 				<p className="text-gray-500 text-sm">Loading matches...</p>
 			</div>
 		);
