@@ -1,3 +1,5 @@
+import type { TeamStatsData } from "@/components/basketball-section/TeamStats";
+
 export interface BasketballTeam {
   name: string;
   alias: string;
@@ -61,10 +63,38 @@ export interface BasketballGameDetails {
     name: string;
     points: number;
   };
-  scheduledTime?: string; // Optional if sometimes present or if we need to extend
+  scheduledTime?: string;
+  teams: TeamStatsData[] // Optional if sometimes present or if we need to extend
 }
 
 export interface BasketballGameDetailsResponse {
   success: boolean;
   data: BasketballGameDetails;
+}
+
+export interface BasketballGameStats {
+  home: {
+    name: string;
+  };
+  away: {
+    name: string;
+  };
+}
+
+export interface BasketballVideo {
+  videoId: string;
+  publishedAt: string;
+  title: string;
+  description?: string; // Optional if future API adds it, but current response doesn't show it
+}
+
+export interface BasketballVideosData {
+  nextPageToken?: string;
+  prevPageToken?: string;
+  videos: BasketballVideo[];
+}
+
+export interface BasketballVideosResponse {
+  success: boolean;
+  data: BasketballVideosData;
 }

@@ -1,24 +1,25 @@
 import BasketBallScoreCard from './BasketBallScoreCard'
 import VenueGuide from './VenueGuide'
-import { TeamStats } from './TeamStats'
-import { sampleTeams } from './BasketBallDetailsPage'
+import { TeamStats, type TeamStatsData } from './TeamStats'
+import type { BasketballGameDetails } from '@/types/api'
 
 
+const InfoTab = ({ gameDetails, teamStats }: { gameDetails?: BasketballGameDetails; teamStats?: TeamStatsData[] }) => {
+  if (!gameDetails) return null;
 
-const InfoTab = () => {
   return (
     <div className='w-full space-y-4'>
       <div className='w-full'>
         <BasketBallScoreCard team1={{
-          name: 'Detroit Pistons',
-          quarterScores: [28, 30, 26, 26],
-          total: 122,
+          name: gameDetails.home.name,
+          quarterScores: [0, 0, 0, 0],
+          total: gameDetails.home.points ?? 0,
 
         }}
           team2={{
-            name: 'Chicago Bulls',
-            quarterScores: [30, 28, 24, 28],
-            total: 120,
+            name: gameDetails.away.name,
+            quarterScores: [0, 0, 0, 0],
+            total: gameDetails.away.points ?? 0,
 
           }}
           quarters={[
@@ -29,10 +30,10 @@ const InfoTab = () => {
           ]} />
       </div>
       <div className='w-full'>
-        <VenueGuide venueName={"Amway Center"} />
+        <VenueGuide venueName={gameDetails.venue.name} />
       </div>
       <div className="w-full mx-auto">
-        <TeamStats teams={sampleTeams} />
+        <TeamStats teams={teamStats || []} />
       </div>
     </div>
   )

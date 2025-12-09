@@ -1,6 +1,7 @@
 import DetailsImageCard from '@/shared/DetailsImageCard'
-import type { Quarter, TeamData, TeamStanding } from '@/types/basketball';
-import type { BasketballStanding, BasketballGameDetails } from '@/types/api';
+import type { TeamStanding } from '@/types/basketball';
+
+import { type BasketballGameDetails, type BasketballStanding, type BasketballGameStats } from '@/types/api';
 import { apiRequest } from '@/lib/api';
 import { useQuery } from '@tanstack/react-query';
 import { TeamStats } from './TeamStats';
@@ -8,417 +9,46 @@ import ImportantUpdate from '@/shared/ImportantUpdate';
 import { useState } from 'react';
 import InfoTab from './InfoTab';
 import StandingsTab from './StandingsTab';
+import { VideosTab } from './VideosTab';
 import { useParams } from '@tanstack/react-router';
+import { Loader2 } from 'lucide-react';
+import { GameDetailsSkeleton } from './GameDetailsSkeleton';
 
 
-
-
-export const sampleTeams = [
-  {
-    teamName: "Detroit Pistons",
-    teamLogo: "/Pistons.png",
-    starters: [
-      {
-        name: "Precious Achiuwa",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 6,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-      {
-        name: "Drew Eubanks",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 6,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-      {
-        name: "Russell Westbrook",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 6,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-      {
-        name: "DeMar DeRozan",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 6,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-      {
-        name: "Zach LaVine",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 6,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-    ],
-    bench: [
-      {
-        name: "Roma",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 8,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-      {
-        name: "Roma",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 8,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-      {
-        name: "Roma",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 8,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-      {
-        name: "Roma",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 8,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-    ],
-    totals: {
-      pts: 99,
-      fg: "39-88",
-      threePt: "8-23",
-      ft: "15-20",
-      reb: 45,
-      ast: 23,
-      to: 18,
-      stl: 12,
-      blk: 0,
-      oreb: 12,
-      dreb: 33,
-      pf: 33,
-      min: 240,
-      fgPct: 44,
-      threePtPct: 29,
-      ftPct: 65,
-    },
-  },
-  {
-    teamName: "Chicago Bulls",
-    teamLogo: "/Bulls.png",
-    starters: [
-      {
-        name: "Precious Achiuwa",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 6,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-      {
-        name: "Drew Eubanks",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 6,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-      {
-        name: "Russell Westbrook",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 6,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-      {
-        name: "DeMar DeRozan",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 6,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-      {
-        name: "Zach LaVine",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 6,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-    ],
-    bench: [
-      {
-        name: "Roma",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 8,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-      {
-        name: "Roma",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 8,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-      {
-        name: "Roma",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 8,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-      {
-        name: "Roma",
-        number: "15",
-        pts: 15,
-        fg: "3-6",
-        threePt: "0-2",
-        ft: "2-4",
-        reb: 9,
-        ast: 8,
-        to: 4,
-        stl: 3,
-        blk: 0,
-        oreb: 5,
-        dreb: 10,
-        pf: 2,
-        min: 26,
-        plusMinus: -8,
-      },
-    ],
-    totals: {
-      pts: 99,
-      fg: "39-88",
-      threePt: "8-23",
-      ft: "15-20",
-      reb: 45,
-      ast: 23,
-      to: 18,
-      stl: 12,
-      blk: 0,
-      oreb: 12,
-      dreb: 33,
-      pf: 33,
-      min: 240,
-      fgPct: 44,
-      threePtPct: 29,
-      ftPct: 65,
-    },
-  },
-]
 
 const BasketBallDetailsPage = () => {
   const { Id } = useParams({ from: '/basketball/$Id' });
   const [activeTab, setActiveTab] = useState('info');
-  const quarters: Quarter[] = [
-    { id: 'q1', label: 'Q1' },
-    { id: 'q2', label: 'Q2' },
-    { id: 'q3', label: 'Q3' },
-    { id: 'q4', label: 'Q4' }
-  ];
-
-  const team1Data: TeamData = {
-    name: 'Detroit Pistons',
-    quarterScores: [36, 34, 26, 25],
-    total: 121,
-  };
-
-  const team2Data: TeamData = {
-    name: 'Chicago Bulls',
-    quarterScores: [32, 28, 26, 28],
-    total: 113,
-  };
 
   const { data: gameDetails, isLoading: isGameLoading } = useQuery({
     queryKey: ['basketball', 'game', Id],
     queryFn: () => apiRequest<BasketballGameDetails>(`/api/basketball/game/${Id}`),
     enabled: !!Id,
   });
+
+  const { data: gameStats, isLoading: isStatsLoading } = useQuery({
+    queryKey: ['basketball', 'game', Id, 'stats'],
+    queryFn: () => apiRequest<BasketballGameStats>(`/api/basketball/game/${Id}/stats`),
+    enabled: !!Id,
+  });
+
+  const mappedTeamStats = gameStats ? [
+    {
+      teamName: gameStats.home.name,
+      teamLogo: "/Profile.png",
+      starters: [],
+      bench: [],
+      totals: { pts: 0, fg: '-', threePt: '-', ft: '-', reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, min: 0, fgPct: 0, threePtPct: 0, ftPct: 0 }
+    },
+    {
+      teamName: gameStats.away.name,
+      teamLogo: "/Profile.png",
+      starters: [],
+      bench: [],
+      totals: { pts: 0, fg: '-', threePt: '-', ft: '-', reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, min: 0, fgPct: 0, threePtPct: 0, ftPct: 0 }
+    }
+  ] : []
+
 
   const gameTabs = [
     { id: 'info', label: 'Info' },
@@ -453,7 +83,7 @@ const BasketBallDetailsPage = () => {
     switch (activeTab) {
       case 'info':
         return (
-          <InfoTab />
+          <InfoTab gameDetails={gameDetails} teamStats={mappedTeamStats} />
         );
 
       case 'standings':
@@ -467,29 +97,15 @@ const BasketBallDetailsPage = () => {
 
       case 'team-stats':
         return (
-          <TeamStats teams={sampleTeams} />
+          <TeamStats teams={mappedTeamStats} isLoading={isStatsLoading} />
         );
 
       case 'videos':
         return (
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold text-white">Game Highlights</h3>
-            <div className="grid grid-cols-2 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="bg-gray-800 rounded-lg overflow-hidden hover:ring-2 ring-blue-500 transition cursor-pointer">
-                  <div className="h-32 bg-linear-to-br from-blue-900 to-gray-900 flex items-center justify-center">
-                    <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                    </svg>
-                  </div>
-                  <div className="p-3">
-                    <p className="text-white text-sm font-medium">Highlight {i}</p>
-                    <p className="text-gray-400 text-xs">2:15</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <VideosTab
+            homeTeam={gameDetails?.home.name || ''}
+            awayTeam={gameDetails?.away.name || ''}
+          />
         );
 
       case 'news':
@@ -516,7 +132,15 @@ const BasketBallDetailsPage = () => {
   };
 
   if (isGameLoading) {
-    return <div className="flex justify-center items-center h-screen text-white">Loading game details...</div>;
+    return <div className='w-full'>
+      <div className='w-full h-screen max-w-full space-y-3 pb-28 lg:pb-10 flex items-center justify-center md:hidden'>
+        <Loader2 className="animate-spin" width={48} height={48} />
+
+      </div>
+      <div className='hidden md:block'>
+        <GameDetailsSkeleton />
+      </div>
+    </div>
   }
 
   return (
@@ -527,14 +151,14 @@ const BasketBallDetailsPage = () => {
             gameTabs={gameTabs}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
-            competitionCountry={gameDetails.venue.name || "International"} // Fallback/Incorrect mapping? Venue name isn't country.
+            competitionCountry={gameDetails.venue.name || "International"}
             competitionName={gameDetails.season.name}
             hostTeamName={gameDetails.home.name}
-            hostTeamLogo='/placeholder.png' // API missing logo
+            hostTeamLogo='/Profile.png'
             matchStatus={gameDetails.status === 'closed' ? 'FT' : gameDetails.status}
             hostTeamScore={gameDetails.home.points}
             guestTeamScore={gameDetails.away.points}
-            guestTeamLogo='/placeholder.png' // API missing logo
+            guestTeamLogo='/Profile.png'
             guestTeamName={gameDetails.away.name}
           />
         )}
