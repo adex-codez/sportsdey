@@ -137,8 +137,9 @@ basketballRoute.openapi(
 			}
 
 			const apiKey = c.env?.SPORTRADAR_API_KEY;
+			const cacheKey = `basketball_schedule_${language}_${year}_${month}_${day}`;
 			const cachedData = (await c.env.sportsdey_ns.get(
-				"basketball_schedule",
+				cacheKey,
 				"json",
 			)) as {
 				data: any;
@@ -216,7 +217,7 @@ basketballRoute.openapi(
 			};
 
 			await c.env.sportsdey_ns.put(
-				"basketball_schedule",
+				cacheKey,
 				JSON.stringify({
 					data: transformedData,
 					expiresAt: Date.now() + 30 * 1000,

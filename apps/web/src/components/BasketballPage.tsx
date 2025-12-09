@@ -6,6 +6,8 @@ import type { BasketballScheduleData } from '@/types/api';
 import type { League } from '@/types/basketball';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
+import { useMemo } from 'react';
+import FixtureFilterHeaders from '@/shared/FixtureFilterHeaders';
 
 const formatDate = (date: Date) => {
   return {
@@ -62,10 +64,22 @@ const BasketballPage = () => {
 
   const leagues: League[] = dynamicLeague ? [dynamicLeague] : [];
 
-  console.log(leagues);
+  const counts = useMemo(() => {
+    if (!scheduleData?.games) return { all: 0, live: 0, finished: 0, upcoming: 0 };
+    const games = scheduleData.games;
+    return {
+      all: games.length,
+      live: games.filter(g => !['closed', 'cancelled', 'scheduled', 'ns'].includes(g.status.toLowerCase())).length,
+      finished: games.filter(g => ['closed', 'ft', 'aot'].includes(g.status.toLowerCase())).length,
+      upcoming: games.filter(g => ['scheduled', 'ns'].includes(g.status.toLowerCase())).length
+    };
+  }, [scheduleData]);
 
   return (
     <div className='space-y-4 mb-32 lg:mb-0'>
+      <div className='hidden w-full lg:block'>
+        <FixtureFilterHeaders counts={counts} />
+      </div>
       {isLoading && <div className="flex flex-col items-center justify-center space-y-2">
         <Loader2 className="animate-spin" width={24} height={24} />
         <p className="text-gray-500 text-sm">Loading matches...</p>

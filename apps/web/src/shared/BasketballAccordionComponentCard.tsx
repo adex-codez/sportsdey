@@ -112,12 +112,12 @@ const MatchCard: React.FC<MatchCardProps> = ({
       ) : (
         <div className="flex flex-col gap-1.5 text-sm">
           <div className="flex justify-between items-center">
-            <span className={`text-foreground ${(score1 ?? 0) > (score2 ?? 0) ? "font-semibold" : ""}`}>{team1}</span>
-            <span className="text-foreground min-w-10 text-right font-semibold">{score1}</span>
+            <span className={`text-primary ${(score1 ?? 0) > (score2 ?? 0) ? "font-semibold" : ""}`}>{team1}</span>
+            <span className={`text-primary min-w-10 text-right ${(score1 ?? 0) > (score2 ?? 0) ? "font-semibold" : ""}`}>{score1}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className={`text-foreground ${(score2 ?? 0) > (score1 ?? 0) ? "font-semibold" : ""}`}>{team2}</span>
-            <span className="text-foreground min-w-10 text-right font-semibold">{score2}</span>
+            <span className={`text-primary ${(score2 ?? 0) > (score1 ?? 0) ? "font-semibold" : ""}`}>{team2}</span>
+            <span className={`text-primary min-w-10 text-right ${(score2 ?? 0) > (score1 ?? 0) ? "font-semibold" : ""}`}>{score2}</span>
           </div>
         </div>
       )}

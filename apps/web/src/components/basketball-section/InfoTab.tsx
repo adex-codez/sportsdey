@@ -12,13 +12,19 @@ const InfoTab = ({ gameDetails, teamStats }: { gameDetails?: BasketballGameDetai
       <div className='w-full'>
         <BasketBallScoreCard team1={{
           name: gameDetails.home.name,
-          quarterScores: [0, 0, 0, 0],
+          quarterScores: gameDetails.home.score?.reduce((acc, curr) => {
+            acc[curr.quarter - 1] = curr.points;
+            return acc;
+          }, [0, 0, 0, 0] as number[]) || [0, 0, 0, 0],
           total: gameDetails.home.points ?? 0,
 
         }}
           team2={{
             name: gameDetails.away.name,
-            quarterScores: [0, 0, 0, 0],
+            quarterScores: gameDetails.away.score?.reduce((acc, curr) => {
+              acc[curr.quarter - 1] = curr.points;
+              return acc;
+            }, [0, 0, 0, 0] as number[]) || [0, 0, 0, 0],
             total: gameDetails.away.points ?? 0,
 
           }}

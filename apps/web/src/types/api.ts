@@ -42,6 +42,66 @@ export interface BasketballStandingsResponse {
   success: boolean;
   data: BasketballStanding[];
 }
+export interface BasketballScore {
+  quarter: number;
+  points: number;
+}
+
+export interface BasketballPlayerStats {
+  field_goals_made: number;
+  field_goals_att: number;
+  field_goals_pct: number;
+  three_points_made: number;
+  three_points_att: number;
+  three_points_pct: number;
+  free_throws_made: number;
+  free_throws_att: number;
+  free_throws_pct: number;
+  rebounds: number;
+  offensive_rebounds: number;
+  defensive_rebounds: number;
+  assists: number;
+  steals: number;
+  blocks: number;
+  turnovers: number;
+  personal_fouls: number;
+  minutes_played?: string;
+  pls_min?: number;
+}
+
+export interface BasketballPlayer {
+  full_name: string;
+  statistics: BasketballPlayerStats;
+}
+
+export interface BasketballTeamStatistics {
+  field_goals_made: number;
+  field_goals_att: number;
+  field_goals_pct: number;
+  three_points_made: number;
+  three_points_att: number;
+  three_points_pct: number;
+  free_throws_made: number;
+  free_throws_att: number;
+  free_throws_pct: number;
+  rebounds: number;
+  offensive_rebounds: number;
+  defensive_rebounds: number;
+  assists: number;
+  steals: number;
+  blocks: number;
+  turnovers: number;
+}
+
+export interface BasketballTeamDetails {
+  name: string;
+  points: number;
+  score?: BasketballScore[];
+  statistics?: BasketballTeamStatistics;
+  starters?: BasketballPlayer[];
+  bench?: BasketballPlayer[];
+}
+
 export interface BasketballGameDetails {
   id: string;
   status: string;
@@ -55,16 +115,11 @@ export interface BasketballGameDetails {
     id: string;
     name: string;
   };
-  home: {
-    name: string;
-    points: number;
-  };
-  away: {
-    name: string;
-    points: number;
-  };
+  clock?: string;
+  quarter?: number;
+  home: BasketballTeamDetails;
+  away: BasketballTeamDetails;
   scheduledTime?: string;
-  teams: TeamStatsData[] // Optional if sometimes present or if we need to extend
 }
 
 export interface BasketballGameDetailsResponse {
@@ -73,12 +128,8 @@ export interface BasketballGameDetailsResponse {
 }
 
 export interface BasketballGameStats {
-  home: {
-    name: string;
-  };
-  away: {
-    name: string;
-  };
+  home: BasketballTeamDetails;
+  away: BasketballTeamDetails;
 }
 
 export interface BasketballVideo {

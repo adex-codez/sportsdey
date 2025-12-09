@@ -32,22 +32,71 @@ const BasketBallDetailsPage = () => {
     enabled: !!Id,
   });
 
+  const mapPlayer = (player: any) => {
+    const s = player.statistics;
+    const pts = (2 * s.field_goals_made) + s.three_points_made + s.free_throws_made;
+    return {
+      name: player.full_name,
+      number: '-',
+      pts,
+      fg: `${s.field_goals_made}/${s.field_goals_att}`,
+      threePt: `${s.three_points_made}/${s.three_points_att}`,
+      ft: `${s.free_throws_made}/${s.free_throws_att}`,
+      reb: s.rebounds || (s.offensive_rebounds + s.defensive_rebounds),
+      ast: s.assists,
+      to: s.turnovers,
+      stl: s.steals,
+      blk: s.blocks,
+      oreb: s.offensive_rebounds,
+      dreb: s.defensive_rebounds,
+      pf: s.personal_fouls,
+      min: s.minutes_played || "0",
+      plusMinus: s.pls_min || 0
+    };
+  };
+
+  const mapTeamToStats = (teamDetails: any) => {
+    if (!teamDetails?.statistics) return {
+      teamName: teamDetails?.name || '',
+      teamLogo: "/Profile.png",
+      starters: [],
+      bench: [],
+      totals: { pts: 0, fg: '-', threePt: '-', ft: '-', reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, min: 0, fgPct: 0, threePtPct: 0, ftPct: 0 }
+    };
+
+    const s = teamDetails.statistics;
+    const totals = {
+      pts: teamDetails.points,
+      fg: `${s.field_goals_made}/${s.field_goals_att}`,
+      fgPct: s.field_goals_pct,
+      threePt: `${s.three_points_made}/${s.three_points_att}`,
+      threePtPct: s.three_points_pct,
+      ft: `${s.free_throws_made}/${s.free_throws_att}`,
+      ftPct: s.free_throws_pct,
+      reb: s.rebounds || (s.offensive_rebounds + s.defensive_rebounds),
+      oreb: s.offensive_rebounds,
+      dreb: s.defensive_rebounds,
+      ast: s.assists,
+      stl: s.steals,
+      blk: s.blocks,
+      to: s.turnovers,
+      pf: 0,
+      min: 240
+    };
+
+    return {
+      teamName: teamDetails.name,
+      teamLogo: "/Profile.png",
+      starters: teamDetails.starters?.map(mapPlayer) || [],
+      bench: teamDetails.bench?.map(mapPlayer) || [],
+      totals
+    };
+  };
+
   const mappedTeamStats = gameStats ? [
-    {
-      teamName: gameStats.home.name,
-      teamLogo: "/Profile.png",
-      starters: [],
-      bench: [],
-      totals: { pts: 0, fg: '-', threePt: '-', ft: '-', reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, min: 0, fgPct: 0, threePtPct: 0, ftPct: 0 }
-    },
-    {
-      teamName: gameStats.away.name,
-      teamLogo: "/Profile.png",
-      starters: [],
-      bench: [],
-      totals: { pts: 0, fg: '-', threePt: '-', ft: '-', reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, min: 0, fgPct: 0, threePtPct: 0, ftPct: 0 }
-    }
-  ] : []
+    mapTeamToStats(gameStats.home),
+    mapTeamToStats(gameStats.away)
+  ] : [];
 
 
   const gameTabs = [
