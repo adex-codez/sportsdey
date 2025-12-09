@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { CalendarDays, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import useWeekDates from "@/hooks/use-weekdates";
@@ -37,6 +37,12 @@ export default function Header() {
 	const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 	const { date, setDate } = useDateContext();
 	const weekDates = useWeekDates();
+	const location = useLocation();
+	const router = useRouter();
+	useEffect(() => {
+		console.log(currentSport)
+	}, [])
+
 
 	useEffect(() => {
 		if (open) {
@@ -160,20 +166,15 @@ export default function Header() {
 								<p className="font-semibold text-lg">Menu</p>
 								<hr />
 								<ul className="space-y-2">
-									<li>Scores</li>
+									<li onClick={() => {
+                    setTab("scores")
+										router.navigate({ to: currentSport === "tennis" ? "/tennis" : currentSport === "basketball" ? "/basketball" : "/" });
+                  }}>Scores</li>
 									<li>Favourites (0)</li>
-									<li>News</li>
-								</ul>
-							</div>
-
-							<div className="space-y-4">
-								<p className="font-semibold text-lg">Betting Tips</p>
-								<hr />
-								<ul className="space-y-2">
-									<li>Value Bets</li>
-									<li>Trends</li>
-									<li>Streaks</li>
-									<li>Daily Acca</li>
+									<li onClick={() => {
+										setTab("news")
+										router.navigate({ to: "/news", search: { sports: currentSport } });
+									}} >News</li>
 								</ul>
 							</div>
 
@@ -187,18 +188,39 @@ export default function Header() {
 			<div className="w-full bg-primary lg:hidden">
 				<div className="flex justify-center border border-[#414141] py-3">
 					<ul className="flex gap-6">
-						<li>
-							<a href="#" className="font-semibold text-secondary text-sm">
-								Scores
-							</a>
+						<li
+							onClick={() => {
+								setTab("scores");
+								const target =
+									currentSport === SPORTS.TENNIS
+										? "/tennis"
+										: currentSport === SPORTS.BASKETBALL
+											? "/basketball"
+											: "/";
+								router.navigate({ to: target });
+							}}
+							className="font-semibold text-secondary text-sm"
+						>
+							Scores
 						</li>
 						<li>
-							<a href="#" className="font-semibold text-secondary text-sm">
+							<Link
+								to="/betting"
+								className="font-semibold text-secondary text-sm"
+								onClick={() => setTab("betting")}
+							>
 								Betting
-							</a>
+							</Link>
 						</li>
 						<li>
-							<a href="#" className="font-semibold text-secondary text-sm">
+							<a
+								href="#"
+								className="font-semibold text-secondary text-sm"
+								onClick={() => {
+									setTab("news")
+router.navigate({ to: "/news", search: { sports: currentSport } });
+								}}
+							>
 								News
 							</a>
 						</li>
@@ -227,38 +249,41 @@ export default function Header() {
 					</nav>
 				</div>
 
-				<div className="flex w-full items-center justify-between bg-[#202120] px-4 py-2 md:gap-0 md:px-6">
-					{weekDates.map((weekDate, index) => (
-						//@biome-ignore lint
-						<div
-							key={`date-${index}`}
-							onClick={() => setDate(weekDate)}
-							className={cn(
-								"flex flex-col text-center",
-								weekDate.toDateString() === date.toDateString()
-									? "text-secondary"
-									: "text-[#6C7073]",
-							)}
-						>
-							<p
+				{!location.pathname.startsWith("/news") &&
+				!location.pathname.startsWith("/betting") ? (
+					<div className="flex w-full items-center justify-between bg-[#202120] px-4 py-2 md:gap-0 md:px-6">
+						{weekDates.map((weekDate, index) => (
+							//@biome-ignore lint
+							<div
+								key={`date-${index}`}
+								onClick={() => setDate(weekDate)}
 								className={cn(
-									"font-medium",
+									"flex flex-col text-center",
 									weekDate.toDateString() === date.toDateString()
-										? "text-base"
-										: "text-sm",
+										? "text-secondary"
+										: "text-[#6C7073]",
 								)}
 							>
-								{new Intl.DateTimeFormat("en-US", {
-									weekday: "short",
-								}).format(weekDate)}
-							</p>
-							<p className="">{weekDate.getDate()}</p>
+								<p
+									className={cn(
+										"font-medium",
+										weekDate.toDateString() === date.toDateString()
+											? "text-base"
+											: "text-sm",
+									)}
+								>
+									{new Intl.DateTimeFormat("en-US", {
+										weekday: "short",
+									}).format(weekDate)}
+								</p>
+								<p className="">{weekDate.getDate()}</p>
+							</div>
+						))}
+						<div className="rounded-lg border border-[#777] bg-primary p-2">
+							<CalendarDays className="text-secondary" width={24} height={24} />
 						</div>
-					))}
-					<div className="rounded-lg border border-[#777] bg-primary p-2">
-						<CalendarDays className="text-secondary" width={24} height={24} />
 					</div>
-				</div>
+				) : null}
 			</div>
 		</div>
 	);

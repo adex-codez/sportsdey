@@ -6,6 +6,7 @@ import { Button } from "./ui/button";
 import { useNavigate } from "@tanstack/react-router";
 import { SPORTS } from "@/lib/constants";
 import { useCurrentSport } from "@/hooks/use-current-sport";
+import BettingWidget from "./betting-widget";
 
 const SidebarItem = ({
 	children,
@@ -29,23 +30,10 @@ const SidebarItem = ({
 
 const Sidebar = () => {
 	const { tab, setTab } = useActiveTab();
-	const [isIframeLoading, setIsIframeLoading] = useState(true);
 	const navigate = useNavigate();
 	const currentSport = useCurrentSport();
 
-	useEffect(() => {
-		const timer = setTimeout(() => setIsIframeLoading(false), 5000);
-		return () => clearTimeout(timer);
-	}, []);
-
-	useEffect(() => {
-		window.addEventListener("message", (event) => {
-			const iframe = document.getElementById("betting-widget-wrapper");
-		if (iframe) {
-			iframe.style.height = "200px";
-		}
-		});	
-	}, []);
+	
 
 
 	return (
@@ -94,25 +82,10 @@ const Sidebar = () => {
 				</ul>
 			</SidebarItem>
 
-			<div className="relative h-[200px] w-full rounded-2xl bg-white">
-				<div id="betting-widget-wrapper">
-				{isIframeLoading && (
-					<div className="absolute inset-0 flex items-center justify-center">
-						<Loader2 className="h-8 w-8 animate-spin text-primary" />
-					</div>
-				)}
-				<iframe
-					src="https://bet.sportsdey.com/?mode=widget"
-					title="sportsdey betting tips widget"
-					className={cn(
-						"h-full w-full cust-scrollbar rounded-2xl transition-opacity duration-500",
-						isIframeLoading ? "opacity-0" : "opacity-100",
-					)}
-					id="betting-widget"
-					onLoad={() => setIsIframeLoading(false)}
-				/>
-				</div>
-				
+
+
+			<div className="relative">
+				<BettingWidget />
 			</div>
 			<SidebarItem heading="My Teams" icon={<ChevronRight />}>
 				<div>

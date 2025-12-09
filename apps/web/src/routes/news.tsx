@@ -18,7 +18,7 @@ export const Route = createFileRoute("/news")({
 function RouteComponent() {
 	const sport = useCurrentSport();
 	const [activeTab, setActiveTab] = useState<"news" | "socials" | "videos">(
-		"videos",
+		"news",
 	);
 
 	const tabs = [

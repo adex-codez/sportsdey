@@ -1,4 +1,3 @@
-import React from 'react'
 import BasketBallScoreCard from './BasketBallScoreCard'
 import VenueGuide from './VenueGuide'
 import { TeamStats } from './TeamStats'

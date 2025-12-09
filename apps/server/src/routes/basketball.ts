@@ -40,6 +40,7 @@ const validateActualDate = (year: number, month: number, day: number) => {
 interface SportRadarGame {
 	id: string;
 	status: string;
+	scheduled: string
 	home_points?: number;
 	away_points?: number;
 	home: {
@@ -200,6 +201,7 @@ basketballRoute.openapi(
 				games: data.games.map((game) => ({
 					id: game.id,
 					status: game.status,
+					scheduledTime: game.scheduled,
 					home: {
 						name: game.home.name,
 						alias: game.home.alias,
@@ -524,6 +526,7 @@ basketballRoute.openapi(
 			}
 
 			const gameData: SportRadarGameSummary = await response.json();
+			console.log(gameData)
 
 			const transformedData = {
 				id: gameData.id,
@@ -536,22 +539,24 @@ basketballRoute.openapi(
 					name: gameData.venue.name,
 				},
 				home: {
-					scores:
-						gameData.home.scoring?.map((score) => ({
+					...(gameData.home.scoring?.length === 0 ? {} :
+						{score: gameData.home.scoring?.map((score) => ({
 							quarter: score.number,
 							points: score.points,
-						})) || [],
-					...transformTeamData(gameData.home, false),
+						}))}
+					),
+					...transformTeamData(gameData.home, false, gameData.status === "scheduled" ? true : false),
 				},
 				away: {
-					scores:
-						gameData.away.scoring?.map((score) => ({
+					 ...(gameData.home.scoring?.length === 0 ? {} :
+						{score:gameData.home.scoring?.map((score) => ({
 							quarter: score.number,
 							points: score.points,
-						})) || [],
-					...transformTeamData(gameData.away, false),
+						}))}),
+					...transformTeamData(gameData.away, false,gameData.status === "scheduled" ? true : false),
 				},
 			};
+			console.log(transformedData)
 
 			await c.env.sportsdey_ns.put(
 				cacheKey,
@@ -711,10 +716,10 @@ basketballRoute.openapi(
 
 			const transformedData = {
 				home: {
-					...transformTeamData(gameData.home, true),
+					...transformTeamData(gameData.home, true, gameData.status === "scheduled" ? true : false),
 				},
 				away: {
-					...transformTeamData(gameData.away, true),
+					...transformTeamData(gameData.away, true,gameData.status === "scheduled" ? true : false),
 				},
 			};
 

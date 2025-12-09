@@ -3,7 +3,14 @@ import type { SportRadarPlayer, SportRadarTeam } from "@/types";
 export function transformTeamData(
 	teamData: SportRadarTeam,
 	skipPoints: boolean,
+	isScheduled: boolean
 ) {
+	if(isScheduled){
+return {
+		name: `${teamData.market} ${teamData.name}`,
+		...(skipPoints ? {} : { points: teamData.points }),
+	};
+	}
 	const activePlayers = teamData.players.filter(
 		(player: SportRadarPlayer) => !player.not_playing_reason,
 	);

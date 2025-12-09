@@ -137,8 +137,8 @@ body {
 	scrollbar-width: thin;
 }
 
-.betting-widget-wrapper {
-    width: 100%;
+#betting-widget-wrapper {
+  width: 100%;
 }
 
 #betting-widget {
