@@ -88,6 +88,7 @@ export const TeamSchema = z.object({
 export const GameSummarySchema = z.object({
 	id: z.string(),
 	status: z.string(),
+	scheduledTime: z.string().nullable(),
 	season: z.object({
 		id: z.string(),
 		year: z.number(),
@@ -96,7 +97,6 @@ export const GameSummarySchema = z.object({
 	}),
 	clock: z.string(),
 	quarter: z.number(),
-
 	home: TeamSchema,
 	away: TeamSchema,
 });

@@ -24,6 +24,7 @@ import {
 	basketballVideosQuery,
 	gameIdParam,
 } from "@/validators";
+import { transform } from "zod";
 
 const basketballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 
@@ -527,11 +528,11 @@ basketballRoute.openapi(
 			}
 
 			const gameData: SportRadarGameSummary = await response.json();
-			console.log(gameData)
 
 			const transformedData = {
 				id: gameData.id,
 				status: gameData.status,
+				...(gameData.scheduled ? {scheduledTime: gameData.scheduled} : {}),
 				season: gameData.season,
 				clock: gameData.clock,
 				quarter: gameData.quarter,
@@ -557,6 +558,7 @@ basketballRoute.openapi(
 					...transformTeamData(gameData.away, false,gameData.status === "scheduled" ? true : false),
 				},
 			};
+
 			console.log(transformedData)
 
 			await c.env.sportsdey_ns.put(

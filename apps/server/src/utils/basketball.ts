@@ -7,7 +7,7 @@ export function transformTeamData(
 ) {
 	if(isScheduled){
 return {
-		name: `${teamData.market} ${teamData.name}`,
+		name: `${teamData.name}`,
 		...(skipPoints ? {} : { points: teamData.points }),
 	};
 	}
@@ -24,7 +24,7 @@ return {
 		.map(transformPlayer);
 
 	return {
-		name: `${teamData.market} ${teamData.name}`,
+		name: `${teamData.name}`,
 		...(skipPoints ? {} : { points: teamData.points }),
 		...transformTeamStatistics(teamData),
 		starters,
