@@ -45,6 +45,7 @@ export interface MatchCardProps {
 	time?: string;
 	isFavorite?: boolean;
 	onFavoriteToggle?: () => void;
+	id?: string;
 }
 
 export interface BasketballAccordionComponentCardProps {

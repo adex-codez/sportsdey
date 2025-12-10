@@ -1,4 +1,5 @@
 import DetailsImageCard from '@/shared/DetailsImageCard'
+import { format } from 'date-fns';
 import type { TeamStanding } from '@/types/basketball';
 
 import { type BasketballGameDetails, type BasketballStanding, type BasketballGameStats } from '@/types/api';
@@ -13,6 +14,8 @@ import { VideosTab } from './VideosTab';
 import { useParams } from '@tanstack/react-router';
 import { Loader2 } from 'lucide-react';
 import { GameDetailsSkeleton } from './GameDetailsSkeleton';
+import { ErrorState } from '@/components/ErrorState';
+import { useApiError } from '@/hooks/useApiError';
 
 
 
@@ -20,10 +23,16 @@ const BasketBallDetailsPage = () => {
   const { Id } = useParams({ from: '/basketball/$Id' });
   const [activeTab, setActiveTab] = useState('info');
 
-  const { data: gameDetails, isLoading: isGameLoading } = useQuery({
+  const { data: gameDetails, isLoading: isGameLoading, error: gameError, isError: isGameError, refetch: refetchGame } = useQuery({
     queryKey: ['basketball', 'game', Id],
     queryFn: () => apiRequest<BasketballGameDetails>(`/api/basketball/game/${Id}`),
     enabled: !!Id,
+  });
+
+  const { isNetworkError: isGameNetworkError } = useApiError({
+    error: gameError,
+    isError: isGameError,
+    refetch: refetchGame
   });
 
   const { data: gameStats, isLoading: isStatsLoading } = useQuery({
@@ -32,22 +41,71 @@ const BasketBallDetailsPage = () => {
     enabled: !!Id,
   });
 
+  const mapPlayer = (player: any) => {
+    const s = player.statistics;
+    const pts = (2 * s.field_goals_made) + s.three_points_made + s.free_throws_made;
+    return {
+      name: player.full_name,
+      number: '-',
+      pts,
+      fg: `${s.field_goals_made}/${s.field_goals_att}`,
+      threePt: `${s.three_points_made}/${s.three_points_att}`,
+      ft: `${s.free_throws_made}/${s.free_throws_att}`,
+      reb: s.rebounds || (s.offensive_rebounds + s.defensive_rebounds),
+      ast: s.assists,
+      to: s.turnovers,
+      stl: s.steals,
+      blk: s.blocks,
+      oreb: s.offensive_rebounds,
+      dreb: s.defensive_rebounds,
+      pf: s.personal_fouls,
+      min: s.minutes_played || "0",
+      plusMinus: s.pls_min || 0
+    };
+  };
+
+  const mapTeamToStats = (teamDetails: any) => {
+    if (!teamDetails?.statistics) return {
+      teamName: teamDetails?.name || '',
+      teamLogo: "/Profile.png",
+      starters: [],
+      bench: [],
+      totals: { pts: 0, fg: '-', threePt: '-', ft: '-', reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, min: 0, fgPct: 0, threePtPct: 0, ftPct: 0 }
+    };
+
+    const s = teamDetails.statistics;
+    const totals = {
+      pts: teamDetails.points,
+      fg: `${s.field_goals_made}/${s.field_goals_att}`,
+      fgPct: s.field_goals_pct,
+      threePt: `${s.three_points_made}/${s.three_points_att}`,
+      threePtPct: s.three_points_pct,
+      ft: `${s.free_throws_made}/${s.free_throws_att}`,
+      ftPct: s.free_throws_pct,
+      reb: s.rebounds || (s.offensive_rebounds + s.defensive_rebounds),
+      oreb: s.offensive_rebounds,
+      dreb: s.defensive_rebounds,
+      ast: s.assists,
+      stl: s.steals,
+      blk: s.blocks,
+      to: s.turnovers,
+      pf: 0,
+      min: 240
+    };
+
+    return {
+      teamName: teamDetails.name,
+      teamLogo: "/Profile.png",
+      starters: teamDetails.starters?.map(mapPlayer) || [],
+      bench: teamDetails.bench?.map(mapPlayer) || [],
+      totals
+    };
+  };
+
   const mappedTeamStats = gameStats ? [
-    {
-      teamName: gameStats.home.name,
-      teamLogo: "/Profile.png",
-      starters: [],
-      bench: [],
-      totals: { pts: 0, fg: '-', threePt: '-', ft: '-', reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, min: 0, fgPct: 0, threePtPct: 0, ftPct: 0 }
-    },
-    {
-      teamName: gameStats.away.name,
-      teamLogo: "/Profile.png",
-      starters: [],
-      bench: [],
-      totals: { pts: 0, fg: '-', threePt: '-', ft: '-', reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, min: 0, fgPct: 0, threePtPct: 0, ftPct: 0 }
-    }
-  ] : []
+    mapTeamToStats(gameStats.home),
+    mapTeamToStats(gameStats.away)
+  ] : [];
 
 
   const gameTabs = [
@@ -59,10 +117,11 @@ const BasketBallDetailsPage = () => {
   ];
 
   const [standingsLimit, setStandingsLimit] = useState(13);
+  const [selectedConference, setSelectedConference] = useState<'western' | 'eastern'>('western');
 
   const { data: standingsData, isLoading: isStandingsLoading } = useQuery({
-    queryKey: ['basketball', 'standings', '2025', 'western', standingsLimit],
-    queryFn: () => apiRequest<BasketballStanding[]>(`/api/basketball/standings/2025?conference=western&limit=${standingsLimit}&offset=0`),
+    queryKey: ['basketball', 'standings', '2025', selectedConference, standingsLimit],
+    queryFn: () => apiRequest<BasketballStanding[]>(`/api/basketball/standings/2025?conference=${selectedConference}&limit=${standingsLimit}&offset=0`),
   });
 
   const teamStandings: TeamStanding[] = standingsData?.map((team, index) => ({
@@ -92,6 +151,10 @@ const BasketBallDetailsPage = () => {
             <StandingsTab
               teams={teamStandings}
               onSeeAllClick={standingsLimit <= 13 ? () => setStandingsLimit(30) : undefined}
+              conference={selectedConference}
+              onConferenceChange={setSelectedConference}
+              homeTeam={gameDetails?.home.name}
+              awayTeam={gameDetails?.away.name}
             />
         );
 
@@ -131,6 +194,19 @@ const BasketBallDetailsPage = () => {
     }
   };
 
+  if (isGameError) {
+    return (
+      <div className='w-full max-w-screen space-y-3 pb-28 lg:pb-10'>
+        <ErrorState
+          message={isGameNetworkError ? 'Network Error' : 'Failed to load game details'}
+          description={isGameNetworkError ? 'Please check your internet connection' : 'Unable to load game information'}
+          onRetry={refetchGame}
+          isNetworkError={isGameNetworkError}
+        />
+      </div>
+    );
+  }
+
   if (isGameLoading) {
     return <div className='w-full'>
       <div className='w-full h-screen max-w-full space-y-3 pb-28 lg:pb-10 flex items-center justify-center md:hidden'>
@@ -151,11 +227,17 @@ const BasketBallDetailsPage = () => {
             gameTabs={gameTabs}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
-            competitionCountry={gameDetails.venue.name || "International"}
-            competitionName={gameDetails.season.name}
+            competitionCountry={"USA"}
+            competitionName={"NBA"}
             hostTeamName={gameDetails.home.name}
             hostTeamLogo='/Profile.png'
-            matchStatus={gameDetails.status === 'closed' ? 'FT' : gameDetails.status}
+            matchStatus={
+              gameDetails.status === 'scheduled' && gameDetails.scheduledTime
+                ? format(new Date(gameDetails.scheduledTime), 'HH:mm')
+                : gameDetails.status === 'closed'
+                  ? 'FT'
+                  : gameDetails.status
+            }
             hostTeamScore={gameDetails.home.points}
             guestTeamScore={gameDetails.away.points}
             guestTeamLogo='/Profile.png'

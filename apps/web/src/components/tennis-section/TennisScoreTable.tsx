@@ -11,10 +11,9 @@ interface TennisPlayerScore {
 interface TennisScoreTableProps {
     players: TennisPlayerScore[]
     className?: string
-    onSeeAllClick?: () => void
 }
 
-const TennisScoreTable = ({ players, className, onSeeAllClick }: TennisScoreTableProps) => {
+const TennisScoreTable = ({ players, className }: TennisScoreTableProps) => {
     return (
         <div className={cn("bg-white rounded-lg overflow-hidden w-full", className)}>
             <div className="w-full overflow-x-auto max-w-[calc(100vw-2rem)] md:max-w-none">
@@ -53,16 +52,7 @@ const TennisScoreTable = ({ players, className, onSeeAllClick }: TennisScoreTabl
                     </tbody>
                 </table>
             </div>
-            {onSeeAllClick && (
-                <div className="w-full flex justify-center py-3 border-t border-[#C8C8C8]">
-                    <button
-                        onClick={onSeeAllClick}
-                        className="text-[10px] underline cursor-pointer text-primary hover:text-primary font-medium"
-                    >
-                        See all Standings
-                    </button>
-                </div>
-            )}
+
         </div>
     )
 }

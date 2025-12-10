@@ -165,18 +165,66 @@ function FormsView({
   )
 }
 
-function StandingsTab({ teams, className, onSeeAllClick }: StandingsTableProps) {
+function StandingsTab({
+  teams,
+  className,
+  onSeeAllClick,
+  conference,
+  onConferenceChange,
+  homeTeam,
+  awayTeam
+}: StandingsTableProps & {
+  conference: 'western' | 'eastern'
+  onConferenceChange: (conference: 'western' | 'eastern') => void
+  homeTeam?: string
+  awayTeam?: string
+}) {
   const [activeFilter, setActiveFilter] = useState<FilterType>("all")
+
+  const isTeamHighlighted = (teamName: string) => {
+    if (!homeTeam && !awayTeam) return false;
+    return teamName === homeTeam || teamName === awayTeam;
+  }
+
+  const enhancedTeams = teams.map(team => ({
+    ...team,
+    isHighlighted: isTeamHighlighted(team.name)
+  }));
 
   return (
     <div className={cn("rounded-lg", className)}>
-      <FilterTabs activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+      <div className="flex gap-x-3 mb-4">
+        <button
+          onClick={() => onConferenceChange('western')}
+          className={cn(
+            "px-4 py-2 rounded-full text-xs font-medium transition-colors border",
+            conference === 'western'
+              ? "bg-[#1BAA04] text-white border-[#1BAA04]"
+              : "bg-white text-primary border-gray-200 hover:bg-gray-50"
+          )}
+        >
+          Western Conference
+        </button>
+        <button
+          onClick={() => onConferenceChange('eastern')}
+          className={cn(
+            "px-4 py-2 rounded-full text-xs font-medium transition-colors border",
+            conference === 'eastern'
+              ? "bg-[#1BAA04] text-white border-[#1BAA04]"
+              : "bg-white text-primary border-gray-200 hover:bg-gray-50"
+          )}
+        >
+          Eastern Conference
+        </button>
+      </div>
 
-      {activeFilter === "forms" ? (
-        <FormsView teams={teams} onSeeAllClick={onSeeAllClick} />
-      ) : (
-        <StandingsView teams={teams} onSeeAllClick={onSeeAllClick} />
-      )}
+      {/* <FilterTabs activeFilter={activeFilter} onFilterChange={setActiveFilter} /> */}
+
+      {/* {activeFilter === "forms" ? (
+        <FormsView teams={enhancedTeams} onSeeAllClick={onSeeAllClick} />
+      ) : ( */}
+      <StandingsView teams={enhancedTeams} onSeeAllClick={onSeeAllClick} />
+      {/* )} */}
     </div>
   )
 }

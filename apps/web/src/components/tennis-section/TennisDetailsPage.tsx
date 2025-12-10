@@ -1,20 +1,37 @@
 import DetailsImageCard from "@/shared/DetailsImageCard";
 import { useState } from "react";
 import TennisInfo from "./TennisInfo";
+import { useParams } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/api";
+import type { TennisMatchDetailsData } from "@/types/api";
+import { ErrorState } from "@/components/ErrorState";
+import { useApiError } from "@/hooks/useApiError";
+import { Loader2 } from "lucide-react";
+import { format } from 'date-fns';
 
 const TennisDetailsPage = () => {
+    const { Id } = useParams({ from: '/tennis/$Id' });
     const [activeTab, setActiveTab] = useState('info');
+
+    const { data, isLoading, error, isError, refetch } = useQuery({
+        queryKey: ['tennis', 'match', Id],
+        queryFn: () => apiRequest<TennisMatchDetailsData>(`/api/tennis/game/${Id}?language=en`),
+    });
+
+    const { isNetworkError } = useApiError({ error, isError, refetch });
+
     const gameTabs = [
         { id: 'info', label: 'Info' },
         { id: 'videos', label: 'Videos' },
         { id: 'news', label: 'News' }
     ];
+
     const renderTabContent = () => {
         switch (activeTab) {
             case 'info':
-                return (
-                    <TennisInfo />
-                );
+                return <TennisInfo matchData={data?.match} />;
+
             case 'videos':
                 return (
                     <div className="space-y-4">
@@ -44,9 +61,9 @@ const TennisDetailsPage = () => {
                         <div className="space-y-3">
                             {[1, 2, 3].map((i) => (
                                 <div key={i} className="bg-gray-800 rounded-lg p-4 hover:bg-gray-750 transition cursor-pointer">
-                                    <h4 className="text-primary font-medium mb-1">Post-Game Analysis: Bulls Dominate</h4>
+                                    <h4 className="text-primary font-medium mb-1">Post-Match Analysis</h4>
                                     <p className="text-gray-400 text-sm mb-2">
-                                        Chicago Bulls showcase stellar performance in their victory over Detroit Pistons...
+                                        Detailed analysis of the match performance and key moments...
                                     </p>
                                     <p className="text-gray-500 text-xs">2 hours ago</p>
                                 </div>
@@ -59,16 +76,79 @@ const TennisDetailsPage = () => {
                 return null;
         }
     };
+
+    if (isError) {
+        return (
+            <div className='space-y-4 mb-32 lg:mb-0 pb-10'>
+                <ErrorState
+                    message={isNetworkError ? 'Network Error' : 'Failed to load match details'}
+                    description={isNetworkError ? 'Please check your internet connection' : 'Unable to load match information'}
+                    onRetry={refetch}
+                    isNetworkError={isNetworkError}
+                />
+            </div>
+        );
+    }
+
+    if (isLoading || !data) {
+        return (
+            <div className='space-y-4 mb-32 lg:mb-0 pb-10'>
+                <div className="flex flex-col items-center justify-center space-y-2 py-20">
+                    <Loader2 className="animate-spin" width={24} height={24} />
+                    <p className="text-gray-500 text-sm">Loading match details...</p>
+                </div>
+            </div>
+        );
+    }
+
+    const match = data.match;
+
+    // Calculate total sets won
+    const homeSetsWon = match.home_team.set_scores.filter((set, idx) =>
+        set.games_won > (match.away_team.set_scores[idx]?.games_won || 0)
+    ).length;
+
+    const awaySetsWon = match.away_team.set_scores.filter((set, idx) =>
+        set.games_won > (match.home_team.set_scores[idx]?.games_won || 0)
+    ).length;
+
+    // Determine match status display
+    let matchStatus: 'live' | 'finished' | 'upcoming' = 'upcoming';
+    if (match.status === 'live') {
+        matchStatus = 'live';
+    } else if (match.status === 'closed' || match.status === 'ended') {
+        matchStatus = 'finished';
+    }
+
     return (
         <div className="space-y-3 pb-28 lg:pb-10">
             <div className='py-4 lg:py-0'>
-                <DetailsImageCard gameTabs={gameTabs} activeTab={activeTab} setActiveTab={setActiveTab} competitionCountry='International' competitionName={`International - Women's Champions League`} hostTeamName='Samir Hamza Reguig' hostTeamLogo='/Profile.png' matchStatus='finished' hostTeamScore={2} guestTeamScore={0} guestTeamLogo='/Profile.png' guestTeamName='Nikita Lanin' />
+                <DetailsImageCard
+                    gameTabs={gameTabs}
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    competitionCountry='International'
+                    competitionName={match.venue || 'Tennis Match'}
+                    hostTeamName={match.home_team.competitor.name}
+                    hostTeamLogo='/Profile.png'
+                    matchStatus={
+                        matchStatus === 'upcoming' && match.start_time
+                            ? format(new Date(match.start_time), 'yyyy-MM-dd HH:mm')
+                            : match.status === 'closed'
+                                ? 'Finished'
+                                : match.status
+                    }
+                    hostTeamScore={homeSetsWon}
+                    guestTeamScore={awaySetsWon}
+                    guestTeamLogo='/Profile.png'
+                    guestTeamName={match.away_team.competitor.name}
+                />
             </div>
             <div>
                 {renderTabContent()}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default TennisDetailsPage
+export default TennisDetailsPage;

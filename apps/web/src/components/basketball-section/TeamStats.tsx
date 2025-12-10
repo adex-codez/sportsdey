@@ -15,7 +15,7 @@ interface Player {
   oreb: number
   dreb: number
   pf: number
-  min: number
+  min: string | number
   plusMinus: number
 }
 
@@ -32,7 +32,7 @@ interface TeamTotals {
   oreb: number
   dreb: number
   pf: number
-  min: number
+  min: string | number
   fgPct: number
   threePtPct: number
   ftPct: number

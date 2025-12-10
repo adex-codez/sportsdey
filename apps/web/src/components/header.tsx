@@ -3,9 +3,7 @@ import { CalendarDays, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import useWeekDates from "@/hooks/use-weekdates";
 import { cn } from "@/lib/utils";
-import BaseballIcon from "@/logos/baseball.svg?react";
 import BasketballIcon from "@/logos/basketball.svg?react";
-import BoxingIcon from "@/logos/boxing.svg?react";
 import FootballIcon from "@/logos/football.svg?react";
 import TennisIcon from "@/logos/tennis.svg?react";
 import WorldIcon from "@/logos/world.svg?react";
@@ -167,9 +165,9 @@ export default function Header() {
 								<hr />
 								<ul className="space-y-2">
 									<li onClick={() => {
-                    setTab("scores")
+										setTab("scores")
 										router.navigate({ to: currentSport === "tennis" ? "/tennis" : currentSport === "basketball" ? "/basketball" : "/" });
-                  }}>Scores</li>
+									}}>Scores</li>
 									<li>Favourites (0)</li>
 									<li onClick={() => {
 										setTab("news")
@@ -218,7 +216,7 @@ export default function Header() {
 								className="font-semibold text-secondary text-sm"
 								onClick={() => {
 									setTab("news")
-router.navigate({ to: "/news", search: { sports: currentSport } });
+									router.navigate({ to: "/news", search: { sports: currentSport } });
 								}}
 							>
 								News
@@ -250,7 +248,7 @@ router.navigate({ to: "/news", search: { sports: currentSport } });
 				</div>
 
 				{!location.pathname.startsWith("/news") &&
-				!location.pathname.startsWith("/betting") ? (
+					!location.pathname.startsWith("/betting") ? (
 					<div className="flex w-full items-center justify-between bg-[#202120] px-4 py-2 md:gap-0 md:px-6">
 						{weekDates.map((weekDate, index) => (
 							//@biome-ignore lint

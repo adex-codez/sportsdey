@@ -1,26 +1,35 @@
 import Badge from "./Badge"
 import CalendarBadge from "./CalendarBadge";
 
-const FixtureFilterHeaders = () => {
-  const data: { label: "all" | "live" | "finished" | "upcoming"; count: number }[] = [
-    {label: "all", count: 9},
-    {label: "live", count: 2},
-    {label: "finished", count: 4},
-    {label: "upcoming", count: 3},
-  ]
-  
+interface FixtureFilterHeadersProps {
+  counts?: {
+    all: number;
+    live: number;
+    finished: number;
+    upcoming: number;
+  }
+}
+
+const FixtureFilterHeaders = ({ counts }: FixtureFilterHeadersProps) => {
+  const data = [
+    { label: "all", count: counts?.all || 0 },
+    { label: "live", count: counts?.live || 0 },
+    { label: "finished", count: counts?.finished || 0 },
+    { label: "upcoming", count: counts?.upcoming || 0 },
+  ] as const;
+
   return (
     <div className='w-full mt-64 lg:mt-0 flex items-start justify-between gap-x-2 '>
       <div className="hidden lg:flex items-center gap-x-2">
 
-      {
-        data.map((item, index)=> ( <Badge totalNumber={item.count} label={item.label} key={index}/>))
-      }
+        {
+          data.map((item, index) => (<Badge totalNumber={item.count} label={item.label} key={index} />))
+        }
       </div>
       <div className="hidden lg:flex">
-        <CalendarBadge/>
+        <CalendarBadge />
       </div>
-       
+
     </div>
   )
 }
