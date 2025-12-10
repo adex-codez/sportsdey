@@ -7,7 +7,7 @@ import { apiRequest } from '@/lib/api';
 import { useQuery } from '@tanstack/react-query';
 import { TeamStats } from './TeamStats';
 import ImportantUpdate from '@/shared/ImportantUpdate';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import InfoTab from './InfoTab';
 import StandingsTab from './StandingsTab';
 import { VideosTab } from './VideosTab';
@@ -16,12 +16,14 @@ import { Loader2 } from 'lucide-react';
 import { GameDetailsSkeleton } from './GameDetailsSkeleton';
 import { ErrorState } from '@/components/ErrorState';
 import { useApiError } from '@/hooks/useApiError';
+import { getTimeUntilStart } from '@/utils/timeUtils';
 
 
 
 const BasketBallDetailsPage = () => {
   const { Id } = useParams({ from: '/basketball/$Id' });
   const [activeTab, setActiveTab] = useState('info');
+  const [countdown, setCountdown] = useState<string>('');
 
   const { data: gameDetails, isLoading: isGameLoading, error: gameError, isError: isGameError, refetch: refetchGame } = useQuery({
     queryKey: ['basketball', 'game', Id],
@@ -34,6 +36,20 @@ const BasketBallDetailsPage = () => {
     isError: isGameError,
     refetch: refetchGame
   });
+
+
+  useEffect(() => {
+    if (gameDetails?.status === 'scheduled' && gameDetails.scheduledTime) {
+      const updateCountdown = () => {
+        setCountdown(getTimeUntilStart(gameDetails.scheduledTime!));
+      };
+
+      updateCountdown();
+      const interval = setInterval(updateCountdown, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [gameDetails]);
 
   const { data: gameStats, isLoading: isStatsLoading } = useQuery({
     queryKey: ['basketball', 'game', Id, 'stats'],
@@ -242,13 +258,14 @@ const BasketBallDetailsPage = () => {
             guestTeamScore={gameDetails.away.points}
             guestTeamLogo='/Profile.png'
             guestTeamName={gameDetails.away.name}
+            isUpcoming={gameDetails.status === 'scheduled'}
+            countdownText={countdown}
           />
         )}
       </div>
       <div>
         {renderTabContent()}
       </div>
-      <div><ImportantUpdate /></div>
     </div>
   )
 }

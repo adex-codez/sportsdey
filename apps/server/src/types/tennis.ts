@@ -56,6 +56,9 @@ export type SportRadarTennisGameResponse = {
 		venue: {
 			id: string;
 			name: string;
+			country_code?: string;
+			country?: string;
+			city?: string;
 		};
 	};
 	sport_event_status: {

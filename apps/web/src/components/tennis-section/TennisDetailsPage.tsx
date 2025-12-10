@@ -1,7 +1,7 @@
 import DetailsImageCard from "@/shared/DetailsImageCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TennisInfo from "./TennisInfo";
-import { useParams } from "@tanstack/react-router";
+import { useParams, useSearch } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
 import type { TennisMatchDetailsData } from "@/types/api";
@@ -9,10 +9,13 @@ import { ErrorState } from "@/components/ErrorState";
 import { useApiError } from "@/hooks/useApiError";
 import { Loader2 } from "lucide-react";
 import { format } from 'date-fns';
+import { getTimeUntilStart } from '@/utils/timeUtils';
 
 const TennisDetailsPage = () => {
     const { Id } = useParams({ from: '/tennis/$Id' });
+    const search = useSearch({ from: '/tennis/$Id' });
     const [activeTab, setActiveTab] = useState('info');
+    const [countdown, setCountdown] = useState<string>('');
 
     const { data, isLoading, error, isError, refetch } = useQuery({
         queryKey: ['tennis', 'match', Id],
@@ -20,6 +23,19 @@ const TennisDetailsPage = () => {
     });
 
     const { isNetworkError } = useApiError({ error, isError, refetch });
+
+    useEffect(() => {
+        if (data?.match.status === 'not_started' && data.match.start_time) {
+            const updateCountdown = () => {
+                setCountdown(getTimeUntilStart(data.match.start_time));
+            };
+
+            updateCountdown();
+            const interval = setInterval(updateCountdown, 1000);
+
+            return () => clearInterval(interval);
+        }
+    }, [data]);
 
     const gameTabs = [
         { id: 'info', label: 'Info' },
@@ -103,7 +119,6 @@ const TennisDetailsPage = () => {
 
     const match = data.match;
 
-    // Calculate total sets won
     const homeSetsWon = match.home_team.set_scores.filter((set, idx) =>
         set.games_won > (match.away_team.set_scores[idx]?.games_won || 0)
     ).length;
@@ -112,13 +127,15 @@ const TennisDetailsPage = () => {
         set.games_won > (match.home_team.set_scores[idx]?.games_won || 0)
     ).length;
 
-    // Determine match status display
     let matchStatus: 'live' | 'finished' | 'upcoming' = 'upcoming';
     if (match.status === 'live') {
         matchStatus = 'live';
     } else if (match.status === 'closed' || match.status === 'ended') {
         matchStatus = 'finished';
     }
+
+    const competitionCountry = search.country || match.venue?.country || 'International';
+    const competitionName = match.competition?.name || match.venue?.name || 'Tennis Match';
 
     return (
         <div className="space-y-3 pb-28 lg:pb-10">
@@ -127,8 +144,8 @@ const TennisDetailsPage = () => {
                     gameTabs={gameTabs}
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
-                    competitionCountry='International'
-                    competitionName={match.venue || 'Tennis Match'}
+                    competitionCountry={competitionCountry}
+                    competitionName={competitionName}
                     hostTeamName={match.home_team.competitor.name}
                     hostTeamLogo='/Profile.png'
                     matchStatus={
@@ -142,6 +159,8 @@ const TennisDetailsPage = () => {
                     guestTeamScore={awaySetsWon}
                     guestTeamLogo='/Profile.png'
                     guestTeamName={match.away_team.competitor.name}
+                    isUpcoming={matchStatus === 'upcoming'}
+                    countdownText={countdown}
                 />
             </div>
             <div>

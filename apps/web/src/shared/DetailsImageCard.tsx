@@ -17,6 +17,8 @@ interface DetailsImageCardProps extends DetailsImageProps {
   activeTab: string
   setActiveTab: (id: string) => void
   gameTabs: { id: string; label: string }[]
+  isUpcoming?: boolean;
+  countdownText?: string;
 }
 
 const DetailsImageCard = ({ competitionName,
@@ -32,7 +34,9 @@ const DetailsImageCard = ({ competitionName,
   activeTab,
   setActiveTab,
   gameTabs,
-  matchStatus }: DetailsImageCardProps) => {
+  matchStatus,
+  isUpcoming = false,
+  countdownText }: DetailsImageCardProps) => {
 
   return (
     <div className="h-64 w-full rounded-t-2xl rounded-b-0 bg-primary relative">
@@ -75,18 +79,31 @@ const DetailsImageCard = ({ competitionName,
           <div className='w-full'>
 
             <div className='flex flex-col items-center gap-y-4'>
-              <span className={`text-base md:text-3xl font-semibold transition-colors duration-300 ${matchStatus === 'live'
-                  ? 'text-[#0E8F1A] animate-pulse'
-                  : 'text-white'
-                }`}>
-                {hostTeamScore} - {guestTeamScore}
-              </span>
-              <span className={`text-xs md:text-sm font-medium mt-2 capitalize block text-center transition-colors duration-300 ${matchStatus === 'live'
-                  ? 'text-[#0E8F1A]'
-                  : 'text-[#1BAA04]'
-                }`}>
-                {matchStatus}
-              </span>
+              {isUpcoming ? (
+                <>
+                  <span className="text-sm text-[#0E8F1A] md:text-xl font-semibold">
+                    Starts in
+                  </span>
+                  <span className="text-sm md:text-lg font-medium text-[#1BAA04]">
+                    {countdownText}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className={`text-base md:text-3xl font-semibold transition-colors duration-300 ${matchStatus === 'live'
+                    ? 'text-[#0E8F1A] animate-pulse'
+                    : 'text-white'
+                    }`}>
+                    {hostTeamScore} - {guestTeamScore}
+                  </span>
+                  <span className={`text-xs md:text-sm font-medium mt-2 capitalize block text-center transition-colors duration-300 ${matchStatus === 'live'
+                    ? 'text-[#0E8F1A]'
+                    : 'text-[#1BAA04]'
+                    }`}>
+                    {matchStatus}
+                  </span>
+                </>
+              )}
             </div>
           </div>
           <div className='flex flex-row-reverse items-center w-full lg:justify-end'>

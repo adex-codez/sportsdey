@@ -183,7 +183,18 @@ export interface TennisMatchDetails {
   id: string;
   start_time: string;
   status: string;
-  venue: string;
+  venue: {
+    name: string;
+    country?: string;
+    country_code?: string;
+    city?: string;
+  };
+  competition?: {
+    id: string;
+    name: string;
+    type?: string;
+    gender?: string;
+  };
   home_team: TennisTeam;
   away_team: TennisTeam;
   winner_id?: string;
