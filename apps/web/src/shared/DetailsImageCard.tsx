@@ -75,8 +75,18 @@ const DetailsImageCard = ({ competitionName,
           <div className='w-full'>
 
             <div className='flex flex-col items-center gap-y-4'>
-              <span className='text-white text-base md:text-3xl font-semibold'>{hostTeamScore} - {guestTeamScore}</span>
-              <span className='text-[#1BAA04] text-xs md:text-sm font-medium mt-2 capitalize block text-center'>{matchStatus}</span>
+              <span className={`text-base md:text-3xl font-semibold transition-colors duration-300 ${matchStatus === 'live'
+                  ? 'text-[#0E8F1A] animate-pulse'
+                  : 'text-white'
+                }`}>
+                {hostTeamScore} - {guestTeamScore}
+              </span>
+              <span className={`text-xs md:text-sm font-medium mt-2 capitalize block text-center transition-colors duration-300 ${matchStatus === 'live'
+                  ? 'text-[#0E8F1A]'
+                  : 'text-[#1BAA04]'
+                }`}>
+                {matchStatus}
+              </span>
             </div>
           </div>
           <div className='flex flex-row-reverse items-center w-full lg:justify-end'>

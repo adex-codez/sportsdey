@@ -137,6 +137,7 @@ body {
 	scrollbar-width: thin;
 }
 
+
 #betting-widget-wrapper {
   width: 100%;
 }
@@ -147,4 +148,37 @@ body {
     display: block;
     min-height: 200px; 
     overflow: hidden; 
+}
+
+/* Custom animations for live tennis scores */
+@keyframes fadeIn {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scoreUpdate {
+  0% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: rgba(27, 170, 4, 0.15);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Smooth transitions for score changes */
+.score-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

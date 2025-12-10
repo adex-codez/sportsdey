@@ -12,7 +12,6 @@ interface VideosTabProps {
 
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Helper component for skeleton loading state
 function VideoCardSkeleton() {
     return (
         <div className="space-y-3">

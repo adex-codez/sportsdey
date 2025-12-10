@@ -8,6 +8,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { useMemo } from 'react';
 import FixtureFilterHeaders from '@/shared/FixtureFilterHeaders';
+import { ErrorState } from '@/components/ErrorState';
+import { useApiError } from '@/hooks/useApiError';
 
 const formatDate = (date: Date) => {
   return {
@@ -22,10 +24,12 @@ const BasketballPage = () => {
   const selectedDate = new Date(selectedDateString);
   const { year, month, day } = formatDate(selectedDate);
 
-  const { data: scheduleData, isLoading } = useQuery({
+  const { data: scheduleData, isLoading, error, isError, refetch } = useQuery({
     queryKey: ['basketball', 'schedule', year, month, day],
     queryFn: () => apiRequest<BasketballScheduleData>(`/api/basketball/schedule/${year}/${month}/${day}?language=en`),
   });
+
+  const { isNetworkError } = useApiError({ error, isError, refetch });
 
 
 
@@ -74,6 +78,19 @@ const BasketballPage = () => {
       upcoming: games.filter(g => ['scheduled', 'ns'].includes(g.status.toLowerCase())).length
     };
   }, [scheduleData]);
+
+  if (isError) {
+    return (
+      <div className='space-y-4 mb-32 lg:mb-0'>
+        <ErrorState
+          message={isNetworkError ? 'Network Error' : 'Failed to load schedule'}
+          description={isNetworkError ? 'Please check your internet connection' : 'Unable to load basketball games'}
+          onRetry={refetch}
+          isNetworkError={isNetworkError}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-4 mb-32 lg:mb-0'>
