@@ -22,8 +22,8 @@ dist/
 prisma/generated/
 
 prompt-playground.json
-match.json
 
+match.json
 
 # deps
 node_modules/
