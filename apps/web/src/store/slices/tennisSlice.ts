@@ -1,3 +1,4 @@
+
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 export type FilterType = 'all' | 'live' | 'finished' | 'upcoming';
