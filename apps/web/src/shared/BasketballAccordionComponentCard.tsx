@@ -48,7 +48,8 @@ const MatchCard: React.FC<MatchCardProps> = ({
   isFavorite = false,
   time,
   onFavoriteToggle,
-  id
+  id,
+  country
 }) => {
   const { state } = useRouter();
   const pathname = state.location.pathname;
@@ -155,7 +156,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
 
   if (isTennisRoute && id) {
     return (
-      <Link to="/tennis/$Id" params={{ Id: id }} className="block">
+      <Link to="/tennis/$Id" params={{ Id: id }} search={{ country }} className="block">
         {cardContent}
       </Link>
     );
@@ -210,7 +211,12 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
       {isExpanded && matches && (
         <div className="flex flex-col">
           {matches.map((match, index) => (
-            <Link key={match.id || index} to={`${getRoutePath()}`} params={{ Id: match.id! }}>
+            <Link
+              key={match.id || index}
+              to={`${getRoutePath()}`}
+              params={{ Id: match.id! }}
+              search={{ country }}
+            >
               <MatchCard
                 team1={match.team1}
                 team2={match.team2}
@@ -222,6 +228,7 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
                 status={match.status ? match.status : match.time}
                 isFavorite={favorites[index]}
                 onFavoriteToggle={() => toggleFavorite(index)}
+                country={country}
               />
             </Link>
           ))}

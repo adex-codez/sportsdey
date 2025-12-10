@@ -46,6 +46,7 @@ export interface MatchCardProps {
 	isFavorite?: boolean;
 	onFavoriteToggle?: () => void;
 	id?: string;
+	country?: string;
 }
 
 export interface BasketballAccordionComponentCardProps {

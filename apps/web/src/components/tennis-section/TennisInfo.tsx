@@ -39,7 +39,7 @@ const TennisInfo = ({ matchData }: TennisInfoProps) => {
                 />
             </div>
             <div className='w-full'>
-                <VenueGuide venueName={matchData.venue || "Tennis Court"} />
+                <VenueGuide venueName={matchData.venue?.name || "Tennis Court"} />
             </div>
         </div>
     )

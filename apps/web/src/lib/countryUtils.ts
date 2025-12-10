@@ -16,6 +16,11 @@ export const getCountryFromCompetition = (competitionName: string): { country: s
     'paris': { country: 'France', flag: 'https://flagcdn.com/w40/fr.png' },
     'lyon': { country: 'France', flag: 'https://flagcdn.com/w40/fr.png' },
     'marseille': { country: 'France', flag: 'https://flagcdn.com/w40/fr.png' },
+    'limoges': { country: 'France', flag: 'https://flagcdn.com/w40/fr.png' },
+    'nice': { country: 'France', flag: 'https://flagcdn.com/w40/fr.png' },
+    'toulouse': { country: 'France', flag: 'https://flagcdn.com/w40/fr.png' },
+    'bordeaux': { country: 'France', flag: 'https://flagcdn.com/w40/fr.png' },
+    'nantes': { country: 'France', flag: 'https://flagcdn.com/w40/fr.png' },
     
     // Spain
     'madrid': { country: 'Spain', flag: 'https://flagcdn.com/w40/es.png' },
