@@ -26,7 +26,7 @@ const BasketballPage = () => {
 
   const { data: scheduleData, isLoading, error, isError, refetch } = useQuery({
     queryKey: ['basketball', 'schedule', year, month, day],
-    queryFn: () => apiRequest<BasketballScheduleData>(`/api/basketball/schedule/${year}/${month}/${day}?language=en`),
+    queryFn: () => apiRequest<BasketballScheduleData>(`basketball/schedule/${year}/${month}/${day}?language=en`),
   });
 
   const { isNetworkError } = useApiError({ error, isError, refetch });

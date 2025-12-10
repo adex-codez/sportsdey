@@ -19,7 +19,7 @@ const TennisDetailsPage = () => {
 
     const { data, isLoading, error, isError, refetch } = useQuery({
         queryKey: ['tennis', 'match', Id],
-        queryFn: () => apiRequest<TennisMatchDetailsData>(`/api/tennis/game/${Id}?language=en`),
+        queryFn: () => apiRequest<TennisMatchDetailsData>(`tennis/game/${Id}?language=en`),
     });
 
     const { isNetworkError } = useApiError({ error, isError, refetch });

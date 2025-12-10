@@ -6,7 +6,6 @@ import { type BasketballGameDetails, type BasketballStanding, type BasketballGam
 import { apiRequest } from '@/lib/api';
 import { useQuery } from '@tanstack/react-query';
 import { TeamStats } from './TeamStats';
-import ImportantUpdate from '@/shared/ImportantUpdate';
 import { useState, useEffect } from 'react';
 import InfoTab from './InfoTab';
 import StandingsTab from './StandingsTab';
@@ -27,7 +26,7 @@ const BasketBallDetailsPage = () => {
 
   const { data: gameDetails, isLoading: isGameLoading, error: gameError, isError: isGameError, refetch: refetchGame } = useQuery({
     queryKey: ['basketball', 'game', Id],
-    queryFn: () => apiRequest<BasketballGameDetails>(`/api/basketball/game/${Id}`),
+    queryFn: () => apiRequest<BasketballGameDetails>(`basketball/game/${Id}`),
     enabled: !!Id,
   });
 
@@ -53,7 +52,7 @@ const BasketBallDetailsPage = () => {
 
   const { data: gameStats, isLoading: isStatsLoading } = useQuery({
     queryKey: ['basketball', 'game', Id, 'stats'],
-    queryFn: () => apiRequest<BasketballGameStats>(`/api/basketball/game/${Id}/stats`),
+    queryFn: () => apiRequest<BasketballGameStats>(`basketball/game/${Id}/stats`),
     enabled: !!Id,
   });
 
@@ -137,7 +136,7 @@ const BasketBallDetailsPage = () => {
 
   const { data: standingsData, isLoading: isStandingsLoading } = useQuery({
     queryKey: ['basketball', 'standings', '2025', selectedConference, standingsLimit],
-    queryFn: () => apiRequest<BasketballStanding[]>(`/api/basketball/standings/2025?conference=${selectedConference}&limit=${standingsLimit}&offset=0`),
+    queryFn: () => apiRequest<BasketballStanding[]>(`basketball/standings/2025?conference=${selectedConference}&limit=${standingsLimit}&offset=0`),
   });
 
   const teamStandings: TeamStanding[] = standingsData?.map((team, index) => ({
