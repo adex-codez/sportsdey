@@ -153,7 +153,6 @@ const MatchCard: React.FC<MatchCardProps> = ({
     </div>
   );
 
-  // Wrap in Link for tennis routes
   if (isTennisRoute && id) {
     return (
       <Link to="/tennis/$Id" params={{ Id: id }} className="block">

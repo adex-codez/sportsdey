@@ -181,13 +181,11 @@ function StandingsTab({
 }) {
   const [activeFilter, setActiveFilter] = useState<FilterType>("all")
 
-  // Helper to check if a team should be highlighted
   const isTeamHighlighted = (teamName: string) => {
     if (!homeTeam && !awayTeam) return false;
     return teamName === homeTeam || teamName === awayTeam;
   }
 
-  // Enhance teams with highlighting before passing to views
   const enhancedTeams = teams.map(team => ({
     ...team,
     isHighlighted: isTeamHighlighted(team.name)

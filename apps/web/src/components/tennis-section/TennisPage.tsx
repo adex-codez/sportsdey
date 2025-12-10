@@ -32,16 +32,16 @@ const TennisPage = () => {
 
   const { isNetworkError } = useApiError({ error, isError, refetch });
 
-  // Calculate match counts for filter headers
+
   const counts = useMemo(() => {
     if (!scheduleData?.competitions) return { all: 0, live: 0, finished: 0, upcoming: 0 };
 
     const allMatches = scheduleData.competitions.flatMap(comp => comp.matches);
 
-    // Helper to check if status is live (same logic as matchesFilter)
+
     const isLive = (status: string) => {
       const lowerStatus = status.toLowerCase();
-      // ONLY 'live' status should be considered live
+
       return lowerStatus === 'live';
     };
 
@@ -65,13 +65,11 @@ const TennisPage = () => {
 
 
 
-  // Helper function to check if match matches the active filter
   const matchesFilter = (status: string) => {
     const lowerStatus = status.toLowerCase();
 
     switch (activeFilter) {
       case 'live':
-        // ONLY 'live' status should show in live filter
         return lowerStatus === 'live';
       case 'finished':
         return ['closed', 'ended', 'interrupted'].includes(lowerStatus);
@@ -83,9 +81,8 @@ const TennisPage = () => {
     }
   };
 
-  // Map API data to League format
   const tennisLeagues: League[] = scheduleData?.competitions.map((comp) => {
-    // Extract country from competition name using utility function
+
     const { country, flag } = getCountryFromCompetition(comp.competition.name);
 
     return {
@@ -94,7 +91,7 @@ const TennisPage = () => {
       leagueName: comp.competition.name,
       flag: flag,
       matches: comp.matches
-        .filter(match => matchesFilter(match.status)) // Filter BEFORE mapping
+        .filter(match => matchesFilter(match.status))
         .map((match) => {
           const formatTime = (dateStr: string) => {
             try {
@@ -108,32 +105,30 @@ const TennisPage = () => {
             }
           };
 
-          // Determine status and time display
+
           let displayStatus: string | undefined;
           let displayTime: string | undefined;
 
           if (match.status === 'not_started' || match.status === 'scheduled' || match.status === 'ns') {
-            // For scheduled matches, show the time instead of status
+
             displayTime = formatTime(match.start_time);
             displayStatus = undefined;
           } else if (match.status === 'cancelled') {
-            // For cancelled matches, show "Cancelled" as status (will be styled small)
             displayStatus = 'Cancelled';
             displayTime = undefined;
           } else if (match.status === 'closed' || match.status === 'ended') {
-            // For finished matches, show "FT"
             displayStatus = 'FT';
             displayTime = undefined;
           } else if (match.status === 'interrupted') {
-            // For interrupted matches, show "INT"
+
             displayStatus = 'INT';
             displayTime = undefined;
           } else if (match.status === 'live') {
-            // For live matches, show "Live" with green background
+
             displayStatus = 'Live';
             displayTime = undefined;
           } else {
-            // For other statuses, show as-is without green background
+
             displayStatus = match.status;
             displayTime = undefined;
           }

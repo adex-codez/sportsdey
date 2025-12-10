@@ -1,8 +1,6 @@
-// Helper function to extract country from competition name
 export const getCountryFromCompetition = (competitionName: string): { country: string; flag: string } => {
   const name = competitionName.toLowerCase();
   
-  // City/Region to Country mapping with flag URLs from flagcdn.com
   const cityCountryMap: Record<string, { country: string; flag: string }> = {
     // Poland
     'krakow': { country: 'Poland', flag: 'https://flagcdn.com/w40/pl.png' },
