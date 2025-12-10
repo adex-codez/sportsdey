@@ -1,208 +1,202 @@
 import SportAccordionCard from '@/shared/BasketballAccordionComponentCard'
 import type { League } from '@/types/basketball'
+import { apiRequest } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
+import { ErrorState } from '@/components/ErrorState';
+import { useApiError } from '@/hooks/useApiError';
+import { useAppSelector } from '@/store/hook';
+import type { RootState } from '@/store';
+import type { TennisScheduleData } from '@/types/api';
+import TennisFixtureFilterHeaders from '@/shared/TennisFixtureFilterHeaders';
+import { useMemo } from 'react';
+import { getCountryFromCompetition } from '@/lib/countryUtils';
 
+const formatDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
 const TennisPage = () => {
-const tennisLeagues: League[] = [
-  {
-    id: "italy-atp-finals",
-    country: "Italy",
-    leagueName: "World Tour Finals, Jimmy Connors Group",
-    flag: "/Italy.png",
-    matches: [
-      {
-        team1: "Taylor Harry Fritz",
-        team2: "Alex De Minaur",
-        player1Sets: [],
-        player2Sets: [],
-        time: "13:00",
-      },
-      {
-        team1: "Carlos Alcaraz",
-        team2: "Lorenzo Musetti",
-        player1Sets: [],
-        player2Sets: [],
-        time: "19:30",
-      },
-    ],
-  },
-  {
-    id: "angola-m15",
-    country: "Angola",
-    leagueName: "M15 Luanda",
-    flag: "/Angola.png",
-    matches: [
-      {
-        team1: "Samir Hamza Reguig",
-        team2: "Nikita Ianin",
-        player1Sets: [{ games: 6 }, { games: 6 }, { games: 2 }],
-        player2Sets: [{ games: 2 }, { games: 4 }, { games: 0 }],
-        status: "FT",
-      },
-      {
-        team1: "Kuperstein Alex",
-        team2: "Kai Wehnelt",
-        player1Sets: [{ games: 1 }, { games: 7, tiebreak: 7 }, { games: 2 }, { games: 6 }],
-        player2Sets: [{ games: 6 }, { games: 6, tiebreak: 4 }, { games: 1 }, { games: 5 }],
-        status: "FT",
-      },
-      {
-        team1: "Ruslan Serazhetdinov",
-        team2: "Constantin Bittoun Kouzmine",
-        player1Sets: [{ games: 3 }, { games: 2 }, { games: 0 }],
-        player2Sets: [{ games: 6 }, { games: 6 }, { games: 2 }],
-        status: "FT",
-      },
-      {
-        team1: "Tanner Gian Luca",
-        team2: "Mikail Alimi",
-        player1Sets: [{ games: 6 }, { games: 6 }, { games: 2 }],
-        player2Sets: [{ games: 0 }, { games: 4 }, { games: 1 }],
-        status: "FT",
-      },
-    ],
-  },
-  {
-    id: "australia-w50",
-    country: "Australia",
-    leagueName: "W50 Brisbane",
-    flag: "/Australia.png",
-    matches: [
-      {
-        team1: "Matei Dodic",
-        team2: "Liam Broady",
-        player1Sets: [{ games: 7 }, { games: 6 }, { games: 2 }],
-        player2Sets: [{ games: 5 }, { games: 2 }, { games: 6 }],
-        status: "Q3",
-      },
-      {
-        team1: "Tom Paris",
-        team2: "Mikhail Kukushkin",
-        player1Sets: [{ games: 6 }, { games: 6 }, { games: 7 }],
-        player2Sets: [{ games: 2 }, { games: 4 }, { games: 5 }],
-        status: "FT",
-      },
-      {
-        team1: "Jan-Lennard Struff",
-        team2: "Vit Kopriva",
-        player1Sets: [],
-        player2Sets: [],
-        time: "13:00",
-      },
-      {
-        team1: "Dan Added",
-        team2: "Kyrian Jacquet",
-        player1Sets: [],
-        player2Sets: [],
-        time: "16:00",
-      },
-    ],
-  },
-  {
-    id: "egypt-w15",
-    country: "Egypt",
-    leagueName: "W15 Sharm ElSheikh",
-    flag: "/Egypt.png",
-    matches: [
-      {
-        team1: "Amelie Hejmankova",
-        team2: "Zoziya Kardava",
-        player1Sets: [{ games: 6 }, { games: 6 }, { games: 2 }],
-        player2Sets: [{ games: 4 }, { games: 0 }, { games: 0 }],
-        status: "FT",
-      },
-      {
-        team1: "Fulgenzi Brandeyn",
-        team2: "Lamis Alhussein Abdel Aziz",
-        player1Sets: [{ games: 6 },  { games: 4 }, { games: 6 }],
-        player2Sets: [{ games: 2 },  { games: 6 }, { games: 3 }],
-        status: "FT",
-      },
-    ],
-  },
-  {
-    id: "australia-challenger",
-    country: "Australia",
-    leagueName: "Challenger Brisbane 3",
-    flag: "/Australia.png",
-    matches: [
-      {
-        team1: "Polmans Marc",
-        team2: "Alex Bolt",
-        player1Sets: [{ games: 4 }, { games: 0 }, { games: 0 }],
-        player2Sets: [{ games: 6 }, { games: 6 }, { games: 2 }],
-        status: "FT",
-      },
-      {
-        team1: "Carl Emil Overbeck",
-        team2: "Leo Vithoontien",
-        player1Sets: [{ games: 6 }, { games: 7, tiebreak: 7 }, { games: 2 }],
-        player2Sets: [{ games: 2 }, { games: 6 }, { games: 0 }],
-        status: "FT",
-      },
-      {
-        team1: "James Duckworth",
-        team2: "Blake Ellis",
-        player1Sets: [{ games: 3 }, { games: 6 }, { games: 2 }],
-        player2Sets: [{ games: 6 }, { games: 1 }, { games: 4 }],
-        status: "FT",
-      },
-      {
-        team1: "Cruz Hewitt",
-        team2: "Tung-Lin Wu",
-        player1Sets: [{ games: 6 }, { games: 4 }, { games: 1 }],
-        player2Sets: [{ games: 3 }, { games: 6 }, { games: 6 }],
-        status: "FT",
-      },
-    ],
-  },
-  {
-    id: "australia-w50-2",
-    country: "Australia",
-    leagueName: "W50 Brisbane",
-    flag: "/Australia.png",
-    matches: [
-      {
-        team1: "Mei Yamaguchi",
-        team2: "Sarah Rokusek",
-        player1Sets: [{ games: 7 }, { games: 6 }, { games: 2 }],
-        player2Sets: [{ games: 5 }, { games: 2 }, { games: 0 }],
-        status: "FT",
-      },
-      {
-        team1: "Katarina Zavatska",
-        team2: "Emerson Jones",
-        player1Sets: [{ games: 3 }, { games: 6 }, { games: 3 }],
-        player2Sets: [{ games: 6 }, { games: 3 }, { games: 1 }],
-        status: "FT",
-      },
-      {
-        team1: "Saki Imamura",
-        team2: "Destanee Jones",
-        player1Sets: [{ games: 3 }, { games: 4 }, { games: 0 }],
-        player2Sets: [{ games: 6 }, { games: 6 }, { games: 2 }],
-        status: "FT",
-      },
-      {
-        team1: "Maddison Inglis",
-        team2: "Miho Kuramochi",
-        player1Sets: [{ games: 3 }, { games: 7, tiebreak: 7 }, { games: 3 }],
-        player2Sets: [{ games: 6 }, { games: 6 }, { games: 1 }],
-        status: "FT",
-      },
-      {
-        team1: "Aira Varakska",
-        team2: "Ayumi Koshikata",
-        player1Sets: [{ games: 2 }, { games: 6, tiebreak: 0 }, { games: 2 }],
-        player2Sets: [{ games: 6 }, { games: 7, tiebreak: 7 }, { games: 2 }],
-        status: "FT",
-      },
-    ],
-  },
-]
+  const selectedDateString = useAppSelector((state: RootState) => state.date.selectedDate);
+  const activeFilter = useAppSelector((state: RootState) => state.tennis.activeFilter);
+  const selectedDate = new Date(selectedDateString);
+  const formattedDate = formatDate(selectedDate);
+
+  const { data: scheduleData, isLoading, error, isError, refetch } = useQuery({
+    queryKey: ['tennis', 'schedule', formattedDate],
+    queryFn: () => apiRequest<TennisScheduleData>(`/api/tennis/schedule/${formattedDate}?language=en`),
+  });
+
+  const { isNetworkError } = useApiError({ error, isError, refetch });
+
+
+  const counts = useMemo(() => {
+    if (!scheduleData?.competitions) return { all: 0, live: 0, finished: 0, upcoming: 0 };
+
+    const allMatches = scheduleData.competitions.flatMap(comp => comp.matches);
+
+
+    const isLive = (status: string) => {
+      const lowerStatus = status.toLowerCase();
+
+      return lowerStatus === 'live';
+    };
+
+    const isFinished = (status: string) => {
+      const lowerStatus = status.toLowerCase();
+      return ['closed', 'ended', 'interrupted'].includes(lowerStatus);
+    };
+
+    const isUpcoming = (status: string) => {
+      const lowerStatus = status.toLowerCase();
+      return ['scheduled', 'ns', 'not_started'].includes(lowerStatus);
+    };
+
+    return {
+      all: allMatches.length,
+      live: allMatches.filter(m => isLive(m.status)).length,
+      finished: allMatches.filter(m => isFinished(m.status)).length,
+      upcoming: allMatches.filter(m => isUpcoming(m.status)).length
+    };
+  }, [scheduleData]);
+
+
+
+  const matchesFilter = (status: string) => {
+    const lowerStatus = status.toLowerCase();
+
+    switch (activeFilter) {
+      case 'live':
+        return lowerStatus === 'live';
+      case 'finished':
+        return ['closed', 'ended', 'interrupted'].includes(lowerStatus);
+      case 'upcoming':
+        return ['scheduled', 'ns', 'not_started'].includes(lowerStatus);
+      case 'all':
+      default:
+        return true;
+    }
+  };
+
+  const tennisLeagues: League[] = scheduleData?.competitions.map((comp) => {
+
+    const { country, flag } = getCountryFromCompetition(comp.competition.name);
+
+    return {
+      id: comp.competition.id,
+      country: country,
+      leagueName: comp.competition.name,
+      flag: flag,
+      matches: comp.matches
+        .filter(match => matchesFilter(match.status))
+        .map((match) => {
+          const formatTime = (dateStr: string) => {
+            try {
+              return new Date(dateStr).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+              });
+            } catch {
+              return "00:00";
+            }
+          };
+
+
+          let displayStatus: string | undefined;
+          let displayTime: string | undefined;
+
+          if (match.status === 'not_started' || match.status === 'scheduled' || match.status === 'ns') {
+
+            displayTime = formatTime(match.start_time);
+            displayStatus = undefined;
+          } else if (match.status === 'cancelled') {
+            displayStatus = 'Cancelled';
+            displayTime = undefined;
+          } else if (match.status === 'closed' || match.status === 'ended') {
+            displayStatus = 'FT';
+            displayTime = undefined;
+          } else if (match.status === 'interrupted') {
+
+            displayStatus = 'INT';
+            displayTime = undefined;
+          } else if (match.status === 'live') {
+
+            displayStatus = 'Live';
+            displayTime = undefined;
+          } else {
+
+            displayStatus = match.status;
+            displayTime = undefined;
+          }
+
+          return {
+            id: match.id,
+            team1: match.home_team.competitor.name,
+            team2: match.away_team.competitor.name,
+            player1Sets: match.home_team.set_scores.map(set => ({
+              games: set.games_won,
+              tiebreak: set.tiebreak_score
+            })),
+            player2Sets: match.away_team.set_scores.map(set => ({
+              games: set.games_won,
+              tiebreak: set.tiebreak_score
+            })),
+            status: displayStatus,
+            time: displayTime,
+          };
+        })
+    };
+  })
+    .filter(league => league.matches.length > 0) || [];
+
+  if (isError) {
+    return (
+      <div className='space-y-4 mb-32 lg:mb-0 pb-10'>
+        <ErrorState
+          message={isNetworkError ? 'Network Error' : 'Failed to load tennis schedule'}
+          description={isNetworkError ? 'Please check your internet connection' : 'Unable to load tennis matches'}
+          onRetry={refetch}
+          isNetworkError={isNetworkError}
+        />
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className='space-y-4 mb-32 lg:mb-0 pb-10'>
+        <div className="flex flex-col items-center justify-center space-y-2 py-20">
+          <Loader2 className="animate-spin" width={24} height={24} />
+          <p className="text-gray-500 text-sm">Loading tennis matches...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className='space-y-4 mb-32 lg:mb-0 pb-10'>
-        {tennisLeagues.map((league) => (
+    <div className='space-y-4 mb-32 lg:mb-0'>
+      <div className='hidden w-full lg:block'>
+        <TennisFixtureFilterHeaders counts={counts} />
+      </div>
+      {tennisLeagues.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20">
+          <p className="text-gray-500 text-sm">
+            {activeFilter === 'all'
+              ? 'No tennis matches scheduled for this date'
+              : activeFilter === 'live'
+                ? 'No live matches at the moment'
+                : activeFilter === 'finished'
+                  ? 'No finished matches for this date'
+                  : 'No upcoming matches for this date'
+            }
+          </p>
+        </div>
+      ) : (
+        tennisLeagues.map((league) => (
           <SportAccordionCard
             key={league.id}
             country={league.country}
@@ -211,7 +205,8 @@ const tennisLeagues: League[] = [
             matches={league.matches}
             imageUrl={league.imageUrl}
           />
-        ))}
+        ))
+      )}
     </div>
   )
 }

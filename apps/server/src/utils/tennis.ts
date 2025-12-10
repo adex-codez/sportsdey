@@ -136,7 +136,18 @@ export function transformTennisMatchData(
 		id: sport_event.id,
 		start_time: sport_event.start_time,
 		status: sport_event_status.status,
-		venue: sport_event.venue.name,
+		venue: {
+			name: sport_event.venue.name,
+			country: sport_event.venue.country,
+			country_code: sport_event.venue.country_code,
+			city: sport_event.venue.city,
+		},
+		competition: {
+			id: sport_event.sport_event_context.competition.id,
+			name: sport_event.sport_event_context.competition.name,
+			type: sport_event.sport_event_context.competition.type,
+			gender: sport_event.sport_event_context.competition.gender,
+		},
 		home_team: {
 			competitor: {
 				id: homeCompetitor?.id || "",

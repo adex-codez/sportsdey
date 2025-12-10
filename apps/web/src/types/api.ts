@@ -42,6 +42,66 @@ export interface BasketballStandingsResponse {
   success: boolean;
   data: BasketballStanding[];
 }
+export interface BasketballScore {
+  quarter: number;
+  points: number;
+}
+
+export interface BasketballPlayerStats {
+  field_goals_made: number;
+  field_goals_att: number;
+  field_goals_pct: number;
+  three_points_made: number;
+  three_points_att: number;
+  three_points_pct: number;
+  free_throws_made: number;
+  free_throws_att: number;
+  free_throws_pct: number;
+  rebounds: number;
+  offensive_rebounds: number;
+  defensive_rebounds: number;
+  assists: number;
+  steals: number;
+  blocks: number;
+  turnovers: number;
+  personal_fouls: number;
+  minutes_played?: string;
+  pls_min?: number;
+}
+
+export interface BasketballPlayer {
+  full_name: string;
+  statistics: BasketballPlayerStats;
+}
+
+export interface BasketballTeamStatistics {
+  field_goals_made: number;
+  field_goals_att: number;
+  field_goals_pct: number;
+  three_points_made: number;
+  three_points_att: number;
+  three_points_pct: number;
+  free_throws_made: number;
+  free_throws_att: number;
+  free_throws_pct: number;
+  rebounds: number;
+  offensive_rebounds: number;
+  defensive_rebounds: number;
+  assists: number;
+  steals: number;
+  blocks: number;
+  turnovers: number;
+}
+
+export interface BasketballTeamDetails {
+  name: string;
+  points: number;
+  score?: BasketballScore[];
+  statistics?: BasketballTeamStatistics;
+  starters?: BasketballPlayer[];
+  bench?: BasketballPlayer[];
+}
+
 export interface BasketballGameDetails {
   id: string;
   status: string;
@@ -55,16 +115,11 @@ export interface BasketballGameDetails {
     id: string;
     name: string;
   };
-  home: {
-    name: string;
-    points: number;
-  };
-  away: {
-    name: string;
-    points: number;
-  };
+  clock?: string;
+  quarter?: number;
+  home: BasketballTeamDetails;
+  away: BasketballTeamDetails;
   scheduledTime?: string;
-  teams: TeamStatsData[] // Optional if sometimes present or if we need to extend
 }
 
 export interface BasketballGameDetailsResponse {
@@ -73,12 +128,80 @@ export interface BasketballGameDetailsResponse {
 }
 
 export interface BasketballGameStats {
-  home: {
+	home: TeamStatsData;
+	away: TeamStatsData;
+}
+
+// Tennis API Types
+export interface TennisCompetitor {
+	id: string;
+	name: string;
+	qualifier: 'home' | 'away';
+}
+
+export interface TennisSetScore {
+	set_number: number;
+	games_won: number;
+	tiebreak_score?: number;
+}
+
+export interface TennisTeam {
+	competitor: TennisCompetitor;
+	set_scores: TennisSetScore[];
+}
+
+export interface TennisMatch {
+	id: string;
+	start_time: string;
+	status: string;
+	home_team: TennisTeam;
+	away_team: TennisTeam;
+	winner_id?: string;
+}
+
+export interface TennisCompetitionInfo {
+	id: string;
+	name: string;
+	parent_id?: string;
+	type: 'singles' | 'doubles' | 'mixed';
+	gender: 'men' | 'women';
+	level?: string;
+}
+
+export interface TennisCompetition {
+	competition: TennisCompetitionInfo;
+	matches: TennisMatch[];
+}
+
+export interface TennisScheduleData {
+	date: string;
+	total_matches: number;
+	competitions: TennisCompetition[];
+}
+
+export interface TennisMatchDetails {
+  id: string;
+  start_time: string;
+  status: string;
+  venue: {
     name: string;
+    country?: string;
+    country_code?: string;
+    city?: string;
   };
-  away: {
+  competition?: {
+    id: string;
     name: string;
+    type?: string;
+    gender?: string;
   };
+  home_team: TennisTeam;
+  away_team: TennisTeam;
+  winner_id?: string;
+}
+
+export interface TennisMatchDetailsData {
+  match: TennisMatchDetails;
 }
 
 export interface BasketballVideo {

@@ -12,6 +12,7 @@ import { Providers } from "@/components/providers";
 import Sidebar from "@/components/sidebar";
 import Socials from "@/components/socials";
 import { Toaster } from "@/components/ui/sonner";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Header from "../components/header";
 import appCss from "../index.css?url";
 import { Provider } from "react-redux";
@@ -57,24 +58,26 @@ function RootDocument() {
 				</head>
 				<body suppressHydrationWarning>
 					<QueryClientProvider client={queryClient}>
-						<Providers>
-							<div className="grid h-svh grid-rows-[auto_1fr_auto] lg:grid-rows-[auto_auto_1fr]">
-								<Header />
-								<Socials />
-								<div className="mx-4 grid md:gap-8 lg:mx-[104px] lg:grid-cols-[20%_80%]">
-									<div className="hidden lg:block">
-										<Sidebar />
+						<ErrorBoundary>
+							<Providers>
+								<div className="grid h-svh grid-rows-[auto_1fr_auto] lg:grid-rows-[auto_auto_1fr]">
+									<Header />
+									<Socials />
+									<div className="mx-4 grid md:gap-8 lg:mx-[104px] lg:grid-cols-[20%_80%]">
+										<div className="hidden lg:block">
+											<Sidebar />
+										</div>
+										<Outlet />
 									</div>
-									<Outlet />
+									<Footer />
 								</div>
-								<Footer />
-							</div>
-						</Providers>
+							</Providers>
 
-						<Toaster richColors />
-						<TanStackRouterDevtools position="bottom-right" />
-						<ReactQueryDevtools initialIsOpen={false} />
-						<Scripts />
+							<Toaster richColors position="top-right" />
+							<TanStackRouterDevtools position="bottom-right" />
+							<ReactQueryDevtools initialIsOpen={false} />
+							<Scripts />
+						</ErrorBoundary>
 					</QueryClientProvider>
 				</body>
 			</html>

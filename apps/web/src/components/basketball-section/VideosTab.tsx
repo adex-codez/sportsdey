@@ -2,13 +2,26 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
 import { type BasketballVideosData } from "@/types/api";
 import { VideoCard } from "./VideoCard";
-import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { VideoModal } from "./VideoModal";
 
 interface VideosTabProps {
     homeTeam: string;
     awayTeam: string;
+}
+
+import { Skeleton } from "@/components/ui/skeleton";
+
+function VideoCardSkeleton() {
+    return (
+        <div className="space-y-3">
+            <Skeleton className="aspect-video w-full rounded-xl bg-gray-800" />
+            <div className="space-y-2">
+                <Skeleton className="h-4 w-3/4 bg-gray-800" />
+                <Skeleton className="h-3 w-1/4 bg-gray-800" />
+            </div>
+        </div>
+    );
 }
 
 export function VideosTab({ homeTeam, awayTeam }: VideosTabProps) {
@@ -23,8 +36,13 @@ export function VideosTab({ homeTeam, awayTeam }: VideosTabProps) {
 
     if (isLoading) {
         return (
-            <div className="flex justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            <div className="space-y-4">
+                <h3 className="text-xl font-bold text-primary">Game Highlights</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-6">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <VideoCardSkeleton key={i} />
+                    ))}
+                </div>
             </div>
         );
     }

@@ -1,24 +1,45 @@
-import React from 'react'
 import VenueGuide from '../basketball-section/VenueGuide'
 import TennisScoreTable from './TennisScoreTable'
+import type { TennisMatchDetails } from '@/types/api'
 
+interface TennisInfoProps {
+    matchData?: TennisMatchDetails;
+}
 
+const TennisInfo = ({ matchData }: TennisInfoProps) => {
+    if (!matchData) {
+        return (
+            <div className='w-full space-y-4'>
+                <p className="text-gray-500 text-sm">Loading match information...</p>
+            </div>
+        );
+    }
 
+    const players = [
+        {
+            name: matchData.home_team.competitor.name,
+            periodScores: matchData.home_team.set_scores.map(s => s.games_won),
+            pts: "",
+            s: ""
+        },
+        {
+            name: matchData.away_team.competitor.name,
+            periodScores: matchData.away_team.set_scores.map(s => s.games_won),
+            pts: "",
+            s: ""
+        }
+    ];
 
-const TennisInfo = () => {
     return (
         <div className='w-full space-y-4'>
             <div className='w-full'>
                 <TennisScoreTable
-                    players={[
-                        { name: "Samir Hamza Reguig", periodScores: [6, 6, 2], pts: "", s: "" },
-                        { name: "Nikita Lanin", periodScores: [2, 4, 0], pts: "", s: "" }
-                    ]}
-                    onSeeAllClick={() => console.log("See all standings clicked")}
+                    players={players}
+
                 />
             </div>
             <div className='w-full'>
-                <VenueGuide venueName={"Estadi johan Cruyff"} />
+                <VenueGuide venueName={matchData.venue?.name || "Tennis Court"} />
             </div>
         </div>
     )
