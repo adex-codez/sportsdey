@@ -27,7 +27,7 @@ const TennisPage = () => {
 
   const { data: scheduleData, isLoading, error, isError, refetch } = useQuery({
     queryKey: ['tennis', 'schedule', formattedDate],
-    queryFn: () => apiRequest<TennisScheduleData>(`/api/tennis/schedule/${formattedDate}?language=en`),
+    queryFn: () => apiRequest<TennisScheduleData>(`tennis/schedule/${formattedDate}?language=en`),
   });
 
   const { isNetworkError } = useApiError({ error, isError, refetch });

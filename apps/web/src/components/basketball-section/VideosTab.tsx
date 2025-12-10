@@ -30,7 +30,7 @@ export function VideosTab({ homeTeam, awayTeam }: VideosTabProps) {
 
     const { data: videosData, isLoading } = useQuery({
         queryKey: ['basketball', 'videos', searchQuery],
-        queryFn: () => apiRequest<BasketballVideosData>(`/api/basketball/videos?query=${encodeURIComponent(searchQuery)}`),
+        queryFn: () => apiRequest<BasketballVideosData>(`basketball/videos?query=${encodeURIComponent(searchQuery)}`),
         enabled: !!homeTeam && !!awayTeam,
     });
 
