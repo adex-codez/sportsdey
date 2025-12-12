@@ -35,36 +35,54 @@ const bottomBarItems = [
 	},
 ];
 const Footer = () => {
-const currentSport = useCurrentSport();
+	const currentSport = useCurrentSport();
 	const { tab, setTab } = useActiveTab();
 	const router = useRouter();
 	return (
-		<div className="fixed bottom-0 z-20 left-0 flex w-full justify-between rounded-t-3xl bg-primary px-8 py-4 lg:hidden">
+		<div className="sticky bottom-0 z-20 left-0 flex w-full justify-between rounded-t-3xl bg-primary px-8 py-4 lg:hidden">
 			{bottomBarItems.map(({ id, icon: Icon, item }) => (
 				<div
 					key={id}
 					onClick={() => {
-							setTab(item);
-							if(item === "scores") {
-									router.navigate({ to: currentSport === "tennis" ? "/tennis" : currentSport === "basketball" ? "/basketball" : "/" });	
-							}
-							if(item === "news") {
-router.navigate({ to: "/news", search: { sports: currentSport } });
-							}
-							if(item === "betting") {
-								router.navigate({to: "/betting"})
-							}
-							// if(item === "lives") {
-							// 		router.navigate({ to: "/lives" });	
-							// }
+						setTab(item);
+						if (item === "scores") {
+							router.navigate({
+								to:
+									currentSport === "tennis"
+										? "/tennis"
+										: currentSport === "basketball"
+											? "/basketball"
+											: "/",
+							});
+						}
+						if (item === "news") {
+							router.navigate({
+								to: "/news",
+								search: { sports: currentSport },
+							});
+						}
+						if (item === "betting") {
+							router.navigate({ to: "/betting" });
+						}
+						// if(item === "lives") {
+						// 		router.navigate({ to: "/lives" });
+						// }
 					}}
 					className={cn(
 						"flex flex-col items-center space-y-2",
 						tab === item ? "text-accent" : "text-secondary",
 					)}
 				>
-					<Icon color={tab === item ? "#1baa04" : "#ececec"} fill={tab === item ? "#1baa04" : "#ececec"} />
-					<p className={cn("text-secondary", tab === item ? "text-accent" : "text-secondary")}>
+					<Icon
+						color={tab === item ? "#1baa04" : "#ececec"}
+						fill={tab === item ? "#1baa04" : "#ececec"}
+					/>
+					<p
+						className={cn(
+							"text-secondary",
+							tab === item ? "text-accent" : "text-secondary",
+						)}
+					>
 						{item.charAt(0).toUpperCase() + item.slice(1).toLowerCase()}
 					</p>
 				</div>
