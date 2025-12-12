@@ -153,7 +153,9 @@ const TennisDetailsPage = () => {
                             ? format(new Date(match.start_time), 'yyyy-MM-dd HH:mm')
                             : match.status === 'closed'
                                 ? 'Finished'
-                                : match.status
+                                : match.status === "interrupted"
+                                ? "Interrupted":
+                                match.status
                     }
                     hostTeamScore={homeSetsWon}
                     guestTeamScore={awaySetsWon}

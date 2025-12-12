@@ -79,7 +79,7 @@ const DetailsImageCard = ({ competitionName,
           <div className='w-full'>
 
             <div className='flex flex-col items-center gap-y-4'>
-              {isUpcoming ? (
+              {matchStatus.toLowerCase() === "upcoming" ? (
                 <>
                   <span className="text-sm text-[#0E8F1A] md:text-xl font-semibold">
                     Starts in
