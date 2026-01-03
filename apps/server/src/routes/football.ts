@@ -81,9 +81,9 @@ footballRoute.openapi(
 		const cleanBase = base.replace(/\/+$/, "");
 
 		if (status === "all") {
-			url = `${cleanBase}/soccer/match/list?date=${date}`;
+			url = `${cleanBase}soccer/match/list?date=${date}`;
 		} else {
-			url = `${cleanBase}/soccer/match/list/${encodeURIComponent(
+			url = `${cleanBase}soccer/match/list/${encodeURIComponent(
 				status,
 			)}/?date=${date}`;
 		}
@@ -233,7 +233,7 @@ footballRoute.openapi(
 		const base = c.env.PROXY_URL;
 		const proxySecret = c.env.PROXY_SECRET;
 		const cleanBase = base.replace(/\/+$/, "");
-		const summaryUrl = `${cleanBase}/soccer/match/summary?matchId=${id}`;
+		const summaryUrl = `${cleanBase}soccer/match/summary?matchId=${id}`;
 
 		const cachedData = (await c.env.sportsdey_ns.get(
 			`match_${id}`,
@@ -299,8 +299,8 @@ footballRoute.openapi(
 				);
 			}
 
-			const standingsUrl = `${cleanBase}/soccer/tournament/standings?tournamentId=${tournamentId}`;
-			const leadersUrl = `${cleanBase}/soccer/tournament/leaderboard/goal?tournamentId=${tournamentId}`;
+			const standingsUrl = `${cleanBase}soccer/tournament/standings?tournamentId=${tournamentId}`;
+			const leadersUrl = `${cleanBase}soccer/tournament/leaderboard/goal?tournamentId=${tournamentId}`;
 			const standingsCacheKey = `standing_${tournamentId}`;
 
 			const [leadersRes, cachedStandings] = await Promise.all([

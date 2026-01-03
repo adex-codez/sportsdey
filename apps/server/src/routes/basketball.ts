@@ -124,7 +124,7 @@ basketballRoute.openapi(
 				);
 			}
 
-			const apiUrl = `${proxyUrl}/basketball/match/list?date=${date}`;
+			const apiUrl = `${proxyUrl}basketball/match/list?date=${date}`;
 
 			const response = await fetch(apiUrl, {
 				headers: {
