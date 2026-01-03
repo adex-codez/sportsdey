@@ -4,23 +4,24 @@ export const TransformedMatchInfoSchema = z.object({
 	competition: z.object({
 		id: z.string(),
 		name: z.string(),
-		gender: z.string(),
 	}),
-	season: z.object({
-		id: z.string(),
-	}),
-	competitors: z.array(
-		z.object({
-			id: z.string(),
-			name: z.string(),
-			qualifier: z.string(),
-			score: z.number(),
-		}),
-	),
+	competitors: z.object({
+						home: z.object({
+							id: z.string(),
+							name: z.string(),
+							score: z.number(),
+						}),
+						away: z.object({
+							id: z.string(),
+							name: z.string(),
+							score: z.number(),
+						}),
+					}
+					),
 	match_info: z.object({
 		date_time: z.string(),
 		stadium: z.string(),
-		capacity: z.number(),
+		// capacity: z.number(),
 	}),
 	clock: z
 		.object({
@@ -28,7 +29,10 @@ export const TransformedMatchInfoSchema = z.object({
 			stoppage_time_played: z.string().optional(),
 		})
 		.optional(),
-	status: z.string(),
+	status: z.object({
+		name: z.string(),
+		shortname: z.string(),
+	}),
 	standings: z
 		.array(
 			z.object({
@@ -57,32 +61,32 @@ export const TransformedMatchInfoSchema = z.object({
 					abbreviation: z.string(),
 				}),
 				gs: z.number(),
-				assists: z.number(),
+				// assists: z.number(),
 			}),
 		)
 		.optional(),
-	last5_home_results: z
-		.array(
-			z.object({
-				match_id: z.string(),
-				date: z.string(),
-				opponent: z.string(),
-				result: z.enum(["win", "draw", "loss"]),
-				score: z.string(),
-			}),
-		)
-		.optional(),
-	last5_away_results: z
-		.array(
-			z.object({
-				match_id: z.string(),
-				date: z.string(),
-				opponent: z.string(),
-				result: z.enum(["win", "draw", "loss"]),
-				score: z.string(),
-			}),
-		)
-		.optional(),
+	// last5_home_results: z
+	// 	.array(
+	// 		z.object({
+	// 			match_id: z.string(),
+	// 			date: z.string(),
+	// 			opponent: z.string(),
+	// 			result: z.enum(["win", "draw", "loss"]),
+	// 			score: z.string(),
+	// 		}),
+	// 	)
+	// 	.optional(),
+	// last5_away_results: z
+	// 	.array(
+	// 		z.object({
+	// 			match_id: z.string(),
+	// 			date: z.string(),
+	// 			opponent: z.string(),
+	// 			result: z.enum(["win", "draw", "loss"]),
+	// 			score: z.string(),
+	// 		}),
+	// 	)
+	// 	.optional(),
 });
 
 export const TransformedResponseSchema = z.object({
@@ -99,13 +103,11 @@ export const TransformedResponseSchema = z.object({
 						home: z.object({
 							id: z.string(),
 							name: z.string(),
-							// shor: z.string(),
 							score: z.number(),
 						}),
 						away: z.object({
 							id: z.string(),
 							name: z.string(),
-							// shor: z.string(),
 							score: z.number(),
 						}),
 					}

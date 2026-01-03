@@ -14,7 +14,8 @@ import type {
 	SportRadarStandingsResponse,
 	SportRadarStandingsTeam,
 } from "@/types";
-import { transformTeamData } from "@/utils/basketball";
+
+import { transformProxySchedule, transformTeamData } from "@/utils/basketball";
 import { jsonZodErrorFormatter } from "@/utils/zod";
 import {
 	basketballScheduleParam,
@@ -24,42 +25,10 @@ import {
 	basketballVideosQuery,
 	gameIdParam,
 } from "@/validators";
-import { transform } from "zod";
 
 const basketballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 
 // Enhanced date validation that checks if the date actually exists
-const validateActualDate = (year: number, month: number, day: number) => {
-	const date = new Date(year, month - 1, day);
-	return (
-		date.getFullYear() === year &&
-		date.getMonth() === month - 1 &&
-		date.getDate() === day
-	);
-};
-
-interface SportRadarGame {
-	id: string;
-	status: string;
-	scheduled: string
-	home_points?: number;
-	away_points?: number;
-	home: {
-		name: string;
-		alias: string;
-	};
-	away: {
-		name: string;
-		alias: string;
-	};
-}
-
-interface SportRadarResponse {
-	league: {
-		name: string;
-	};
-	games: SportRadarGame[];
-}
 
 // Schemas for the game summary
 
@@ -68,7 +37,7 @@ interface SportRadarResponse {
 // Create the route with proper parameter names that match the path
 const basketballScheduleRoute = createRoute({
 	method: "get",
-	path: "/schedule/{year}/{month}/{day}",
+	path: "/schedule",
 	summary: "Get NBA schedule for a specific date",
 	description:
 		"Retrieves NBA games scheduled for the specified date. Poll on the client for 5s to get near realtime updates about the schedules",
@@ -117,32 +86,30 @@ basketballRoute.openapi(
 	basketballScheduleRoute,
 	async (c) => {
 		try {
-			const { year, month, day } = c.req.valid("param");
-			const { language } = c.req.valid("query");
+			const { date } = c.req.valid("query");
 
-			if (!validateActualDate(year, month, day)) {
+			const proxyUrl = c.env.PROXY_URL;
+			const proxySecret = c.env.PROXY_SECRET;
+
+			if (!proxyUrl || !proxySecret) {
 				return c.json(
 					{
 						success: false as const,
-						error: "Invalid date",
+						error: "Configuration error",
 						details: [
 							{
-								field: "date",
-								message: `The date ${year}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")} does not exist`,
-								code: "invalid_date",
+								field: "server",
+								message: "Proxy configuration missing",
+								code: "config_error",
 							},
 						],
 					},
-					400,
+					500,
 				);
 			}
 
-			const apiKey = c.env?.SPORTRADAR_API_KEY;
-			const cacheKey = `basketball_schedule_${language}_${year}_${month}_${day}`;
-			const cachedData = (await c.env.sportsdey_ns.get(
-				cacheKey,
-				"json",
-			)) as {
+			const cacheKey = `basketball_schedule_${date}`;
+			const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
 				data: any;
 				expiresAt: number;
 			} | null;
@@ -157,38 +124,23 @@ basketballRoute.openapi(
 				);
 			}
 
-			const paddedMonth = month.toString().padStart(2, "0");
-			const paddedDay = day.toString().padStart(2, "0");
+			const apiUrl = `${proxyUrl}/basketball/match/list?date=${date}`;
 
-			const apiUrl = `https://api.sportradar.com/nba/trial/v8/${language}/games/${year}/${paddedMonth}/${paddedDay}/schedule.json?api_key=${apiKey}`;
-
-			const response = await fetch(apiUrl);
+			const response = await fetch(apiUrl, {
+				headers: {
+					"X-Proxy-Auth": proxySecret,
+				},
+			});
 
 			if (!response.ok) {
-				// if (response.status === 401) {
-				// 	return c.json(
-				// 		{
-				// 			success: false as const,
-				// 			error: "Authentication failed",
-				// 			details: [
-				// 				{
-				// 					field: "api_key",
-				// 					message: "Invalid or expired SportRadar API key",
-				// 					code: "auth_failed",
-				// 				},
-				// 			],
-				// 		},
-				// 		401,
-				// 	);
-				// }
 				return c.json(
 					{
 						success: false as const,
 						error: "External API error",
 						details: [
 							{
-								field: "sportradar_api",
-								message: `SportRadar API returned status ${response.status}`,
+								field: "proxy_api",
+								message: `Proxy API returned status ${response.status}`,
 								code: "external_api_error",
 							},
 						],
@@ -197,25 +149,8 @@ basketballRoute.openapi(
 				);
 			}
 
-			const data: SportRadarResponse = await response.json();
-			const transformedData = {
-				league: data.league.name,
-				games: data.games.map((game) => ({
-					id: game.id,
-					status: game.status,
-					scheduledTime: game.scheduled,
-					home: {
-						name: game.home.name,
-						alias: game.home.alias,
-						points: game.home_points ?? null,
-					},
-					away: {
-						name: game.away.name,
-						alias: game.away.alias,
-						points: game.away_points ?? null,
-					},
-				})),
-			};
+			const data = await response.json();
+			const transformedData = transformProxySchedule(data as any[]);
 
 			await c.env.sportsdey_ns.put(
 				cacheKey,
@@ -233,6 +168,7 @@ basketballRoute.openapi(
 				200,
 			);
 		} catch (error) {
+			console.error(error);
 			return c.json(
 				{
 					success: false as const,
@@ -532,7 +468,7 @@ basketballRoute.openapi(
 			const transformedData = {
 				id: gameData.id,
 				status: gameData.status,
-				...(gameData.scheduled ? {scheduledTime: gameData.scheduled} : {}),
+				...(gameData.scheduled ? { scheduledTime: gameData.scheduled } : {}),
 				season: gameData.season,
 				clock: gameData.clock,
 				quarter: gameData.quarter,
@@ -541,25 +477,38 @@ basketballRoute.openapi(
 					name: gameData.venue.name,
 				},
 				home: {
-					...(gameData.home.scoring?.length === 0 ? {} :
-						{score: gameData.home.scoring?.map((score) => ({
-							quarter: score.number,
-							points: score.points,
-						}))}
+					...(gameData.home.scoring?.length === 0
+						? {}
+						: {
+								score: gameData.home.scoring?.map((score) => ({
+									quarter: score.number,
+									points: score.points,
+								})),
+							}),
+					...transformTeamData(
+						gameData.home,
+						false,
+						gameData.status === "scheduled" ? true : false,
 					),
-					...transformTeamData(gameData.home, false, gameData.status === "scheduled" ? true : false),
 				},
 				away: {
-					 ...(gameData.home.scoring?.length === 0 ? {} :
-						{score:gameData.home.scoring?.map((score) => ({
-							quarter: score.number,
-							points: score.points,
-						}))}),
-					...transformTeamData(gameData.away, false,gameData.status === "scheduled" ? true : false),
+					...(gameData.home.scoring?.length === 0
+						? {}
+						: {
+								score: gameData.home.scoring?.map((score) => ({
+									quarter: score.number,
+									points: score.points,
+								})),
+							}),
+					...transformTeamData(
+						gameData.away,
+						false,
+						gameData.status === "scheduled" ? true : false,
+					),
 				},
 			};
 
-			console.log(transformedData)
+			console.log(transformedData);
 
 			await c.env.sportsdey_ns.put(
 				cacheKey,
@@ -719,10 +668,18 @@ basketballRoute.openapi(
 
 			const transformedData = {
 				home: {
-					...transformTeamData(gameData.home, true, gameData.status === "scheduled" ? true : false),
+					...transformTeamData(
+						gameData.home,
+						true,
+						gameData.status === "scheduled" ? true : false,
+					),
 				},
 				away: {
-					...transformTeamData(gameData.away, true,gameData.status === "scheduled" ? true : false),
+					...transformTeamData(
+						gameData.away,
+						true,
+						gameData.status === "scheduled" ? true : false,
+					),
 				},
 			};
 

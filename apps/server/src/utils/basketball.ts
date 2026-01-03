@@ -3,13 +3,13 @@ import type { SportRadarPlayer, SportRadarTeam } from "@/types";
 export function transformTeamData(
 	teamData: SportRadarTeam,
 	skipPoints: boolean,
-	isScheduled: boolean
+	isScheduled: boolean,
 ) {
-	if(isScheduled){
-return {
-		name: `${teamData.name}`,
-		...(skipPoints ? {} : { points: teamData.points }),
-	};
+	if (isScheduled) {
+		return {
+			name: `${teamData.name}`,
+			...(skipPoints ? {} : { points: teamData.points }),
+		};
 	}
 	const activePlayers = teamData.players.filter(
 		(player: SportRadarPlayer) => !player.not_playing_reason,
@@ -79,5 +79,44 @@ export function transformPlayer(player: SportRadarPlayer) {
 			personal_fouls: player.statistics?.personal_fouls || 0,
 			minutes_played: player.statistics?.minutes || 0,
 		},
+	};
+}
+
+export function transformProxySchedule(data: any[]) {
+	const competitionsMap = new Map();
+
+	data.forEach((match) => {
+		const tournamentId = match.tournament.id;
+		const tournamentName = match.tournament.name;
+
+		if (!competitionsMap.has(tournamentId)) {
+			competitionsMap.set(tournamentId, {
+				id: String(tournamentId),
+				name: tournamentName,
+				games: [],
+			});
+		}
+
+		const competition = competitionsMap.get(tournamentId);
+
+		competition.games.push({
+			id: String(match.id),
+			status: match.status.name.toLowerCase().replace(" ", "-"), // simplified status mapping
+			scheduledTime: match.date,
+			home: {
+				name: match.homeTeam.name,
+				alias: match.homeTeam.shortName,
+				points: match.homeTeam.score?.current ?? null,
+			},
+			away: {
+				name: match.awayTeam.name,
+				alias: match.awayTeam.shortName,
+				points: match.awayTeam.score?.current ?? null,
+			},
+		});
+	});
+
+	return {
+		competitions: Array.from(competitionsMap.values()),
 	};
 }
