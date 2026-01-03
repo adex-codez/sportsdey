@@ -8,13 +8,12 @@ import {
 	VideoResponseSchema,
 	successResponseSchema,
 } from "@/schemas";
-import type { SportRadarGameSummary } from "@/types";
 
 import {
 	transformGameSummary,
+	transformGameTeamStats,
 	transformProxySchedule,
 	transformProxyStandings,
-	transformTeamData,
 } from "@/utils/basketball";
 import { jsonZodErrorFormatter } from "@/utils/zod";
 import {
@@ -582,7 +581,25 @@ basketballRoute.openapi(
 	async (c) => {
 		try {
 			const { gameId } = c.req.valid("param");
-			const apiKey = c.env?.SPORTRADAR_API_KEY;
+			const proxyUrl = c.env.PROXY_URL;
+			const proxySecret = c.env.PROXY_SECRET;
+
+			if (!proxyUrl || !proxySecret) {
+				return c.json(
+					{
+						success: false as const,
+						error: "Configuration error",
+						details: [
+							{
+								field: "server",
+								message: "Proxy configuration missing",
+								code: "config_error",
+							},
+						],
+					},
+					500,
+				);
+			}
 
 			const cacheKey = `basketball_game_${gameId}_stats`;
 			const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
@@ -600,9 +617,12 @@ basketballRoute.openapi(
 				);
 			}
 
-			// Fetch from SportRadar API
-			const apiUrl = `https://api.sportradar.com/nba/trial/v8/en/games/${gameId}/summary.json?api_key=${apiKey}`;
-			const response = await fetch(apiUrl);
+			const response = await fetch(
+				`${proxyUrl}basketball/match/boxscore?matchId=${gameId}`,
+				{
+					headers: { "X-Proxy-Auth": proxySecret },
+				},
+			);
 
 			if (!response.ok) {
 				if (response.status === 404) {
@@ -628,8 +648,8 @@ basketballRoute.openapi(
 						error: "External API error",
 						details: [
 							{
-								field: "sportradar_api",
-								message: `SportRadar API returned status ${response.status}`,
+								field: "proxy_api",
+								message: `Proxy API returned status ${response.status}`,
 								code: "external_api_error",
 							},
 						],
@@ -638,24 +658,8 @@ basketballRoute.openapi(
 				);
 			}
 
-			const gameData: SportRadarGameSummary = await response.json();
-
-			const transformedData = {
-				home: {
-					...transformTeamData(
-						gameData.home,
-						true,
-						gameData.status === "scheduled" ? true : false,
-					),
-				},
-				away: {
-					...transformTeamData(
-						gameData.away,
-						true,
-						gameData.status === "scheduled" ? true : false,
-					),
-				},
-			};
+			const boxscoreData = await response.json();
+			const transformedData = transformGameTeamStats(boxscoreData as any);
 
 			await c.env.sportsdey_ns.put(
 				cacheKey,

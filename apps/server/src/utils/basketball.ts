@@ -327,3 +327,72 @@ export const transformProxyStandings = (
 		data: transformedParams,
 	};
 };
+
+export const transformGameTeamStats = (boxscore: {
+	homeTeam: ProxyTeamBoxscore;
+	awayTeam: ProxyTeamBoxscore;
+}) => {
+	const parseMinutes = (timeStr?: string): number => {
+		if (!timeStr) return 0;
+		const parts = timeStr.split(":").map(Number);
+		if (parts.length < 2) return 0;
+		const [min, sec] = parts;
+		if (min === undefined || sec === undefined) return 0;
+		return min + sec / 60;
+	};
+
+	const transformPlayer = (p: ProxyPlayer) => ({
+		full_name: p.player.knownName,
+		pls_min: parseMinutes(p.statistics.playingTime),
+		statistics: {
+			field_goals_made: p.statistics.successfulFieldGoals || 0,
+			field_goals_att: p.statistics.fieldGoalAttempts || 0,
+			field_goals_pct: (p.statistics.fieldGoalSuccessRate || 0) * 100,
+			three_points_made: p.statistics.successfulThreePointShots || 0,
+			three_points_att: p.statistics.threePointShotAttempts || 0,
+			three_points_pct: (p.statistics.threePointSuccessRate || 0) * 100,
+			free_throws_made: p.statistics.successfulFreeThrows || 0,
+			free_throws_att: p.statistics.freeThrowAttempts || 0,
+			free_throws_pct: (p.statistics.freeThrowSuccessRate || 0) * 100,
+			rebounds: p.statistics.totalRebounds || 0,
+			offensive_rebounds: p.statistics.offensiveRebounds || 0,
+			defensive_rebounds: p.statistics.defensiveRebounds || 0,
+			assists: p.statistics.assists || 0,
+			steals: p.statistics.steals || 0,
+			blocks: p.statistics.blocks || 0,
+			turnovers: p.statistics.turnovers || 0,
+			personal_fouls: p.statistics.personalFouls || 0,
+		},
+	});
+
+	const transformTeamStats = (teamBoxscore: ProxyTeamBoxscore) => {
+		const starters = teamBoxscore?.boxscore
+			? teamBoxscore.boxscore
+					.filter((p) => !p.statistics.onBench)
+					.map(transformPlayer)
+			: [];
+
+		const bench = teamBoxscore?.boxscore
+			? teamBoxscore.boxscore
+					.filter(
+						(p) =>
+							p.statistics.onBench &&
+							!p.statistics.dnp &&
+							p.statistics.playingTime &&
+							p.statistics.playingTime !== "00:00",
+					)
+					.map(transformPlayer)
+			: [];
+
+		return {
+			name: teamBoxscore.name,
+			starters,
+			bench,
+		};
+	};
+
+	return {
+		home: transformTeamStats(boxscore.homeTeam),
+		away: transformTeamStats(boxscore.awayTeam),
+	};
+};
