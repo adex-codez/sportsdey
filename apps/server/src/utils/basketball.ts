@@ -1,122 +1,300 @@
-import type { SportRadarPlayer, SportRadarTeam } from "@/types";
+import { ScheduleData } from "@/schemas";
+import { GameSummarySchema } from "@/schemas";
+import { z } from "@hono/zod-openapi";
 
-export function transformTeamData(
-	teamData: SportRadarTeam,
-	skipPoints: boolean,
-	isScheduled: boolean,
-) {
-	if (isScheduled) {
-		return {
-			name: `${teamData.name}`,
-			...(skipPoints ? {} : { points: teamData.points }),
-		};
+// Types mimicking the proxy response structure based on user input
+interface ProxyPlayerStats {
+	playingTime?: string;
+	totalPoints: number;
+	successfulFreeThrows?: number;
+	freeThrowAttempts?: number;
+	freeThrowSuccessRate?: number;
+	successfulFieldGoals?: number;
+	fieldGoalAttempts?: number;
+	fieldGoalSuccessRate?: number;
+	successfulThreePointShots?: number;
+	threePointShotAttempts?: number;
+	threePointSuccessRate?: number;
+	defensiveRebounds?: number;
+	offensiveRebounds?: number;
+	totalRebounds?: number;
+	assists?: number;
+	turnovers?: number;
+	steals?: number;
+	blocks?: number;
+	personalFouls?: number;
+	isStarting?: boolean;
+	onBench?: boolean;
+	dnp?: boolean;
+}
+
+interface ProxyPlayer {
+	player: {
+		id: number;
+		knownName: string;
+		shirtNumber: string;
+		country: { name: string; shortName: string; id: number };
+	};
+	statistics: ProxyPlayerStats;
+}
+
+interface ProxyTeamBoxscore {
+	boxscore: ProxyPlayer[];
+	name: string;
+	id: number;
+}
+
+interface ProxyGameSummary {
+	id: number;
+	status: { name: string; shortName: string; id: number };
+	tournament: {
+		name: string;
+		id: number;
 	}
-	const activePlayers = teamData.players.filter(
-		(player: SportRadarPlayer) => !player.not_playing_reason,
+	homeTeam: {
+		id: number;
+		name: string;
+		score: {
+			quarter1: number;
+			quarter2: number;
+			quarter3: number;
+			quarter4: number;
+			current: number;
+		};
+	};
+	awayTeam: {
+		id: number;
+		name: string;
+		score: {
+			quarter1: number;
+			quarter2: number;
+			quarter3: number;
+			quarter4: number;
+			current: number;
+		};
+	};
+	date: string;
+	info?: {
+		stadium?: {
+			name: string;
+		};
+	};
+	gameClock?: {
+		minute: number;
+		second: number;
+	};
+}
+
+export const transformProxySchedule = (
+	data: any[],
+): z.infer<typeof ScheduleData> => {
+	// Group games by tournament/competition
+	const groupedGames = data.reduce(
+		(acc, game) => {
+			const tournamentName = game.tournament?.name || "Unknown Tournament";
+			const tournamentId = game.tournament?.id || "unknown";
+
+			if (!acc[tournamentId]) {
+				acc[tournamentId] = {
+					id: String(tournamentId),
+					name: tournamentName,
+					games: [],
+				};
+			}
+
+			acc[tournamentId].games.push({
+				id: String(game.id),
+				status: mapGameStatus(game.status?.shortName),
+				scheduledTime: game.startTimestamp
+					? new Date(game.startTimestamp * 1000).toISOString()
+					: parseDateString(game.date), // Handle DD/MM/YYYY HH:mm:ss
+				home: {
+					name: game.homeTeam?.name || "Unknown",
+					alias: game.homeTeam?.shortName || "",
+					points: game.homeTeam?.score?.current ?? null,
+				},
+				away: {
+					name: game.awayTeam?.name || "Unknown",
+					alias: game.awayTeam?.shortName || "",
+					points: game.awayTeam?.score?.current ?? null,
+				},
+			});
+
+			return acc;
+		},
+		{} as Record<string, any>,
 	);
 
-	const starters = activePlayers
-		.filter((player: SportRadarPlayer) => player.played && player.starter)
-		.map(transformPlayer);
-
-	const bench = activePlayers
-		.filter((player: SportRadarPlayer) => player.played && !player.starter)
-		.map(transformPlayer);
-
 	return {
-		name: `${teamData.name}`,
-		...(skipPoints ? {} : { points: teamData.points }),
-		...transformTeamStatistics(teamData),
-		starters,
-		bench,
+		competitions: Object.values(groupedGames),
 	};
-}
+};
 
-export function transformTeamStatistics(teamData: SportRadarTeam) {
-	return {
-		statistics: {
-			field_goals_made: teamData.statistics?.field_goals_made || 0,
-			field_goals_att: teamData.statistics?.field_goals_att || 0,
-			field_goals_pct: teamData.statistics?.field_goals_pct || 0,
-			three_points_made: teamData.statistics?.three_points_made || 0,
-			three_points_att: teamData.statistics?.three_points_att || 0,
-			three_points_pct: teamData.statistics?.three_points_pct || 0,
-			free_throws_made: teamData.statistics?.free_throws_made || 0,
-			free_throws_att: teamData.statistics?.free_throws_att || 0,
-			free_throws_pct: teamData.statistics?.free_throws_pct || 0,
-			rebounds: teamData.statistics?.rebounds || 0,
-			offensive_rebounds: teamData.statistics?.offensive_rebounds || 0,
-			defensive_rebounds: teamData.statistics?.defensive_rebounds || 0,
-			assists: teamData.statistics?.assists || 0,
-			steals: teamData.statistics?.steals || 0,
-			blocks: teamData.statistics?.blocks || 0,
-			turnovers: teamData.statistics?.turnovers || 0,
-		},
-	};
-}
+// Helper status mapper
+const mapGameStatus = (
+	statusShortName?: string,
+):
+	| "scheduled"
+	| "closed"
+	| "inprogress"
+	| "halftime"
+	| "postponed"
+	| "cancelled" => {
+	switch (statusShortName) {
+		case "FT":
+		case "AOT":
+			return "closed";
+		case "NS":
+			return "scheduled";
+		case "1Q":
+		case "2Q":
+		case "3Q":
+		case "4Q":
+			return "inprogress";
+		case "HT":
+			return "halftime";
+		case "Postponed":
+			return "postponed";
+		case "Canceled":
+			return "cancelled";
+		default:
+			return "scheduled"; // Default fallback
+	}
+};
 
-export function transformPlayer(player: SportRadarPlayer) {
-	return {
-		full_name: player.full_name,
-		statistics: {
-			field_goals_made: player.statistics?.field_goals_made || 0,
-			pls_min: player.statistics?.pls_min || 0,
-			field_goals_att: player.statistics?.field_goals_att || 0,
-			field_goals_pct: player.statistics?.field_goals_pct || 0,
-			three_points_made: player.statistics?.three_points_made || 0,
-			three_points_att: player.statistics?.three_points_att || 0,
-			three_points_pct: player.statistics?.three_points_pct || 0,
-			free_throws_made: player.statistics?.free_throws_made || 0,
-			free_throws_att: player.statistics?.free_throws_att || 0,
-			free_throws_pct: player.statistics?.free_throws_pct || 0,
-			rebounds: player.statistics?.rebounds || 0,
-			offensive_rebounds: player.statistics?.offensive_rebounds || 0,
-			defensive_rebounds: player.statistics?.defensive_rebounds || 0,
-			assists: player.statistics?.assists || 0,
-			steals: player.statistics?.steals || 0,
-			blocks: player.statistics?.blocks || 0,
-			turnovers: player.statistics?.turnovers || 0,
-			personal_fouls: player.statistics?.personal_fouls || 0,
-			minutes_played: player.statistics?.minutes || 0,
-		},
-	};
-}
+const parseDateString = (dateStr?: string): string => {
+	if (!dateStr) return new Date().toISOString();
+	// Expecting "DD/MM/YYYY HH:mm:ss"
+	const parts = dateStr.split(" ");
+	if (parts.length < 1) return new Date().toISOString();
 
-export function transformProxySchedule(data: any[]) {
-	const competitionsMap = new Map();
+	const dateParts = parts[0].split("/");
+	if (dateParts.length !== 3) return new Date().toISOString();
 
-	data.forEach((match) => {
-		const tournamentId = match.tournament.id;
-		const tournamentName = match.tournament.name;
+	const day = Number.parseInt(dateParts[0] || "0", 10);
+	const month = Number.parseInt(dateParts[1] || "0", 10) - 1; // Months are 0-indexed in JS
+	const year = Number.parseInt(dateParts[2] || "0", 10);
 
-		if (!competitionsMap.has(tournamentId)) {
-			competitionsMap.set(tournamentId, {
-				id: String(tournamentId),
-				name: tournamentName,
-				games: [],
-			});
+	let hours = 0;
+	let minutes = 0;
+	let seconds = 0;
+
+	if (parts.length > 1) {
+		const timeParts = parts[1].split(":");
+		if (timeParts.length >= 2) {
+			hours = Number.parseInt(timeParts[0] || "0", 10);
+			minutes = Number.parseInt(timeParts[1] || "0", 10);
+			if (timeParts.length === 3) {
+				seconds = Number.parseInt(timeParts[2] || "0", 10);
+			}
 		}
+	}
 
-		const competition = competitionsMap.get(tournamentId);
+	return new Date(
+		Date.UTC(year, month, day, hours, minutes, seconds),
+	).toISOString();
+};
 
-		competition.games.push({
-			id: String(match.id),
-			status: match.status.name.toLowerCase().replace(" ", "-"), // simplified status mapping
-			scheduledTime: match.date,
-			home: {
-				name: match.homeTeam.name,
-				alias: match.homeTeam.shortName,
-				points: match.homeTeam.score?.current ?? null,
+export const transformGameSummary = (
+	summary: ProxyGameSummary,
+	boxscore: { homeTeam: ProxyTeamBoxscore; awayTeam: ProxyTeamBoxscore },
+): z.infer<typeof GameSummarySchema> => {
+	const transformTeam = (
+		teamSummary: ProxyGameSummary["homeTeam"],
+		teamBoxscore: ProxyTeamBoxscore,
+	) => {
+		const starters = teamBoxscore?.boxscore
+			? teamBoxscore.boxscore
+					.filter((p) => !p.statistics.onBench)
+					.map(transformPlayer)
+			: [];
+
+		const bench = teamBoxscore?.boxscore
+			? teamBoxscore.boxscore
+					.filter(
+						(p) =>
+							p.statistics.onBench &&
+							!p.statistics.dnp &&
+							p.statistics.playingTime &&
+							p.statistics.playingTime !== "00:00",
+					)
+					.map(transformPlayer)
+			: [];
+
+		return {
+			name: teamSummary.name,
+			points: teamSummary.score.current,
+			score: {
+				quarter1: teamSummary.score.quarter1,
+				quarter2: teamSummary.score.quarter2,
+				quarter3: teamSummary.score.quarter3,
+				quarter4: teamSummary.score.quarter4,
 			},
-			away: {
-				name: match.awayTeam.name,
-				alias: match.awayTeam.shortName,
-				points: match.awayTeam.score?.current ?? null,
-			},
-		});
+			starters,
+			bench,
+		};
+	};
+
+	const transformPlayer = (p: ProxyPlayer) => ({
+		full_name: p.player.knownName,
+		pls_min: parseMinutes(p.statistics.playingTime),
+		statistics: {
+			minutes: p.statistics.playingTime || "00:00",
+			field_goals_made: p.statistics.successfulFieldGoals || 0,
+			field_goals_att: p.statistics.fieldGoalAttempts || 0,
+			field_goals_pct: (p.statistics.fieldGoalSuccessRate || 0) * 100,
+			three_points_made: p.statistics.successfulThreePointShots || 0,
+			three_points_att: p.statistics.threePointShotAttempts || 0,
+			three_points_pct: (p.statistics.threePointSuccessRate || 0) * 100,
+			free_throws_made: p.statistics.successfulFreeThrows || 0,
+			free_throws_att: p.statistics.freeThrowAttempts || 0,
+			free_throws_pct: (p.statistics.freeThrowSuccessRate || 0) * 100,
+			rebounds: p.statistics.totalRebounds || 0,
+			offensive_rebounds: p.statistics.offensiveRebounds || 0,
+			defensive_rebounds: p.statistics.defensiveRebounds || 0,
+			assists: p.statistics.assists || 0,
+			steals: p.statistics.steals || 0,
+			blocks: p.statistics.blocks || 0,
+			turnovers: p.statistics.turnovers || 0,
+			personal_fouls: p.statistics.personalFouls || 0,
+		},
 	});
 
-	return {
-		competitions: Array.from(competitionsMap.values()),
+	// Helper to parse "MM:SS" into total minutes (as number)
+	const parseMinutes = (timeStr?: string): number => {
+		if (!timeStr) return 0;
+		const parts = timeStr.split(":").map(Number);
+		if (parts.length < 2) return 0;
+		const [min, sec] = parts;
+		if (min === undefined || sec === undefined) return 0;
+		return min + sec / 60;
 	};
-}
+
+	// Construct clock string
+	let clock = "";
+	if (summary.gameClock) {
+		const min = summary.gameClock.minute.toString().padStart(2, "0");
+		const sec = summary.gameClock.second.toString().padStart(2, "0");
+		clock = `${min}:${sec}`;
+	}
+
+	return {
+		id: String(summary.id),
+		status: summary.status.name,
+		tournament: summary.tournament,
+		date: summary.date,
+		venue: summary.info?.stadium?.name || "Unknown Venue",
+		clock: clock,
+		home: transformTeam(summary.homeTeam, boxscore?.homeTeam),
+		away: transformTeam(summary.awayTeam, boxscore?.awayTeam),
+	};
+};
+
+// Kept for backward compatibility
+export const transformTeamData = (
+	_teamData: any,
+	_isHome: boolean,
+	_isScheduled: boolean,
+) => {
+	return {};
+};
