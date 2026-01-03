@@ -23,7 +23,11 @@ const FootballSchedule = () => {
 		data: schedules,
 		isLoading,
 		// error,
-	} = useFootballSchedule(date.toISOString().split("T")[0], "en");
+		// error,
+	} = useFootballSchedule(
+		`${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`,
+		"en",
+	);
 
 	useEffect(() => {
 		console.log(schedules);
@@ -46,16 +50,12 @@ const FootballSchedule = () => {
 
 		schedules.competitions.forEach((competition) => {
 			competition.matches.forEach((match) => {
-				switch (match.match_status) {
-					case "live":
-						liveCount++;
-						break;
-					case "closed":
-						finishedCount++;
-						break;
-					case "not_started":
-						upcomingCount++;
-						break;
+				if (match.match_status === "closed") {
+					finishedCount++;
+				} else if (match.match_status === "SCH") {
+					upcomingCount++;
+				} else {
+					liveCount++;
 				}
 			});
 		});
@@ -75,26 +75,20 @@ const FootballSchedule = () => {
 			return schedules;
 		}
 
-		const statusMap: Record<FiltersType, string | null> = {
-			live: "live",
-			finished: "closed",
-			upcoming: "not_started",
-			all: null,
-		};
-
-		const targetStatus = statusMap[currentFilter];
-		if (!targetStatus) return schedules;
-
 		const filteredCompetitions = [];
 
 		for (const competition of schedules.competitions) {
-			const matchingMatches = [];
-
-			for (const match of competition.matches) {
-				if (match.match_status === targetStatus) {
-					matchingMatches.push(match);
-				}
-			}
+			const matchingMatches = competition.matches.filter((match) => {
+				if (currentFilter === "all") return true;
+				if (currentFilter === "finished")
+					return match.match_status === "closed";
+				if (currentFilter === "upcoming") return match.match_status === "SCH";
+				if (currentFilter === "live")
+					return (
+						match.match_status !== "closed" && match.match_status !== "SCH"
+					);
+				return false;
+			});
 
 			if (matchingMatches.length > 0) {
 				filteredCompetitions.push({
@@ -174,13 +168,13 @@ const FootballSchedule = () => {
 												<div className="flex w-full justify-between space-y-4 text-sm lg:w-fit lg:items-center lg:justify-start lg:space-y-0">
 													<div className="items-center gap-4 space-y-4 lg:flex lg:space-y-0">
 														<p className="wrap-break-word">
-															{match.competitors[0].name}
+															{match.competitors.home.name}
 														</p>
 														<span className="hidden font-medium text-sm lg:block">
 															VS
 														</span>
 														<p className="wrap-break-word">
-															{match.competitors[1].name}
+															{match.competitors.away.name}
 														</p>
 													</div>
 

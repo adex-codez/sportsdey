@@ -5,7 +5,8 @@ export function useFootballSchedule(date: string, lang: string) {
 	return useQuery({
 		queryKey: ["football-schedule", date, lang],
 		queryFn: () => {
-			const endpoint = `football/schedule/${date}?lang=${lang}`;
+			console.log(date)
+			const endpoint = `football/all?date=${date}&lang=${lang}`;
 			return apiRequest<FootballSchedule>(endpoint);
 		},
 	});

@@ -23,16 +23,12 @@ const footballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 footballRoute.openapi(
 	createRoute({
 		method: "get",
-		path: "/{status}/{date}",
+		path: "/{status}",
 		request: {
 			params: z.object({
 				status: z.string().openapi({
 					description: "Matches status either all, scheduled and live",
 					example: "all"
-				}),
-				date: z.string().openapi({
-					description: "Schedule date (DD-MM-YYYY)",
-					example: "15/09/2024",
 				}),
 			}),
 			query: z.object({
@@ -40,6 +36,10 @@ footballRoute.openapi(
 					.string()
 					.optional()
 					.openapi({ description: "Language code", example: "en" }),
+date: z.string().openapi({
+					description: "Schedule date (DD-MM-YYYY)",
+					example: "15/09/2024",
+				}),
 			}),
 		},
 		responses: {
@@ -72,7 +72,8 @@ footballRoute.openapi(
 		summary: "Get football schedule for a given date",
 	}),
 	async (c) => {
-		const { date, status } = c.req.valid("param");
+		const { status } = c.req.valid("param");
+		const {date} = c.req.valid("query")
 		const base = c.env.PROXY_URL;
 		const proxySecret = c.env.PROXY_SECRET;
 
