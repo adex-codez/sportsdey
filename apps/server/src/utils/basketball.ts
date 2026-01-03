@@ -1,5 +1,4 @@
-import { ScheduleData } from "@/schemas";
-import { GameSummarySchema } from "@/schemas";
+import { GameSummarySchema, ScheduleData, StandingsSchema } from "@/schemas";
 import { z } from "@hono/zod-openapi";
 
 // Types mimicking the proxy response structure based on user input
@@ -50,7 +49,7 @@ interface ProxyGameSummary {
 	tournament: {
 		name: string;
 		id: number;
-	}
+	};
 	homeTeam: {
 		id: number;
 		name: string;
@@ -297,4 +296,34 @@ export const transformTeamData = (
 	_isScheduled: boolean,
 ) => {
 	return {};
+};
+
+export const transformProxyStandings = (
+	data: any[],
+): z.infer<typeof StandingsSchema> => {
+	const leagueStandings =
+		data.find((item) => item.name === "League Standings") || data[0];
+
+	if (!leagueStandings || !leagueStandings.standings?.overall) {
+		return { data: [] };
+	}
+
+	const transformedParams = leagueStandings.standings.overall.map(
+		(teamData: any) => ({
+			id: String(teamData.team.id),
+			name: teamData.team.name,
+			points: teamData.points,
+			wins: teamData.won,
+			losses: teamData.lost,
+			played: teamData.played,
+			// streak: 0, // Not provided in the new API response
+			gb: teamData.gb,
+			diff: teamData.pd, // Point differential
+			win_pct: teamData.wpg,
+		}),
+	);
+
+	return {
+		data: transformedParams,
+	};
 };

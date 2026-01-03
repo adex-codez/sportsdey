@@ -32,39 +32,14 @@ export const gameIdParam = z.object({
 });
 
 export const basketballStandingsParam = z.object({
-	season: z.string().openapi({
-		param: { name: "season", in: "path" },
-		description: "Year of a season in YYYY format",
-		example: "2025",
+	tournamentId: z.string().openapi({
+		param: { name: "tournamentId", in: "path" },
+		description: "ID of the tournament",
+		example: "132",
 	}),
 });
 
-export const basketballStandingsQuery = z.object({
-	conference: z.enum(["eastern", "western"]).openapi({
-		param: { name: "conference", in: "query" },
-		description:
-			"The conference standing you are looking for which can either be western or eastern conference",
-	}),
-	limit: z.coerce
-		.number()
-		.min(1)
-		.max(30)
-		.default(13)
-		.openapi({
-			param: { name: "limit", in: "query" },
-			description:
-				"Limit controls the number of teams that are going to be shown at once",
-		}),
-	offset: z.coerce
-		.number()
-		.min(0)
-		.default(0)
-		.openapi({
-			param: { name: "offset", in: "query" },
-			description:
-				"Offset controls the number of teams to skip when showing the data",
-		}),
-});
+export const basketballStandingsQuery = z.object({});
 
 export const basketballVideosQuery = z.object({
 	query: z.string().openapi({

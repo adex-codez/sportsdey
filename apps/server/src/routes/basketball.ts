@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
 	ErrorResponseSchema,
 	GameSummarySchema,
@@ -8,16 +8,12 @@ import {
 	VideoResponseSchema,
 	successResponseSchema,
 } from "@/schemas";
-import type {
-	SportRadarGameSummary,
-	SportRadarStandingsConference,
-	SportRadarStandingsResponse,
-	SportRadarStandingsTeam,
-} from "@/types";
+import type { SportRadarGameSummary } from "@/types";
 
 import {
-	transformProxySchedule,
 	transformGameSummary,
+	transformProxySchedule,
+	transformProxyStandings,
 	transformTeamData,
 } from "@/utils/basketball";
 import { jsonZodErrorFormatter } from "@/utils/zod";
@@ -25,7 +21,6 @@ import {
 	basketballScheduleParam,
 	basketballScheduleQuery,
 	basketballStandingsParam,
-	basketballStandingsQuery,
 	basketballVideosQuery,
 	gameIdParam,
 } from "@/validators";
@@ -195,12 +190,11 @@ basketballRoute.openapi(
 
 const basketballStandingsRoute = createRoute({
 	method: "get",
-	path: "/standings/{season}",
-	summary: "Get NBA standings for a season and type",
-	description: "Retrieves NBA standings, filtered by conference and paginated.",
+	path: "/standings/{tournamentId}",
+	summary: "Get Standings for a tournament",
+	description: "Retrieves standings for a specific tournament.",
 	request: {
 		params: basketballStandingsParam,
-		query: basketballStandingsQuery,
 	},
 	responses: {
 		200: {
@@ -243,94 +237,80 @@ basketballRoute.openapi(
 	basketballStandingsRoute,
 	async (c) => {
 		try {
-			const { season } = c.req.valid("param");
-			const { conference, limit, offset } = c.req.valid("query");
-			const cacheKey = `basketball_standings_${season}_REG`;
-			const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-				data: SportRadarStandingsResponse;
-				expiresAt: number;
-			} | null;
+			const { tournamentId } = c.req.valid("param");
+			const proxyUrl = c.env.PROXY_URL;
+			const proxySecret = c.env.PROXY_SECRET;
 
-			let standingsData: SportRadarStandingsResponse;
-			if (cachedData && Date.now() <= cachedData.expiresAt) {
-				standingsData = cachedData.data;
-			} else {
-				const apiKey = c.env?.SPORTRADAR_API_KEY;
-				const apiUrl = `https://api.sportradar.com/nba/trial/v8/en/seasons/${season}/REG/standings.json?api_key=${apiKey}`;
-				const response = await fetch(apiUrl);
-				if (!response.ok) {
-					return c.json(
-						{
-							success: false as const,
-							error: "External API error",
-							details: [
-								{
-									field: "sportradar_api",
-									message: `SportRadar API returned status ${response.status}`,
-									code: "external_api_error",
-								},
-							],
-						},
-						502,
-					);
-				}
-				standingsData = (await response.json()) as SportRadarStandingsResponse;
-				// await c.env.sportsdey_ns.put(
-				// 	cacheKey,
-				// 	JSON.stringify({
-				// 		data: standingsData,
-				// 		expiresAt: Date.now() + 2 * 60 * 1000,
-				// 	}),
-				// );
-			}
-
-			// Filter by conference (ignore divisions)
-			const conferenceData = (standingsData.conferences || []).filter(
-				(conf: SportRadarStandingsConference) =>
-					conf.name ===
-					(conference === "eastern"
-						? "EASTERN CONFERENCE"
-						: "WESTERN CONFERENCE"),
-			);
-			if (!conferenceData) {
+			if (!proxyUrl || !proxySecret) {
 				return c.json(
 					{
 						success: false as const,
-						error: "Conference not found",
+						error: "Configuration error",
 						details: [
 							{
-								field: "conference",
-								message: `Conference '${conference}' not found in standings data`,
-								code: "conference_not_found",
+								field: "server",
+								message: "Proxy configuration missing",
+								code: "config_error",
 							},
 						],
 					},
-					400,
+					500,
 				);
 			}
 
-			const teams = conferenceData[0]?.divisions.flatMap((division) =>
-				division.teams.map((team: SportRadarStandingsTeam) => ({
-					id: team.id,
-					name: `${team.market} ${team.name}`,
-					wins: team.wins,
-					losses: team.losses,
-					played: team.wins + team.losses,
-					streak:
-						team.streak?.type === "win"
-							? team.streak.length
-							: team.streak?.type === "loss"
-								? -team.streak.length
-								: 0,
-					gb: team.games_back ?? 0,
-					diff: team.point_diff ?? 0,
-					win_pct: team.win_pct ?? 0,
-				})),
+			const cacheKey = `basketball_standings_${tournamentId}`;
+			const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+				data: any;
+				expiresAt: number;
+			} | null;
+
+			if (cachedData && Date.now() <= cachedData.expiresAt) {
+				return c.json(
+					{
+						success: true as const,
+						data: cachedData.data,
+					},
+					200,
+				);
+			}
+
+			const apiUrl = `${proxyUrl}basketball/tournament/standings?tournamentId=${tournamentId}`;
+
+			const response = await fetch(apiUrl, {
+				headers: {
+					"X-Proxy-Auth": proxySecret,
+				},
+			});
+
+			if (!response.ok) {
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [
+							{
+								field: "proxy_api",
+								message: `Proxy API returned status ${response.status}`,
+								code: "external_api_error",
+							},
+						],
+					},
+					502,
+				);
+			}
+
+			const data = await response.json();
+			const transformedData = transformProxyStandings(data as any[]);
+
+			await c.env.sportsdey_ns.put(
+				cacheKey,
+				JSON.stringify({
+					data: transformedData,
+					expiresAt: Date.now() + 60 * 60 * 1000, // Cache for 1 hour
+				}),
 			);
 
-			const paginatedTeams = teams!.slice(offset, offset + limit);
-
-			return c.json({ success: true as const, data: paginatedTeams }, 200);
+			return c.json({ success: true as const, data: transformedData }, 200);
 		} catch (error) {
 			return c.json(
 				{
