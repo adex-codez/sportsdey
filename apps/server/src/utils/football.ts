@@ -1,72 +1,64 @@
 import type {
 	CompetitionGroup,
-	ScheduleRes,
-	TransformedCompetitor,
 	TransformedMatch,
 	TransformedMatchInfo,
 	TransformedResponse,
 } from "@/types/football";
 
-export function transformFootballSchedule(
-	data: ScheduleRes,
+export function transformProxySchedule(
+	data: any[],
 ): TransformedResponse {
 	// Use a Map to group schedules by competition
 	const competitionMap = new Map<string, CompetitionGroup>();
 
 	// Iterate through each schedule and group by competition
-	data.schedules.forEach((schedule) => {
-		const { sport_event, sport_event_status, clock } = schedule;
-		const { sport_event_context, competitors } = sport_event;
-		const { competition, category } = sport_event_context;
+	data.forEach((matchData) => {
+		const {
+			tournament,
+			homeTeam,
+			awayTeam,
+			status,
+			times,
+			date,
+			id,
+		} = matchData;
 
-		const competitionId = competition.id;
+		const competitionId = tournament.id;
 
 		// Create competition group if it doesn't exist
 		if (!competitionMap.has(competitionId)) {
 			competitionMap.set(competitionId, {
 				competition: {
-					id: competition.id,
-					name: competition.name,
-					gender: competition.gender,
-				},
-				category: {
-					id: category.id,
-					name: category.name,
+					id: tournament.id,
+					name: tournament.name,
 				},
 				matches: [],
 			});
 		}
 
-		// Map scores to competitors based on qualifier
-		const competitorsWithScores: TransformedCompetitor[] = competitors.map(
-			(competitor) => ({
-				id: competitor.id,
-				name: competitor.name,
-				abbreviation: competitor.abbreviation,
-				qualifier: competitor.qualifier,
-				score:
-					competitor.qualifier === "home"
-						? sport_event_status.home_score
-						: sport_event_status.away_score,
-			}),
-		);
-
 		// Create match object
 		const match: TransformedMatch = {
-			sport_event_id: sport_event.id,
-			competitors: competitorsWithScores,
-			start_time: sport_event.start_time,
-			match_status: sport_event_status.match_status,
-			clock: clock
+			id: id,
+			competitors: {
+				home: {
+					id: homeTeam.id,
+					name: homeTeam.name,
+					score: homeTeam.score?.current ?? 0,
+				},
+				away: {
+					id: awayTeam.id,
+					name: awayTeam.name,
+					score: awayTeam.score?.current ?? 0,
+				},
+			},
+			start_time: date,
+			match_status: status.shortName === "FT" ? "closed" : status.shortName, // Mapping FT to closed to match previous behavior if needed, or just keep it
+			clock: times?.currentMinute
 				? {
-						played: clock.played,
+						played: times.currentMinute.toString(),
 					}
-				: {
-						played: "done",
-					},
+				: undefined,
 		};
-
-		// Add match to the competition group
 		competitionMap.get(competitionId)!.matches.push(match);
 	});
 
@@ -74,7 +66,7 @@ export function transformFootballSchedule(
 	const competitions = Array.from(competitionMap.values());
 
 	// Calculate total matches count
-	const total_matches = data.schedules.length;
+	const total_matches = data.length;
 
 	return { competitions, total_matches };
 }

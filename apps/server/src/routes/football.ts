@@ -7,13 +7,13 @@ import {
 	TransformedResponseSchema,
 	VideoResponseSchema,
 } from "@/schemas";
-import type { ScheduleRes } from "@/types";
+// import type { ScheduleRes } from "@/types";
 import type { StandingsRes, TeamStanding } from "@/types/football";
 import { fetchWithErrorHandling } from "@/utils";
 import {
 	getLast5Matches,
 	transformFootballMatchInfo,
-	transformFootballSchedule,
+	transformProxySchedule,
 	transformTopScorers,
 } from "@/utils/football";
 import { jsonZodErrorFormatter } from "@/utils/zod";
@@ -23,12 +23,16 @@ const footballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 footballRoute.openapi(
 	createRoute({
 		method: "get",
-		path: "/schedule/{date}",
+		path: "/{status}/{date}",
 		request: {
 			params: z.object({
+				status: z.string().openapi({
+					description: "Matches status either all, scheduled and live",
+					example: "all"
+				}),
 				date: z.string().openapi({
-					description: "Schedule date (YYYY-MM-DD)",
-					example: "2024-09-15",
+					description: "Schedule date (DD-MM-YYYY)",
+					example: "15/09/2024",
 				}),
 			}),
 			query: z.object({
@@ -68,18 +72,25 @@ footballRoute.openapi(
 		summary: "Get football schedule for a given date",
 	}),
 	async (c) => {
-		const { date } = c.req.valid("param");
-		const { lang } = c.req.valid("query");
-		const base = c.env.SPORTRADAR_URL;
-		const apiKey = c.env.SPORTRADAR_API_KEY;
+		const { date, status } = c.req.valid("param");
+		const base = c.env.PROXY_URL;
+		const proxySecret = c.env.PROXY_SECRET;
 
-		const langSegment = lang ? `${encodeURIComponent(lang)}/` : "en";
-		const url = `${base.replace(/\/+$/, "")}/soccer/trial/v4/${langSegment}/schedules/${encodeURIComponent(
-			date,
-		)}/schedules.json`;
+		let url = "";
+		const cleanBase = base.replace(/\/+$/, "");
+
+		if (status === "all") {
+			url = `${cleanBase}/soccer/match/list?date=${date}`;
+		} else {
+			url = `${cleanBase}/soccer/match/list/${encodeURIComponent(
+				status,
+			)}/?date=${date}`;
+		}
+
+		console.log(url)
 
 		const cachedData = (await c.env.sportsdey_ns.get(
-			`football_schedule_${date}`,
+			`football_schedule_${date}_${status}`,
 			"json",
 		)) as {
 			data: any;
@@ -98,7 +109,10 @@ footballRoute.openapi(
 
 		try {
 			const upstream = await fetch(url, {
-				headers: { "x-api-key": apiKey, Accept: "application/json" },
+				headers: {
+					"X-Proxy-Auth": proxySecret,
+					Accept: "application/json",
+				},
 			});
 
 			if (!upstream.ok) {
@@ -108,8 +122,8 @@ footballRoute.openapi(
 						error: "External API error",
 						details: [
 							{
-								field: "sportradar_api",
-								message: `SportRadar API returned status ${upstream.status}`,
+								field: "proxy_api",
+								message: `Proxy API returned status ${upstream.status}`,
 								code: "external_api_error",
 							},
 						],
@@ -118,13 +132,13 @@ footballRoute.openapi(
 				);
 			}
 
-			const data = (await upstream.json()) as ScheduleRes;
+			const data = (await upstream.json()) as any[];
 
 			// Transform the data before returning
-			const transformedData = transformFootballSchedule(data);
+			const transformedData = transformProxySchedule(data);
 
 			await c.env.sportsdey_ns.put(
-				`football_schedule_${date}`,
+				`football_schedule_${date}_${status}`,
 				JSON.stringify({
 					data: transformedData,
 					expiresAt: Date.now() + 5000,
@@ -146,8 +160,7 @@ footballRoute.openapi(
 					details: [
 						{
 							field: "server",
-							message:
-								"An unexpected error occurred while processing your request",
+							message: "An unexpected error occurred while processing your request",
 							code: "internal_error",
 						},
 					],

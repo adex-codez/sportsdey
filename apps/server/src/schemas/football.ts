@@ -91,25 +91,26 @@ export const TransformedResponseSchema = z.object({
 			competition: z.object({
 				id: z.string(),
 				name: z.string(),
-				gender: z.string(),
-			}),
-			category: z.object({
-				id: z.string(),
-				name: z.string(),
 			}),
 			matches: z.array(
 				z.object({
-					sport_event_id: z.string(),
-					competitors: z.array(
-						z.object({
+					id: z.string(),
+					competitors: z.object({
+						home: z.object({
 							id: z.string(),
 							name: z.string(),
-							abbreviation: z.string(),
-							qualifier: z.string(),
+							// shor: z.string(),
 							score: z.number(),
 						}),
+						away: z.object({
+							id: z.string(),
+							name: z.string(),
+							// shor: z.string(),
+							score: z.number(),
+						}),
+					}
 					),
-					start_time: z.string(),
+					date: z.string(),
 					match_status: z.string(),
 					clock: z
 						.object({

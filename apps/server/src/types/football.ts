@@ -41,8 +41,19 @@ export type TransformedCompetitor = {
 };
 
 export type TransformedMatch = {
-	sport_event_id: string;
-	competitors: TransformedCompetitor[];
+	id: string;
+	competitors: {
+		home: {
+			id: string;
+			name: string;
+			score: number;
+		};
+		away: {
+			id: string;
+			name: string;
+			score: number;
+		};
+	};
 	start_time: string;
 	match_status: string;
 	clock?: {
@@ -52,11 +63,6 @@ export type TransformedMatch = {
 
 export type CompetitionGroup = {
 	competition: {
-		id: string;
-		name: string;
-		gender: string;
-	};
-	category: {
 		id: string;
 		name: string;
 	};
