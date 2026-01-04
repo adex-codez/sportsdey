@@ -11,7 +11,7 @@ app.use(logger());
 app.use(
 	"/*",
 	cors({
-		origin: env.CORS_ORIGIN || "",
+		origin: "*",
 		allowMethods: ["GET", "POST", "OPTIONS"],
 
 	}),
