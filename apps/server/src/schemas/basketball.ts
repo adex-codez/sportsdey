@@ -26,6 +26,7 @@ export const ScheduledGameSchema = z.object({
 		alias: z.string(),
 		points: z.number().nullable(),
 	}),
+	clock: z.string().optional(),
 });
 export const ScheduleData = z.object({
 	competitions: z.array(
