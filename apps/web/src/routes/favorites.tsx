@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router';
+import { createFileRoute, useRouter, Link } from '@tanstack/react-router';
 import { ChevronLeft, Star, Trash2 } from 'lucide-react';
 import { type FavoriteTeam, type FavoriteMatch, useFavorites } from '@/hooks/useFavorites';
 import { useQuery } from '@tanstack/react-query';
@@ -25,20 +25,37 @@ const FavoriteMatchCardRow = ({ match, onRemove }: { match: FavoriteMatch; onRem
     const time = gameData?.clock || match.time || "00:00";
 
 
+    const getRouteConfig = () => {
+        switch (match.sport) {
+            case 'basketball':
+                return { to: '/basketball/$Id' as const, params: { Id: match.id } };
+            case 'tennis':
+                return { to: '/tennis/$Id' as const, params: { Id: match.id }, search: { country: match.country } };
+            case 'football':
+                return { to: '/index/$gameId' as const, params: { gameId: match.id } };
+            default:
+                return { to: '/index/$gameId' as const, params: { gameId: match.id } };
+        }
+    };
+
+    const routeConfig = getRouteConfig();
+
     return (
         <div className="bg-white overflow-hidden border-b border-gray-100 last:border-b-0">
-            <MatchCard
-                id={match.id}
-                team1={team1}
-                team2={team2}
-                score1={score1}
-                score2={score2}
-                status={status}
-                time={time}
-                isFavorite={true}
-                onFavoriteToggle={onRemove}
-                hideFinishedStatus={true}
-            />
+            <Link {...routeConfig} className="block hover:bg-gray-50 transition-colors">
+                <MatchCard
+                    id={match.id}
+                    team1={team1}
+                    team2={team2}
+                    score1={score1}
+                    score2={score2}
+                    status={status}
+                    time={time}
+                    isFavorite={true}
+                    onFavoriteToggle={onRemove}
+                    hideFinishedStatus={true}
+                />
+            </Link>
         </div>
     );
 };
