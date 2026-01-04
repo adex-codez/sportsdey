@@ -1,5 +1,5 @@
-// const API_BASE_URL = import.meta.env.VITE_SERVER_URL || "localhost:3000";
-const API_BASE_URL = "/api/";
+const API_BASE_URL = import.meta.env.VITE_SERVER_URL || "/api/";
+// const API_BASE_URL = "/api/";
 
 
 type ApiSuccessResponse<T> = {
