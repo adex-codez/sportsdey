@@ -11,14 +11,20 @@ export interface BasketballGame {
   status: string;
   time?: string;
   scheduledTime?: string;
+  clock?: string;
   home: BasketballTeam;
   away: BasketballTeam;
 }
 
 // The user indicated the response is this object directly
-export interface BasketballScheduleData {
-  league: string;
+export interface BasketballCompetition {
+  id: string;
+  name: string;
   games: BasketballGame[];
+}
+
+export interface BasketballScheduleData {
+  competitions: BasketballCompetition[];
 }
 
 export interface BasketballScheduleResponse {
@@ -32,22 +38,27 @@ export interface BasketballStanding {
   wins: number;
   losses: number;
   played: number;
-  streak: number | string;
+  streak?: number | string;
   gb: number | string;
   diff: number | string;
   win_pct: number;
+  points?: number; // Added from new API response
 }
 
 export interface BasketballStandingsResponse {
   success: boolean;
-  data: BasketballStanding[];
+  data: {
+    data: BasketballStanding[];
+  };
 }
 export interface BasketballScore {
   quarter: number;
   points: number;
 }
 
+
 export interface BasketballPlayerStats {
+  minutes?: string; 
   field_goals_made: number;
   field_goals_att: number;
   field_goals_pct: number;
@@ -65,61 +76,58 @@ export interface BasketballPlayerStats {
   blocks: number;
   turnovers: number;
   personal_fouls: number;
-  minutes_played?: string;
-  pls_min?: number;
 }
 
 export interface BasketballPlayer {
   full_name: string;
+  pls_min: number; // The new API returns this as a number (minutes)
   statistics: BasketballPlayerStats;
 }
 
-export interface BasketballTeamStatistics {
-  field_goals_made: number;
-  field_goals_att: number;
-  field_goals_pct: number;
-  three_points_made: number;
-  three_points_att: number;
-  three_points_pct: number;
-  free_throws_made: number;
-  free_throws_att: number;
-  free_throws_pct: number;
-  rebounds: number;
-  offensive_rebounds: number;
-  defensive_rebounds: number;
-  assists: number;
-  steals: number;
-  blocks: number;
-  turnovers: number;
+// Stats API Response Types
+export interface BasketballTeamStatsResponse {
+  success: boolean;
+  data: {
+    home: {
+      name: string;
+      starters: BasketballPlayer[];
+      bench: BasketballPlayer[];
+    };
+    away: {
+      name: string;
+      starters: BasketballPlayer[];
+      bench: BasketballPlayer[];
+    };
+  };
 }
 
 export interface BasketballTeamDetails {
   name: string;
   points: number;
-  score?: BasketballScore[];
-  statistics?: BasketballTeamStatistics;
-  starters?: BasketballPlayer[];
+  score: {
+    quarter1: number;
+    quarter2: number;
+    quarter3: number;
+    quarter4: number;
+    [key: string]: number; // Allow for OT etc
+  };
+  starters?: BasketballPlayer[]; // Made optional as it might not be in the basic game details
   bench?: BasketballPlayer[];
 }
 
 export interface BasketballGameDetails {
   id: string;
   status: string;
-  season: {
-    id: string;
-    year: number;
-    type: string;
+  tournament: {
     name: string;
+    shortName: string;
+    id: number;
   };
-  venue: {
-    id: string;
-    name: string;
-  };
-  clock?: string;
-  quarter?: number;
+  date: string;
+  venue: string;
+  clock: string;
   home: BasketballTeamDetails;
   away: BasketballTeamDetails;
-  scheduledTime?: string;
 }
 
 export interface BasketballGameDetailsResponse {

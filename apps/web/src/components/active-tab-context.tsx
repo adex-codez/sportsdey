@@ -1,4 +1,3 @@
-import { Accordion } from "radix-ui";
 import {
 	createContext,
 	type PropsWithChildren,
@@ -6,7 +5,7 @@ import {
 	useState,
 } from "react";
 
-type Tabs = "scores" | "favourites" | "news" | "betting";
+export type Tabs = "scores" | "favourites" | "news" | "betting";
 
 type ActiveTabContextType = {
 	tab: Tabs;
