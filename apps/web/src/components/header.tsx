@@ -25,7 +25,7 @@ export default function Header() {
 			icon: BasketballIcon,
 			sport: SPORTS.BASKETBALL,
 		},
-		{ to: "/tennis", label: "Tennis", icon: TennisIcon, sport: SPORTS.TENNIS },
+		// { to: "/tennis", label: "Tennis", icon: TennisIcon, sport: SPORTS.TENNIS },
 		// { to: "/boxing", label: "Boxing", icon: BoxingIcon, sport: "boxing" },
 		// { to: "/ufc", label: "UFC", icon: BaseballIcon, sport: "ufc" },
 	] as const;
@@ -168,7 +168,10 @@ export default function Header() {
 										setTab("scores")
 										router.navigate({ to: currentSport === "tennis" ? "/tennis" : currentSport === "basketball" ? "/basketball" : "/" });
 									}}>Scores</li>
-									<li>Favourites (0)</li>
+									<li onClick={() => {
+										setTab("favourites")
+										router.navigate({ to: "/favorites", search: { sports: currentSport } });
+									}}>Favourites (0)</li>
 									<li onClick={() => {
 										setTab("news")
 										router.navigate({ to: "/news", search: { sports: currentSport } });

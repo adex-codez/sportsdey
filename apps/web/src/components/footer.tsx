@@ -1,17 +1,17 @@
 import { cn } from "@/lib/utils";
 import Bet from "@/logos/bet.svg?react";
-import Lives from "@/logos/live.svg?react";
 import News from "@/logos/news.svg?react";
 import Score from "@/logos/score.svg?react";
-import { useActiveTab } from "./active-tab-context";
+import { type Tabs, useActiveTab } from "./active-tab-context";
 import { useCurrentSport } from "@/hooks/use-current-sport";
 import { useRouter } from "@tanstack/react-router";
 
-const bottomBarItems = [
+const bottomBarItems: { id: number; item: Tabs; icon: React.FC<React.SVGProps<SVGSVGElement> & { title?: string }> }[] = [
 	{
 		id: 1,
 		item: "scores",
 		icon: Score,
+
 	},
 	{
 		id: 2,
@@ -28,11 +28,11 @@ const bottomBarItems = [
 		item: "news",
 		icon: News,
 	},
-	{
-		id: 5,
-		item: "lives",
-		icon: Lives,
-	},
+	// {
+	// 	id: 5,
+	// 	item: "lives",
+	// 	icon: Lives,
+	// },
 ];
 const Footer = () => {
 	const currentSport = useCurrentSport();
@@ -53,6 +53,12 @@ const Footer = () => {
 										: currentSport === "basketball"
 											? "/basketball"
 											: "/",
+							});
+						}
+						if (item === "favourites") {
+							router.navigate({
+								to: "/favorites",
+								search: { sports: currentSport },
 							});
 						}
 						if (item === "news") {

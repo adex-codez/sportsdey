@@ -32,6 +32,9 @@ export interface BasketballComponentHeaderProps {
 	isExpanded: boolean;
 	onToggle: () => void;
 	imageUrl?: string;
+	isFavorite?: boolean;
+	onFavoriteToggle?: (e: React.MouseEvent) => void;
+	sport?: string;
 }
 
 export interface MatchCardProps {
@@ -47,6 +50,7 @@ export interface MatchCardProps {
 	onFavoriteToggle?: () => void;
 	id?: string;
 	country?: string;
+	hideFinishedStatus?: boolean;
 }
 
 export interface BasketballAccordionComponentCardProps {

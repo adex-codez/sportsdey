@@ -1,7 +1,8 @@
-import type { BasketballAccordionComponentCardProps, BasketballComponentHeaderProps, FavoritesState, MatchCardProps, SetScore } from '@/types/basketball';
+import type { BasketballAccordionComponentCardProps, BasketballComponentHeaderProps, MatchCardProps, SetScore } from '@/types/basketball';
 import { Link, useRouter } from '@tanstack/react-router';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import React, { useState } from 'react';
+import { useFavorites } from '@/hooks/useFavorites';
 
 
 const BasketballComponentHeader: React.FC<BasketballComponentHeaderProps> = ({
@@ -10,7 +11,9 @@ const BasketballComponentHeader: React.FC<BasketballComponentHeaderProps> = ({
   league,
   isExpanded,
   onToggle,
-  imageUrl
+  imageUrl,
+  isFavorite,
+  onFavoriteToggle
 }) => {
   return (
     <div
@@ -26,9 +29,19 @@ const BasketballComponentHeader: React.FC<BasketballComponentHeaderProps> = ({
           <img src={`/${country}.png`} alt={`${country} flag`} className='w-6 h-6 rounded-full' />
         )}
         <div className='inline-flex items-center gap-x-1 text-sm'>
-          <p className='font-bold text-primary'>{country}</p>
+          <p className='font-bold text-primary'>{country === "South Korea" ? "S/Korea" : country}</p>
           -
-          <p className='text-primary font-bold'>{league}</p>
+          <p className='text-primary font-bold text-xs'>{league}</p>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onFavoriteToggle?.(e);
+            }}
+            className={`text-sm border-none bg-transparent cursor-pointer transition-colors ml-1 ${isFavorite ? 'text-yellow-400' : 'text-[#C8C8C8] hover:text-yellow-400'
+              }`}
+          >
+            ★
+          </button>
         </div>
 
       </div>
@@ -49,7 +62,8 @@ const MatchCard: React.FC<MatchCardProps> = ({
   time,
   onFavoriteToggle,
   id,
-  country
+  country,
+  hideFinishedStatus = false
 }) => {
   const { state } = useRouter();
   const pathname = state.location.pathname;
@@ -74,14 +88,20 @@ const MatchCard: React.FC<MatchCardProps> = ({
   }
 
   const cardContent = (
-    <div className="grid cursor-pointer grid-cols-[50px_1fr_40px] items-center gap-x-4 px-5 py-3.5 border-b border-border hover:bg-muted/30 transition-colors last:border-b-0">
+    <div className={`grid cursor-pointer ${hideFinishedStatus ? 'grid-cols-[40px_1fr_40px]' : 'grid-cols-[50px_1fr_40px]'} items-center gap-x-4 px-5 py-3.5 border-b border-border hover:bg-muted/30 transition-colors last:border-b-0`}>
       <div className={`flex items-center justify-center capitalize w-[35px] h-[35px] rounded-[10px] ${status?.toLowerCase() === "live"
-        ? "bg-[#0E8F1A] text-white text-xs font-medium animate-pulse"
-        : status === "Cancelled"
-          ? "text-muted-foreground text-[10px] font-normal"
-          : "text-muted-foreground text-xs font-medium"
+        ? "bg-[#0E8F1A] text-white text-[9px] font-medium animate-pulse"
+        : "text-muted-foreground text-xs font-medium"
         }`}>
-        {status === "scheduled" && time ? time : status || time}
+        {(() => {
+          const s = status?.toLowerCase() || "";
+          const isFinished = s.includes("full time") || s.includes("finished") || s === "closed" || s === "ended" || s === "ft";
+
+          if (hideFinishedStatus && isFinished) return null;
+          if (isFinished) return "FT";
+
+          return status?.toLowerCase() === "live" ? time : (status === "scheduled" && time ? time : status || time);
+        })()}
       </div>
 
       {isTennisRoute && player1Sets && player2Sets ? (
@@ -130,12 +150,12 @@ const MatchCard: React.FC<MatchCardProps> = ({
       ) : (
         <div className="flex flex-col gap-1.5 text-sm">
           <div className="flex justify-between items-center">
-            <span className={`text-primary ${(score1 ?? 0) > (score2 ?? 0) ? "font-semibold" : ""}`}>{team1}</span>
-            <span className={`text-primary min-w-10 text-right ${(score1 ?? 0) > (score2 ?? 0) ? "font-semibold" : ""}`}>{score1}</span>
+            <span className={`text-primary ${(score1 != null && score2 != null && score1 > score2) ? "font-semibold" : ""}`}>{team1}</span>
+            <span className={`text-primary min-w-10 text-right ${(score1 != null && score2 != null && score1 > score2) ? "font-semibold" : ""}`}>{score1 != null ? score1 : ""}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className={`text-primary ${(score2 ?? 0) > (score1 ?? 0) ? "font-semibold" : ""}`}>{team2}</span>
-            <span className={`text-primary min-w-10 text-right ${(score2 ?? 0) > (score1 ?? 0) ? "font-semibold" : ""}`}>{score2}</span>
+            <span className={`text-primary ${(score1 != null && score2 != null && score2 > score1) ? "font-semibold" : ""}`}>{team2}</span>
+            <span className={`text-primary min-w-10 text-right ${(score1 != null && score2 != null && score2 > score1) ? "font-semibold" : ""}`}>{score2 != null ? score2 : ""}</span>
           </div>
         </div>
       )}
@@ -173,18 +193,71 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
   defaultExpanded = true,
   imageUrl
 }) => {
-  const [isExpanded, setIsExpanded] = useState<boolean>(defaultExpanded);
-  const [favorites, setFavorites] = useState<FavoritesState>({});
+  const { isFavoriteLeague, toggleFavoriteLeague, isFavoriteMatch, toggleFavoriteMatch } = useFavorites();
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const router = useRouter();
+  const pathname = router.state.location.pathname;
+  const isTennisRoute = pathname.includes('tennis');
+  const sport = isTennisRoute ? 'tennis' : 'basketball';
 
-  const toggleFavorite = (index: number): void => {
-    setFavorites(prev => ({
-      ...prev,
-      [index]: !prev[index]
-    }));
+  const handleLeagueFavoriteToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFavoriteLeague({
+      id: league, // Using league name as ID for now as per common pattern in this app
+      name: league,
+      country,
+      flag,
+      sport
+    });
   };
 
-  const { state } = useRouter();
-  const pathname = state.location.pathname;
+  const getCountryCode = (name: string): string => {
+    const lowerName = name.toLowerCase();
+    const mapping: Record<string, string> = {
+      "usa": "us", "nba": "us", "ncaa": "us", "america": "us",
+      "turkey": "tr", "turkish": "tr", "tbsl": "tr", "bsl": "tr", "efes": "tr",
+      "spain": "es", "spanish": "es", "acb": "es",
+      "germany": "de", "german": "de", "bbl": "de",
+      "france": "fr", "french": "fr", "lnb": "fr",
+      "italy": "it", "italian": "it", "lba": "it",
+      "greece": "gr", "greek": "gr",
+      "australia": "au", "australian": "au",
+      "china": "cn", "chinese": "cn", "cba": "cn",
+      "philippines": "ph", "philippine": "ph", "pba": "ph",
+      "japan": "jp", "japanese": "jp", "b.league": "jp",
+    };
+    for (const key in mapping) {
+      if (lowerName.includes(key)) return mapping[key];
+    }
+    return "";
+  };
+
+  const getCountryName = (name: string): string => {
+    const code = getCountryCode(name);
+    if (code === 'tr') return 'Turkey';
+    if (code === 'us') return 'USA';
+    if (code === 'de') return 'Germany';
+    if (code === 'es') return 'Spain';
+    if (code === 'fr') return 'France';
+    if (code === 'it') return 'Italy';
+    if (code === 'gr') return 'Greece';
+    return name || "International";
+  };
+
+  const handleToggleFavorite = (match: any) => {
+    if (!match.id) return;
+    toggleFavoriteMatch({
+      id: match.id,
+      team1: match.team1 || '',
+      team2: match.team2 || '',
+      time: match.time,
+      sport: sport,
+      tournament: league,
+      country: getCountryName(country || league || ""),
+      flag: flag || (getCountryCode(country || league || "") ? `https://flagcdn.com/w40/${getCountryCode(country || league || "")}.png` : undefined)
+    });
+  };
+
   const getRoutePath = () => {
     let routePath = ""
     if (pathname.includes('/basketball') || pathname.includes('basketball')) {
@@ -202,10 +275,11 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
         flag={flag}
         country={country}
         league={league}
-        matchCount={matches?.length}
         isExpanded={isExpanded}
         onToggle={() => setIsExpanded(!isExpanded)}
         imageUrl={imageUrl}
+        isFavorite={isFavoriteLeague(league)}
+        onFavoriteToggle={handleLeagueFavoriteToggle}
       />
 
       {isExpanded && matches && (
@@ -226,9 +300,10 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
                 score1={match.score1}
                 score2={match.score2}
                 status={match.status ? match.status : match.time}
-                isFavorite={favorites[index]}
-                onFavoriteToggle={() => toggleFavorite(index)}
+                isFavorite={match.id ? isFavoriteMatch(match.id) : false}
+                onFavoriteToggle={() => handleToggleFavorite(match)}
                 country={country}
+                id={match.id}
               />
             </Link>
           ))}

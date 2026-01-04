@@ -172,12 +172,14 @@ function StandingsTab({
   conference,
   onConferenceChange,
   homeTeam,
-  awayTeam
+  awayTeam,
+  hideConference
 }: StandingsTableProps & {
   conference: 'western' | 'eastern'
   onConferenceChange: (conference: 'western' | 'eastern') => void
   homeTeam?: string
   awayTeam?: string
+  hideConference?: boolean
 }) {
   const [activeFilter, setActiveFilter] = useState<FilterType>("all")
 
@@ -193,30 +195,32 @@ function StandingsTab({
 
   return (
     <div className={cn("rounded-lg", className)}>
-      <div className="flex gap-x-3 mb-4">
-        <button
-          onClick={() => onConferenceChange('western')}
-          className={cn(
-            "px-4 py-2 rounded-full text-xs font-medium transition-colors border",
-            conference === 'western'
-              ? "bg-[#1BAA04] text-white border-[#1BAA04]"
-              : "bg-white text-primary border-gray-200 hover:bg-gray-50"
-          )}
-        >
-          Western Conference
-        </button>
-        <button
-          onClick={() => onConferenceChange('eastern')}
-          className={cn(
-            "px-4 py-2 rounded-full text-xs font-medium transition-colors border",
-            conference === 'eastern'
-              ? "bg-[#1BAA04] text-white border-[#1BAA04]"
-              : "bg-white text-primary border-gray-200 hover:bg-gray-50"
-          )}
-        >
-          Eastern Conference
-        </button>
-      </div>
+      {/* {!hideConference && (
+        <div className="flex gap-x-3 mb-4">
+          <button
+            onClick={() => onConferenceChange('western')}
+            className={cn(
+              "px-4 py-2 rounded-full text-xs font-medium transition-colors border",
+              conference === 'western'
+                ? "bg-[#1BAA04] text-white border-[#1BAA04]"
+                : "bg-white text-primary border-gray-200 hover:bg-gray-50"
+            )}
+          >
+            Western Conference
+          </button>
+          <button
+            onClick={() => onConferenceChange('eastern')}
+            className={cn(
+              "px-4 py-2 rounded-full text-xs font-medium transition-colors border",
+              conference === 'eastern'
+                ? "bg-[#1BAA04] text-white border-[#1BAA04]"
+                : "bg-white text-primary border-gray-200 hover:bg-gray-50"
+            )}
+          >
+            Eastern Conference
+          </button>
+        </div>
+      )} */}
 
       {/* <FilterTabs activeFilter={activeFilter} onFilterChange={setActiveFilter} /> */}
 
