@@ -28,8 +28,13 @@ export const ScheduledGameSchema = z.object({
 	}),
 });
 export const ScheduleData = z.object({
-	league: z.string(),
-	games: z.array(ScheduledGameSchema),
+	competitions: z.array(
+		z.object({
+			id: z.string().or(z.number()).transform(String),
+			name: z.string(),
+			games: z.array(ScheduledGameSchema),
+		}),
+	),
 });
 
 export const PlayerStatisticsSchema = z.object({
@@ -63,40 +68,46 @@ export const TeamSchema = z.object({
 	points: z.number(),
 	starters: z.array(PlayerSchema).optional(),
 	bench: z.array(PlayerSchema).optional(),
-	statistics: z.object({
-		minutes: z.string(),
-		field_goals_made: z.number(),
-		field_goals_att: z.number(),
-		field_goals_pct: z.number(),
-		three_points_made: z.number(),
-		three_points_att: z.number(),
-		three_points_pct: z.number(),
-		free_throws_made: z.number(),
-		free_throws_att: z.number(),
-		free_throws_pct: z.number(),
-		rebounds: z.number(),
-		offensive_rebounds: z.number(),
-		defensive_rebounds: z.number(),
-		assists: z.number(),
-		steals: z.number(),
-		blocks: z.number(),
-		turnovers: z.number(),
-		personal_fouls: z.number(),
-	}).optional(),
+	score: z.object({
+		quarter1: z.number(),
+		quarter2: z.number(),
+		quarter3: z.number(),
+		quarter4: z.number(),
+	})
+	// statistics: z
+	// 	.object({
+	// 		minutes: z.string(),
+	// 		field_goals_made: z.number(),
+	// 		field_goals_att: z.number(),
+	// 		field_goals_pct: z.number(),
+	// 		three_points_made: z.number(),
+	// 		three_points_att: z.number(),
+	// 		three_points_pct: z.number(),
+	// 		free_throws_made: z.number(),
+	// 		free_throws_att: z.number(),
+	// 		free_throws_pct: z.number(),
+	// 		rebounds: z.number(),
+	// 		offensive_rebounds: z.number(),
+	// 		defensive_rebounds: z.number(),
+	// 		assists: z.number(),
+	// 		steals: z.number(),
+	// 		blocks: z.number(),
+	// 		turnovers: z.number(),
+	// 		personal_fouls: z.number(),
+	// 	})
+	// 	.optional(),
 });
 
 export const GameSummarySchema = z.object({
 	id: z.string(),
 	status: z.string(),
-	scheduledTime: z.string().nullable(),
-	season: z.object({
-		id: z.string(),
-		year: z.number(),
-		type: z.string(),
-		name: z.string(),
-	}),
+	date: z.string(),
 	clock: z.string(),
-	quarter: z.number(),
+	venue: z.string(),
+	tournament: z.object({
+		name: z.string(),
+		id: z.number(),
+	}),
 	home: TeamSchema,
 	away: TeamSchema,
 });
@@ -126,5 +137,3 @@ export const GameTeamStatsSchema = z.object({
 	home: TeamStatsSchema,
 	away: TeamStatsSchema,
 });
-
-

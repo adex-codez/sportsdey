@@ -13,12 +13,17 @@ export type FootballSchedule = {
 		matches: {
 			sport_event_id: string;
 			competitors: {
-				id: string;
-				name: string;
-				abbreviation: string;
-				qualifier: string;
-				score: number;
-			}[];
+				home: {
+					id: string;
+					name: string;
+					score: number;
+				};
+				away: {
+					id: string;
+					name: string;
+					score: number;
+				};
+			};
 			start_time: string;
 			match_status: string;
 			clock?: {
