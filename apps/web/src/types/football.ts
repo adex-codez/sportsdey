@@ -63,7 +63,7 @@ export type FootballMatchInfoType = {
 		played: string;
 		stoppage_time_played?: string;
 	};
-	status: string;
+	status: string | { name: string; shortname: string };
 	standings?: {
 		id: string;
 		name: string;

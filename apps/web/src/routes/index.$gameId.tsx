@@ -17,8 +17,12 @@ function RouteComponent() {
 	const { gameId } = Route.useParams();
 	const { data: gameInfo, isLoading } = useFootballMatchInfo(gameId, "en");
 
+	const matchStatus = typeof gameInfo?.status === 'string'
+		? gameInfo?.status
+		: gameInfo?.status?.shortname;
+
 	useEffect(() => {
-		if (gameInfo?.status === "SCH" && gameInfo.match_info.date_time) {
+		if (matchStatus === "SCH" && gameInfo?.match_info.date_time) {
 			const updateCountdown = () => {
 				setCountdown(getTimeUntilStart(gameInfo.match_info.date_time));
 			};
@@ -26,7 +30,7 @@ function RouteComponent() {
 			const interval = setInterval(updateCountdown, 1000);
 			return () => clearInterval(interval);
 		}
-	}, [gameInfo]);
+	}, [gameInfo, matchStatus]);
 	if (isLoading) {
 		return (
 			<div className="flex h-[40%] flex-col items-center justify-center space-y-2">
@@ -59,7 +63,7 @@ function RouteComponent() {
 	return (
 		<div>
 			<DetailsImageCard
-				competitionName={gameInfo?.competition.name}
+				competitionName={gameInfo.competition.name}
 				hostTeamLogo="/Profile.png"
 				guestTeamLogo="/Profile.png"
 				hostTeamName={
@@ -75,10 +79,10 @@ function RouteComponent() {
 					gameInfo.competitors.away.score
 				}
 				competitionCountry=""
-				matchStatus={gameInfo.status === "finished" || gameInfo.status === "closed" ? "FT" : gameInfo.status}
+				matchStatus={matchStatus === "finished" || matchStatus === "closed" || matchStatus === "FT" ? "FT" : matchStatus || ""}
 				setActiveTab={setTab}
 				activeTab={tab}
-				isUpcoming={gameInfo.status === "SCH"}
+				isUpcoming={matchStatus === "SCH"}
 				countdownText={countdown}
 				scheduledDate={gameInfo.match_info.date_time ? format(safeParseDate(gameInfo.match_info.date_time), "dd/MM/yyyy") : undefined}
 				scheduledTime={gameInfo.match_info.date_time ? format(safeParseDate(gameInfo.match_info.date_time), "HH:mm") : undefined}
