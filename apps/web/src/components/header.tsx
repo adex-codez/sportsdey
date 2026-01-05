@@ -5,7 +5,6 @@ import useWeekDates from "@/hooks/use-weekdates";
 import { cn } from "@/lib/utils";
 import BasketballIcon from "@/logos/basketball.svg?react";
 import FootballIcon from "@/logos/football.svg?react";
-import TennisIcon from "@/logos/tennis.svg?react";
 import WorldIcon from "@/logos/world.svg?react";
 import { useDateContext } from "./date-context";
 import { Button } from "./ui/button";
@@ -34,7 +33,7 @@ export default function Header() {
 	const menuButtonRef = useRef<HTMLButtonElement | null>(null);
 	const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 	const { date, setDate } = useDateContext();
-	const weekDates = useWeekDates();
+	const weekDates = useWeekDates(date);
 	const location = useLocation();
 	const router = useRouter();
 	useEffect(() => {
@@ -276,16 +275,22 @@ export default function Header() {
 											: "text-sm",
 									)}
 								>
-									{new Intl.DateTimeFormat("en-US", {
-										weekday: "short",
-									}).format(weekDate)}
+									{weekDate.toDateString() === new Date().toDateString()
+										? "Today"
+										: new Intl.DateTimeFormat("en-US", {
+											weekday: "short",
+										}).format(weekDate)}
 								</p>
 								<p className="">{weekDate.getDate()}</p>
 							</div>
 						))}
-						<div className="rounded-lg border border-[#777] bg-primary p-2">
+						<button
+							type="button"
+							className="rounded-lg border border-[#777] bg-primary p-2 active:scale-95 transition-transform opacity-50 cursor-not-allowed"
+							title="Calendar disabled for this release"
+						>
 							<CalendarDays className="text-secondary" width={24} height={24} />
-						</div>
+						</button>
 					</div>
 				) : null}
 			</div>
