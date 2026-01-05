@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useSearch, useNavigate } from "@tanstack/react-router";
+import { X } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useFootballSchedule } from "@/hooks/use-fooball-schedule";
@@ -16,6 +17,10 @@ import {
 } from "./ui/accordion";
 
 const FootballSchedule = () => {
+	const search = useSearch({ from: "/" }) as { league?: string; sports?: string };
+	const navigate = useNavigate();
+	const activeLeague = search.league;
+
 	const { date, setDate } = useDateContext();
 	const [currentFilter, setCurrentFilter] = useState<FiltersType>("all");
 	const [isPending, startTransition] = useTransition();
@@ -98,11 +103,16 @@ const FootballSchedule = () => {
 			}
 		}
 
+
+		const finalCompetitions = activeLeague
+			? filteredCompetitions.filter(comp => comp.competition.name === activeLeague)
+			: filteredCompetitions;
+
 		return {
 			...schedules,
-			competitions: filteredCompetitions,
+			competitions: finalCompetitions,
 		};
-	}, [schedules, currentFilter]);
+	}, [schedules, currentFilter, activeLeague]);
 
 	if (isLoading) {
 		return (
@@ -135,6 +145,22 @@ const FootballSchedule = () => {
 					<span className="text-gray-600 text-sm">Filtering matches...</span>
 				</div>
 			)}
+
+			{activeLeague && !isLoading && (
+				<div className="flex items-center justify-between bg-accent/10 border border-accent/20 px-4 py-3 rounded-xl mb-4">
+					<div className="flex items-center gap-2">
+						<span className="text-sm font-medium text-primary">Filtered by:</span>
+						<span className="text-sm font-bold text-accent">{activeLeague}</span>
+					</div>
+					<button
+						onClick={() => navigate({ to: "/", search: { league: undefined, sports: search.sports } })}
+						className="flex items-center gap-1 text-xs font-bold text-accent hover:bg-accent/20 px-2 py-1 rounded-lg transition-colors"
+					>
+						<X className="w-3 h-3" />
+						Clear Filter
+					</button>
+				</div>
+			)}
 			<div className="space-y-4">
 				{filteredSchedules?.competitions.map((competition) => (
 					<Accordion
@@ -154,7 +180,8 @@ const FootballSchedule = () => {
 								<div>
 									{competition.matches.map((match, index) => (
 										<Link
-											to={`/index/${match.sport_event_id}`}
+											to="/index/$gameId"
+											params={{ gameId: match.sport_event_id }}
 											key={`${index}+1`}
 										>
 											<div className="flex flex-wrap items-center justify-between gap-4 border-gray-100 border-b px-4 py-4 hover:bg-gray-50">

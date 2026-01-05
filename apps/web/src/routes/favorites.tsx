@@ -62,7 +62,7 @@ const FavoriteMatchCardRow = ({ match, onRemove }: { match: FavoriteMatch; onRem
 
 function FavoritesPage() {
     const router = useRouter();
-    const { favoriteTeams, favoriteMatches, toggleFavoriteTeam, toggleFavoriteMatch } = useFavorites();
+    const { favoriteTeams, favoriteMatches, favoriteLeagues, toggleFavoriteTeam, toggleFavoriteMatch, toggleFavoriteLeague } = useFavorites();
 
     const teamsGroupedByLeague = useMemo(() => {
         const groups: Record<string, { league: string; country: string; flag?: string; teams: FavoriteTeam[] }> = {};
@@ -128,6 +128,49 @@ function FavoritesPage() {
                     </div>
                 ) : (
                     <>
+                        {/* Favorite Leagues Section */}
+                        {favoriteLeagues.length > 0 && (
+                            <section className="space-y-4">
+                                <h2 className="text-lg font-bold text-primary ml-1">Favorite Leagues</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                    {favoriteLeagues.map((league) => {
+                                        const sport = league.sport.toLowerCase();
+                                        const to = sport === 'basketball' ? '/basketball' : sport === 'tennis' ? '/tennis' : '/';
+                                        return (
+                                            <div
+                                                key={league.id}
+                                                className="bg-white flex items-center justify-between hover:bg-gray-50 transition-all group rounded-xl border border-gray-100 shadow-sm overflow-hidden"
+                                            >
+                                                <Link
+                                                    to={to as any}
+                                                    search={{ league: league.name, sports: league.sport } as any}
+                                                    className="flex-1 p-4 flex items-center gap-4"
+                                                >
+                                                    <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center p-1.5 border border-gray-100 overflow-hidden">
+                                                        <img
+                                                            src={league.flag || '/International.png'}
+                                                            alt={league.name}
+                                                            className="w-full h-full object-cover rounded-full"
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="font-bold text-sm text-primary">{league.name}</span>
+                                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{league.country} • {league.sport}</span>
+                                                    </div>
+                                                </Link>
+                                                <button
+                                                    onClick={() => toggleFavoriteLeague(league)}
+                                                    className="text-gray-300 hover:text-red-500 transition-colors p-4"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </section>
+                        )}
+
                         {/* Favorite Teams Section */}
                         {teamsGroupedByLeague.length > 0 && (
                             <section className="space-y-4">

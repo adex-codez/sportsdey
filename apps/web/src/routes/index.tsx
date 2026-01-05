@@ -3,6 +3,10 @@ import { useActiveTab } from "@/components/active-tab-context";
 import FootballSchedule from "@/components/football-schedule";
 
 export const Route = createFileRoute("/")({
+	validateSearch: (search: Record<string, unknown>) => ({
+		league: (search.league as string) || undefined,
+		sports: (search.sports as string) || undefined,
+	}),
 	component: HomeComponent,
 });
 
