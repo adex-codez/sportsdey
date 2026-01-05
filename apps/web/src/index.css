@@ -12,8 +12,8 @@
 
 html,
 body {
-	/*@apply bg-white;*/
-	/*overflow-x: hidden !important;*/
+	height: 100svh;
+	overflow: hidden;
 }
 
 :root {
@@ -127,6 +127,7 @@ body {
 	* {
 		@apply border-border outline-ring/50;
 	}
+
 	body {
 		@apply bg-background text-foreground text-sm;
 	}
@@ -137,48 +138,65 @@ body {
 	scrollbar-width: thin;
 }
 
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+	-ms-overflow-style: none;
+	/* IE and Edge */
+	scrollbar-width: none;
+	/* Firefox */
+}
+
 
 #betting-widget-wrapper {
-  width: 100%;
+	width: 100%;
 }
 
 #betting-widget {
-    width: 100%;
-    border: none;
-    display: block;
-    min-height: 200px; 
-    overflow: hidden; 
+	width: 100%;
+	border: none;
+	display: block;
+	min-height: 200px;
+	overflow: hidden;
 }
 
 /* Custom animations for live tennis scores */
 @keyframes fadeIn {
-  0% {
-    opacity: 0.7;
-    transform: scale(0.95);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+	0% {
+		opacity: 0.7;
+		transform: scale(0.95);
+	}
+
+	50% {
+		opacity: 1;
+		transform: scale(1.05);
+	}
+
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
 }
 
 @keyframes scoreUpdate {
-  0% {
-    background-color: transparent;
-  }
-  50% {
-    background-color: rgba(27, 170, 4, 0.15);
-  }
-  100% {
-    background-color: transparent;
-  }
+	0% {
+		background-color: transparent;
+	}
+
+	50% {
+		background-color: rgba(27, 170, 4, 0.15);
+	}
+
+	100% {
+		background-color: transparent;
+	}
 }
 
 /* Smooth transitions for score changes */
 .score-transition {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
