@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FootballMatchInfo } from "@/components/football-match-info";
 import { useFootballMatchInfo } from "@/hooks/use-footmatch-info";
-import { extractTeamInfo } from "@/lib/football";
 import DetailsImageCard from "@/shared/DetailsImageCard";
+import { format } from "date-fns";
+import { getTimeUntilStart, safeParseDate } from "@/utils/timeUtils";
 
 export const Route = createFileRoute("/index/$gameId")({
 	component: RouteComponent,
@@ -12,8 +13,20 @@ export const Route = createFileRoute("/index/$gameId")({
 
 function RouteComponent() {
 	const [tab, setTab] = useState("info");
+	const [countdown, setCountdown] = useState<string>("");
 	const { gameId } = Route.useParams();
 	const { data: gameInfo, isLoading } = useFootballMatchInfo(gameId, "en");
+
+	useEffect(() => {
+		if (gameInfo?.status === "SCH" && gameInfo.match_info.date_time) {
+			const updateCountdown = () => {
+				setCountdown(getTimeUntilStart(gameInfo.match_info.date_time));
+			};
+			updateCountdown();
+			const interval = setInterval(updateCountdown, 1000);
+			return () => clearInterval(interval);
+		}
+	}, [gameInfo]);
 	if (isLoading) {
 		return (
 			<div className="flex h-[40%] flex-col items-center justify-center space-y-2">
@@ -62,9 +75,13 @@ function RouteComponent() {
 					gameInfo.competitors.away.score
 				}
 				competitionCountry=""
-				matchStatus={gameInfo.status === "finished" ? gameInfo.status : ""}
+				matchStatus={gameInfo.status === "finished" || gameInfo.status === "closed" ? "FT" : gameInfo.status}
 				setActiveTab={setTab}
 				activeTab={tab}
+				isUpcoming={gameInfo.status === "SCH"}
+				countdownText={countdown}
+				scheduledDate={gameInfo.match_info.date_time ? format(safeParseDate(gameInfo.match_info.date_time), "dd/MM/yyyy") : undefined}
+				scheduledTime={gameInfo.match_info.date_time ? format(safeParseDate(gameInfo.match_info.date_time), "HH:mm") : undefined}
 				gameTabs={[
 					{ id: "info", label: "Info" },
 					{ id: "stats", label: "Stats" },

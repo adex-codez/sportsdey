@@ -9,7 +9,7 @@ import { ErrorState } from "@/components/ErrorState";
 import { useApiError } from "@/hooks/useApiError";
 import { Loader2 } from "lucide-react";
 import { format } from 'date-fns';
-import { getTimeUntilStart } from '@/utils/timeUtils';
+import { getTimeUntilStart, safeParseDate } from '@/utils/timeUtils';
 
 const TennisDetailsPage = () => {
     const { Id } = useParams({ from: '/tennis/$Id' });
@@ -154,8 +154,8 @@ const TennisDetailsPage = () => {
                             : match.status === 'closed'
                                 ? 'Finished'
                                 : match.status === "interrupted"
-                                ? "Interrupted":
-                                match.status
+                                    ? "Interrupted" :
+                                    match.status
                     }
                     hostTeamScore={homeSetsWon}
                     guestTeamScore={awaySetsWon}
@@ -163,6 +163,8 @@ const TennisDetailsPage = () => {
                     guestTeamName={match.away_team.competitor.name}
                     isUpcoming={matchStatus === 'upcoming'}
                     countdownText={countdown}
+                    scheduledDate={match.start_time ? format(safeParseDate(match.start_time), 'dd/MM/yyyy') : undefined}
+                    scheduledTime={match.start_time ? format(safeParseDate(match.start_time), 'HH:mm') : undefined}
                 />
             </div>
             <div>

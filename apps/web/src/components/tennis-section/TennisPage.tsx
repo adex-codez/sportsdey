@@ -11,6 +11,7 @@ import type { TennisScheduleData } from '@/types/api';
 import TennisFixtureFilterHeaders from '@/shared/TennisFixtureFilterHeaders';
 import { useMemo } from 'react';
 import { getCountryFromCompetition } from '@/lib/countryUtils';
+import { EmptyState } from '../EmptyState';
 
 const formatDate = (date: Date) => {
   const year = date.getFullYear();
@@ -179,22 +180,22 @@ const TennisPage = () => {
 
   return (
     <div className='space-y-4 mb-32 lg:mb-0'>
-      <div className='hidden w-full lg:block'>
+      <div className='hidden w-full lg:block sticky top-[-16px] z-10 bg-background/95 backdrop-blur-sm px-1 py-4'>
         <TennisFixtureFilterHeaders counts={counts} />
       </div>
       {tennisLeagues.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20">
-          <p className="text-gray-500 text-sm">
-            {activeFilter === 'all'
+        <EmptyState
+          title={`No ${activeFilter === 'all' ? '' : activeFilter} tennis matches`}
+          description={
+            activeFilter === 'all'
               ? 'No tennis matches scheduled for this date'
               : activeFilter === 'live'
                 ? 'No live matches at the moment'
                 : activeFilter === 'finished'
                   ? 'No finished matches for this date'
                   : 'No upcoming matches for this date'
-            }
-          </p>
-        </div>
+          }
+        />
       ) : (
         tennisLeagues.map((league) => (
           <SportAccordionCard

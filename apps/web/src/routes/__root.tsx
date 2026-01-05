@@ -60,16 +60,26 @@ function RootDocument() {
 					<QueryClientProvider client={queryClient}>
 						<ErrorBoundary>
 							<Providers>
-								<div className="grid h-svh grid-rows-[auto_1fr_auto] lg:grid-rows-[auto_auto_1fr]">
-									<Header />
-									<Socials />
-									<div className="mx-4 grid md:gap-8 lg:mx-[104px] lg:grid-cols-[20%_80%]">
-										<div className="hidden lg:block">
-											<Sidebar />
+								<div className="flex h-svh flex-col overflow-hidden">
+									<header className="shrink-0">
+										<Header />
+										<Socials />
+									</header>
+
+									<main className="flex-1 overflow-hidden">
+										<div className="mx-4 md:gap-8 lg:mx-[104px] grid h-full lg:grid-cols-[20%_80%] py-4">
+											<aside className="hidden lg:block h-full overflow-y-auto no-scrollbar pr-4">
+												<Sidebar />
+											</aside>
+											<section className="h-full overflow-y-auto no-scrollbar min-w-0">
+												<Outlet />
+											</section>
 										</div>
-										<Outlet />
-									</div>
-									<Footer />
+									</main>
+
+									<footer className="shrink-0 lg:hidden">
+										<Footer />
+									</footer>
 								</div>
 							</Providers>
 

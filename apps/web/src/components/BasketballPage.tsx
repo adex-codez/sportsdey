@@ -11,7 +11,7 @@ import FixtureFilterHeaders from '@/shared/FixtureFilterHeaders';
 import { ErrorState } from '@/components/ErrorState';
 import { useApiError } from '@/hooks/useApiError';
 import { useSearch, useNavigate } from '@tanstack/react-router';
-import { X } from 'lucide-react';
+import { EmptyState } from '@/components/EmptyState';
 
 const formatDate = (date: Date) => {
   return {
@@ -320,7 +320,7 @@ const BasketballPage = () => {
 
   return (
     <div className='space-y-4 mb-32 lg:mb-0'>
-      <div className='hidden w-full lg:block'>
+      <div className='hidden w-full lg:block sticky top-[-16px] z-10 bg-background/95 backdrop-blur-sm px-1 py-4'>
         <FixtureFilterHeaders counts={counts} />
       </div>
       {isLoading && <div className="flex flex-col items-center justify-center space-y-2 lg:mb-20">
@@ -328,8 +328,8 @@ const BasketballPage = () => {
         <p className="text-gray-500 text-sm">Loading matches...</p>
       </div>}
 
-      {activeLeague && !isLoading && (
-        <div className="flex items-center justify-between bg-accent/10 border border-accent/20 px-4 py-3 rounded-xl mx-1">
+      {!isLoading && activeLeague && (
+        <div className="flex items-center justify-between bg-accent/10 border border-accent/20 px-4 py-3 rounded-xl mx-1 mb-4">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-primary">Filtered by:</span>
             <span className="text-sm font-bold text-accent">{activeLeague}</span>
@@ -338,10 +338,16 @@ const BasketballPage = () => {
             onClick={() => navigate({ to: '/basketball', search: { league: undefined } })}
             className="flex items-center gap-1 text-xs font-bold text-accent hover:bg-accent/20 px-2 py-1 rounded-lg transition-colors"
           >
-            <X className="w-3 h-3" />
             Clear Filter
           </button>
         </div>
+      )}
+
+      {!isLoading && leagues.length === 0 && (
+        <EmptyState
+          title={`No ${activeFilter === 'all' ? '' : activeFilter} basketball matches`}
+          description={`We couldn't find any matches matching your criteria for this date.`}
+        />
       )}
       {!isLoading && leagues.map((league) => (
         <BasketballAccordionComponentCard

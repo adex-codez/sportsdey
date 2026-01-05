@@ -39,7 +39,7 @@ const Footer = () => {
 	const { tab, setTab } = useActiveTab();
 	const router = useRouter();
 	return (
-		<div className="sticky bottom-0 z-20 left-0 flex w-full justify-between rounded-t-3xl bg-primary px-8 py-4 lg:hidden">
+		<div className="flex w-full justify-between rounded-t-3xl bg-primary px-8 py-4 lg:hidden">
 			{bottomBarItems.map(({ id, icon: Icon, item }) => (
 				<div
 					key={id}

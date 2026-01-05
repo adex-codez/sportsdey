@@ -12,16 +12,19 @@ import { VideosTab } from './VideosTab';
 import { useParams } from '@tanstack/react-router';
 
 import { GameDetailsSkeleton } from './GameDetailsSkeleton';
-import { getTimeUntilStart } from '@/utils/timeUtils';
+import { getTimeUntilStart, safeParseDate } from '@/utils/timeUtils';
 
 import type { TeamStatsData } from './TeamStats';
 import { useFavorites } from '@/hooks/useFavorites';
+import { format } from 'date-fns';
 
 const BasketBallDetailsPage = () => {
   const { Id } = useParams({ from: '/basketball/$Id' });
   const [activeTab, setActiveTab] = useState('info');
   const [countdown, setCountdown] = useState<string>('');
   const [standingsConference, setStandingsConference] = useState<'western' | 'eastern'>('western');
+  const [standingsEnabled, setStandingsEnabled] = useState(false);
+  const [statsEnabled, setStatsEnabled] = useState(false);
 
 
   const { isFavoriteTeam, toggleFavoriteTeam, isFavoriteLeague, toggleFavoriteLeague } = useFavorites();
@@ -32,17 +35,30 @@ const BasketBallDetailsPage = () => {
     enabled: !!Id,
   });
 
-  const { data: statsData } = useQuery({
+  useEffect(() => {
+    if (activeTab === 'standings') {
+      setStandingsEnabled(true);
+    }
+    if (activeTab === 'team_stats') {
+      setStatsEnabled(true);
+    }
+  }, [activeTab]);
+
+  const { data: statsData, isLoading: isStatsLoading } = useQuery({
     queryKey: ['basketball', 'game', Id, 'stats'],
     queryFn: () => apiRequest<any>(`basketball/game/${Id}/stats`),
-    enabled: !!Id,
+    enabled: !!Id && statsEnabled,
+    staleTime: 5 * 60 * 1000,
   });
 
   const tournamentId = gameDetails?.tournament?.id;
-  const { data: standingsData } = useQuery({
-    queryKey: ['basketball', 'standings', tournamentId, standingsConference],
+
+
+  const { data: standingsData, isLoading: isStandingsLoading } = useQuery({
+    queryKey: ['basketball', 'standings', tournamentId],
     queryFn: () => apiRequest<any>(`basketball/standings/${tournamentId}`),
-    enabled: !!tournamentId,
+    enabled: !!tournamentId && standingsEnabled,
+    staleTime: 5 * 60 * 1000, // Preserve for 5 minutes
   });
 
 
@@ -123,10 +139,18 @@ const BasketBallDetailsPage = () => {
 
   const mapStatsData = (apiStats: any, side: 'home' | 'away'): TeamStatsData => {
     const teamData = apiStats?.[side];
-    const teamName = gameDetails?.[side].name || '';
+    const teamFromDetails = gameDetails?.[side];
+    const teamName = teamFromDetails?.name || '';
     const teamLogo = "/Profile.png";
 
-    if (!teamData) {
+    // If we have API stats (lazy loaded), use them. 
+    // Otherwise, check if gameDetails has the info (starters/bench)
+    const effectiveData = teamData || {
+      starters: teamFromDetails?.starters || [],
+      bench: teamFromDetails?.bench || []
+    };
+
+    if (!effectiveData.starters.length && !effectiveData.bench.length) {
       return {
         teamName,
         teamLogo,
@@ -170,10 +194,10 @@ const BasketBallDetailsPage = () => {
       }
     }
 
-    const starters = teamData.starters.map(mapPlayerWithMins);
-    const bench = teamData.bench.map(mapPlayerWithMins);
+    const starters = effectiveData.starters.map(mapPlayerWithMins);
+    const bench = effectiveData.bench.map(mapPlayerWithMins);
 
-    const rawPlayers = [...teamData.starters, ...teamData.bench];
+    const rawPlayers = [...effectiveData.starters, ...effectiveData.bench];
     const agg = rawPlayers.reduce((acc, player) => {
       const s = player.statistics;
       const pts = (2 * s.field_goals_made) + s.three_points_made + s.free_throws_made;
@@ -223,7 +247,7 @@ const BasketBallDetailsPage = () => {
     };
   };
 
-  const mappedTeamStats = statsData && gameDetails ? [
+  const mappedTeamStats = gameDetails ? [
     mapStatsData(statsData, 'home'),
     mapStatsData(statsData, 'away')
   ] : [];
@@ -252,12 +276,14 @@ const BasketBallDetailsPage = () => {
             homeTeam={gameDetails?.home.name}
             awayTeam={gameDetails?.away.name}
             hideConference={isUSLeague}
+            isLoading={isStandingsLoading}
           />
         );
       case 'team_stats':
         return (
           <TeamStats
             teams={mappedTeamStats}
+            isLoading={isStatsLoading}
           />
         );
       case 'videos':
@@ -309,6 +335,8 @@ const BasketBallDetailsPage = () => {
           guestTeamName={gameDetails.away.name}
           isUpcoming={!gameDetails.status.toLowerCase().includes('full') && !gameDetails.status.toLowerCase().includes('ft')}
           countdownText={countdown}
+          scheduledDate={gameDetails.date ? format(safeParseDate(gameDetails.date), 'dd/MM/yyyy') : undefined}
+          scheduledTime={gameDetails.date ? format(safeParseDate(gameDetails.date), 'HH:mm') : undefined}
           isHomeFavorite={isHomeFavorite}
           isAwayFavorite={isAwayFavorite}
           onToggleHomeFavorite={() => gameDetails && handleToggleFavorite(gameDetails.home.name)}
