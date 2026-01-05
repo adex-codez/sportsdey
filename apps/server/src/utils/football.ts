@@ -163,6 +163,7 @@ export function transformProxyH2H(
 	awayTeamId: string,
 ): H2HMatch[] {
 	if (!data?.h2h?.results?.overall) return [];
+	
 
 	const matches = data.h2h.results.overall.slice(0, 5);
 
