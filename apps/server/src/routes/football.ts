@@ -336,7 +336,9 @@ footballRoute.openapi(
 
 			let leadersData: any[] = [];
 			if (leadersRes.ok) {
-				leadersData = (await leadersRes.json()) as any[];
+				const lead = (await leadersRes.json())
+				console.log(lead)
+				leadersData =  lead as any[];
 			}
 
 			const teamIds = [
@@ -348,6 +350,7 @@ footballRoute.openapi(
 				teamIds,
 			);
 			const transformedTopScorers = transformProxyTopScorers(leadersData);
+			
 			const transformedData = transformProxyMatchInfo(
 				summaryData,
 				transformedStandings,

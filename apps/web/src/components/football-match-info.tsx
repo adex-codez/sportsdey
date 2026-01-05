@@ -120,6 +120,8 @@ export const FootballMatchInfo = ({
 			</div> */}
 			<div className="rounded-2xl bg-white">
 				<p className="font-semibold px-4 py-2">Match Info</p>
+					<div className="px-4 py-2 flex justify-between w-full border-gray-200 border-t"><p className="text-base">Date/Time</p><p>{info.match_info.date_time}</p></div>
+					<div className="px-4 py-2 flex justify-between w-full border-gray-200 border-t"><p className="text-base">Stadium</p><p>{info.match_info.stadium}</p></div>
 			</div>
 		</div>
 	);
