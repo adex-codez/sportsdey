@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface Player {
   name: string
@@ -154,7 +155,26 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 
-export function TeamStats({ teams, className }: TeamStatsProps) {
+export function TeamStats({ teams, className, isLoading }: TeamStatsProps) {
+  if (isLoading) {
+    return (
+      <div className={cn("bg-white rounded-lg p-4 space-y-4", className)}>
+        <Skeleton className="h-6 w-32 bg-gray-100" />
+        <div className="space-y-3">
+          {[1, 2].map(i => (
+            <div key={i} className="border border-[#C8C8C8] rounded-lg p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-6 w-6 rounded-full bg-gray-100" />
+                <Skeleton className="h-4 w-40 bg-gray-100" />
+              </div>
+              <Skeleton className="h-32 w-full bg-gray-100" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={cn("bg-white rounded-lg", className)}>
       <h2 className="text-sm font-semibold text-primary py-3 px-2 border-b border-b-[#C8C8C8]">Team stats</h2>
