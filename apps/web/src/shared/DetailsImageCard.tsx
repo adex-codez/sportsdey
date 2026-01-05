@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { TabNavigation } from "@/components/ui/tab-navigation";
 import type { DetailsImageProps } from "@/types/basketball";
 
@@ -23,6 +22,8 @@ interface DetailsImageCardProps extends DetailsImageProps {
   gameTabs: { id: string; label: string }[]
   isUpcoming?: boolean;
   countdownText?: string;
+  scheduledDate?: string;
+  scheduledTime?: string;
 }
 
 const DetailsImageCard = ({ competitionName,
@@ -44,7 +45,9 @@ const DetailsImageCard = ({ competitionName,
   gameTabs,
   matchStatus,
   isUpcoming = false,
-  countdownText }: DetailsImageCardProps) => {
+  countdownText,
+  scheduledDate,
+  scheduledTime }: DetailsImageCardProps) => {
 
   return (
     <div className="h-64 w-full rounded-t-2xl rounded-b-0 bg-primary relative">
@@ -86,25 +89,35 @@ const DetailsImageCard = ({ competitionName,
           </div>
           <div className='w-full'>
 
-            <div className='flex flex-col items-center gap-y-4'>
-              {matchStatus.toLowerCase() === "upcoming" ? (
+            <div className='flex flex-col items-center gap-y-1.5'>
+              {isUpcoming ? (
                 <>
-                  <span className="text-sm text-[#0E8F1A] md:text-xl font-semibold">
-                    Starts in
-                  </span>
-                  <span className="text-sm md:text-lg font-medium text-[#1BAA04]">
-                    {countdownText}
-                  </span>
+                  {scheduledDate && (
+                    <span className="text-white text-xs md:text-sm font-medium">
+                      {scheduledDate}
+                    </span>
+                  )}
+                  {scheduledTime && (
+                    <span className="text-white text-base md:text-2xl font-bold">
+                      {scheduledTime}
+                    </span>
+                  )}
+                  {countdownText && (
+                    <span className="text-[10px] text-center md:text-sm space-y-1 font-semibold text-[#1BAA04] mt-1">
+                      Starts in <br />
+                      {countdownText}
+                    </span>
+                  )}
                 </>
               ) : (
                 <>
-                  <span className={`text-base md:text-3xl font-semibold transition-colors duration-300 ${matchStatus === 'live'
+                  <span className={`text-base md:text-3xl font-semibold transition-colors duration-300 ${matchStatus?.toLowerCase() === 'live'
                     ? 'text-[#0E8F1A] animate-pulse'
                     : 'text-white'
                     }`}>
                     {hostTeamScore} - {guestTeamScore}
                   </span>
-                  <span className={`text-xs md:text-sm font-medium mt-2 capitalize block text-center transition-colors duration-300 ${matchStatus === 'live'
+                  <span className={`text-xs md:text-sm font-medium mt-2 capitalize block text-center transition-colors duration-300 ${matchStatus?.toLowerCase() === 'live'
                     ? 'text-[#0E8F1A]'
                     : 'text-[#1BAA04]'
                     }`}>

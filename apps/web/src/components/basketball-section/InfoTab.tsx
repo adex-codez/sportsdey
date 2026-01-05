@@ -40,7 +40,7 @@ const InfoTab = ({ gameDetails, teamStats }: { gameDetails?: BasketballGameDetai
           ]} />
       </div>
       <div className='w-full'>
-        <VenueGuide venueName={gameDetails.venue.name} />
+        <VenueGuide venueName={gameDetails.venue || 'n/a'} />
       </div>
       <div className="w-full mx-auto">
         <TeamStats teams={teamStats || []} />

@@ -12,10 +12,11 @@ import { VideosTab } from './VideosTab';
 import { useParams } from '@tanstack/react-router';
 
 import { GameDetailsSkeleton } from './GameDetailsSkeleton';
-import { getTimeUntilStart } from '@/utils/timeUtils';
+import { getTimeUntilStart, safeParseDate } from '@/utils/timeUtils';
 
 import type { TeamStatsData } from './TeamStats';
 import { useFavorites } from '@/hooks/useFavorites';
+import { format } from 'date-fns';
 
 const BasketBallDetailsPage = () => {
   const { Id } = useParams({ from: '/basketball/$Id' });
@@ -309,6 +310,8 @@ const BasketBallDetailsPage = () => {
           guestTeamName={gameDetails.away.name}
           isUpcoming={!gameDetails.status.toLowerCase().includes('full') && !gameDetails.status.toLowerCase().includes('ft')}
           countdownText={countdown}
+          scheduledDate={gameDetails.date ? format(safeParseDate(gameDetails.date), 'dd/MM/yyyy') : undefined}
+          scheduledTime={gameDetails.date ? format(safeParseDate(gameDetails.date), 'HH:mm') : undefined}
           isHomeFavorite={isHomeFavorite}
           isAwayFavorite={isAwayFavorite}
           onToggleHomeFavorite={() => gameDetails && handleToggleFavorite(gameDetails.home.name)}
