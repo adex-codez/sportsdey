@@ -117,6 +117,7 @@ export const transformProxySchedule = (
 					alias: game.awayTeam?.shortName || "",
 					points: game.awayTeam?.score?.current ?? null,
 				},
+				...(game.gameClock ? { clock: `${game.gameClock.minute}:${game.gameClock.second}` } : {}),
 			});
 
 			return acc;
@@ -141,9 +142,10 @@ const mapGameStatus = (
 	| "cancelled" => {
 	switch (statusShortName) {
 		case "FT":
+		case "AET":
 		case "AOT":
 			return "closed";
-		case "NS":
+		case "SCH":
 			return "scheduled";
 		case "1Q":
 		case "2Q":
@@ -222,12 +224,12 @@ export const transformGameSummary = (
 
 		return {
 			name: teamSummary.name,
-			points: teamSummary.score.current,
+			points: teamSummary.score ? teamSummary.score.current : 0,
 			score: {
-				quarter1: teamSummary.score.quarter1,
-				quarter2: teamSummary.score.quarter2,
-				quarter3: teamSummary.score.quarter3,
-				quarter4: teamSummary.score.quarter4,
+				quarter1: teamSummary.score ? teamSummary.score.quarter1 : 0,
+				quarter2: teamSummary.score ? teamSummary.score.quarter2 : 0,
+				quarter3: teamSummary.score ? teamSummary.score.quarter3 : 0,
+				quarter4: teamSummary.score ? teamSummary.score.quarter4 : 0,
 			},
 			starters,
 			bench,

@@ -1,5 +1,5 @@
-import { ChevronRight, Loader2 } from "lucide-react";
-import { useEffect, useState, type PropsWithChildren } from "react";
+import { ChevronRight } from "lucide-react";
+import { type PropsWithChildren } from "react";
 import { cn } from "@/lib/utils";
 import { useActiveTab } from "./active-tab-context";
 import { Button } from "./ui/button";
@@ -7,6 +7,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { SPORTS } from "@/lib/constants";
 import { useCurrentSport } from "@/hooks/use-current-sport";
 import BettingWidget from "./betting-widget";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const SidebarItem = ({
 	children,
@@ -32,9 +33,7 @@ const Sidebar = () => {
 	const { tab, setTab } = useActiveTab();
 	const navigate = useNavigate();
 	const currentSport = useCurrentSport();
-
-	
-
+	const { favoriteTeams, favoriteLeagues, totalFavoritesCount, toggleFavoriteTeam, toggleFavoriteLeague } = useFavorites();
 
 	return (
 		<div className="space-y-8">
@@ -53,7 +52,7 @@ const Sidebar = () => {
 									: currentSport === SPORTS.BASKETBALL
 										? "/basketball"
 										: "/";
-							navigate({ to: target });
+							navigate({ to: target, search: { league: undefined, sports: currentSport } as any });
 						}}
 					>
 						Scores
@@ -63,9 +62,13 @@ const Sidebar = () => {
 							"cursor-pointer",
 							tab === "favourites" ? "font-semibold text-accent" : null,
 						)}
+						onClick={() => {
+							setTab("favourites");
+							navigate({ to: "/favorites", search: { sports: currentSport } });
+						}}
 					>
 						{" "}
-						Favourite (0)
+						Favourite ({totalFavoritesCount})
 					</li>
 					<li
 						className={cn(
@@ -89,11 +92,34 @@ const Sidebar = () => {
 			</div>
 			<SidebarItem heading="My Teams" icon={<ChevronRight />}>
 				<div>
-					<p className="px-6 py-6 text-sm">
-						{" "}
-						You have no teams selected as favourites. Tap the star icon next to
-						a team to add to favourites.
-					</p>
+					{favoriteTeams.length === 0 ? (
+						<p className="px-6 py-6 text-sm">
+							{" "}
+							You have no teams selected as favourites. Tap the star icon next to
+							a team to add to favourites.
+						</p>
+					) : (
+						<ul className="px-6 py-4 space-y-3">
+							{favoriteTeams.map((team) => (
+								<li key={team.id} className="flex items-center justify-between">
+									<div className="flex items-center gap-3">
+										<img
+											src={team.logo || '/Profile.png'}
+											alt={team.name}
+											className="w-8 h-8 object-contain"
+										/>
+										<span className="text-sm font-medium truncate max-w-[120px]" title={team.name}>{team.name}</span>
+									</div>
+									<button
+										onClick={() => toggleFavoriteTeam(team)}
+										className="text-yellow-400 hover:text-yellow-500"
+									>
+										★
+									</button>
+								</li>
+							))}
+						</ul>
+					)}
 				</div>
 			</SidebarItem>
 			<SidebarItem heading="Convert Your betting code">
@@ -125,12 +151,35 @@ const Sidebar = () => {
 				</div>
 			</SidebarItem>
 			<SidebarItem heading="My League" icon={<ChevronRight />}>
-				<div className="px-6 py-6">
-					<p className="text-sm">
-						{" "}
-						You have no leagues selected as favourites. Tap the star icon in the
-						league detail to add to favourites.
-					</p>
+				<div>
+					{favoriteLeagues.length === 0 ? (
+						<p className="px-6 py-6 text-sm">
+							{" "}
+							You have no leagues selected as favourites. Tap the star icon in the
+							league detail to add to favourites.
+						</p>
+					) : (
+						<ul className="px-6 py-4 space-y-3">
+							{favoriteLeagues.map((league) => (
+								<li key={league.id} className="flex items-center justify-between">
+									<div className="flex items-center gap-3">
+										<img
+											src={league.flag || '/International.png'}
+											alt={league.name}
+											className="w-8 h-8 rounded-full object-cover"
+										/>
+										<span className="text-sm font-medium truncate max-w-[120px]" title={league.name}>{league.name}</span>
+									</div>
+									<button
+										onClick={() => toggleFavoriteLeague(league)}
+										className="text-yellow-400 hover:text-yellow-500"
+									>
+										★
+									</button>
+								</li>
+							))}
+						</ul>
+					)}
 				</div>
 			</SidebarItem>
 		</div>

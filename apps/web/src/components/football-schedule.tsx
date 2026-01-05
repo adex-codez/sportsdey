@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useSearch, useNavigate } from "@tanstack/react-router";
+import { X } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useFootballSchedule } from "@/hooks/use-fooball-schedule";
@@ -14,8 +15,13 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "./ui/accordion";
+import { EmptyState } from "./EmptyState";
 
 const FootballSchedule = () => {
+	const search = useSearch({ from: "/" }) as { league?: string; sports?: string };
+	const navigate = useNavigate();
+	const activeLeague = search.league;
+
 	const { date, setDate } = useDateContext();
 	const [currentFilter, setCurrentFilter] = useState<FiltersType>("all");
 	const [isPending, startTransition] = useTransition();
@@ -98,11 +104,16 @@ const FootballSchedule = () => {
 			}
 		}
 
+
+		const finalCompetitions = activeLeague
+			? filteredCompetitions.filter(comp => comp.competition.name === activeLeague)
+			: filteredCompetitions;
+
 		return {
 			...schedules,
-			competitions: filteredCompetitions,
+			competitions: finalCompetitions,
 		};
-	}, [schedules, currentFilter]);
+	}, [schedules, currentFilter, activeLeague]);
 
 	if (isLoading) {
 		return (
@@ -121,7 +132,7 @@ const FootballSchedule = () => {
 
 	return (
 		<div>
-			<div className="flex items-center justify-between space-y-4">
+			<div className="sticky top-[-16px] z-10 bg-background/95 backdrop-blur-sm px-1 py-4 flex items-center justify-between">
 				<Filters
 					currentFilter={currentFilter}
 					setCurrentFilter={handleFilterChange}
@@ -135,95 +146,119 @@ const FootballSchedule = () => {
 					<span className="text-gray-600 text-sm">Filtering matches...</span>
 				</div>
 			)}
-			<div className="space-y-4">
-				{filteredSchedules?.competitions.map((competition) => (
-					<Accordion
-						key={`${competition.competition.id}`}
-						type="single"
-						collapsible
-						defaultValue={`${competition.competition.id}`}
+
+			{activeLeague && !isLoading && (
+				<div className="flex items-center justify-between bg-accent/10 border border-accent/20 px-4 py-3 rounded-xl mb-4">
+					<div className="flex items-center gap-2">
+						<span className="text-sm font-medium text-primary">Filtered by:</span>
+						<span className="text-sm font-bold text-accent">{activeLeague}</span>
+					</div>
+					<button
+						onClick={() => navigate({ to: "/", search: { league: undefined, sports: search.sports } })}
+						className="flex items-center gap-1 text-xs font-bold text-accent hover:bg-accent/20 px-2 py-1 rounded-lg transition-colors"
 					>
-						<AccordionItem
-							value={`${competition.competition.id}`}
-							className="w-full rounded-2xl bg-white"
+						<X className="w-3 h-3" />
+						Clear Filter
+					</button>
+				</div>
+			)}
+			<div className="space-y-4">
+				{filteredSchedules?.competitions.length === 0 ? (
+					<EmptyState
+						title={`No ${currentFilter === 'all' ? '' : currentFilter} matches found`}
+						description={`We couldn't find any matches matching your criteria for this date.`}
+					/>
+				) : (
+					filteredSchedules?.competitions.map((competition) => (
+						<Accordion
+							key={`${competition.competition.id}`}
+							type="single"
+							collapsible
+							defaultValue={`${competition.competition.id}`}
 						>
-							<AccordionTrigger className="cursor-pointer rounded-none border-gray-100 px-4 font-bold text-primary [&[data-state=open]]:border-b">
-								{competition.competition.name}
-							</AccordionTrigger>
-							<AccordionContent className="cursor-pointer overflow-hidden">
-								<div>
-									{competition.matches.map((match, index) => (
-										<Link
-											to={`/index/${match.sport_event_id}`}
-											key={`${index}+1`}
-										>
-											<div className="flex flex-wrap items-center justify-between gap-4 border-gray-100 border-b px-4 py-4 hover:bg-gray-50">
-												<div className="flex w-full justify-between lg:w-fit">
-													<p>{formatTime(new Date(match.start_time))}</p>
-													<div className="block lg:hidden">
-														<Favourite />
-													</div>
-												</div>
-
-												<div className="flex w-full justify-between space-y-4 text-sm lg:w-fit lg:items-center lg:justify-start lg:space-y-0">
-													<div className="items-center gap-4 space-y-4 lg:flex lg:space-y-0">
-														<p className="wrap-break-word">
-															{match.competitors.home.name}
-														</p>
-														<span className="hidden font-medium text-sm lg:block">
-															VS
-														</span>
-														<p className="wrap-break-word">
-															{match.competitors.away.name}
-														</p>
+							<AccordionItem
+								value={`${competition.competition.id}`}
+								className="w-full rounded-2xl bg-white"
+							>
+								<AccordionTrigger className="cursor-pointer rounded-none border-gray-100 px-4 font-bold text-primary [&[data-state=open]]:border-b">
+									{competition.competition.name}
+								</AccordionTrigger>
+								<AccordionContent className="cursor-pointer overflow-hidden">
+									<div>
+										{competition.matches.map((match, index) => (
+											<Link
+												to="/index/$gameId"
+												params={{ gameId: match.id }}
+												key={`${index}+1`}
+											>
+												<div className="flex flex-wrap items-center justify-between gap-4 border-gray-100 border-b px-4 py-4 hover:bg-gray-50">
+													<div className="flex w-full justify-between lg:w-fit">
+														<p>{formatTime(new Date(match.start_time))}</p>
+														<div className="block lg:hidden">
+															<Favourite />
+														</div>
 													</div>
 
-													<div className="flex h-12 gap-6 rounded-sm bg-[#EBEBEB] px-3 py-1 lg:hidden">
-														<div className="flex flex-col items-center rounded-lg">
-															<p>1</p>
-															<p className="font-semibold">1.60</p>
-														</div>
-														<div className="flex flex-col items-center rounded-lg">
-															<p>X</p>
-															<p className="font-semibold">4.20</p>
-														</div>
-														<div className="">
-															<p>2</p>
-															<p className="font-semibold">4.20</p>
-														</div>
-													</div>
-												</div>
-												<div className="hidden items-center gap-2 lg:flex">
-													<div className="rounded-lg bg-[#EBEBEB] px-2 lg:py-1">
-														<p>
-															1
-															<span className="px-3 py-1 font-semibold">
-																1.60
+													<div className="flex w-full justify-between space-y-4 text-sm lg:w-fit lg:items-center lg:justify-start lg:space-y-0">
+														<div className="items-center gap-4 space-y-4 lg:flex lg:space-y-0">
+															<p className="wrap-break-word">
+																{match.competitors.home.name}
+															</p>
+															<span className="hidden font-medium text-sm lg:block">
+																VS
 															</span>
-														</p>
+															<p className="wrap-break-word">
+																{match.competitors.away.name}
+															</p>
+														</div>
+
+														<div className="flex h-12 gap-6 rounded-sm bg-[#EBEBEB] px-3 py-1 lg:hidden">
+															<div className="flex flex-col items-center rounded-lg">
+																<p>1</p>
+																<p className="font-semibold">1.60</p>
+															</div>
+															<div className="flex flex-col items-center rounded-lg">
+																<p>X</p>
+																<p className="font-semibold">4.20</p>
+															</div>
+															<div className="">
+																<p>2</p>
+																<p className="font-semibold">4.20</p>
+															</div>
+														</div>
 													</div>
-													<div className="rounded-lg bg-[#EBEBEB] px-2 py-1">
-														<p>
-															X <span className="font-semibold">4.20</span>
-														</p>
-													</div>
-													<div className="rounded-lg bg-[#EBEBEB] px-2 py-1">
-														<p>
-															2 <span className="font-semibold">4.20</span>
-														</p>
-													</div>
-													<div className="hidden lg:block">
-														<Favourite />
+													<div className="hidden items-center gap-2 lg:flex">
+														<div className="rounded-lg bg-[#EBEBEB] px-2 lg:py-1">
+															<p>
+																1
+																<span className="px-3 py-1 font-semibold">
+																	1.60
+																</span>
+															</p>
+														</div>
+														<div className="rounded-lg bg-[#EBEBEB] px-2 py-1">
+															<p>
+																X <span className="font-semibold">4.20</span>
+															</p>
+														</div>
+														<div className="rounded-lg bg-[#EBEBEB] px-2 py-1">
+															<p>
+																2 <span className="font-semibold">4.20</span>
+															</p>
+														</div>
+														<div className="hidden lg:block">
+															<Favourite />
+														</div>
 													</div>
 												</div>
-											</div>
-										</Link>
-									))}
-								</div>
-							</AccordionContent>
-						</AccordionItem>
-					</Accordion>
-				))}
+											</Link>
+										))}
+									</div>
+								</AccordionContent>
+							</AccordionItem>
+						</Accordion>
+					))
+				)}
 			</div>
 		</div>
 	);

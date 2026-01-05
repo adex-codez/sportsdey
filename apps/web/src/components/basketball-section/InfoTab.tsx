@@ -12,19 +12,23 @@ const InfoTab = ({ gameDetails, teamStats }: { gameDetails?: BasketballGameDetai
       <div className='w-full'>
         <BasketBallScoreCard team1={{
           name: gameDetails.home.name,
-          quarterScores: gameDetails.home.score?.reduce((acc, curr) => {
-            acc[curr.quarter - 1] = curr.points;
-            return acc;
-          }, [0, 0, 0, 0] as number[]) || [0, 0, 0, 0],
+          quarterScores: gameDetails.home.score ? [
+            gameDetails.home.score['quarter1'] || 0,
+            gameDetails.home.score['quarter2'] || 0,
+            gameDetails.home.score['quarter3'] || 0,
+            gameDetails.home.score['quarter4'] || 0
+          ] : [0, 0, 0, 0],
           total: gameDetails.home.points ?? 0,
 
         }}
           team2={{
             name: gameDetails.away.name,
-            quarterScores: gameDetails.away.score?.reduce((acc, curr) => {
-              acc[curr.quarter - 1] = curr.points;
-              return acc;
-            }, [0, 0, 0, 0] as number[]) || [0, 0, 0, 0],
+            quarterScores: gameDetails.away.score ? [
+              gameDetails.away.score['quarter1'] || 0,
+              gameDetails.away.score['quarter2'] || 0,
+              gameDetails.away.score['quarter3'] || 0,
+              gameDetails.away.score['quarter4'] || 0
+            ] : [0, 0, 0, 0],
             total: gameDetails.away.points ?? 0,
 
           }}
@@ -36,7 +40,7 @@ const InfoTab = ({ gameDetails, teamStats }: { gameDetails?: BasketballGameDetai
           ]} />
       </div>
       <div className='w-full'>
-        <VenueGuide venueName={gameDetails.venue.name} />
+        <VenueGuide venueName={gameDetails.venue || 'n/a'} />
       </div>
       <div className="w-full mx-auto">
         <TeamStats teams={teamStats || []} />

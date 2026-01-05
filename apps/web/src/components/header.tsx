@@ -25,7 +25,7 @@ export default function Header() {
 			icon: BasketballIcon,
 			sport: SPORTS.BASKETBALL,
 		},
-		{ to: "/tennis", label: "Tennis", icon: TennisIcon, sport: SPORTS.TENNIS },
+		// { to: "/tennis", label: "Tennis", icon: TennisIcon, sport: SPORTS.TENNIS },
 		// { to: "/boxing", label: "Boxing", icon: BoxingIcon, sport: "boxing" },
 		// { to: "/ufc", label: "UFC", icon: BaseballIcon, sport: "ufc" },
 	] as const;
@@ -63,7 +63,7 @@ export default function Header() {
 	}, [open]);
 
 	return (
-		<div className="sticky not-[lg]:top-0 z-30 w-full pb-4 lg:pb-0 lg:static">
+		<div className="z-30 w-full pb-4 lg:pb-0">
 			<div className="h-[60px] w-full bg-primary px-4 py-1 text-foreground lg:flex lg:h-20 lg:flex-row lg:items-center lg:justify-between lg:px-[10%] lg:py-1">
 				<div className="flex min-w-0 justify-between">
 					<button
@@ -166,9 +166,15 @@ export default function Header() {
 								<ul className="space-y-2">
 									<li onClick={() => {
 										setTab("scores")
-										router.navigate({ to: currentSport === "tennis" ? "/tennis" : currentSport === "basketball" ? "/basketball" : "/" });
+										router.navigate({
+											to: currentSport === "tennis" ? "/tennis" : currentSport === "basketball" ? "/basketball" : "/",
+											search: { league: undefined, sports: currentSport } as any
+										});
 									}}>Scores</li>
-									<li>Favourites (0)</li>
+									<li onClick={() => {
+										setTab("favourites")
+										router.navigate({ to: "/favorites", search: { sports: currentSport } });
+									}}>Favourites (0)</li>
 									<li onClick={() => {
 										setTab("news")
 										router.navigate({ to: "/news", search: { sports: currentSport } });
@@ -195,7 +201,7 @@ export default function Header() {
 										: currentSport === SPORTS.BASKETBALL
 											? "/basketball"
 											: "/";
-								router.navigate({ to: target });
+								router.navigate({ to: target, search: { league: undefined, sports: currentSport } as any });
 							}}
 							className="font-semibold text-secondary text-sm"
 						>

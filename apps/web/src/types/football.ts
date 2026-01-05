@@ -11,7 +11,7 @@ export type FootballSchedule = {
 			name: string;
 		};
 		matches: {
-			sport_event_id: string;
+			id: string;
 			competitors: {
 				home: {
 					id: string;
@@ -43,11 +43,17 @@ export type FootballMatchInfoType = {
 		id: string;
 	};
 	competitors: {
-		id: string;
-		name: string;
-		qualifier: string;
-		score: number;
-	}[];
+		home: {
+			id: string;
+			name: string;
+			score: number;
+		};
+		away: {
+			id: string;
+			name: string;
+			score: number;
+		};
+	};
 	match_info: {
 		date_time: string;
 		stadium: string;
@@ -57,7 +63,7 @@ export type FootballMatchInfoType = {
 		played: string;
 		stoppage_time_played?: string;
 	};
-	status: string;
+	status: string | { name: string; shortname: string };
 	standings?: {
 		id: string;
 		name: string;

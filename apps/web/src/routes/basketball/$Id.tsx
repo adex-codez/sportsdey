@@ -6,6 +6,5 @@ export const Route = createFileRoute('/basketball/$Id')({
 })
 
 function RouteComponent() {
-    const {Id} = Route.useParams()
-  return <div><BasketBallDetailsPage/></div>
+  return <div><BasketBallDetailsPage /></div>
 }

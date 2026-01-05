@@ -10,6 +10,8 @@ import { useMemo } from 'react';
 import FixtureFilterHeaders from '@/shared/FixtureFilterHeaders';
 import { ErrorState } from '@/components/ErrorState';
 import { useApiError } from '@/hooks/useApiError';
+import { useSearch, useNavigate } from '@tanstack/react-router';
+import { EmptyState } from '@/components/EmptyState';
 
 const formatDate = (date: Date) => {
   return {
@@ -20,62 +22,286 @@ const formatDate = (date: Date) => {
 }
 
 const BasketballPage = () => {
+  const search = useSearch({ from: '/basketball/' }) as { league?: string };
+  const navigate = useNavigate();
+  const activeLeague = search.league;
+
   const selectedDateString = useAppSelector((state: RootState) => state.date.selectedDate);
   const selectedDate = new Date(selectedDateString);
   const { year, month, day } = formatDate(selectedDate);
 
   const { data: scheduleData, isLoading, error, isError, refetch } = useQuery({
     queryKey: ['basketball', 'schedule', year, month, day],
-    queryFn: () => apiRequest<BasketballScheduleData>(`basketball/schedule/${year}/${month}/${day}?language=en`),
+    queryFn: () => {
+      const paddedMonth = month.toString().padStart(2, '0');
+      const paddedDay = day.toString().padStart(2, '0');
+      return apiRequest<BasketballScheduleData>(`basketball/schedule?date=${paddedDay}/${paddedMonth}/${year}&language=en`);
+    },
   });
 
   const { isNetworkError } = useApiError({ error, isError, refetch });
 
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const getCountryCode = (name: string): string => {
+    const lowerName = name.toLowerCase();
 
+    // Manual mapping for common basketball leagues/countries
+    const mapping: Record<string, string> = {
+      "usa": "us", "nba": "us", "ncaa": "us", "america": "us",
+      "australia": "au", "australian": "au",
+      "argentina": "ar", "lnb": "ar",
+      "italy": "it", "italian": "it",
+      "spain": "es", "spanish": "es", "acb": "es",
+      "germany": "de", "german": "de", "bbl": "de",
+      "france": "fr", "french": "fr", "lnb pro a": "fr",
+      "greece": "gr", "greek": "gr",
+      "turkey": "tr", "turkish": "tr", "tbsl": "tr",
+      "lithuania": "lt", "lithuanian": "lt", "lkl": "lt",
+      "china": "cn", "chinese": "cn", "cba": "cn",
+      "poland": "pl", "polish": "pl",
+      "south korea": "kr", "korea": "kr", "korean": "kr", "kbl": "kr",
+      "brazil": "br", "brazilian": "br", "nbb": "br",
+      "israel": "il", "israeli": "il",
+      "slovenia": "si", "slovenian": "si",
+      "bulgaria": "bg", "bulgarian": "bg",
+      "serbia": "rs", "serbian": "rs",
+      "croatia": "hr", "croatian": "hr",
+      "russia": "ru", "russian": "ru", "vtb": "ru",
+      "japan": "jp", "japanese": "jp", "b.league": "jp",
+      "philippines": "ph", "philippine": "ph", "pba": "ph",
+      "mexico": "mx", "mexican": "mx", "lnbp": "mx",
+      "puerto rico": "pr", "bsn": "pr",
+      "venezuela": "ve", "lpb": "ve",
+      "uruguay": "uy", "fubb": "uy",
+      "canada": "ca", "canadian": "ca", "cebl": "ca",
+      "great britain": "gb", "british": "gb", "bbl uk": "gb",
+      "belgium": "be", "belgian": "be", "bnxt": "be",
+      "netherlands": "nl", "dutch": "nl",
+      "finland": "fi", "finnish": "fi", "korisliiga": "fi",
+      "sweden": "se", "swedish": "se", "basketligan": "se",
+      "czech republic": "cz", "czech": "cz", "nbl cz": "cz",
+      "hungary": "hu", "hungarian": "hu",
+      "romania": "ro", "romanian": "ro",
+      "latvia": "lv", "latvian": "lv",
+      "estonia": "ee", "estonian": "ee",
+      "ukraine": "ua", "ukrainian": "ua",
+      "georgia": "ge", "georgian": "ge",
+      "montenegro": "me", "montenegrin": "me",
+      "bosnia": "ba", "bosnian": "ba",
+      "macedonia": "mk", "macedonian": "mk",
+      "cyprus": "cy", "cypriot": "cy",
+      "portugal": "pt", "portuguese": "pt",
+      "lebanon": "lb", "lebanese": "lb",
+      "qatar": "qa", "qsl": "qa",
+      "bahrain": "bh",
+      "taiwan": "tw", "p.league+": "tw", "t1 league": "tw",
+      "algeria": "dz", "algerian": "dz",
+      "euroleague": "eu", "eurocup": "eu",
+      "iceland": "is", "icelandic": "is",
+      "norway": "no", "norwegian": "no",
+      "denmark": "dk", "danish": "dk",
+      "england": "gb-eng", "english": "gb-eng",
+      "ireland": "ie", "irish": "ie",
+      "scotland": "gb-sct", "scottish": "gb-sct",
+      "wales": "gb-wls", "welsh": "gb-wls",
+      "austria": "at", "austrian": "at",
+      "switzerland": "ch", "swiss": "ch",
+      "luxembourg": "lu",
+      "slovakia": "sk", "slovak": "sk",
+      "belarus": "by", "belarusian": "by",
+      "moldova": "md",
+      "albania": "al", "albanian": "al",
+      "kosovo": "xk",
+      "armenia": "am",
+      "azerbaijan": "az",
+      "kazakhstan": "kz", "kazakh": "kz",
+      "iran": "ir",
+      "iraq": "iq",
+      "jordan": "jo",
+      "kuwait": "kw",
+      "uae": "ae",
+      "saudi arabia": "sa",
+      "oman": "om",
+      "yemen": "ye",
+      "syria": "sy",
+      "palestine": "ps",
+      "indonesia": "id", "indonesian": "id",
+      "malaysia": "my",
+      "thailand": "th", "thai": "th",
+      "vietnam": "vn", "vietnamese": "vn",
+      "singapore": "sg",
+      "hong kong": "hk",
+      "mongolia": "mn",
+      "new zealand": "nz",
+      "chile": "cl",
+      "colombia": "co",
+      "peru": "pe",
+      "ecuador": "ec",
+      "paraguay": "py",
+      "bolivia": "bo",
+      "panama": "pa",
+      "costa rica": "cr",
+      "dominican republic": "do", "dominican": "do",
+      "cuba": "cu", "cuban": "cu",
+      "jamaica": "jm",
+      "bahamas": "bs",
+      "morocco": "ma", "moroccan": "ma",
+      "tunisia": "tn", "tunisian": "tn",
+      "libya": "ly",
+      "sudan": "sd",
+      "south africa": "za",
+      "nigeria": "ng",
+      "senegal": "sn",
+      "mali": "ml",
+      "ivory coast": "ci",
+      "cameroon": "cm",
+      "rwanda": "rw",
+      "uganda": "ug",
+      "kenya": "ke"
+    };
 
-  const LEAGUE_METADATA: Record<string, { country: string; flag: string }> = {
-    "NBA": { country: "USA", flag: "/USA.png" },
-    "LNB": { country: "Argentina", flag: "/Argentina.png" },
-    "Euroleague": { country: "Europe", flag: "/International.png" },
+    // Try extended fuzzy matching
+    for (const key in mapping) {
+      if (lowerName.includes(key)) return mapping[key];
+    }
+
+    return "";
   };
 
-  const dynamicLeague: League | null = scheduleData ? {
-    id: `league-${scheduleData.league}`,
-    country: LEAGUE_METADATA[scheduleData.league]?.country || "International",
-    leagueName: scheduleData.league,
-    flag: LEAGUE_METADATA[scheduleData.league]?.flag || "/placeholder.png",
-    matches: scheduleData.games.map((game) => {
-      const formatTime = (dateStr?: string) => {
-        if (!dateStr) return undefined;
-        try {
-          return new Date(dateStr).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-        } catch {
-          return undefined;
-        }
-      };
+  const getCompetitionInfo = (name: string): { country: string; flag: string } => {
+    // If name contains specific country keywords, return that.
+    // Otherwise default to the name itself or "International"
+    // And try to find a flag code.
+
+    const code = getCountryCode(name);
+    // Determine a display Country Name. 
+    // This is naive; ideally we'd map "Polish Tauron Basket Liga" -> "Poland".
+    // For now, we rely on the flag.
+    // If code exists, use it.
+
+    let countryDisplay = "International";
+    if (code) {
+      if (code === 'us') countryDisplay = "USA";
+      else if (code === 'au') countryDisplay = "Australia";
+      else if (code === 'es') countryDisplay = "Spain";
+      else if (code === 'fr') countryDisplay = "France";
+      else if (code === 'de') countryDisplay = "Germany";
+      else if (code === 'it') countryDisplay = "Italy";
+      else if (code === 'tr') countryDisplay = "Turkey";
+      else if (code === 'gr') countryDisplay = "Greece";
+      else if (code === 'lt') countryDisplay = "Lithuania";
+      else if (code === 'cn') countryDisplay = "China";
+      else if (code === 'ar') countryDisplay = "Argentina";
+      else if (code === 'br') countryDisplay = "Brazil";
+      else if (code === 'il') countryDisplay = "Israel";
+      else if (code === 'si') countryDisplay = "Slovenia";
+      else if (code === 'bg') countryDisplay = "Bulgaria";
+      else if (code === 'rs') countryDisplay = "Serbia";
+      else if (code === 'hr') countryDisplay = "Croatia";
+      else if (code === 'ru') countryDisplay = "Russia";
+      else if (code === 'jp') countryDisplay = "Japan";
+      else if (code === 'ph') countryDisplay = "Philippines";
+      else if (code === 'pl') countryDisplay = "Poland";
+      else if (code === 'kr') countryDisplay = "South Korea";
+      else if (code === 'qa') countryDisplay = "Qatar";
+      else if (code === 'dz') countryDisplay = "Algeria";
+      else if (code === 'eu') countryDisplay = "Europe";
+      else if (code === 'gb') countryDisplay = "United Kingdom";
+      else if (code === 'pt') countryDisplay = "Portugal";
+      else if (code === 'cz') countryDisplay = "Czech Republic";
+      else if (code === 'ro') countryDisplay = "Romania";
+      else if (code === 'be') countryDisplay = "Belgium";
+      else if (code === 'nl') countryDisplay = "Netherlands";
+      else if (code === 'is') countryDisplay = "Iceland";
+      else if (code === 'lv') countryDisplay = "Latvia";
+      else if (code === 'ee') countryDisplay = "Estonia";
+      else if (code === 'no') countryDisplay = "Norway";
+      else if (code === 'dk') countryDisplay = "Denmark";
+      else if (code === 'fi') countryDisplay = "Finland";
+      else if (code === 'se') countryDisplay = "Sweden";
+      else if (code === 'tw') countryDisplay = "Taiwan";
+      else countryDisplay = name.split(' ')[0] || name;
+    } else {
+      countryDisplay = name.includes('League') ? "International" : name;
+    }
+
+    const flagUrl = code && code !== 'eu'
+      ? `https://flagcdn.com/w40/${code}.png`
+      : code === 'eu' ? '/International.png'
+        : '/International.png';
+
+    return { country: countryDisplay, flag: flagUrl };
+  };
+
+  const activeFilter = useAppSelector((state: RootState) => state.basketball.activeFilter);
+
+  const leagues: League[] = useMemo(() => {
+    if (!scheduleData?.competitions) return [];
+
+    return scheduleData.competitions.map((comp) => {
+      const { country, flag } = getCompetitionInfo(comp.name);
+
+      const mappedMatches = comp.games.map((game) => {
+        const formatTime = (dateStr?: string) => {
+          if (!dateStr) return undefined;
+          try {
+            return new Date(dateStr).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+          } catch {
+            return undefined;
+          }
+        };
+
+        const isLive = !!game.clock || !['closed', 'cancelled', 'scheduled', 'ns'].includes(game.status.toLowerCase());
+        const isFinished = ['closed', 'ft', 'aot'].includes(game.status.toLowerCase());
+        const isUpcoming = !isLive && !isFinished;
+
+        return {
+          id: game.id,
+          team1: game.home.name,
+          team2: game.away.name,
+          score1: game.home.points ?? undefined,
+          score2: game.away.points ?? undefined,
+          status: game.status === 'closed' ? 'FT' : (game.clock ? 'Live' : game.status),
+          time: game.clock || formatTime(game.scheduledTime || game.time) || "00:00",
+          clock: game.clock,
+          isLive,
+          isFinished,
+          isUpcoming
+        };
+      });
+
+
+      const filteredMatches = mappedMatches.filter(match => {
+        if (activeFilter === 'all') return true;
+        if (activeFilter === 'live') return match.isLive;
+        if (activeFilter === 'finished') return match.isFinished;
+        if (activeFilter === 'upcoming') return match.isUpcoming;
+        return true;
+      });
 
       return {
-        id: game.id,
-        team1: game.home.name,
-        team2: game.away.name,
-        score1: game.home.points ?? 0,
-        score2: game.away.points ?? 0,
-        status: game.status === 'closed' ? 'FT' : game.status,
-        time: formatTime(game.scheduledTime || game.time) || "00:00"
+        id: comp.id,
+        country,
+        leagueName: comp.name,
+        flag: flag,
+        matches: filteredMatches
       };
     })
-  } : null;
-
-  const leagues: League[] = dynamicLeague ? [dynamicLeague] : [];
+      .filter(league => league.matches.length > 0)
+      .filter(league => !activeLeague || league.leagueName === activeLeague);
+  }, [scheduleData, activeFilter, activeLeague]);
 
   const counts = useMemo(() => {
-    if (!scheduleData?.games) return { all: 0, live: 0, finished: 0, upcoming: 0 };
-    const games = scheduleData.games;
+    if (!scheduleData?.competitions) return { all: 0, live: 0, finished: 0, upcoming: 0 };
+
+    let allGames: any[] = [];
+    scheduleData.competitions.forEach(c => allGames.push(...c.games));
+
     return {
-      all: games.length,
-      live: games.filter(g => !['closed', 'cancelled', 'scheduled', 'ns'].includes(g.status.toLowerCase())).length,
-      finished: games.filter(g => ['closed', 'ft', 'aot'].includes(g.status.toLowerCase())).length,
-      upcoming: games.filter(g => ['scheduled', 'ns'].includes(g.status.toLowerCase())).length
+      all: allGames.length,
+      live: allGames.filter(g => !!g.clock || !['closed', 'cancelled', 'scheduled', 'ns'].includes(g.status.toLowerCase())).length,
+      finished: allGames.filter(g => ['closed', 'ft', 'aot'].includes(g.status.toLowerCase())).length,
+      upcoming: allGames.filter(g => !g.clock && ['scheduled', 'ns'].includes(g.status.toLowerCase())).length
     };
   }, [scheduleData]);
 
@@ -94,16 +320,38 @@ const BasketballPage = () => {
 
   return (
     <div className='space-y-4 mb-32 lg:mb-0'>
-      <div className='hidden w-full lg:block'>
+      <div className='hidden w-full lg:block sticky top-[-16px] z-10 bg-background/95 backdrop-blur-sm px-1 py-4'>
         <FixtureFilterHeaders counts={counts} />
       </div>
-      {isLoading && <div className="flex flex-col items-center justify-center space-y-2">
+      {isLoading && <div className="flex flex-col items-center justify-center space-y-2 lg:mb-20">
         <Loader2 className="animate-spin" width={24} height={24} />
         <p className="text-gray-500 text-sm">Loading matches...</p>
       </div>}
-      {!isLoading && leagues.map((league, index) => (
+
+      {!isLoading && activeLeague && (
+        <div className="flex items-center justify-between bg-accent/10 border border-accent/20 px-4 py-3 rounded-xl mx-1 mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-primary">Filtered by:</span>
+            <span className="text-sm font-bold text-accent">{activeLeague}</span>
+          </div>
+          <button
+            onClick={() => navigate({ to: '/basketball', search: { league: undefined } })}
+            className="flex items-center gap-1 text-xs font-bold text-accent hover:bg-accent/20 px-2 py-1 rounded-lg transition-colors"
+          >
+            Clear Filter
+          </button>
+        </div>
+      )}
+
+      {!isLoading && leagues.length === 0 && (
+        <EmptyState
+          title={`No ${activeFilter === 'all' ? '' : activeFilter} basketball matches`}
+          description={`We couldn't find any matches matching your criteria for this date.`}
+        />
+      )}
+      {!isLoading && leagues.map((league) => (
         <BasketballAccordionComponentCard
-          key={league.id || index}
+          key={league.id}
           country={league.country}
           league={league.leagueName}
           flag={league.flag}

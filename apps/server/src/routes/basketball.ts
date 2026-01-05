@@ -26,13 +26,7 @@ import {
 
 const basketballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 
-// Enhanced date validation that checks if the date actually exists
 
-// Schemas for the game summary
-
-// Game ID parameter validator
-
-// Create the route with proper parameter names that match the path
 const basketballScheduleRoute = createRoute({
 	method: "get",
 	path: "/schedule",

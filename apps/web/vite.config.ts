@@ -15,4 +15,12 @@ export default defineConfig({
 		viteReact(),
 		svgr(),
 	],
+	server: {
+		proxy: {
+			"/api": {
+				target: "https://sportsdey-server.adeaduratimilehin.workers.dev",
+				changeOrigin: true,
+			},
+		},
+	},
 });

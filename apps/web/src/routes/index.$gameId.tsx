@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FootballMatchInfo } from "@/components/football-match-info";
 import { useFootballMatchInfo } from "@/hooks/use-footmatch-info";
-import { extractTeamInfo } from "@/lib/football";
 import DetailsImageCard from "@/shared/DetailsImageCard";
+import { format } from "date-fns";
+import { getTimeUntilStart, safeParseDate } from "@/utils/timeUtils";
 
 export const Route = createFileRoute("/index/$gameId")({
 	component: RouteComponent,
@@ -12,8 +13,24 @@ export const Route = createFileRoute("/index/$gameId")({
 
 function RouteComponent() {
 	const [tab, setTab] = useState("info");
+	const [countdown, setCountdown] = useState<string>("");
 	const { gameId } = Route.useParams();
 	const { data: gameInfo, isLoading } = useFootballMatchInfo(gameId, "en");
+
+	const matchStatus = typeof gameInfo?.status === 'string'
+		? gameInfo?.status
+		: gameInfo?.status?.shortname;
+
+	useEffect(() => {
+		if (matchStatus === "SCH" && gameInfo?.match_info.date_time) {
+			const updateCountdown = () => {
+				setCountdown(getTimeUntilStart(gameInfo.match_info.date_time));
+			};
+			updateCountdown();
+			const interval = setInterval(updateCountdown, 1000);
+			return () => clearInterval(interval);
+		}
+	}, [gameInfo, matchStatus]);
 	if (isLoading) {
 		return (
 			<div className="flex h-[40%] flex-col items-center justify-center space-y-2">
@@ -34,11 +51,7 @@ function RouteComponent() {
 		switch (tab) {
 			case "info":
 				return (
-					<FootballMatchInfo
-						isLoading={isLoading}
-						info={gameInfo}
-						setTab={setTab}
-					/>
+					<FootballMatchInfo info={gameInfo} setTab={setTab} />
 				);
 			// case "info":
 			// 	return <div>Info</div>;
@@ -50,25 +63,29 @@ function RouteComponent() {
 	return (
 		<div>
 			<DetailsImageCard
-				competitionName={gameInfo?.competition.name}
-				hostTeamLogo=""
-				guestTeamLogo=""
+				competitionName={gameInfo.competition.name}
+				hostTeamLogo="/Profile.png"
+				guestTeamLogo="/Profile.png"
 				hostTeamName={
-					extractTeamInfo("home", "name", gameInfo.competitors) as string
+					gameInfo.competitors.home.name
 				}
 				hostTeamScore={
-					extractTeamInfo("home", "score", gameInfo.competitors) as number
+					gameInfo.competitors.home.score
 				}
 				guestTeamName={
-					extractTeamInfo("away", "name", gameInfo.competitors) as string
+					gameInfo.competitors.away.name
 				}
 				guestTeamScore={
-					extractTeamInfo("away", "score", gameInfo.competitors) as number
+					gameInfo.competitors.away.score
 				}
 				competitionCountry=""
-				matchStatus={gameInfo.status === "finished" ? gameInfo.status : ""}
+				matchStatus={matchStatus === "finished" || matchStatus === "closed" || matchStatus === "FT" ? "FT" : matchStatus || ""}
 				setActiveTab={setTab}
 				activeTab={tab}
+				isUpcoming={matchStatus === "SCH"}
+				countdownText={countdown}
+				scheduledDate={gameInfo.match_info.date_time ? format(safeParseDate(gameInfo.match_info.date_time), "dd/MM/yyyy") : undefined}
+				scheduledTime={gameInfo.match_info.date_time ? format(safeParseDate(gameInfo.match_info.date_time), "HH:mm") : undefined}
 				gameTabs={[
 					{ id: "info", label: "Info" },
 					{ id: "stats", label: "Stats" },

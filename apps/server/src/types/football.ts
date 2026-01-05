@@ -125,12 +125,12 @@ export type TransformedMatchInfo = {
 		home: {
 			id: string;
 			name: string;
-			score: number;
+			score?: number;
 		};
 		away: {
 			id: string;
 			name: string;
-			score: number;
+			score?: number;
 		};
 	};
 	match_info: {
@@ -153,7 +153,7 @@ export type TransformedMatchInfo = {
 
 export type ProxyMatchSummary = {
 	homeTeam: {
-		score: {
+		score?: {
 			regular?: number;
 			halfTime?: number;
 			current?: number;
@@ -164,7 +164,7 @@ export type ProxyMatchSummary = {
 		id: number;
 	};
 	awayTeam: {
-		score: {
+		score?: {
 			regular?: number;
 			halfTime?: number;
 			current?: number;

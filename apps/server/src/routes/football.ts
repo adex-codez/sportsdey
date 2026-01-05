@@ -234,7 +234,7 @@ footballRoute.openapi(
 		const base = c.env.PROXY_URL;
 		const proxySecret = c.env.PROXY_SECRET;
 		const cleanBase = base.replace(/\/+$/, "");
-		const summaryUrl = `${cleanBase}soccer/match/summary?matchId=${id}`;
+		const summaryUrl = `${cleanBase}/soccer/match/summary?matchId=${id}`;
 
 		const cachedData = (await c.env.sportsdey_ns.get(
 			`match_${id}`,
@@ -302,7 +302,6 @@ footballRoute.openapi(
 
 			const standingsUrl = `${cleanBase}/soccer/tournament/standings?tournamentId=${tournamentId}`;
 			const leadersUrl = `${cleanBase}/soccer/tournament/leaderboard/goal?tournamentId=${tournamentId}`;
-			const h2hUrl = `${cleanBase}/soccer/h2h/match/list/recent/?matchId=${id}`;
 			const standingsCacheKey = `standing_${tournamentId}`;
 
 			const [leadersRes, h2hRes, cachedStandings] = await Promise.all([
@@ -341,7 +340,9 @@ footballRoute.openapi(
 
 			let leadersData: any[] = [];
 			if (leadersRes.ok) {
-				leadersData = (await leadersRes.json()) as any[];
+				const lead = (await leadersRes.json())
+				console.log(lead)
+				leadersData =  lead as any[];
 			}
 
 			let h2hData: any = null;
