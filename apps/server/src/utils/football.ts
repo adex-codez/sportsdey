@@ -6,17 +6,14 @@ import type {
 } from "@/types/football";
 
 export function transformProxySchedule(data: any[]): TransformedResponse {
-	// Use a Map to group schedules by competition
 	const competitionMap = new Map<string, CompetitionGroup>();
 
-	// Iterate through each schedule and group by competition
 	data.forEach((matchData) => {
 		const { tournament, homeTeam, awayTeam, status, times, date, id } =
 			matchData;
 
 		const competitionId = tournament.id;
 
-		// Create competition group if it doesn't exist
 		if (!competitionMap.has(competitionId)) {
 			competitionMap.set(competitionId, {
 				competition: {
@@ -27,7 +24,6 @@ export function transformProxySchedule(data: any[]): TransformedResponse {
 			});
 		}
 
-		// Create match object
 		const match: TransformedMatch = {
 			id: id,
 			competitors: {
@@ -43,7 +39,7 @@ export function transformProxySchedule(data: any[]): TransformedResponse {
 				},
 			},
 			start_time: date,
-			match_status: status.shortName === "FT" ? "closed" : status.shortName, // Mapping FT to closed to match previous behavior if needed, or just keep it
+			match_status: status.shortName === "FT" ? "closed" : status.shortName,
 			clock: times?.currentMinute
 				? {
 						played: times.currentMinute.toString(),
@@ -53,10 +49,10 @@ export function transformProxySchedule(data: any[]): TransformedResponse {
 		competitionMap.get(competitionId)!.matches.push(match);
 	});
 
-	// Convert Map to array
+	
 	const competitions = Array.from(competitionMap.values());
 
-	// Calculate total matches count
+	
 	const total_matches = data.length;
 
 	return { competitions, total_matches };
@@ -67,6 +63,7 @@ export function transformProxyMatchInfo(
 	standings?: import("@/types/football").TeamStanding[],
 	top_scorers?: import("@/types/football").TopScorer[],
 ): TransformedMatchInfo {
+	console.log(summary);
 	const transformed: TransformedMatchInfo = {
 		competition: {
 			id: summary.tournament.id.toString(),
@@ -77,12 +74,12 @@ export function transformProxyMatchInfo(
 			home: {
 				id: summary.homeTeam.id.toString(),
 				name: summary.homeTeam.name,
-				score: summary.homeTeam.score.current ?? 0,
+				...(summary.homeTeam.score ? { score: summary.homeTeam.score.current } : { score: 0 }),
 			},
 			away: {
 				id: summary.awayTeam.id.toString(),
 				name: summary.awayTeam.name,
-				score: summary.awayTeam.score.current ?? 0,
+				...(summary.awayTeam.score ? { score: summary.awayTeam.score.current } : { score: 0 }),
 			},
 		},
 		match_info: {
@@ -95,8 +92,6 @@ export function transformProxyMatchInfo(
 		},
 	};
 
-	// Add clock only if status is Live? The example only showed "Full Time".
-	// We'll leave it undefined for now unless we see clock data in the proxy response.
 
 	if (standings) {
 		transformed.standings = standings;
@@ -114,7 +109,7 @@ export function transformProxyStandings(
 ): import("@/types/football").TeamStanding[] {
 	if (!data || data.length === 0) return [];
 
-	const standingGroup = data[0]; // Assuming we took the first one (Group A or similar)
+	const standingGroup = data[0];
 	if (!standingGroup?.standings?.overall) return [];
 
 	return standingGroup.standings.overall
@@ -130,7 +125,7 @@ export function transformProxyStandings(
 			lost: team.lost,
 			goals_for: team.scored,
 			goals_against: team.against,
-			goal_diff: team.average, // Based on user confirmation/example
+			goal_diff: team.average, 
 		}))
 		.sort((a, b) => a.position - b.position);
 }
@@ -149,6 +144,6 @@ export function transformProxyTopScorers(
 			abbreviation: player.team.shortName,
 		},
 		gs: player.totalGoals,
-		assists: 0, // Schema has it but example doesn't.
+		assists: 0, 
 	}));
 }
