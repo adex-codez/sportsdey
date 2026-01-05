@@ -13,7 +13,11 @@ interface DetailsImageCardProps extends DetailsImageProps {
   hostTeamScore: number;
   matchStatus: string;
   isFavorite?: boolean,
-  onFavoriteToggle?: () => {};
+  onFavoriteToggle?: () => void;
+  isHomeFavorite?: boolean;
+  onToggleHomeFavorite?: () => void;
+  isAwayFavorite?: boolean;
+  onToggleAwayFavorite?: () => void;
   activeTab: string
   setActiveTab: (id: string) => void
   gameTabs: { id: string; label: string }[]
@@ -31,6 +35,10 @@ const DetailsImageCard = ({ competitionName,
   hostTeamScore,
   isFavorite = false,
   onFavoriteToggle,
+  isHomeFavorite = false,
+  onToggleHomeFavorite,
+  isAwayFavorite = false,
+  onToggleAwayFavorite,
   activeTab,
   setActiveTab,
   gameTabs,
@@ -64,8 +72,8 @@ const DetailsImageCard = ({ competitionName,
           <div className='w-full flex items-center lg:justify-end'>
 
             <button
-              onClick={onFavoriteToggle}
-              className={`text-xl border-none bg-transparent cursor-pointer transition-colors ${isFavorite ? 'text-yellow-400' : 'text-[#C8C8C8] hover:text-yellow-400'
+              onClick={onToggleHomeFavorite}
+              className={`text-xl border-none bg-transparent cursor-pointer transition-colors ${isHomeFavorite ? 'text-yellow-400' : 'text-[#C8C8C8] hover:text-yellow-400'
                 }`}
             >
               ★
@@ -109,8 +117,8 @@ const DetailsImageCard = ({ competitionName,
           <div className='flex flex-row-reverse items-center w-full lg:justify-end'>
 
             <button
-              onClick={onFavoriteToggle}
-              className={`text-xl border-none bg-transparent cursor-pointer transition-colors ${isFavorite ? 'text-yellow-400' : 'text-[#C8C8C8] hover:text-yellow-400'
+              onClick={onToggleAwayFavorite}
+              className={`text-xl border-none bg-transparent cursor-pointer transition-colors ${isAwayFavorite ? 'text-yellow-400' : 'text-[#C8C8C8] hover:text-yellow-400'
                 }`}
             >
               ★

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { showError } from '@/store/slices/notificationSlice';
 import { ApiError } from '@/lib/api';
@@ -14,8 +14,11 @@ interface UseApiErrorOptions {
 export function useApiError({ error, isError, refetch }: UseApiErrorOptions) {
   const dispatch = useDispatch<AppDispatch>();
 
+  const displayedErrorRef = useRef<Error | null>(null);
+
   useEffect(() => {
-    if (isError && error) {
+    if (isError && error && error !== displayedErrorRef.current) {
+      displayedErrorRef.current = error;
       const apiError = error as ApiError;
 
       dispatch(showError({

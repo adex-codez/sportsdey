@@ -1,8 +1,7 @@
 import DetailsImageCard from '@/shared/DetailsImageCard'
-import { format } from 'date-fns';
-import type { TeamStanding } from '@/types/basketball';
 
-import { type BasketballGameDetails, type BasketballStanding, type BasketballGameStats } from '@/types/api';
+
+import { type BasketballGameDetails } from '@/types/api';
 import { apiRequest } from '@/lib/api';
 import { useQuery } from '@tanstack/react-query';
 import { TeamStats } from './TeamStats';
@@ -11,173 +10,256 @@ import InfoTab from './InfoTab';
 import StandingsTab from './StandingsTab';
 import { VideosTab } from './VideosTab';
 import { useParams } from '@tanstack/react-router';
-import { Loader2 } from 'lucide-react';
+
 import { GameDetailsSkeleton } from './GameDetailsSkeleton';
-import { ErrorState } from '@/components/ErrorState';
-import { useApiError } from '@/hooks/useApiError';
 import { getTimeUntilStart } from '@/utils/timeUtils';
 
-
+import type { TeamStatsData } from './TeamStats';
+import { useFavorites } from '@/hooks/useFavorites';
 
 const BasketBallDetailsPage = () => {
   const { Id } = useParams({ from: '/basketball/$Id' });
   const [activeTab, setActiveTab] = useState('info');
   const [countdown, setCountdown] = useState<string>('');
+  const [standingsConference, setStandingsConference] = useState<'western' | 'eastern'>('western');
 
-  const { data: gameDetails, isLoading: isGameLoading, error: gameError, isError: isGameError, refetch: refetchGame } = useQuery({
+
+  const { isFavoriteTeam, toggleFavoriteTeam, isFavoriteLeague, toggleFavoriteLeague } = useFavorites();
+
+  const { data: gameDetails, isLoading: isGameLoading } = useQuery({
     queryKey: ['basketball', 'game', Id],
     queryFn: () => apiRequest<BasketballGameDetails>(`basketball/game/${Id}`),
     enabled: !!Id,
   });
 
-  const { isNetworkError: isGameNetworkError } = useApiError({
-    error: gameError,
-    isError: isGameError,
-    refetch: refetchGame
-  });
-
-
-  useEffect(() => {
-    if (gameDetails?.status === 'scheduled' && gameDetails.scheduledTime) {
-      const updateCountdown = () => {
-        setCountdown(getTimeUntilStart(gameDetails.scheduledTime!));
-      };
-
-      updateCountdown();
-      const interval = setInterval(updateCountdown, 1000);
-
-      return () => clearInterval(interval);
-    }
-  }, [gameDetails]);
-
-  const { data: gameStats, isLoading: isStatsLoading } = useQuery({
+  const { data: statsData } = useQuery({
     queryKey: ['basketball', 'game', Id, 'stats'],
-    queryFn: () => apiRequest<BasketballGameStats>(`basketball/game/${Id}/stats`),
+    queryFn: () => apiRequest<any>(`basketball/game/${Id}/stats`),
     enabled: !!Id,
   });
 
-  const mapPlayer = (player: any) => {
-    const s = player.statistics;
-    const pts = (2 * s.field_goals_made) + s.three_points_made + s.free_throws_made;
+  const tournamentId = gameDetails?.tournament?.id;
+  const { data: standingsData } = useQuery({
+    queryKey: ['basketball', 'standings', tournamentId, standingsConference],
+    queryFn: () => apiRequest<any>(`basketball/standings/${tournamentId}`),
+    enabled: !!tournamentId,
+  });
+
+
+
+  const homeTeamId = gameDetails?.home.name || '';
+  const awayTeamId = gameDetails?.away.name || '';
+
+  const isHomeFavorite = isFavoriteTeam(homeTeamId);
+  const isAwayFavorite = isFavoriteTeam(awayTeamId);
+
+  const handleToggleFavorite = (teamName: string, logo: string = '/Profile.png') => {
+    const tournamentName = gameDetails?.tournament?.name || "";
+    const country = getCountryName(tournamentName);
+    const flag = getCountryCode(tournamentName) ? `https://flagcdn.com/w40/${getCountryCode(tournamentName)}.png` : undefined;
+
+    toggleFavoriteTeam({
+      id: teamName,
+      name: teamName,
+      logo,
+      sport: 'basketball',
+      tournament: tournamentName,
+      tournamentId: gameDetails?.tournament?.id?.toString(),
+      country,
+      flag
+    });
+  };
+
+  const handleToggleFavoriteLeague = () => {
+    if (!gameDetails?.tournament) return;
+
+    const tournamentName = gameDetails.tournament.name || "";
+    const country = getCountryName(tournamentName);
+    const flag = getCountryCode(tournamentName) ? `https://flagcdn.com/w40/${getCountryCode(tournamentName)}.png` : undefined;
+
+    toggleFavoriteLeague({
+      id: tournamentName,
+      name: tournamentName,
+      country,
+      flag,
+      sport: 'basketball'
+    });
+  };
+
+
+  const getCountryCode = (name: string): string => {
+    const lowerName = name.toLowerCase();
+    const mapping: Record<string, string> = {
+      "usa": "us", "nba": "us", "ncaa": "us", "america": "us",
+      "turkey": "tr", "turkish": "tr", "tbsl": "tr", "bsl": "tr", "efes": "tr",
+      "spain": "es", "spanish": "es", "acb": "es",
+      "germany": "de", "german": "de", "bbl": "de",
+      "france": "fr", "french": "fr", "lnb": "fr",
+      "italy": "it", "italian": "it", "lba": "it",
+      "greece": "gr", "greek": "gr",
+      "australia": "au", "australian": "au",
+      "china": "cn", "chinese": "cn", "cba": "cn",
+      "philippines": "ph", "philippine": "ph", "pba": "ph",
+      "japan": "jp", "japanese": "jp", "b.league": "jp",
+    };
+    for (const key in mapping) {
+      if (lowerName.includes(key)) return mapping[key];
+    }
+    return "";
+  };
+
+  const getCountryName = (name: string): string => {
+    const code = getCountryCode(name);
+    if (code === 'tr') return 'Turkey';
+    if (code === 'us') return 'USA';
+    if (code === 'de') return 'Germany';
+    if (code === 'es') return 'Spain';
+    if (code === 'fr') return 'France';
+    if (code === 'it') return 'Italy';
+    if (code === 'gr') return 'Greece';
+    return name || "International";
+  };
+
+
+  const mapStatsData = (apiStats: any, side: 'home' | 'away'): TeamStatsData => {
+    const teamData = apiStats?.[side];
+    const teamName = gameDetails?.[side].name || '';
+    const teamLogo = "/Profile.png";
+
+    if (!teamData) {
+      return {
+        teamName,
+        teamLogo,
+        starters: [],
+        bench: [],
+        totals: {
+          pts: 0, fg: "0/0", fgPct: 0, threePt: "0/0", threePtPct: 0, ft: "0/0", ftPct: 0,
+          reb: 0, oreb: 0, dreb: 0, ast: 0, stl: 0, blk: 0, to: 0, pf: 0, min: "0"
+        } as any
+      }
+    }
+
+    const mapPlayerWithMins = (p: any) => {
+      const formatMins = (min: number) => {
+        if (min === 0) return "00:00";
+        const m = Math.floor(min);
+        const s = Math.floor((min - m) * 60);
+        return `${m}:${s.toString().padStart(2, '0')}`;
+      };
+
+      const s = p.statistics;
+      const pts = (2 * s.field_goals_made) + s.three_points_made + s.free_throws_made;
+
+      return {
+        name: p.full_name,
+        number: '-',
+        pts,
+        fg: `${s.field_goals_made}/${s.field_goals_att}`,
+        threePt: `${s.three_points_made}/${s.three_points_att}`,
+        ft: `${s.free_throws_made}/${s.free_throws_att}`,
+        reb: s.rebounds,
+        ast: s.assists,
+        to: s.turnovers,
+        stl: s.steals,
+        blk: s.blocks,
+        oreb: s.offensive_rebounds,
+        dreb: s.defensive_rebounds,
+        pf: s.personal_fouls,
+        min: formatMins(p.pls_min),
+        plusMinus: 0
+      }
+    }
+
+    const starters = teamData.starters.map(mapPlayerWithMins);
+    const bench = teamData.bench.map(mapPlayerWithMins);
+
+    const rawPlayers = [...teamData.starters, ...teamData.bench];
+    const agg = rawPlayers.reduce((acc, player) => {
+      const s = player.statistics;
+      const pts = (2 * s.field_goals_made) + s.three_points_made + s.free_throws_made;
+
+      acc.pts += pts;
+      acc.fgm += s.field_goals_made;
+      acc.fga += s.field_goals_att;
+      acc.tpm += s.three_points_made;
+      acc.tpa += s.three_points_att;
+      acc.ftm += s.free_throws_made;
+      acc.fta += s.free_throws_att;
+      acc.reb += s.rebounds;
+      acc.oreb += s.offensive_rebounds;
+      acc.dreb += s.defensive_rebounds;
+      acc.ast += s.assists;
+      acc.stl += s.steals;
+      acc.blk += s.blocks;
+      acc.to += s.turnovers;
+      return acc;
+    }, { pts: 0, fgm: 0, fga: 0, tpm: 0, tpa: 0, ftm: 0, fta: 0, reb: 0, oreb: 0, dreb: 0, ast: 0, stl: 0, blk: 0, to: 0 });
+
+    const formatPct = (made: number, att: number) => att > 0 ? Math.round((made / att) * 100) : 0;
+
     return {
-      name: player.full_name,
-      number: '-',
-      pts,
-      fg: `${s.field_goals_made}/${s.field_goals_att}`,
-      threePt: `${s.three_points_made}/${s.three_points_att}`,
-      ft: `${s.free_throws_made}/${s.free_throws_att}`,
-      reb: s.rebounds || (s.offensive_rebounds + s.defensive_rebounds),
-      ast: s.assists,
-      to: s.turnovers,
-      stl: s.steals,
-      blk: s.blocks,
-      oreb: s.offensive_rebounds,
-      dreb: s.defensive_rebounds,
-      pf: s.personal_fouls,
-      min: s.minutes_played || "0",
-      plusMinus: s.pls_min || 0
+      teamName,
+      teamLogo,
+      starters,
+      bench,
+      totals: {
+        pts: agg.pts,
+        fg: `${agg.fgm}/${agg.fga}`,
+        fgPct: formatPct(agg.fgm, agg.fga),
+        threePt: `${agg.tpm}/${agg.tpa}`,
+        threePtPct: formatPct(agg.tpm, agg.tpa),
+        ft: `${agg.ftm}/${agg.fta}`,
+        ftPct: formatPct(agg.ftm, agg.fta),
+        reb: agg.reb,
+        oreb: agg.oreb,
+        dreb: agg.dreb,
+        ast: agg.ast,
+        stl: agg.stl,
+        blk: agg.blk,
+        to: agg.to,
+        pf: 0,
+        min: 240
+      }
     };
   };
 
-  const mapTeamToStats = (teamDetails: any) => {
-    if (!teamDetails?.statistics) return {
-      teamName: teamDetails?.name || '',
-      teamLogo: "/Profile.png",
-      starters: [],
-      bench: [],
-      totals: { pts: 0, fg: '-', threePt: '-', ft: '-', reb: 0, ast: 0, to: 0, stl: 0, blk: 0, oreb: 0, dreb: 0, pf: 0, min: 0, fgPct: 0, threePtPct: 0, ftPct: 0 }
-    };
-
-    const s = teamDetails.statistics;
-    const totals = {
-      pts: teamDetails.points,
-      fg: `${s.field_goals_made}/${s.field_goals_att}`,
-      fgPct: s.field_goals_pct,
-      threePt: `${s.three_points_made}/${s.three_points_att}`,
-      threePtPct: s.three_points_pct,
-      ft: `${s.free_throws_made}/${s.free_throws_att}`,
-      ftPct: s.free_throws_pct,
-      reb: s.rebounds || (s.offensive_rebounds + s.defensive_rebounds),
-      oreb: s.offensive_rebounds,
-      dreb: s.defensive_rebounds,
-      ast: s.assists,
-      stl: s.steals,
-      blk: s.blocks,
-      to: s.turnovers,
-      pf: 0,
-      min: 240
-    };
-
-    return {
-      teamName: teamDetails.name,
-      teamLogo: "/Profile.png",
-      starters: teamDetails.starters?.map(mapPlayer) || [],
-      bench: teamDetails.bench?.map(mapPlayer) || [],
-      totals
-    };
-  };
-
-  const mappedTeamStats = gameStats ? [
-    mapTeamToStats(gameStats.home),
-    mapTeamToStats(gameStats.away)
+  const mappedTeamStats = statsData && gameDetails ? [
+    mapStatsData(statsData, 'home'),
+    mapStatsData(statsData, 'away')
   ] : [];
-
 
   const gameTabs = [
     { id: 'info', label: 'Info' },
     { id: 'standings', label: 'Standings' },
-    { id: 'team-stats', label: 'Team Stats' },
+    { id: 'team_stats', label: 'Team Stats' },
     { id: 'videos', label: 'Videos' },
-    { id: 'news', label: 'News' }
   ];
-
-  const [standingsLimit, setStandingsLimit] = useState(13);
-  const [selectedConference, setSelectedConference] = useState<'western' | 'eastern'>('western');
-
-  const { data: standingsData, isLoading: isStandingsLoading } = useQuery({
-    queryKey: ['basketball', 'standings', '2025', selectedConference, standingsLimit],
-    queryFn: () => apiRequest<BasketballStanding[]>(`basketball/standings/2025?conference=${selectedConference}&limit=${standingsLimit}&offset=0`),
-  });
-
-  const teamStandings: TeamStanding[] = standingsData?.map((team, index) => ({
-    position: index + 1,
-    name: team.name,
-    played: team.played,
-    wins: team.wins,
-    losses: team.losses,
-    streak: String(team.streak),
-    gamesBehind: String(team.gb),
-    diff: String(team.diff),
-    pct: String(team.win_pct),
-    lastFiveResults: []
-  })) || [];
-
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'info':
-        return (
-          <InfoTab gameDetails={gameDetails} teamStats={mappedTeamStats} />
-        );
-
+        return <InfoTab gameDetails={gameDetails} teamStats={mappedTeamStats} />;
       case 'standings':
-        return (
-          isStandingsLoading ? <div className="text-center text-gray-500">Loading standings...</div> :
-            <StandingsTab
-              teams={teamStandings}
-              onSeeAllClick={standingsLimit <= 13 ? () => setStandingsLimit(30) : undefined}
-              conference={selectedConference}
-              onConferenceChange={setSelectedConference}
-              homeTeam={gameDetails?.home.name}
-              awayTeam={gameDetails?.away.name}
-            />
-        );
 
-      case 'team-stats':
-        return (
-          <TeamStats teams={mappedTeamStats} isLoading={isStatsLoading} />
-        );
+        const isUSLeague = gameDetails?.tournament?.name?.toLowerCase().includes("us") ||
+          gameDetails?.tournament?.name?.toLowerCase().includes("nba");
 
+        return (
+          <StandingsTab
+            teams={standingsData?.data || []}
+            conference={standingsConference}
+            onConferenceChange={setStandingsConference}
+            homeTeam={gameDetails?.home.name}
+            awayTeam={gameDetails?.away.name}
+            hideConference={isUSLeague}
+          />
+        );
+      case 'team_stats':
+        return (
+          <TeamStats
+            teams={mappedTeamStats}
+          />
+        );
       case 'videos':
         return (
           <VideosTab
@@ -185,88 +267,62 @@ const BasketBallDetailsPage = () => {
             awayTeam={gameDetails?.away.name || ''}
           />
         );
-
-      case 'news':
-        return (
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold text-white">Latest News</h3>
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-gray-800 rounded-lg p-4 hover:bg-gray-750 transition cursor-pointer">
-                  <h4 className="text-white font-medium mb-1">Post-Game Analysis: Bulls Dominate</h4>
-                  <p className="text-gray-400 text-sm mb-2">
-                    Chicago Bulls showcase stellar performance in their victory over Detroit Pistons...
-                  </p>
-                  <p className="text-gray-500 text-xs">2 hours ago</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-
       default:
         return null;
     }
   };
 
-  if (isGameError) {
-    return (
-      <div className='w-full max-w-screen space-y-3 pb-28 lg:pb-10'>
-        <ErrorState
-          message={isGameNetworkError ? 'Network Error' : 'Failed to load game details'}
-          description={isGameNetworkError ? 'Please check your internet connection' : 'Unable to load game information'}
-          onRetry={refetchGame}
-          isNetworkError={isGameNetworkError}
-        />
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (gameDetails?.status === 'scheduled' || !gameDetails?.status.toLowerCase().includes('full')) {
+      if (gameDetails?.date) {
+        const updateCountdown = () => {
+          setCountdown(getTimeUntilStart(gameDetails.date));
+        };
+        updateCountdown();
+        const interval = setInterval(updateCountdown, 1000);
+        return () => clearInterval(interval);
+      }
+    }
+  }, [gameDetails]);
 
   if (isGameLoading) {
-    return <div className='w-full'>
-      <div className='w-full h-screen max-w-full space-y-3 pb-28 lg:pb-10 flex items-center justify-center md:hidden'>
-        <Loader2 className="animate-spin" width={48} height={48} />
-
-      </div>
-      <div className='hidden md:block'>
-        <GameDetailsSkeleton />
-      </div>
-    </div>
+    return <GameDetailsSkeleton />;
   }
 
   return (
-    <div className='w-full max-w-screen space-y-3 pb-28 lg:pb-10'>
-      <div className='py-4 lg:py-0'>
-        {gameDetails && (
-          <DetailsImageCard
-            gameTabs={gameTabs}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            competitionCountry={"USA"}
-            competitionName={"NBA"}
-            hostTeamName={gameDetails.home.name}
-            hostTeamLogo='/Profile.png'
-            matchStatus={
-              gameDetails.status === 'scheduled' && gameDetails.scheduledTime
-                ? format(new Date(gameDetails.scheduledTime), 'HH:mm')
-                : gameDetails.status === 'closed'
-                  ? 'FT'
-                  : gameDetails.status
-            }
-            hostTeamScore={gameDetails.home.points}
-            guestTeamScore={gameDetails.away.points}
-            guestTeamLogo='/Profile.png'
-            guestTeamName={gameDetails.away.name}
-            isUpcoming={gameDetails.status === 'scheduled'}
-            countdownText={countdown}
-          />
-        )}
-      </div>
-      <div>
+    <div className="flex flex-col gap-4">
+      {gameDetails && (
+        <DetailsImageCard
+          gameTabs={gameTabs}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          competitionCountry={getCountryCode(gameDetails.tournament?.name || "") === 'tr' ? 'Turkey' : gameDetails.tournament?.name || "International"}
+          competitionName={gameDetails.tournament?.name || ""}
+          hostTeamName={gameDetails.home.name}
+          hostTeamLogo='/Profile.png'
+          matchStatus={
+            gameDetails.status
+          }
+          hostTeamScore={gameDetails.home.points}
+          guestTeamScore={gameDetails.away.points}
+          guestTeamLogo='/Profile.png'
+          guestTeamName={gameDetails.away.name}
+          isUpcoming={!gameDetails.status.toLowerCase().includes('full') && !gameDetails.status.toLowerCase().includes('ft')}
+          countdownText={countdown}
+          isHomeFavorite={isHomeFavorite}
+          isAwayFavorite={isAwayFavorite}
+          onToggleHomeFavorite={() => gameDetails && handleToggleFavorite(gameDetails.home.name)}
+          onToggleAwayFavorite={() => gameDetails && handleToggleFavorite(gameDetails.away.name)}
+          isFavorite={isFavoriteLeague(gameDetails.tournament?.name || "")}
+          onFavoriteToggle={handleToggleFavoriteLeague}
+        />
+      )}
+      <div className="mt-4">
         {renderTabContent()}
       </div>
     </div>
-  )
+  );
+
 }
 
 export default BasketBallDetailsPage

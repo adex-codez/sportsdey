@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function GameDetailsSkeleton() {
     return (
-        <div className="w-full max-w-screen space-y-3 pb-28 lg:pb-10 bg-gray-50/50">
+        <div className="w-full space-y-3 pb-28 lg:pb-10 bg-gray-50/50">
             {/* Main Card Skeleton - Wrapper matches BasketBallDetailsPage */}
             <div className='py-4 lg:py-0'>
                 <div className="h-64 w-full rounded-t-2xl bg-gray-900 relative overflow-hidden mx-auto">
@@ -48,9 +48,9 @@ export function GameDetailsSkeleton() {
             </div>
 
             {/* Tab Content Below */}
-            <div className="w-full max-w-4xl mx-auto px-4 space-y-5">
+            <div className="w-full px-4 space-y-5">
                 {/* Score Summary */}
-                <div className="bg-white rounded-2xl p-5 shadow-sm space-y-4">
+                <div className="w-full rounded-2xl p-5 shadow-sm space-y-4">
                     <div className="flex justify-between items-center pb-3 border-b border-gray-200">
                         <Skeleton className="h-5 w-32 bg-gray-200" />
                         <Skeleton className="h-5 w-12 bg-gray-200 rounded-full" />
