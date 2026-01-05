@@ -65,6 +65,16 @@ export const TransformedMatchInfoSchema = z.object({
 			}),
 		)
 		.optional(),
+	h2h: z
+		.array(
+			z.object({
+				id: z.string(),
+				date: z.string(),
+				homeTeamResult: z.enum(["W", "D", "L"]),
+				awayTeamResult: z.enum(["W", "D", "L"]),
+			}),
+		)
+		.optional(),
 	// last5_home_results: z
 	// 	.array(
 	// 		z.object({

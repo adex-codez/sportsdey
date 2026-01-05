@@ -1,5 +1,6 @@
 import type {
 	CompetitionGroup,
+	H2HMatch,
 	TransformedMatch,
 	TransformedMatchInfo,
 	TransformedResponse,
@@ -66,6 +67,7 @@ export function transformProxyMatchInfo(
 	summary: import("@/types/football").ProxyMatchSummary,
 	standings?: import("@/types/football").TeamStanding[],
 	top_scorers?: import("@/types/football").TopScorer[],
+	h2h?: H2HMatch[],
 ): TransformedMatchInfo {
 	const transformed: TransformedMatchInfo = {
 		competition: {
@@ -103,6 +105,9 @@ export function transformProxyMatchInfo(
 	}
 	if (top_scorers) {
 		transformed.top_scorers = top_scorers;
+	}
+	if (h2h && h2h.length > 0) {
+		transformed.h2h = h2h;
 	}
 
 	return transformed;
@@ -151,4 +156,49 @@ export function transformProxyTopScorers(
 		gs: player.totalGoals,
 		assists: 0, // Schema has it but example doesn't.
 	}));
+}
+
+/**
+ * Transform H2H data from proxy API.
+ * Results are calculated relative to the current match's home/away teams.
+ */
+export function transformProxyH2H(
+	data: any,
+	homeTeamId: string,
+	awayTeamId: string,
+): H2HMatch[] {
+	if (!data?.h2h?.results?.overall) return [];
+
+	const matches = data.h2h.results.overall.slice(0, 5);
+
+	return matches.map((match: any) => {
+		const matchHomeId = match.homeTeam.id.toString();
+		const homeScore = match.homeTeam.score?.current ?? 0;
+		const awayScore = match.awayTeam.score?.current ?? 0;
+
+		// Determine result for each team in this historical match
+		const getResult = (teamId: string): "W" | "D" | "L" => {
+			let teamScore: number;
+			let opponentScore: number;
+
+			if (teamId === matchHomeId) {
+				teamScore = homeScore;
+				opponentScore = awayScore;
+			} else {
+				teamScore = awayScore;
+				opponentScore = homeScore;
+			}
+
+			if (teamScore > opponentScore) return "W";
+			if (teamScore < opponentScore) return "L";
+			return "D";
+		};
+
+		return {
+			id: match.id.toString(),
+			date: match.date,
+			homeTeamResult: getResult(homeTeamId), // Result for current match's home team
+			awayTeamResult: getResult(awayTeamId), // Result for current match's away team
+		};
+	});
 }
