@@ -11,7 +11,7 @@ export type FootballSchedule = {
 			name: string;
 		};
 		matches: {
-			sport_event_id: string;
+			id: string;
 			competitors: {
 				home: {
 					id: string;

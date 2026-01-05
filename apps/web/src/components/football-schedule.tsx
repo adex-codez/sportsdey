@@ -181,7 +181,7 @@ const FootballSchedule = () => {
 									{competition.matches.map((match, index) => (
 										<Link
 											to="/index/$gameId"
-											params={{ gameId: match.sport_event_id }}
+											params={{ gameId: match.id }}
 											key={`${index}+1`}
 										>
 											<div className="flex flex-wrap items-center justify-between gap-4 border-gray-100 border-b px-4 py-4 hover:bg-gray-50">
