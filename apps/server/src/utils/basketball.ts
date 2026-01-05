@@ -224,12 +224,12 @@ export const transformGameSummary = (
 
 		return {
 			name: teamSummary.name,
-			points: teamSummary.score.current,
+			points: teamSummary.score ? teamSummary.score.current : 0,
 			score: {
-				quarter1: teamSummary.score.quarter1,
-				quarter2: teamSummary.score.quarter2,
-				quarter3: teamSummary.score.quarter3,
-				quarter4: teamSummary.score.quarter4,
+				quarter1: teamSummary.score ? teamSummary.score.quarter1 : 0,
+				quarter2: teamSummary.score ? teamSummary.score.quarter2 : 0,
+				quarter3: teamSummary.score ? teamSummary.score.quarter3 : 0,
+				quarter4: teamSummary.score ? teamSummary.score.quarter4 : 0,
 			},
 			starters,
 			bench,

@@ -47,8 +47,8 @@ function RouteComponent() {
 		<div>
 			<DetailsImageCard
 				competitionName={gameInfo?.competition.name}
-				hostTeamLogo=""
-				guestTeamLogo=""
+				hostTeamLogo="/Profile.png"
+				guestTeamLogo="/Profile.png"
 				hostTeamName={
 					gameInfo.competitors.home.name
 				}

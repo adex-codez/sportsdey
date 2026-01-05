@@ -119,7 +119,7 @@ export const FootballMatchInfo = ({
 				))}
 			</div> */}
 			<div className="rounded-2xl bg-white">
-				<p className="font-semibold">Match Info</p>
+				<p className="font-semibold px-4 py-2">Match Info</p>
 			</div>
 		</div>
 	);
