@@ -52,7 +52,7 @@ const Sidebar = () => {
 									: currentSport === SPORTS.BASKETBALL
 										? "/basketball"
 										: "/";
-							navigate({ to: target });
+							navigate({ to: target, search: { league: undefined, sports: currentSport } as any });
 						}}
 					>
 						Scores

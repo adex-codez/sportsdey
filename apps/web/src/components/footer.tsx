@@ -53,6 +53,7 @@ const Footer = () => {
 										: currentSport === "basketball"
 											? "/basketball"
 											: "/",
+								search: { league: undefined, sports: currentSport } as any,
 							});
 						}
 						if (item === "favourites") {
@@ -68,7 +69,7 @@ const Footer = () => {
 							});
 						}
 						if (item === "betting") {
-							router.navigate({ to: "/betting" });
+							router.navigate({ to: "/betting", search: {} as any });
 						}
 						// if(item === "lives") {
 						// 		router.navigate({ to: "/lives" });

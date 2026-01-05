@@ -10,6 +10,8 @@ import { useMemo } from 'react';
 import FixtureFilterHeaders from '@/shared/FixtureFilterHeaders';
 import { ErrorState } from '@/components/ErrorState';
 import { useApiError } from '@/hooks/useApiError';
+import { useSearch, useNavigate } from '@tanstack/react-router';
+import { X } from 'lucide-react';
 
 const formatDate = (date: Date) => {
   return {
@@ -20,6 +22,10 @@ const formatDate = (date: Date) => {
 }
 
 const BasketballPage = () => {
+  const search = useSearch({ from: '/basketball/' }) as { league?: string };
+  const navigate = useNavigate();
+  const activeLeague = search.league;
+
   const selectedDateString = useAppSelector((state: RootState) => state.date.selectedDate);
   const selectedDate = new Date(selectedDateString);
   const { year, month, day } = formatDate(selectedDate);
@@ -214,14 +220,14 @@ const BasketballPage = () => {
       else if (code === 'fi') countryDisplay = "Finland";
       else if (code === 'se') countryDisplay = "Sweden";
       else if (code === 'tw') countryDisplay = "Taiwan";
-      else countryDisplay = name.split(' ')[0] || name; // Fallback to first word of league
+      else countryDisplay = name.split(' ')[0] || name;
     } else {
       countryDisplay = name.includes('League') ? "International" : name;
     }
 
     const flagUrl = code && code !== 'eu'
       ? `https://flagcdn.com/w40/${code}.png`
-      : code === 'eu' ? '/International.png' // Fallback for Europe/Intl if needed
+      : code === 'eu' ? '/International.png'
         : '/International.png';
 
     return { country: countryDisplay, flag: flagUrl };
@@ -264,7 +270,7 @@ const BasketballPage = () => {
         };
       });
 
-      // Apply filter
+
       const filteredMatches = mappedMatches.filter(match => {
         if (activeFilter === 'all') return true;
         if (activeFilter === 'live') return match.isLive;
@@ -280,8 +286,10 @@ const BasketballPage = () => {
         flag: flag,
         matches: filteredMatches
       };
-    }).filter(league => league.matches.length > 0); // Hide leagues with no matches after filtering
-  }, [scheduleData, activeFilter]);
+    })
+      .filter(league => league.matches.length > 0)
+      .filter(league => !activeLeague || league.leagueName === activeLeague);
+  }, [scheduleData, activeFilter, activeLeague]);
 
   const counts = useMemo(() => {
     if (!scheduleData?.competitions) return { all: 0, live: 0, finished: 0, upcoming: 0 };
@@ -315,10 +323,26 @@ const BasketballPage = () => {
       <div className='hidden w-full lg:block'>
         <FixtureFilterHeaders counts={counts} />
       </div>
-      {isLoading && <div className="flex flex-col items-center justify-center space-y-2">
+      {isLoading && <div className="flex flex-col items-center justify-center space-y-2 lg:mb-20">
         <Loader2 className="animate-spin" width={24} height={24} />
         <p className="text-gray-500 text-sm">Loading matches...</p>
       </div>}
+
+      {activeLeague && !isLoading && (
+        <div className="flex items-center justify-between bg-accent/10 border border-accent/20 px-4 py-3 rounded-xl mx-1">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-primary">Filtered by:</span>
+            <span className="text-sm font-bold text-accent">{activeLeague}</span>
+          </div>
+          <button
+            onClick={() => navigate({ to: '/basketball', search: { league: undefined } })}
+            className="flex items-center gap-1 text-xs font-bold text-accent hover:bg-accent/20 px-2 py-1 rounded-lg transition-colors"
+          >
+            <X className="w-3 h-3" />
+            Clear Filter
+          </button>
+        </div>
+      )}
       {!isLoading && leagues.map((league) => (
         <BasketballAccordionComponentCard
           key={league.id}
