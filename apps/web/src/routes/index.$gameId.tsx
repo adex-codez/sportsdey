@@ -34,11 +34,7 @@ function RouteComponent() {
 		switch (tab) {
 			case "info":
 				return (
-					<FootballMatchInfo
-						isLoading={isLoading}
-						info={gameInfo}
-						setTab={setTab}
-					/>
+					<FootballMatchInfo info={gameInfo} setTab={setTab} />
 				);
 			// case "info":
 			// 	return <div>Info</div>;
@@ -54,16 +50,16 @@ function RouteComponent() {
 				hostTeamLogo=""
 				guestTeamLogo=""
 				hostTeamName={
-					extractTeamInfo("home", "name", gameInfo.competitors) as string
+					gameInfo.competitors.home.name
 				}
 				hostTeamScore={
-					extractTeamInfo("home", "score", gameInfo.competitors) as number
+					gameInfo.competitors.home.score
 				}
 				guestTeamName={
-					extractTeamInfo("away", "name", gameInfo.competitors) as string
+					gameInfo.competitors.away.name
 				}
 				guestTeamScore={
-					extractTeamInfo("away", "score", gameInfo.competitors) as number
+					gameInfo.competitors.away.score
 				}
 				competitionCountry=""
 				matchStatus={gameInfo.status === "finished" ? gameInfo.status : ""}

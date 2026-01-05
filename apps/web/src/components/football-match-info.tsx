@@ -3,11 +3,10 @@ import type { FootballMatchInfoType } from "@/types/football";
 
 export const FootballMatchInfo = ({
 	info,
-	isLoading,
+	setTab,
 }: {
 	info: FootballMatchInfoType;
 	setTab: (tab: string) => void;
-	isLoading: boolean;
 }) => {
 	return (
 		<div className="space-y-4">
@@ -45,7 +44,7 @@ export const FootballMatchInfo = ({
 					</div>
 				))}
 			</div>
-			<div className="rounded-2xl bg-white">
+			{/* <div className="rounded-2xl bg-white">
 				<div className="flex px-4 py-2 font-semibold">
 					<p className="truncate"> Form(Most Recent at Right)</p>
 				</div>
@@ -55,7 +54,6 @@ export const FootballMatchInfo = ({
 						key={competitor.id}
 						className="flex items-center justify-between border-gray-200 border-t px-4 py-2"
 					>
-						{/* Team name — allow it to shrink */}
 						<p className="min-w-0 overflow-hidden truncate text-primary">
 							{competitor.name}
 						</p>
@@ -119,7 +117,7 @@ export const FootballMatchInfo = ({
 						</div>
 					</div>
 				))}
-			</div>
+			</div> */}
 			<div className="rounded-2xl bg-white">
 				<p className="font-semibold">Match Info</p>
 			</div>
