@@ -166,7 +166,10 @@ export default function Header() {
 								<ul className="space-y-2">
 									<li onClick={() => {
 										setTab("scores")
-										router.navigate({ to: currentSport === "tennis" ? "/tennis" : currentSport === "basketball" ? "/basketball" : "/" });
+										router.navigate({
+											to: currentSport === "tennis" ? "/tennis" : currentSport === "basketball" ? "/basketball" : "/",
+											search: { league: undefined, sports: currentSport } as any
+										});
 									}}>Scores</li>
 									<li onClick={() => {
 										setTab("favourites")
@@ -198,7 +201,7 @@ export default function Header() {
 										: currentSport === SPORTS.BASKETBALL
 											? "/basketball"
 											: "/";
-								router.navigate({ to: target });
+								router.navigate({ to: target, search: { league: undefined, sports: currentSport } as any });
 							}}
 							className="font-semibold text-secondary text-sm"
 						>
