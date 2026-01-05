@@ -117,6 +117,7 @@ export const transformProxySchedule = (
 					alias: game.awayTeam?.shortName || "",
 					points: game.awayTeam?.score?.current ?? null,
 				},
+				...(game.gameClock ? { clock: `${game.gameClock.minute}:${game.gameClock.second}` } : {}),
 			});
 
 			return acc;
@@ -141,9 +142,10 @@ const mapGameStatus = (
 	| "cancelled" => {
 	switch (statusShortName) {
 		case "FT":
+		case "AET":
 		case "AOT":
 			return "closed";
-		case "NS":
+		case "SCH":
 			return "scheduled";
 		case "1Q":
 		case "2Q":
