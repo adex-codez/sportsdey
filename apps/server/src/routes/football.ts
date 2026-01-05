@@ -11,6 +11,7 @@ import {
 // import type { StandingsRes, TeamStanding } from "@/types/football";
 // import { fetchWithErrorHandling } from "@/utils";
 import {
+	transformProxyH2H,
 	transformProxyMatchInfo,
 	transformProxySchedule,
 	transformProxyStandings,
@@ -303,8 +304,11 @@ footballRoute.openapi(
 			const leadersUrl = `${cleanBase}/soccer/tournament/leaderboard/goal?tournamentId=${tournamentId}`;
 			const standingsCacheKey = `standing_${tournamentId}`;
 
-			const [leadersRes, cachedStandings] = await Promise.all([
+			const [leadersRes, h2hRes, cachedStandings] = await Promise.all([
 				fetch(leadersUrl, {
+					headers: { "X-Proxy-Auth": proxySecret, Accept: "application/json" },
+				}),
+				fetch(h2hUrl, {
 					headers: { "X-Proxy-Auth": proxySecret, Accept: "application/json" },
 				}),
 				c.env.sportsdey_ns.get(standingsCacheKey, "json") as Promise<{
@@ -341,20 +345,26 @@ footballRoute.openapi(
 				leadersData =  lead as any[];
 			}
 
-			const teamIds = [
-				summaryData.homeTeam.id.toString(),
-				summaryData.awayTeam.id.toString(),
-			];
+			let h2hData: any = null;
+			if (h2hRes.ok) {
+				h2hData = await h2hRes.json();
+			}
+
+			const homeTeamId = summaryData.homeTeam.id.toString();
+			const awayTeamId = summaryData.awayTeam.id.toString();
+			const teamIds = [homeTeamId, awayTeamId];
+
 			const transformedStandings = transformProxyStandings(
 				standingsData,
 				teamIds,
 			);
 			const transformedTopScorers = transformProxyTopScorers(leadersData);
-			
+			const transformedH2H = transformProxyH2H(h2hData, homeTeamId, awayTeamId);
 			const transformedData = transformProxyMatchInfo(
 				summaryData,
 				transformedStandings,
 				transformedTopScorers,
+				transformedH2H,
 			);
 
 			const isFinished =

@@ -108,6 +108,13 @@ export type MatchResultSummary = {
 	score: string;
 };
 
+export type H2HMatch = {
+	id: string;
+	date: string;
+	homeTeamResult: "W" | "D" | "L"; // Result for current match's home team
+	awayTeamResult: "W" | "D" | "L"; // Result for current match's away team
+};
+
 export type TransformedMatchInfo = {
 	competition: {
 		id: string;
@@ -141,6 +148,7 @@ export type TransformedMatchInfo = {
 	};
 	standings?: TeamStanding[];
 	top_scorers?: TopScorer[];
+	h2h?: H2HMatch[];
 };
 
 export type ProxyMatchSummary = {
