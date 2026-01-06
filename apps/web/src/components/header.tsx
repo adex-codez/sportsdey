@@ -38,9 +38,7 @@ export default function Header() {
 	const weekDates = useWeekDates(date);
 	const location = useLocation();
 	const router = useRouter();
-	useEffect(() => {
-		console.log(currentSport)
-	}, [])
+
 
 
 	useEffect(() => {

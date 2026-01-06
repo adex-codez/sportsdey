@@ -88,7 +88,7 @@ export const FootballMatchInfo = ({
 						{info.homeH2H?.map((match) => (
 							<div
 								key={match.id}
-								className="flex size-6 p-2 items-center justify-center rounded-full text-xs font-normal text-white"
+								className="flex size-6 p-2 items-center justify-center rounded-full text-xs font-normal cursor-pointer text-white"
 								style={{
 									backgroundColor:
 										match.result === "win"
@@ -113,7 +113,7 @@ export const FootballMatchInfo = ({
 							{info.awayH2H?.map((match) => (
 								<div
 									key={match.id}
-									className="flex p-2 size-6 items-center justify-center rounded-full text-xs font-normal text-white"
+									className="flex cursor-pointer p-2 size-6 items-center justify-center rounded-full text-xs font-normal text-white"
 									style={{
 										backgroundColor:
 											match.result === "win"

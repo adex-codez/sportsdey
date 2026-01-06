@@ -3,7 +3,7 @@
 import type { FootballStatsResponse } from '@/types/football'
 
 interface FootballStatsTabProps {
-    stats?: FootballStatsResponse['data']
+    stats?: FootballStatsResponse
     isLoading?: boolean
 }
 
@@ -17,6 +17,7 @@ function StatBar({ label, homeValue, awayValue }: StatBarProps) {
     const total = homeValue + awayValue;
     const homePercentage = total > 0 ? (homeValue / total) * 100 : 50;
     const awayPercentage = total > 0 ? (awayValue / total) * 100 : 50;
+    const hasValues = total > 0;
 
     return (
         <div className="py-3 border-b border-gray-100 last:border-b-0">
@@ -28,13 +29,13 @@ function StatBar({ label, homeValue, awayValue }: StatBarProps) {
             <div className="flex items-center gap-1">
                 <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden flex flex-row-reverse">
                     <div
-                        className="h-full bg-[#1BAA04] transition-all duration-300"
+                        className={`h-full transition-all duration-300 ${hasValues ? 'bg-[#1BAA04]' : ''}`}
                         style={{ width: `${homePercentage}%` }}
                     />
                 </div>
                 <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div
-                        className="h-full bg-[#1BAA04] transition-all duration-300"
+                        className={`h-full transition-all duration-300 ${hasValues ? 'bg-[#1BAA04]' : ''}`}
                         style={{ width: `${awayPercentage}%` }}
                     />
                 </div>
@@ -44,7 +45,7 @@ function StatBar({ label, homeValue, awayValue }: StatBarProps) {
 }
 
 function FootballStatsTab({ stats, isLoading }: FootballStatsTabProps) {
-    console.log({ stats });
+
     if (isLoading) {
         return (
             <div className="bg-white rounded-xl p-8 text-center">

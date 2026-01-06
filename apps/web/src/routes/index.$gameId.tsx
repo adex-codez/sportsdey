@@ -55,8 +55,6 @@ function RouteComponent() {
 		}
 	}, [tab]);
 
-	console.log(statsData)
-
 	useEffect(() => {
 		if (matchStatus === "SCH" && gameInfo?.match_info.date_time) {
 			const updateCountdown = () => {
@@ -99,7 +97,7 @@ function RouteComponent() {
 			case "stats":
 				return (
 					<FootballStatsTab
-						stats={statsData?.data}
+						stats={statsData}
 						isLoading={isStatsLoading}
 					/>
 				);
