@@ -21,7 +21,11 @@ const FavoriteMatchCardRow = ({ match, onRemove }: { match: FavoriteMatch; onRem
     const team2 = gameData?.away?.name || match.team2;
     const score1 = gameData?.home?.points;
     const score2 = gameData?.away?.points;
-    const status = (gameData?.status === 'closed' || gameData?.status === 'ended' || gameData?.status === 'Finished A.E.T.' || gameData?.status === 'Full Time') ? 'FT' : (gameData?.clock ? 'Live' : (gameData?.status || 'FT'));
+    const status = gameData
+        ? ((gameData?.status === 'closed' || gameData?.status === 'ended' || gameData?.status === 'Finished A.E.T.' || gameData?.status === 'Full Time')
+            ? 'FT'
+            : (gameData?.clock ? 'Live' : (gameData?.status || match.time)))
+        : (match.time || 'Scheduled');
     const time = gameData?.clock || match.time || "00:00";
 
 
@@ -116,7 +120,7 @@ function FavoritesPage() {
             </div>
 
             <div className="space-y-8 px-4 w-full mx-auto">
-                {favoriteTeams.length === 0 && favoriteMatches.length === 0 ? (
+                {favoriteTeams.length === 0 && favoriteMatches.length === 0 && favoriteLeagues.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24 text-center">
                         <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
                             <Star className="w-10 h-10 text-gray-300" />
@@ -162,7 +166,7 @@ function FavoritesPage() {
                                                     onClick={() => toggleFavoriteLeague(league)}
                                                     className="text-gray-300 hover:text-red-500 transition-colors p-4"
                                                 >
-                                                    <Trash2 className="w-4 h-4" />
+                                                    <Trash2 className="w-4 h-4 cursor-pointer" />
                                                 </button>
                                             </div>
                                         );

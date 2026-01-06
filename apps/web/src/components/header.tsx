@@ -11,10 +11,12 @@ import { Button } from "./ui/button";
 import { useCurrentSport } from "@/hooks/use-current-sport";
 import { SPORTS } from "@/lib/constants";
 import { useActiveTab } from "./active-tab-context";
+import { useFavorites } from "@/hooks/useFavorites";
 
 export default function Header() {
 	const currentSport = useCurrentSport();
 	const { setTab } = useActiveTab();
+	const { totalFavoritesCount } = useFavorites();
 
 	const links = [
 		{ to: "/", label: "Football", icon: FootballIcon, sport: SPORTS.FOOTBALL },
@@ -173,7 +175,7 @@ export default function Header() {
 									<li onClick={() => {
 										setTab("favourites")
 										router.navigate({ to: "/favorites", search: { sports: currentSport } });
-									}}>Favourites (0)</li>
+									}}>Favourites ({totalFavoritesCount})</li>
 									<li onClick={() => {
 										setTab("news")
 										router.navigate({ to: "/news", search: { sports: currentSport } });
