@@ -1,182 +1,38 @@
 {
-	"kind": "youtube#searchListResponse",
-	"etag": "YFqSoAM4blgY1EAWxM2wys_Sfxc",
-	"nextPageToken": "CAUQAA",
-	"regionCode": "NG",
-	"pageInfo": {
-		"totalResults": 1000000,
-		"resultsPerPage": 5
+	"home": {
+		"stats": {
+			"ballPossession": 65,
+			"shotsOnTarget": 3,
+			"shotsOffTarget": 12,
+			"fouls": 17,
+			"corners": 5,
+			"offsides": 1,
+			"saves": 1,
+			"yellowCards": 3,
+			"secondYellowCards": 0,
+			"redCards": 0
+		},
+		"name": "Melbourne City",
+		"id": 15272
 	},
-	"items": [
-		{
-			"kind": "youtube#searchResult",
-			"etag": "qs0aKuEzroZ-TnEEw1VgROV_K_U",
-			"id": {
-				"kind": "youtube#video",
-				"videoId": "XRHpLLP_wdU"
-			},
-			"snippet": {
-				"publishedAt": "2025-12-05T03:55:00Z",
-				"channelId": "UClZLd1ZZRJmj08Qq70xg4VA",
-				"title": "Real Madrid vs Manchester City: Duel Taktik Terpanas di Liga Champions #shorts #ligachampions",
-				"description": "Big match Liga Champions akan tersaji saat Real Madrid menjamu Manchester City dalam duel yang dipastikan berlangsung ...",
-				"thumbnails": {
-					"default": {
-						"url": "https://i.ytimg.com/vi/XRHpLLP_wdU/default.jpg",
-						"width": 120,
-						"height": 90
-					},
-					"medium": {
-						"url": "https://i.ytimg.com/vi/XRHpLLP_wdU/mqdefault.jpg",
-						"width": 320,
-						"height": 180
-					},
-					"high": {
-						"url": "https://i.ytimg.com/vi/XRHpLLP_wdU/hqdefault.jpg",
-						"width": 480,
-						"height": 360
-					}
-				},
-				"channelTitle": "Momentum90+",
-				"liveBroadcastContent": "none",
-				"publishTime": "2025-12-05T03:55:00Z"
-			}
+	"away": {
+		"statistics": {
+			"ballPossession": 35,
+			"shotsOnTarget": 1,
+			"shotsOffTarget": 9,
+			"fouls": 12,
+			"corners": 5,
+			"offsides": 0,
+			"saves": 2,
+			"yellowCards": 3,
+			"secondYellowCards": 0,
+			"redCards": 0
 		},
-		{
-			"kind": "youtube#searchResult",
-			"etag": "NKX-c6WNkri3jsBtfKKebwwZb5Y",
-			"id": {
-				"kind": "youtube#video",
-				"videoId": "wJ22x6aFHkE"
-			},
-			"snippet": {
-				"publishedAt": "2025-12-05T02:50:03Z",
-				"channelId": "UC5lSZpbtbxsQELL77RXf5NA",
-				"title": "man city vs Real Madrid",
-				"description": "",
-				"thumbnails": {
-					"default": {
-						"url": "https://i.ytimg.com/vi/wJ22x6aFHkE/default.jpg",
-						"width": 120,
-						"height": 90
-					},
-					"medium": {
-						"url": "https://i.ytimg.com/vi/wJ22x6aFHkE/mqdefault.jpg",
-						"width": 320,
-						"height": 180
-					},
-					"high": {
-						"url": "https://i.ytimg.com/vi/wJ22x6aFHkE/hqdefault.jpg",
-						"width": 480,
-						"height": 360
-					}
-				},
-				"channelTitle": "Paxtakor_Futboli",
-				"liveBroadcastContent": "none",
-				"publishTime": "2025-12-05T02:50:03Z"
-			}
-		},
-		{
-			"kind": "youtube#searchResult",
-			"etag": "VlyJNRPyjjYyXjLDUjdG1-hfHcA",
-			"id": {
-				"kind": "youtube#video",
-				"videoId": "sVn8GKAMOIM"
-			},
-			"snippet": {
-				"publishedAt": "2025-12-05T02:18:09Z",
-				"channelId": "UCKQa1RwfqAuEUO1NO9RuDFA",
-				"title": "10th Man City VS Real Madrid #edit #football #halamadrid",
-				"description": "",
-				"thumbnails": {
-					"default": {
-						"url": "https://i.ytimg.com/vi/sVn8GKAMOIM/default.jpg",
-						"width": 120,
-						"height": 90
-					},
-					"medium": {
-						"url": "https://i.ytimg.com/vi/sVn8GKAMOIM/mqdefault.jpg",
-						"width": 320,
-						"height": 180
-					},
-					"high": {
-						"url": "https://i.ytimg.com/vi/sVn8GKAMOIM/hqdefault.jpg",
-						"width": 480,
-						"height": 360
-					}
-				},
-				"channelTitle": "XDX edit ",
-				"liveBroadcastContent": "none",
-				"publishTime": "2025-12-05T02:18:09Z"
-			}
-		},
-		{
-			"kind": "youtube#searchResult",
-			"etag": "pbX8A6cFEmiK7sguTPRfpFSQS-Q",
-			"id": {
-				"kind": "youtube#video",
-				"videoId": "AZ7KiPBzzI0"
-			},
-			"snippet": {
-				"publishedAt": "2025-12-05T02:09:14Z",
-				"channelId": "UCyFIckQnuJsq2fH9lvj0NUA",
-				"title": "unbelievable game #shortvideo #football #manchestercity #realmadrid",
-				"description": "",
-				"thumbnails": {
-					"default": {
-						"url": "https://i.ytimg.com/vi/AZ7KiPBzzI0/default.jpg",
-						"width": 120,
-						"height": 90
-					},
-					"medium": {
-						"url": "https://i.ytimg.com/vi/AZ7KiPBzzI0/mqdefault.jpg",
-						"width": 320,
-						"height": 180
-					},
-					"high": {
-						"url": "https://i.ytimg.com/vi/AZ7KiPBzzI0/hqdefault.jpg",
-						"width": 480,
-						"height": 360
-					}
-				},
-				"channelTitle": "Mini Mr Sagar blogs ",
-				"liveBroadcastContent": "none",
-				"publishTime": "2025-12-05T02:09:14Z"
-			}
-		},
-		{
-			"kind": "youtube#searchResult",
-			"etag": "NyoYQfGFFZ-CNxK3TCCxPNsXw1M",
-			"id": {
-				"kind": "youtube#video",
-				"videoId": "lbRDGu4b6aM"
-			},
-			"snippet": {
-				"publishedAt": "2025-12-04T23:26:44Z",
-				"channelId": "UCIjSkM6W6YTYqSPfTFFKTbg",
-				"title": "Real Madrid VS Man city Was 🥶😈☠ #football #viral #edit #shorts #skills #realmadrid #mbappe #mancity",
-				"description": "",
-				"thumbnails": {
-					"default": {
-						"url": "https://i.ytimg.com/vi/lbRDGu4b6aM/default.jpg",
-						"width": 120,
-						"height": 90
-					},
-					"medium": {
-						"url": "https://i.ytimg.com/vi/lbRDGu4b6aM/mqdefault.jpg",
-						"width": 320,
-						"height": 180
-					},
-					"high": {
-						"url": "https://i.ytimg.com/vi/lbRDGu4b6aM/hqdefault.jpg",
-						"width": 480,
-						"height": 360
-					}
-				},
-				"channelTitle": "IzoxFoot298",
-				"liveBroadcastContent": "none",
-				"publishTime": "2025-12-04T23:26:44Z"
-			}
-		}
-	]
+		"name": "Brisbane Roar",
+		"shortName": "BRO",
+		"mediumName": "Brisbane Roar",
+		"id": 8722
+	},
+	"date": "06/01/2026 08:00:00",
+	"id": 1985541
 }

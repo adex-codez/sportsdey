@@ -286,6 +286,62 @@ export type ProxyGoalLeaderboard = {
 // 	};
 // };
 
+export type ProxyMatchStats = {
+	homeTeam: {
+		statistics: {
+			ballPossession: number;
+			shotsOnTarget: number;
+			shotsOffTarget: number;
+			fouls: number;
+			corners: number;
+			offsides: number;
+			saves: number;
+			yellowCards: number;
+			secondYellowCards: number;
+			redCards: number;
+		};
+		name: string;
+		shortName: string;
+		mediumName: string;
+		id: number;
+	};
+	awayTeam: {
+		statistics: {
+			ballPossession: number;
+			shotsOnTarget: number;
+			shotsOffTarget: number;
+			fouls: number;
+			corners: number;
+			offsides: number;
+			saves: number;
+			yellowCards: number;
+			secondYellowCards: number;
+			redCards: number;
+		};
+		name: string;
+		shortName: string;
+		mediumName: string;
+		id: number;
+	};
+	date: string;
+	id: number;
+};
+
+export type TransformedMatchStats = {
+	home: {
+		statistics: ProxyMatchStats["homeTeam"]["statistics"];
+		name: string;
+		id: number;
+	};
+	away: {
+		statistics: ProxyMatchStats["awayTeam"]["statistics"];
+		name: string;
+		id: number;
+	};
+	date: string;
+	id: number;
+};
+
 export type StandingsRes = {
 	standings: {
 		type: string;

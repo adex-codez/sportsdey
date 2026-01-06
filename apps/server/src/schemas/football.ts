@@ -141,3 +141,31 @@ export const TransformedResponseSchema = z.object({
 	),
 	total_matches: z.number(),
 });
+
+const TeamStatsSchema = z.object({
+	ballPossession: z.number().openapi({ example: 65 }),
+	shotsOnTarget: z.number().openapi({ example: 3 }),
+	shotsOffTarget: z.number().openapi({ example: 12 }),
+	fouls: z.number().openapi({ example: 17 }),
+	corners: z.number().openapi({ example: 5 }),
+	offsides: z.number().openapi({ example: 1 }),
+	saves: z.number().openapi({ example: 1 }),
+	yellowCards: z.number().openapi({ example: 3 }),
+	secondYellowCards: z.number().openapi({ example: 0 }),
+	redCards: z.number().openapi({ example: 0 }),
+});
+
+export const MatchStatsSchema = z.object({
+	home: z.object({
+		statistics: TeamStatsSchema,
+		name: z.string().openapi({ example: "Melbourne City" }),
+		id: z.number().openapi({ example: 15272 }),
+	}),
+	away: z.object({
+		statistics: TeamStatsSchema,
+		name: z.string().openapi({ example: "Brisbane Roar" }),
+		id: z.number().openapi({ example: 8722 }),
+	}),
+	date: z.string().openapi({ example: "06/01/2026 08:00:00" }),
+	id: z.number().openapi({ example: 1985541 }),
+});

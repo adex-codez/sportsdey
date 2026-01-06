@@ -6,6 +6,7 @@ import {
 	TransformedMatchInfoSchema,
 	TransformedResponseSchema,
 	VideoResponseSchema,
+	MatchStatsSchema,
 } from "@/schemas";
 // import type { ScheduleRes } from "@/types";
 // import type { StandingsRes, TeamStanding } from "@/types/football";
@@ -15,6 +16,7 @@ import {
 	transformProxyMatchInfo,
 	transformProxySchedule,
 	transformProxyStandings,
+	transformProxyStats,
 	transformProxyTopScorers,
 } from "@/utils/football";
 import { jsonZodErrorFormatter } from "@/utils/zod";
@@ -566,6 +568,159 @@ footballRoute.openapi(
 		}
 	},
 	jsonZodErrorFormatter,
+);
+
+footballRoute.openapi(
+	createRoute({
+		method: "get",
+		path: "/match/{id}/stats",
+		request: {
+			params: z.object({
+				id: z.string().openapi({
+					description: "Match ID",
+					example: "1985541",
+				}),
+			}),
+		},
+		responses: {
+			200: {
+				description: "Match statistics",
+				content: {
+					"application/json": {
+						schema: successResponseSchema(MatchStatsSchema),
+					},
+				},
+			},
+			404: {
+				description: "Match not found or stats unavailable",
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+			},
+			500: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "Internal server error",
+			},
+			502: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "Bad gateway - external API error",
+			},
+		},
+		tags: ["Football"],
+		summary: "Get football match statistics by ID",
+	}),
+	async (c) => {
+		const { id } = c.req.valid("param");
+		const base = c.env.PROXY_URL;
+		const proxySecret = c.env.PROXY_SECRET;
+		const cleanBase = base.replace(/\/+$/, "");
+		const url = `${cleanBase}/soccer/match/statistics?matchId=${id}`;
+
+		const cacheKey = `match_stats_${id}`;
+		const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+			data: any;
+			expiresAt: number;
+		} | null;
+
+		if (cachedData && Date.now() <= cachedData.expiresAt) {
+			return c.json(
+				{
+					success: true as const,
+					data: cachedData.data,
+				},
+				200,
+			);
+		}
+
+		try {
+			const response = await fetch(url, {
+				headers: {
+					"X-Proxy-Auth": proxySecret,
+					Accept: "application/json",
+				},
+			});
+
+			if (!response.ok) {
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [
+							{
+								field: "proxy_api",
+								message: `Proxy API returned status ${response.status}`,
+								code: "external_api_error",
+							},
+						],
+					},
+					502,
+				);
+			}
+
+			const data = (await response.json()) as any;
+
+			if (!data || !data.homeTeam || !data.awayTeam) {
+				return c.json(
+					{
+						success: false as const,
+						error: "Not Found",
+						details: [
+							{
+								field: "matchId",
+								message: "Statistics not available for this match",
+								code: "not_found",
+							},
+						],
+					},
+					404,
+				);
+			}
+
+			const transformedData = transformProxyStats(data);
+
+			await c.env.sportsdey_ns.put(
+				cacheKey,
+				JSON.stringify({
+					data: transformedData,
+					expiresAt: Date.now() + 60 * 1000, // Cache for 1 minute
+				}),
+			);
+
+			return c.json(
+				{
+					success: true as const,
+					data: transformedData,
+				},
+				200,
+			);
+		} catch (err) {
+			console.error("Match stats error:", err);
+			return c.json(
+				{
+					success: false as const,
+					error: "Internal server error",
+					details: [
+						{
+							field: "server",
+							message: "An unexpected error occurred",
+							code: "internal_error",
+						},
+					],
+				},
+				500,
+			);
+		}
+	},
 );
 
 export default footballRoute;

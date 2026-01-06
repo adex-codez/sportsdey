@@ -235,3 +235,22 @@ export function transformProxyH2H(
 
 	return { homeH2H, awayH2H };
 }
+
+export function transformProxyStats(
+	data: import("@/types/football").ProxyMatchStats,
+): import("@/types/football").TransformedMatchStats {
+	return {
+		home: {
+			statistics: data.homeTeam.statistics,
+			name: data.homeTeam.name,
+			id: data.homeTeam.id,
+		},
+		away: {
+			statistics: data.awayTeam.statistics,
+			name: data.awayTeam.name,
+			id: data.awayTeam.id,
+		},
+		date: data.date,
+		id: data.id,
+	};
+}
