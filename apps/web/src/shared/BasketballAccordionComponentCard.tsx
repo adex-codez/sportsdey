@@ -87,20 +87,22 @@ const MatchCard: React.FC<MatchCardProps> = ({
     return wins
   }
 
+  const s = status?.toLowerCase() || "";
+  const isFinished = s.includes("full time") || s.includes("finished") || s === "closed" || s === "ended" || s === "ft";
+  const isLive = s === "live" || s === "q1" || s === "q2" || s === "q3" || s === "q4" || s === "ht" || s === "ot";
+  const shouldShowScores = isLive || isFinished;
+
   const cardContent = (
     <div className={`grid cursor-pointer ${hideFinishedStatus ? 'grid-cols-[40px_1fr_40px]' : 'grid-cols-[50px_1fr_40px]'} items-center gap-x-4 px-5 py-3.5 border-b border-border hover:bg-muted/30 transition-colors last:border-b-0`}>
-      <div className={`flex items-center justify-center capitalize w-[35px] h-[35px] rounded-[10px] ${status?.toLowerCase() === "live"
+      <div className={`flex items-center justify-center capitalize w-[35px] h-[35px] rounded-[10px] ${s === "live"
         ? "bg-[#0E8F1A] text-white text-[9px] font-medium animate-pulse"
         : "text-muted-foreground text-xs font-medium"
         }`}>
         {(() => {
-          const s = status?.toLowerCase() || "";
-          const isFinished = s.includes("full time") || s.includes("finished") || s === "closed" || s === "ended" || s === "ft";
-
           if (hideFinishedStatus && isFinished) return null;
           if (isFinished) return "FT";
 
-          return status?.toLowerCase() === "live" ? time : (status === "scheduled" && time ? time : status || time);
+          return s === "live" ? time : (s === "scheduled" && time ? time : status || time);
         })()}
       </div>
 
@@ -108,7 +110,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
         <div className="flex flex-col gap-1.5 text-sm">
           <div className="flex justify-between items-center">
             <span
-              className={`text-foreground transition-all duration-300 ${calculateSetsWon(player1Sets, player2Sets) > calculateSetsWon(player2Sets, player1Sets) ? "font-semibold" : ""}`}
+              className={`text-foreground transition-all duration-300 ${shouldShowScores && calculateSetsWon(player1Sets, player2Sets) > calculateSetsWon(player2Sets, player1Sets) ? "font-semibold" : ""}`}
             >
               {team1}
             </span>
@@ -116,19 +118,19 @@ const MatchCard: React.FC<MatchCardProps> = ({
               {player1Sets.map((set, idx) => (
                 <span
                   key={idx}
-                  className={`w-4 text-center transition-all duration-300 ${status?.toLowerCase() === 'live'
+                  className={`w-4 text-center transition-all duration-300 ${s === 'live'
                     ? 'animate-[fadeIn_0.5s_ease-in-out]'
                     : ''
                     }`}
                 >
-                  {renderSetScore(set, set.games > (player2Sets[idx]?.games ?? 0))}
+                  {shouldShowScores ? renderSetScore(set, set.games > (player2Sets[idx]?.games ?? 0)) : ""}
                 </span>
               ))}
             </div>
           </div>
           <div className="flex justify-between items-center">
             <span
-              className={`text-foreground transition-all duration-300 ${calculateSetsWon(player2Sets, player1Sets) > calculateSetsWon(player1Sets, player2Sets) ? "font-semibold" : ""}`}
+              className={`text-foreground transition-all duration-300 ${shouldShowScores && calculateSetsWon(player2Sets, player1Sets) > calculateSetsWon(player1Sets, player2Sets) ? "font-semibold" : ""}`}
             >
               {team2}
             </span>
@@ -136,12 +138,12 @@ const MatchCard: React.FC<MatchCardProps> = ({
               {player2Sets.map((set, idx) => (
                 <span
                   key={idx}
-                  className={`w-4 text-center transition-all duration-300 ${status?.toLowerCase() === 'live'
+                  className={`w-4 text-center transition-all duration-300 ${s === 'live'
                     ? 'animate-[fadeIn_0.5s_ease-in-out]'
                     : ''
                     }`}
                 >
-                  {renderSetScore(set, set.games > (player1Sets[idx]?.games ?? 0))}
+                  {shouldShowScores ? renderSetScore(set, set.games > (player1Sets[idx]?.games ?? 0)) : ""}
                 </span>
               ))}
             </div>
@@ -150,12 +152,12 @@ const MatchCard: React.FC<MatchCardProps> = ({
       ) : (
         <div className="flex flex-col gap-1.5 text-sm">
           <div className="flex justify-between items-center">
-            <span className={`text-primary ${(score1 != null && score2 != null && score1 > score2) ? "font-semibold" : ""}`}>{team1}</span>
-            <span className={`text-primary min-w-10 text-right ${(score1 != null && score2 != null && score1 > score2) ? "font-semibold" : ""}`}>{score1 != null ? score1 : ""}</span>
+            <span className={`text-primary ${shouldShowScores && (score1 != null && score2 != null && score1 > score2) ? "font-semibold" : ""}`}>{team1}</span>
+            <span className={`text-primary min-w-10 text-right ${shouldShowScores && (score1 != null && score2 != null && score1 > score2) ? "font-semibold" : ""}`}>{shouldShowScores && score1 != null ? score1 : ""}</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className={`text-primary ${(score1 != null && score2 != null && score2 > score1) ? "font-semibold" : ""}`}>{team2}</span>
-            <span className={`text-primary min-w-10 text-right ${(score1 != null && score2 != null && score2 > score1) ? "font-semibold" : ""}`}>{score2 != null ? score2 : ""}</span>
+            <span className={`text-primary ${shouldShowScores && (score1 != null && score2 != null && score2 > score1) ? "font-semibold" : ""}`}>{team2}</span>
+            <span className={`text-primary min-w-10 text-right ${shouldShowScores && (score1 != null && score2 != null && score2 > score1) ? "font-semibold" : ""}`}>{shouldShowScores && score2 != null ? score2 : ""}</span>
           </div>
         </div>
       )}
