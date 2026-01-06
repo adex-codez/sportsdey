@@ -169,3 +169,24 @@ export const MatchStatsSchema = z.object({
 	date: z.string().openapi({ example: "06/01/2026 08:00:00" }),
 	id: z.number().openapi({ example: 1985541 }),
 });
+
+export const FullStandingsSchema = z.object({
+	tournament: z.object({
+		id: z.number().openapi({ example: 2 }),
+		name: z.string().openapi({ example: "English Premier League" }),
+	}),
+	standings: z.array(
+		z.object({
+			name: z.string().openapi({ example: "Arsenal" }),
+			position: z.number().openapi({ example: 1 }),
+			statistics: z.object({
+				P: z.number().openapi({ example: 20 }),
+				W: z.number().openapi({ example: 15 }),
+				D: z.number().openapi({ example: 3 }),
+				L: z.number().openapi({ example: 2 }),
+				GD: z.number().openapi({ example: 26 }),
+				PTS: z.number().openapi({ example: 48 }),
+			}),
+		}),
+	),
+});

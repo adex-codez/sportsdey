@@ -254,3 +254,35 @@ export function transformProxyStats(
 		id: data.id,
 	};
 }
+
+export function transformFullProxyStandings(data: any[]): import("@/types/football").FullStandingsResponse {
+	if (!data || data.length === 0) {
+		throw new Error("No standings data available");
+	}
+
+	const tournamentData = data[0];
+	const tournament = {
+		id: tournamentData.tournament.id,
+		name: tournamentData.tournament.name,
+	};
+
+	const overallStandings = tournamentData.standings?.overall || [];
+
+	const standings = overallStandings.map((item: any) => ({
+		name: item.team.name,
+		position: item.position,
+		statistics: {
+			P: item.played,
+			W: item.won,
+			D: item.draw,
+			L: item.lost,
+			GD: item.average,
+			PTS: item.points,
+		},
+	}));
+
+	return {
+		tournament,
+		standings,
+	};
+}

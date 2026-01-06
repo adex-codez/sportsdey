@@ -151,6 +151,27 @@ export type TransformedMatchInfo = {
 	awayH2H?: H2HMatch[];
 };
 
+export type FullTeamStanding = {
+	name: string;
+	position: number;
+	statistics: {
+		P: number;
+		W: number;
+		D: number;
+		L: number;
+		GD: number;
+		PTS: number;
+	};
+};
+
+export type FullStandingsResponse = {
+	tournament: {
+		id: number;
+		name: string;
+	};
+	standings: FullTeamStanding[];
+};
+
 export type ProxyMatchSummary = {
 	homeTeam: {
 		score?: {
