@@ -101,3 +101,53 @@ export type FootballMatchInfoType = {
 		result: "win" | "draw" | "loss";
 	}[];
 };
+
+export type FootballStandingsResponse = {
+	tournament: {
+		id: number;
+		name: string;
+	};
+	standings: FootballStanding[];
+};
+
+export type FootballStanding = {
+	name: string;
+	position: number;
+	statistics: {
+		P: number;
+		W: number;
+		D: number;
+		L: number;
+		GD: number;
+		PTS: number;
+	};
+	isHighlighted?: boolean;
+};
+
+export type FootballStatsResponse = {
+	success: boolean;
+	data: {
+		home: {
+			statistics: {
+				yellowCards: number;
+				secondYellowCards: number;
+				redCards: number;
+			};
+			name: string;
+			id: number;
+		};
+		away: {
+			statistics: {
+				yellowCards: number;
+				secondYellowCards: number;
+				redCards: number;
+			};
+			name: string;
+			id: number;
+		};
+		date: string;
+		id: number;
+	};
+};
+
+

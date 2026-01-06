@@ -17,6 +17,7 @@ import { getTimeUntilStart, safeParseDate } from '@/utils/timeUtils';
 import type { TeamStatsData } from './TeamStats';
 import { useFavorites } from '@/hooks/useFavorites';
 import { format } from 'date-fns';
+import { getBasketballTeamLogo } from '@/utils/getBasketballTeamLogo';
 
 const BasketBallDetailsPage = () => {
   const { Id } = useParams({ from: '/basketball/$Id' });
@@ -325,13 +326,13 @@ const BasketBallDetailsPage = () => {
           competitionCountry={getCountryCode(gameDetails.tournament?.name || "") === 'tr' ? 'Turkey' : gameDetails.tournament?.name || "International"}
           competitionName={gameDetails.tournament?.name || ""}
           hostTeamName={gameDetails.home.name}
-          hostTeamLogo='/Profile.png'
+          hostTeamLogo={getBasketballTeamLogo(gameDetails.home.name)}
           matchStatus={
             gameDetails.status
           }
           hostTeamScore={gameDetails.home.points}
           guestTeamScore={gameDetails.away.points}
-          guestTeamLogo='/Profile.png'
+          guestTeamLogo={getBasketballTeamLogo(gameDetails.away.name)}
           guestTeamName={gameDetails.away.name}
           isUpcoming={!gameDetails.status.toLowerCase().includes('full') && !gameDetails.status.toLowerCase().includes('ft')}
           countdownText={countdown}
