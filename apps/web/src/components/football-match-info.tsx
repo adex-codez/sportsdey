@@ -1,9 +1,12 @@
-import { Loader2 } from "lucide-react";
+
 import type { FootballMatchInfoType } from "@/types/football";
+import { TopScorers } from "./top-scorers";
+import { formatDateTimeWithoutSeconds } from "@/lib/utils";
+
 
 export const FootballMatchInfo = ({
 	info,
-	setTab,
+	setTab
 }: {
 	info: FootballMatchInfoType;
 	setTab: (tab: string) => void;
@@ -81,31 +84,23 @@ export const FootballMatchInfo = ({
 					<p className="min-w-0 overflow-hidden truncate text-primary">
 						{info.competitors.home.name}
 					</p>
-					<div className="flex gap-4">
-						{info.homeH2H?.map((match) =>
-							match.result === "win" ? (
-								<div
-									key={match.id}
-									className="green-500 flex size-8 justify-center rounded-full bg-[#4EAC31] px-2 py-2"
-								>
-									W
-								</div>
-							) : match.result === "loss" ? (
-								<div
-									key={match.id}
-									className="flex size-8 justify-center rounded-full bg-[#EB3343] px-2 py-2"
-								>
-									L
-								</div>
-							) : (
-								<div
-									key={match.id}
-									className="flex size-8 justify-center rounded-full bg-[#EF8031] px-2 py-2"
-								>
-									D
-								</div>
-							),
-						)}
+					<div className="flex items-center gap-3">
+						{info.homeH2H?.map((match) => (
+							<div
+								key={match.id}
+								className="flex size-6 p-2 items-center justify-center rounded-full text-xs font-normal cursor-pointer text-white"
+								style={{
+									backgroundColor:
+										match.result === "win"
+											? "#4EAC31"
+											: match.result === "loss"
+												? "#EB3343"
+												: "#EF8031",
+								}}
+							>
+								{match.result === "win" ? "W" : match.result === "loss" ? "L" : "D"}
+							</div>
+						))}
 					</div>
 				</div>
 				<div className="flex items-center justify-between border-gray-200 border-t px-4 py-2">
@@ -114,41 +109,35 @@ export const FootballMatchInfo = ({
 					</p>
 
 					<div>
-						<div className="flex gap-4">
-							{info.homeH2H?.map((match) =>
-								match.result === "win" ? (
-									<div
-										key={match.id}
-										className="green-500 flex size-8 justify-center rounded-full bg-[#4EAC31] px-2 py-2"
-									>
-										W
-									</div>
-								) : match.result === "loss" ? (
-									<div
-										key={match.id}
-										className="flex size-8 justify-center rounded-full bg-[#EB3343] px-2 py-2"
-									>
-										L
-									</div>
-								) : (
-									<div
-										key={match.id}
-										className="flex size-8 justify-center rounded-full bg-[#EF8031] px-2 py-2"
-									>
-										D
-									</div>
-								),
-							)}
+						<div className="flex items-center gap-3">
+							{info.awayH2H?.map((match) => (
+								<div
+									key={match.id}
+									className="flex cursor-pointer p-2 size-6 items-center justify-center rounded-full text-xs font-normal text-white"
+									style={{
+										backgroundColor:
+											match.result === "win"
+												? "#4EAC31"
+												: match.result === "loss"
+													? "#EB3343"
+													: "#EF8031",
+									}}
+								>
+									{match.result === "win" ? "W" : match.result === "loss" ? "L" : "D"}
+								</div>
+							))}
 						</div>
 					</div>
 				</div>
 			</div>
-			;
+			{info.top_scorers && info.top_scorers.length > 0 && (
+				<TopScorers scorers={info.top_scorers} />
+			)}
 			<div className="rounded-2xl bg-white">
 				<p className="font-semibold px-4 py-2">Match Info</p>
 				<div className="px-4 py-2 flex justify-between w-full border-gray-200 border-t">
 					<p className="text-base">Date/Time</p>
-					<p>{info.match_info.date_time}</p>
+					<p>{formatDateTimeWithoutSeconds(info.match_info.date_time)}</p>
 				</div>
 				<div className="px-4 py-2 flex justify-between w-full border-gray-200 border-t">
 					<p className="text-base">Stadium</p>

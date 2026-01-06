@@ -11,6 +11,17 @@ export function formatTime(date: Date): string {
 	return `${hours}:${minutes}`;
 }
 
+export function formatDateTimeWithoutSeconds(dateTimeString: string): string {
+  // Split into date and time parts
+  const [date, timeWithSeconds] = dateTimeString.split(" ");
+
+  // Remove the last 3 characters (:SS) from the time
+  const timeWithoutSeconds = timeWithSeconds.slice(0, -3);
+
+  // Return combined: "06/01/2026 20:00"
+  return `${date} ${timeWithoutSeconds}`;
+}
+
 // async function searchYouTubeVideos(topic) {
 // 	const API_KEY = "YOUR_API_KEY"; // Replace with your actual API key
 // 	const BASE_URL = "https://www.googleapis.com/youtube/v3/search";

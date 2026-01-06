@@ -2,10 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { FootballMatchInfo } from "@/components/football-match-info";
+import { TopScorers } from "@/components/top-scorers";
+import FootballStandingsTab from "@/components/football-section/FootballStandingsTab";
+import FootballStatsTab from "@/components/football-section/FootballStatsTab";
 import { useFootballMatchInfo } from "@/hooks/use-footmatch-info";
 import DetailsImageCard from "@/shared/DetailsImageCard";
 import { format } from "date-fns";
 import { getTimeUntilStart, safeParseDate } from "@/utils/timeUtils";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/api";
+import type { FootballStandingsResponse, FootballStatsResponse } from "@/types/football";
+import { getTeamLogo } from "@/utils/getTeamLogo";
 
 export const Route = createFileRoute("/index/$gameId")({
 	component: RouteComponent,
@@ -14,12 +21,39 @@ export const Route = createFileRoute("/index/$gameId")({
 function RouteComponent() {
 	const [tab, setTab] = useState("info");
 	const [countdown, setCountdown] = useState<string>("");
+	const [standingsEnabled, setStandingsEnabled] = useState(false);
+	const [statsEnabled, setStatsEnabled] = useState(false);
 	const { gameId } = Route.useParams();
 	const { data: gameInfo, isLoading } = useFootballMatchInfo(gameId, "en");
+
+	const leagueId = gameInfo?.competition?.id;
+
+	const { data: standingsData, isLoading: isStandingsLoading } = useQuery({
+		queryKey: ['football', 'standings', leagueId],
+		queryFn: () => apiRequest<FootballStandingsResponse>(`football/standings/${leagueId}`),
+		enabled: !!leagueId && standingsEnabled,
+		staleTime: 5 * 60 * 1000,
+	});
+
+	const { data: statsData, isLoading: isStatsLoading } = useQuery({
+		queryKey: ['football', 'stats', gameId],
+		queryFn: () => apiRequest<FootballStatsResponse>(`football/match/${gameId}/stats`),
+		enabled: !!gameId && statsEnabled,
+		staleTime: 5 * 60 * 1000,
+	});
 
 	const matchStatus = typeof gameInfo?.status === 'string'
 		? gameInfo?.status
 		: gameInfo?.status?.shortname;
+
+	useEffect(() => {
+		if (tab === 'table') {
+			setStandingsEnabled(true);
+		}
+		if (tab === 'stats') {
+			setStatsEnabled(true);
+		}
+	}, [tab]);
 
 	useEffect(() => {
 		if (matchStatus === "SCH" && gameInfo?.match_info.date_time) {
@@ -50,22 +84,44 @@ function RouteComponent() {
 	const renderTabContent = () => {
 		switch (tab) {
 			case "info":
-				return (
-					<FootballMatchInfo info={gameInfo} setTab={setTab} />
+				return <FootballMatchInfo setTab={setTab} info={gameInfo} />;
+			case "top_scorers":
+				return gameInfo.top_scorers ? (
+					<TopScorers scorers={gameInfo.top_scorers} />
+				) : (
+					<div className="bg-white rounded-2xl p-8 text-center text-gray-400 border border-gray-100 italic">
+						Top scorers data not available for this match.
+					</div>
 				);
-			// case "info":
-			// 	return <div>Info</div>;
-			// case "info":
-			// 	return <div>Info</div>;
+
+			case "stats":
+				return (
+					<FootballStatsTab
+						stats={statsData}
+						isLoading={isStatsLoading}
+					/>
+				);
+			case "table":
+				return (
+					<FootballStandingsTab
+						teams={standingsData?.standings || []}
+						homeTeam={gameInfo.competitors.home.name}
+						awayTeam={gameInfo.competitors.away.name}
+						isLoading={isStandingsLoading}
+					/>
+				);
+			default:
+				return <FootballMatchInfo setTab={setTab} info={gameInfo} />;
 		}
 	};
+
 
 	return (
 		<div>
 			<DetailsImageCard
 				competitionName={gameInfo.competition.name}
-				hostTeamLogo="/Profile.png"
-				guestTeamLogo="/Profile.png"
+				hostTeamLogo={getTeamLogo(gameInfo.competitors.home.name)}
+				guestTeamLogo={getTeamLogo(gameInfo.competitors.away.name)}
 				hostTeamName={
 					gameInfo.competitors.home.name
 				}

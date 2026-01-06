@@ -7,7 +7,7 @@ export default function BettingWidget() {
 	useEffect(() => {
 		const timer = setTimeout(() => setIsIframeLoading(false), 5000);
 		const handleMessage = (event: MessageEvent) => {
-			console.log(event.origin);
+			// console.log(event.origin);
 			if (event.origin !== "https://bet.sportsdey.com") return;
 
 			if (event.data?.type === "SET_IFRAME_HEIGHT") {
