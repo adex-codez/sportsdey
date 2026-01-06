@@ -6,18 +6,17 @@ export const TransformedMatchInfoSchema = z.object({
 		name: z.string(),
 	}),
 	competitors: z.object({
-						home: z.object({
-							id: z.string(),
-							name: z.string(),
-							score: z.number(),
-						}),
-						away: z.object({
-							id: z.string(),
-							name: z.string(),
-							score: z.number(),
-						}),
-					}
-					),
+		home: z.object({
+			id: z.string(),
+			name: z.string(),
+			score: z.number(),
+		}),
+		away: z.object({
+			id: z.string(),
+			name: z.string(),
+			score: z.number(),
+		}),
+	}),
 	match_info: z.object({
 		date_time: z.string(),
 		stadium: z.string(),
@@ -65,13 +64,21 @@ export const TransformedMatchInfoSchema = z.object({
 			}),
 		)
 		.optional(),
-	h2h: z
+	homeH2H: z
 		.array(
 			z.object({
 				id: z.string(),
 				date: z.string(),
-				homeTeamResult: z.enum(["W", "D", "L"]),
-				awayTeamResult: z.enum(["W", "D", "L"]),
+				result: z.enum(["W", "D", "L"]),
+			}),
+		)
+		.optional(),
+	awayH2H: z
+		.array(
+			z.object({
+				id: z.string(),
+				date: z.string(),
+				result: z.enum(["W", "D", "L"]),
 			}),
 		)
 		.optional(),
@@ -120,8 +127,7 @@ export const TransformedResponseSchema = z.object({
 							name: z.string(),
 							score: z.number(),
 						}),
-					}
-					),
+					}),
 					date: z.string(),
 					match_status: z.string(),
 					clock: z
@@ -135,5 +141,3 @@ export const TransformedResponseSchema = z.object({
 	),
 	total_matches: z.number(),
 });
-
-

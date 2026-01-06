@@ -302,7 +302,7 @@ footballRoute.openapi(
 
 			const standingsUrl = `${cleanBase}/soccer/tournament/standings?tournamentId=${tournamentId}`;
 			const leadersUrl = `${cleanBase}/soccer/tournament/leaderboard/goal?tournamentId=${tournamentId}`;
-			const h2hUrl = `${cleanBase}/soccer/h2h/match/list/recent/?matchId=${id}`;
+			const h2hUrl = `${cleanBase}/soccer/h2h/match/list/recent?matchId=${id}`;
 			const standingsCacheKey = `standing_${tournamentId}`;
 
 			const [leadersRes, h2hRes, cachedStandings] = await Promise.all([
@@ -345,10 +345,10 @@ footballRoute.openapi(
 				leadersData =  lead as any[];
 			}
 
+
 			let h2hData: any = null;
 			if (h2hRes.ok) {
-			const	data =await h2hRes.json() 
-			console.log("h2h data", data)
+				const	data =await h2hRes.json() 
 				h2hData = data;
 			}
 

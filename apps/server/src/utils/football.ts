@@ -50,10 +50,8 @@ export function transformProxySchedule(data: any[]): TransformedResponse {
 		competitionMap.get(competitionId)!.matches.push(match);
 	});
 
-	
 	const competitions = Array.from(competitionMap.values());
 
-	
 	const total_matches = data.length;
 
 	return { competitions, total_matches };
@@ -63,9 +61,8 @@ export function transformProxyMatchInfo(
 	summary: import("@/types/football").ProxyMatchSummary,
 	standings?: import("@/types/football").TeamStanding[],
 	top_scorers?: import("@/types/football").TopScorer[],
-	h2h?: H2HMatch[],
+	h2h?: { homeH2H: H2HMatch[]; awayH2H: H2HMatch[] },
 ): TransformedMatchInfo {
-	console.log(summary);
 	const transformed: TransformedMatchInfo = {
 		competition: {
 			id: summary.tournament.id.toString(),
@@ -76,12 +73,16 @@ export function transformProxyMatchInfo(
 			home: {
 				id: summary.homeTeam.id.toString(),
 				name: summary.homeTeam.name,
-				...(summary.homeTeam.score ? { score: summary.homeTeam.score.current } : { score: 0 }),
+				...(summary.homeTeam.score
+					? { score: summary.homeTeam.score.current }
+					: { score: 0 }),
 			},
 			away: {
 				id: summary.awayTeam.id.toString(),
 				name: summary.awayTeam.name,
-				...(summary.awayTeam.score ? { score: summary.awayTeam.score.current } : { score: 0 }),
+				...(summary.awayTeam.score
+					? { score: summary.awayTeam.score.current }
+					: { score: 0 }),
 			},
 		},
 		match_info: {
@@ -94,15 +95,19 @@ export function transformProxyMatchInfo(
 		},
 	};
 
-
 	if (standings) {
 		transformed.standings = standings;
 	}
 	if (top_scorers) {
 		transformed.top_scorers = top_scorers;
 	}
-	if (h2h && h2h.length > 0) {
-		transformed.h2h = h2h;
+	if (h2h) {
+		if (h2h.homeH2H.length > 0) {
+			transformed.homeH2H = h2h.homeH2H;
+		}
+		if (h2h.awayH2H.length > 0) {
+			transformed.awayH2H = h2h.awayH2H;
+		}
 	}
 
 	return transformed;
@@ -130,7 +135,7 @@ export function transformProxyStandings(
 			lost: team.lost,
 			goals_for: team.scored,
 			goals_against: team.against,
-			goal_diff: team.average, 
+			goal_diff: team.average,
 		}))
 		.sort((a, b) => a.position - b.position);
 }
@@ -149,52 +154,57 @@ export function transformProxyTopScorers(
 			abbreviation: player.team.shortName,
 		},
 		gs: player.totalGoals,
-		assists: 0, 
+		assists: 0,
 	}));
 }
 
 /**
  * Transform H2H data from proxy API.
- * Results are calculated relative to the current match's home/away teams.
+ * Returns separate arrays for home and away teams.
  */
 export function transformProxyH2H(
 	data: any,
 	homeTeamId: string,
 	awayTeamId: string,
-): H2HMatch[] {
-	if (!data?.h2h?.results?.overall) return [];
-	
+): { homeH2H: H2HMatch[]; awayH2H: H2HMatch[] } {
+	if (!data?.h2h?.results?.overall) return { homeH2H: [], awayH2H: [] };
 
 	const matches = data.h2h.results.overall.slice(0, 5);
 
-	return matches.map((match: any) => {
+	const getResult = (teamId: string, match: any): "win" | "draw" | "loss" => {
 		const matchHomeId = match.homeTeam.id.toString();
 		const homeScore = match.homeTeam.score?.current ?? 0;
 		const awayScore = match.awayTeam.score?.current ?? 0;
 
-		// Determine result for each team in this historical match
-		const getResult = (teamId: string): "W" | "D" | "L" => {
-			let teamScore: number;
-			let opponentScore: number;
+		let teamScore: number;
+		let opponentScore: number;
 
-			if (teamId === matchHomeId) {
-				teamScore = homeScore;
-				opponentScore = awayScore;
-			} else {
-				teamScore = awayScore;
-				opponentScore = homeScore;
-			}
+		if (teamId === matchHomeId) {
+			teamScore = homeScore;
+			opponentScore = awayScore;
+		} else {
+			teamScore = awayScore;
+			opponentScore = homeScore;
+		}
 
-			if (teamScore > opponentScore) return "W";
-			if (teamScore < opponentScore) return "L";
-			return "D";
-		};
+		if (teamScore > opponentScore) return "win";
+		if (teamScore < opponentScore) return "loss";
+		return "draw";
+	};
 
-		return {
-			id: match.id.toString(),
-			date: match.date,
-			homeTeamResult: getResult(homeTeamId), // Result for current match's home team
-			awayTeamResult: getResult(awayTeamId), // Result for current match's away team
-		};
-	});
+	const homeH2H: H2HMatch[] = matches.map((match: any) => ({
+		id: match.id.toString(),
+		name: data.homeTeam.name,
+		date: match.date,
+		result: getResult(homeTeamId, match),
+	}));
+
+	const awayH2H: H2HMatch[] = matches.map((match: any) => ({
+		id: match.id.toString(),
+		name: data.awayTeam.name,
+		date: match.date,
+		result: getResult(awayTeamId, match),
+	}));
+
+	return { homeH2H, awayH2H };
 }

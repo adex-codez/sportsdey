@@ -88,18 +88,16 @@ export type FootballMatchInfoType = {
 		gs: number;
 		assists: number;
 	}[];
-	last5_home_results?: {
-		match_id: string;
+	homeH2H?: {
+		id: string;
 		date: string;
-		opponent: string;
+		name: string;
 		result: "win" | "draw" | "loss";
-		score: string;
 	}[];
-	last5_away_results?: {
-		match_id: string;
+	awayH2H?: {
+		id: string;
 		date: string;
-		opponent: string;
+		name: string;
 		result: "win" | "draw" | "loss";
-		score: string;
 	}[];
 };
