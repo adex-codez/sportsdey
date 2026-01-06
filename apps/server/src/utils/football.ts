@@ -52,6 +52,33 @@ export function transformProxySchedule(data: any[]): TransformedResponse {
 
 	const competitions = Array.from(competitionMap.values());
 
+	// Sort competitions to show major leagues first
+	const priorityLeagues = [
+		"Champions League",
+		"English Premier League",
+		"La Liga",
+		"Serie A",
+		"French Ligue 1",
+	];
+
+	competitions.sort((a, b) => {
+		const aName = a.competition.name;
+		const bName = b.competition.name;
+
+		const aIndex = priorityLeagues.findIndex((league) =>
+			aName.includes(league),
+		);
+		const bIndex = priorityLeagues.findIndex((league) =>
+			bName.includes(league),
+		);
+
+		if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+		if (aIndex !== -1) return -1;
+		if (bIndex !== -1) return 1;
+
+		return aName.localeCompare(bName);
+	});
+
 	const total_matches = data.length;
 
 	return { competitions, total_matches };

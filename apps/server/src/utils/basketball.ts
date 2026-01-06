@@ -117,7 +117,9 @@ export const transformProxySchedule = (
 					alias: game.awayTeam?.shortName || "",
 					points: game.awayTeam?.score?.current ?? null,
 				},
-				...(game.gameClock ? { clock: `${game.gameClock.minute}:${game.gameClock.second}` } : {}),
+				...(game.gameClock
+					? { clock: `${game.gameClock.minute}:${game.gameClock.second}` }
+					: {}),
 			});
 
 			return acc;
@@ -125,8 +127,22 @@ export const transformProxySchedule = (
 		{} as Record<string, any>,
 	);
 
+	// Sort competitions to show NBA first
+	const competitions = Object.values(groupedGames) as Array<{
+		id: string;
+		name: string;
+		games: any[];
+	}>;
+	competitions.sort((a, b) => {
+		const aIsNba = a.name.toUpperCase().includes("NBA");
+		const bIsNba = b.name.toUpperCase().includes("NBA");
+		if (aIsNba && !bIsNba) return -1;
+		if (!aIsNba && bIsNba) return 1;
+		return 0;
+	});
+
 	return {
-		competitions: Object.values(groupedGames),
+		competitions,
 	};
 };
 
