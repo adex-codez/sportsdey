@@ -474,7 +474,8 @@ basketballRoute.openapi(
 
 			// Determine cache time based on status using the transformed status directly or checking summary
 			const isClosed =
-				transformedData.status === "Full Time" ||
+				transformedData.status === "Full Time" || 
+				transformedData.status === "Finished A.E.T." ||
 				transformedData.status === "closed";
 
 			await c.env.sportsdey_ns.put(

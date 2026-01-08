@@ -93,7 +93,6 @@ footballRoute.openapi(
       )}/?date=${date}`;
     }
 
-    // console.log(url);
 
     const cachedData = (await c.env.sportsdey_ns.get(
       `football_schedule_${date}_${status}`,
@@ -395,7 +394,6 @@ footballRoute.openapi(
         200
       );
     } catch (err) {
-      console.error("Match info error:", err);
       return c.json(
         {
           success: false as const,

@@ -1,6 +1,7 @@
 "use client"
 
 import type { FootballStatsResponse } from '@/types/football'
+import { useEffect } from 'react'
 
 interface FootballStatsTabProps {
     stats?: FootballStatsResponse
@@ -45,6 +46,7 @@ function StatBar({ label, homeValue, awayValue }: StatBarProps) {
 }
 
 function FootballStatsTab({ stats, isLoading }: FootballStatsTabProps) {
+    
 
     if (isLoading) {
         return (

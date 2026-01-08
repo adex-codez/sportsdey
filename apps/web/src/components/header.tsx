@@ -1,4 +1,9 @@
-import { Link, useLocation, useRouter } from "@tanstack/react-router";
+import {
+	Link,
+	useLocation,
+	useParams,
+	useRouter,
+} from "@tanstack/react-router";
 import { CalendarDays, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import useWeekDates from "@/hooks/use-weekdates";
@@ -39,7 +44,8 @@ export default function Header() {
 	const location = useLocation();
 	const router = useRouter();
 
-
+	const params = useParams({ strict: false });
+	const hasPathParams = Object.keys(params).length > 0;
 
 	useEffect(() => {
 		if (open) {
@@ -163,21 +169,47 @@ export default function Header() {
 								<p className="font-semibold text-lg">Menu</p>
 								<hr />
 								<ul className="space-y-2">
-									<li onClick={() => {
-										setTab("scores")
-										router.navigate({
-											to: currentSport === "tennis" ? "/tennis" : currentSport === "basketball" ? "/basketball" : "/",
-											search: { league: undefined, sports: currentSport } as any
-										});
-									}}>Scores</li>
-									<li onClick={() => {
-										setTab("favourites")
-										router.navigate({ to: "/favorites", search: { sports: currentSport } });
-									}}>Favourites ({totalFavoritesCount})</li>
-									<li onClick={() => {
-										setTab("news")
-										router.navigate({ to: "/news", search: { sports: currentSport } });
-									}} >News</li>
+									<li
+										onClick={() => {
+											setTab("scores");
+											router.navigate({
+												to:
+													currentSport === "tennis"
+														? "/tennis"
+														: currentSport === "basketball"
+															? "/basketball"
+															: "/",
+												search: {
+													league: undefined,
+													sports: currentSport,
+												} as any,
+											});
+										}}
+									>
+										Scores
+									</li>
+									<li
+										onClick={() => {
+											setTab("favourites");
+											router.navigate({
+												to: "/favorites",
+												search: { sports: currentSport },
+											});
+										}}
+									>
+										Favourites ({totalFavoritesCount})
+									</li>
+									<li
+										onClick={() => {
+											setTab("news");
+											router.navigate({
+												to: "/news",
+												search: { sports: currentSport },
+											});
+										}}
+									>
+										News
+									</li>
 								</ul>
 							</div>
 
@@ -200,7 +232,10 @@ export default function Header() {
 										: currentSport === SPORTS.BASKETBALL
 											? "/basketball"
 											: "/";
-								router.navigate({ to: target, search: { league: undefined, sports: currentSport } as any });
+								router.navigate({
+									to: target,
+									search: { league: undefined, sports: currentSport } as any,
+								});
 							}}
 							className="font-semibold text-secondary text-sm"
 						>
@@ -220,8 +255,11 @@ export default function Header() {
 								href="#"
 								className="font-semibold text-secondary text-sm"
 								onClick={() => {
-									setTab("news")
-									router.navigate({ to: "/news", search: { sports: currentSport } });
+									setTab("news");
+									router.navigate({
+										to: "/news",
+										search: { sports: currentSport },
+									});
 								}}
 							>
 								News
@@ -230,7 +268,7 @@ export default function Header() {
 					</ul>
 				</div>
 
-				<div className="flex w-[98vw] overflow-x-auto md:w-full md:justify-center">
+				<div className="flex w-[98vw] overflow-x-auto md:w-full justify-center">
 					{/* <nav className="flex w-max items-center justify-center gap-4 border border-[#414141] md:border-0 px-4 py-4"> */}
 					<nav className="flex w-max items-center justify-center gap-4 px-4 py-4">
 						{links.map(({ to, label, icon: Icon, sport }) => (
@@ -253,13 +291,30 @@ export default function Header() {
 				</div>
 
 				{!location.pathname.startsWith("/news") &&
-					!location.pathname.startsWith("/betting") ? (
+				!location.pathname.startsWith("/betting") ? (
 					<div className="flex w-full items-center justify-between bg-[#202120] px-4 py-2 md:gap-0 md:px-6">
 						{weekDates.map((weekDate, index) => (
 							//@biome-ignore lint
 							<div
 								key={`date-${index}`}
-								onClick={() => setDate(weekDate)}
+								onClick={() => {
+									setDate(weekDate);
+									if (hasPathParams) {
+										const target =
+											currentSport === SPORTS.TENNIS
+												? "/tennis"
+												: currentSport === SPORTS.BASKETBALL
+													? "/basketball"
+													: "/";
+										router.navigate({
+											to: target,
+											search: {
+												league: undefined,
+												sports: currentSport,
+											} as any,
+										});
+									}
+								}}
 								className={cn(
 									"flex flex-col text-center",
 									weekDate.toDateString() === date.toDateString()
@@ -278,8 +333,8 @@ export default function Header() {
 									{weekDate.toDateString() === new Date().toDateString()
 										? "Today"
 										: new Intl.DateTimeFormat("en-US", {
-											weekday: "short",
-										}).format(weekDate)}
+												weekday: "short",
+											}).format(weekDate)}
 								</p>
 								<p className="">{weekDate.getDate()}</p>
 							</div>

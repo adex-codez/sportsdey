@@ -97,7 +97,6 @@ export type TopScorer = {
 		abbreviation: string;
 	};
 	gs: number; // goals scored
-	assists: number;
 };
 
 export type MatchResultSummary = {

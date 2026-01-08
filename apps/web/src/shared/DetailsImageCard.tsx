@@ -1,5 +1,6 @@
 import { TabNavigation } from "@/components/ui/tab-navigation";
 import type { DetailsImageProps } from "@/types/basketball";
+import { useEffect } from "react";
 
 interface DetailsImageCardProps extends DetailsImageProps {
   competitionName: string;
@@ -111,17 +112,17 @@ const DetailsImageCard = ({ competitionName,
                 </>
               ) : (
                 <>
-                  <span className={`text-base md:text-3xl font-semibold transition-colors duration-300 ${matchStatus?.toLowerCase() === 'live'
+                  <span className={`text-base md:text-3xl font-semibold transition-colors duration-300 ${matchStatus?.toLowerCase() !== 'finished a.e.t.' && matchStatus?.toLowerCase() !== 'finished' && matchStatus?.toLowerCase() !== 'full time' && matchStatus?.toLowerCase() !== 'ft'
                     ? 'text-[#0E8F1A] animate-pulse'
                     : 'text-white'
                     }`}>
                     {hostTeamScore} - {guestTeamScore}
                   </span>
-                  <span className={`text-xs md:text-sm font-medium mt-2 capitalize block text-center transition-colors duration-300 ${matchStatus?.toLowerCase() === 'live'
+                  <span className={`text-xs md:text-sm font-medium mt-2 capitalize block text-center transition-colors duration-300 ${matchStatus?.toLowerCase() !== 'finished a.e.t.' && matchStatus?.toLowerCase() !== 'finished' && matchStatus?.toLowerCase() !== 'full time' && matchStatus?.toLowerCase() !== 'ft'
                     ? 'text-[#0E8F1A]'
                     : 'text-[#1BAA04]'
                     }`}>
-                    {matchStatus}
+                    {matchStatus.toLowerCase() === 'finished a.e.t.' ? "Closed" : matchStatus}
                   </span>
                 </>
               )}

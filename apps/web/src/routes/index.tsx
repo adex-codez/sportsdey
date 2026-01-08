@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useActiveTab } from "@/components/active-tab-context";
 import FootballSchedule from "@/components/football-schedule";
+import ImportantUpdate from "@/shared/ImportantUpdate";
 
 export const Route = createFileRoute("/")({
 	validateSearch: (search: Record<string, unknown>) => ({
@@ -13,8 +14,9 @@ export const Route = createFileRoute("/")({
 function HomeComponent() {
 	const { tab } = useActiveTab();
 	return (
-		<div className="px-4 py-2 lg:container lg:mx-auto">
+		<div className="px-4 py-2 lg:container lg:mx-auto space-y-6">
 			{tab === "scores" ? <FootballSchedule /> : null}
+			<ImportantUpdate />
 		</div>
 	);
 }

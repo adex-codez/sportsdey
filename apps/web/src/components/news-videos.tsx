@@ -1,9 +1,11 @@
 import { useNewsVideos } from "@/hooks/use-news-videos";
 import { Loader2 } from "lucide-react";
-import { useEffect, useRef } from "react";
-import { format } from "date-fns";
+import { useEffect, useRef, useState } from "react";
+import { VideoCard } from "./basketball-section/VideoCard";
+import { VideoModal } from "./basketball-section/VideoModal";
 
 export function VideosTab({ sport }: { sport: string }) {
+	const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 	const {
 		data,
 		fetchNextPage,
@@ -58,29 +60,18 @@ export function VideosTab({ sport }: { sport: string }) {
 					// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
 					<div key={i} className="contents">
 						{page.videos.map((video) => (
-							<div
-								key={video.videoEmbedUrl}
-								className="overflow-hidden rounded-xl border bg-card text-card-foreground shadow"
-							>
-								<div className="aspect-video w-full">
-									<iframe
-										src={video.videoEmbedUrl}
-										title={video.title}
-										className="h-full w-full"
-										allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-										allowFullScreen
-									/>
-								</div>
-								<div className="p-4">
-									<h3 className="line-clamp-2 font-semibold text-lg leading-tight">
-										{video.title}
-									</h3>
-									<p className="mt-2 text-muted-foreground text-sm">
-										{format(new Date(video.publishedAt), "PPP")}
-									</p>
-								</div>
-							</div>
+							<VideoCard
+								key={video.videoId}
+								videoId={video.videoId}
+								title={video.title}
+								publishedAt={video.publishedAt}
+								onPlay={setSelectedVideoId}
+							/>
 						))}
+						<VideoModal
+							videoId={selectedVideoId}
+							onClose={() => setSelectedVideoId(null)}
+						/>
 					</div>
 				))}
 			</div>

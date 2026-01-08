@@ -1,4 +1,5 @@
 export interface NewsVideo {
+	videoId: string
 	videoEmbedUrl: string;
 	publishedAt: string;
 	title: string;

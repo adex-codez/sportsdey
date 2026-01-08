@@ -30,20 +30,20 @@
 	// bun db:generate
 	// To apply migrations locally, run:
 	// wrangler d1 migrations apply YOUR_DB_NAME --local
-	"d1_databases": [
-		{
-  		"binding": "DB",
-			"database_name": "sportsdey_db",
-			"database_id": "15eaaf0e-6285-47f5-97dd-7c9615975707",
-			"remote": false,
-			"preview_database_id": "local-test-db",
-			"migrations_dir": "./src/db/migrations"
-		}
-	],
+	// "d1_databases": [
+	// 	{
+  // 		"binding": "DB",
+	// 		"database_name": "sportsdey_db",
+	// 		"database_id": "15eaaf0e-6285-47f5-97dd-7c9615975707",
+	// 		"remote": false,
+	// 		"preview_database_id": "local-test-db",
+	// 		"migrations_dir": "./src/db/migrations"
+	// 	}
+	// ],
 	"kv_namespaces": [
 		{
 			"binding": "sportsdey_ns",
-			"id": "18eb61e1ab0b45858d6ae792b4694ee0",
+			"id": "7720322efb504b96a392d8acfe37ad4b",
 			"remote": false
 		}
 	]

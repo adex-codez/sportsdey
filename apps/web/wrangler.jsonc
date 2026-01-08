@@ -7,6 +7,12 @@
 	"assets": {
 		"directory": ".output/public"
 	},
+	"routes": [
+    {
+      "pattern": "sportsdey.com",
+      "custom_domain": true
+    }
+  ],
 	"observability": {
 		"enabled": true
 	}

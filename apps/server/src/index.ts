@@ -16,10 +16,10 @@ app.use(
 	}),
 );
 
-app.route("/api", routes);
+app.route("/", routes);
 
-app.get("/api/docs", swaggerUI({ url: "/api/openapi.json" }));
-app.doc("/api/openapi.json", {
+app.get("/docs", swaggerUI({ url: "/openapi.json" }));
+app.doc("/openapi.json", {
 	openapi: "3.0.0",
 	info: {
 		version: "1.0.0",

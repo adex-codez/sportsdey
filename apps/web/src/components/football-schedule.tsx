@@ -1,13 +1,11 @@
 import { Link, useSearch, useNavigate } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { Loader2 } from "lucide-react";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useFootballSchedule } from "@/hooks/use-fooball-schedule";
 import type { FiltersType } from "@/lib/data";
 import { formatTime } from "@/lib/utils";
 import Favourite from "@/logos/favourite.svg?react";
-import { useDateContext } from "./date-context";
-import { DatePicker } from "./date-picker";
 import { Filters } from "./filters";
 import {
 	Accordion,
@@ -16,28 +14,30 @@ import {
 	AccordionTrigger,
 } from "./ui/accordion";
 import { EmptyState } from "./EmptyState";
+import { useAppSelector } from "@/store/hook";
+import type { RootState } from "@/store";
+import { useFavorites } from "@/hooks/useFavorites";
+import { MatchCard } from "@/shared/BasketballAccordionComponentCard";
 
 const FootballSchedule = () => {
-	const search = useSearch({ from: "/" }) as { league?: string; sports?: string };
+	const { isFavoriteMatch, toggleFavoriteMatch } = useFavorites();
+	const search = useSearch({ from: "/" }) as {
+		league?: string;
+		sports?: string;
+	};
 	const navigate = useNavigate();
 	const activeLeague = search.league;
 
-	const { date, setDate } = useDateContext();
+	const selectedDateString = useAppSelector(
+		(state: RootState) => state.date.selectedDate,
+	);
+	const selectedDate = new Date(selectedDateString);
 	const [currentFilter, setCurrentFilter] = useState<FiltersType>("all");
 	const [isPending, startTransition] = useTransition();
-	const {
-		data: schedules,
-		isLoading,
-		// error,
-		// error,
-	} = useFootballSchedule(
-		`${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`,
+	const { data: schedules, isLoading } = useFootballSchedule(
+		`${selectedDate.getDate().toString().padStart(2, "0")}/${(selectedDate.getMonth() + 1).toString().padStart(2, "0")}/${selectedDate.getFullYear()}`,
 		"en",
 	);
-
-	useEffect(() => {
-		console.log(schedules);
-	}, []);
 
 	const filtersCount = useMemo(() => {
 		if (!schedules) {
@@ -104,9 +104,10 @@ const FootballSchedule = () => {
 			}
 		}
 
-
 		const finalCompetitions = activeLeague
-			? filteredCompetitions.filter(comp => comp.competition.name === activeLeague)
+			? filteredCompetitions.filter(
+					(comp) => comp.competition.name === activeLeague,
+				)
 			: filteredCompetitions;
 
 		return {
@@ -138,7 +139,7 @@ const FootballSchedule = () => {
 					setCurrentFilter={handleFilterChange}
 					filtersCount={filtersCount}
 				/>
-				<DatePicker date={date} setDate={setDate} />
+				{/* <DatePicker date={date} setDate={setDate} /> */}
 			</div>
 			{isPending && (
 				<div className="flex items-center justify-center py-4">
@@ -150,11 +151,20 @@ const FootballSchedule = () => {
 			{activeLeague && !isLoading && (
 				<div className="flex items-center justify-between bg-accent/10 border border-accent/20 px-4 py-3 rounded-xl mb-4">
 					<div className="flex items-center gap-2">
-						<span className="text-sm font-medium text-primary">Filtered by:</span>
-						<span className="text-sm font-bold text-accent">{activeLeague}</span>
+						<span className="text-sm font-medium text-primary">
+							Filtered by:
+						</span>
+						<span className="text-sm font-bold text-accent">
+							{activeLeague}
+						</span>
 					</div>
 					<button
-						onClick={() => navigate({ to: "/", search: { league: undefined, sports: search.sports } })}
+						onClick={() =>
+							navigate({
+								to: "/",
+								search: { league: undefined, sports: search.sports },
+							})
+						}
 						className="flex items-center gap-1 text-xs font-bold text-accent hover:bg-accent/20 px-2 py-1 rounded-lg transition-colors"
 						type="button"
 					>
@@ -166,7 +176,7 @@ const FootballSchedule = () => {
 			<div className="space-y-4">
 				{filteredSchedules?.competitions.length === 0 ? (
 					<EmptyState
-						title={`No ${currentFilter === 'all' ? '' : currentFilter} matches found`}
+						title={`No ${currentFilter === "all" ? "" : currentFilter} matches found`}
 						description={`We couldn't find any matches matching your criteria for this date.`}
 					/>
 				) : (
@@ -192,66 +202,26 @@ const FootballSchedule = () => {
 												params={{ gameId: match.id }}
 												key={`${index}+1`}
 											>
-												<div className="flex flex-wrap items-center justify-between gap-4 border-gray-100 border-b px-4 py-4 hover:bg-gray-50">
-													<div className="flex w-full justify-between lg:w-fit">
-														<p>{formatTime(new Date(match.start_time))}</p>
-														<div className="block lg:hidden">
-															<Favourite />
-														</div>
-													</div>
-
-													<div className="flex w-full justify-between space-y-4 text-sm lg:w-fit lg:items-center lg:justify-start lg:space-y-0">
-														<div className="items-center gap-4 space-y-4 lg:flex lg:space-y-0">
-															<p className="wrap-break-word">
-																{match.competitors.home.name}
-															</p>
-															<span className="hidden font-medium text-sm lg:block">
-																VS
-															</span>
-															<p className="wrap-break-word">
-																{match.competitors.away.name}
-															</p>
-														</div>
-
-														<div className="flex h-12 gap-6 rounded-sm bg-[#EBEBEB] px-3 py-1 lg:hidden">
-															<div className="flex flex-col items-center rounded-lg">
-																<p>1</p>
-																<p className="font-semibold">1.60</p>
-															</div>
-															<div className="flex flex-col items-center rounded-lg">
-																<p>X</p>
-																<p className="font-semibold">4.20</p>
-															</div>
-															<div className="">
-																<p>2</p>
-																<p className="font-semibold">4.20</p>
-															</div>
-														</div>
-													</div>
-													<div className="hidden items-center gap-2 lg:flex">
-														<div className="rounded-lg bg-[#EBEBEB] px-2 lg:py-1">
-															<p>
-																1
-																<span className="px-3 py-1 font-semibold">
-																	1.60
-																</span>
-															</p>
-														</div>
-														<div className="rounded-lg bg-[#EBEBEB] px-2 py-1">
-															<p>
-																X <span className="font-semibold">4.20</span>
-															</p>
-														</div>
-														<div className="rounded-lg bg-[#EBEBEB] px-2 py-1">
-															<p>
-																2 <span className="font-semibold">4.20</span>
-															</p>
-														</div>
-														<div className="hidden lg:block">
-															<Favourite />
-														</div>
-													</div>
-												</div>
+												<MatchCard
+													team1={match.competitors.home.name}
+													team2={match.competitors.away.name}
+													time={formatTime(new Date(match.start_time))}
+													score1={match.competitors.home.score}
+													score2={match.competitors.away.score}
+													isFavorite={
+														match.id ? isFavoriteMatch(match.id) : false
+													}
+													status={match.match_status}
+													onFavoriteToggle={() =>
+														toggleFavoriteMatch({
+															id: match.id,
+															team1: match.competitors.home.name,
+															team2: match.competitors.away.name,
+															sport: "football",
+														})
+													}
+													id={match.id}
+												/>
 											</Link>
 										))}
 									</div>

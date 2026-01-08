@@ -86,7 +86,6 @@ export type FootballMatchInfoType = {
       abbreviation: string;
     };
     gs: number;
-    assists: number;
   }[];
   homeH2H?: {
     id: string;

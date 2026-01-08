@@ -38,9 +38,10 @@ export function getTimeUntilStart(scheduledTime: string | Date): string {
 
   const diffMs = startTime.getTime() - now.getTime();
 
+
   // If the time has passed, return empty string
   if (diffMs <= 0) {
-    return "Starting soon";
+    return "";
   }
 
   const diffSeconds = Math.floor(diffMs / 1000);

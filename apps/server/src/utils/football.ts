@@ -41,11 +41,13 @@ export function transformProxySchedule(data: any[]): TransformedResponse {
 			},
 			start_time: date,
 			match_status: status.shortName === "FT" ? "closed" : status.shortName,
-			clock: times?.currentMinute
+			...(times?.currentMinute
 				? {
-						played: times.currentMinute.toString(),
+						clock: {
+								played: times.currentMinute.toString(),
+							},
 					}
-				: undefined,
+				: {}),
 		};
 		competitionMap.get(competitionId)!.matches.push(match);
 	});
@@ -181,7 +183,6 @@ export function transformProxyTopScorers(
 			abbreviation: player.team.shortName,
 		},
 		gs: player.totalGoals,
-		assists: 0,
 	}));
 }
 
