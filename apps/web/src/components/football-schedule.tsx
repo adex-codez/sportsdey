@@ -156,6 +156,7 @@ const FootballSchedule = () => {
 					<button
 						onClick={() => navigate({ to: "/", search: { league: undefined, sports: search.sports } })}
 						className="flex items-center gap-1 text-xs font-bold text-accent hover:bg-accent/20 px-2 py-1 rounded-lg transition-colors"
+						type="button"
 					>
 						<X className="w-3 h-3" />
 						Clear Filter

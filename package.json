@@ -14,6 +14,7 @@
     "dev:native": "turbo -F native dev",
     "dev:web": "turbo -F web dev",
     "dev:server": "turbo -F server dev",
+    "dev:studio": "turbo -F studio-sportsdey dev",
     "db:push": "turbo -F @sportsdey/db db:push",
     "db:studio": "turbo -F @sportsdey/db db:studio",
     "db:generate": "turbo -F @sportsdey/db db:generate",

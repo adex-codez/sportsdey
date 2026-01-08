@@ -16,8 +16,10 @@ import { Route as BettingRouteImport } from './routes/betting'
 import { Route as BasketballRouteImport } from './routes/basketball'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TennisIndexRouteImport } from './routes/tennis.index'
+import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as BasketballIndexRouteImport } from './routes/basketball.index'
 import { Route as TennisIdRouteImport } from './routes/tennis/$Id'
+import { Route as NewsNewsIdRouteImport } from './routes/news.$newsId'
 import { Route as IndexGameIdRouteImport } from './routes/index.$gameId'
 import { Route as BasketballIdRouteImport } from './routes/basketball/$Id'
 
@@ -56,6 +58,11 @@ const TennisIndexRoute = TennisIndexRouteImport.update({
   path: '/',
   getParentRoute: () => TennisRoute,
 } as any)
+const NewsIndexRoute = NewsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NewsRoute,
+} as any)
 const BasketballIndexRoute = BasketballIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -65,6 +72,11 @@ const TennisIdRoute = TennisIdRouteImport.update({
   id: '/$Id',
   path: '/$Id',
   getParentRoute: () => TennisRoute,
+} as any)
+const NewsNewsIdRoute = NewsNewsIdRouteImport.update({
+  id: '/$newsId',
+  path: '/$newsId',
+  getParentRoute: () => NewsRoute,
 } as any)
 const IndexGameIdRoute = IndexGameIdRouteImport.update({
   id: '/index/$gameId',
@@ -82,23 +94,26 @@ export interface FileRoutesByFullPath {
   '/basketball': typeof BasketballRouteWithChildren
   '/betting': typeof BettingRoute
   '/favorites': typeof FavoritesRoute
-  '/news': typeof NewsRoute
+  '/news': typeof NewsRouteWithChildren
   '/tennis': typeof TennisRouteWithChildren
   '/basketball/$Id': typeof BasketballIdRoute
   '/index/$gameId': typeof IndexGameIdRoute
+  '/news/$newsId': typeof NewsNewsIdRoute
   '/tennis/$Id': typeof TennisIdRoute
   '/basketball/': typeof BasketballIndexRoute
+  '/news/': typeof NewsIndexRoute
   '/tennis/': typeof TennisIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/betting': typeof BettingRoute
   '/favorites': typeof FavoritesRoute
-  '/news': typeof NewsRoute
   '/basketball/$Id': typeof BasketballIdRoute
   '/index/$gameId': typeof IndexGameIdRoute
+  '/news/$newsId': typeof NewsNewsIdRoute
   '/tennis/$Id': typeof TennisIdRoute
   '/basketball': typeof BasketballIndexRoute
+  '/news': typeof NewsIndexRoute
   '/tennis': typeof TennisIndexRoute
 }
 export interface FileRoutesById {
@@ -107,12 +122,14 @@ export interface FileRoutesById {
   '/basketball': typeof BasketballRouteWithChildren
   '/betting': typeof BettingRoute
   '/favorites': typeof FavoritesRoute
-  '/news': typeof NewsRoute
+  '/news': typeof NewsRouteWithChildren
   '/tennis': typeof TennisRouteWithChildren
   '/basketball/$Id': typeof BasketballIdRoute
   '/index/$gameId': typeof IndexGameIdRoute
+  '/news/$newsId': typeof NewsNewsIdRoute
   '/tennis/$Id': typeof TennisIdRoute
   '/basketball/': typeof BasketballIndexRoute
+  '/news/': typeof NewsIndexRoute
   '/tennis/': typeof TennisIndexRoute
 }
 export interface FileRouteTypes {
@@ -126,19 +143,22 @@ export interface FileRouteTypes {
     | '/tennis'
     | '/basketball/$Id'
     | '/index/$gameId'
+    | '/news/$newsId'
     | '/tennis/$Id'
     | '/basketball/'
+    | '/news/'
     | '/tennis/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/betting'
     | '/favorites'
-    | '/news'
     | '/basketball/$Id'
     | '/index/$gameId'
+    | '/news/$newsId'
     | '/tennis/$Id'
     | '/basketball'
+    | '/news'
     | '/tennis'
   id:
     | '__root__'
@@ -150,8 +170,10 @@ export interface FileRouteTypes {
     | '/tennis'
     | '/basketball/$Id'
     | '/index/$gameId'
+    | '/news/$newsId'
     | '/tennis/$Id'
     | '/basketball/'
+    | '/news/'
     | '/tennis/'
   fileRoutesById: FileRoutesById
 }
@@ -160,7 +182,7 @@ export interface RootRouteChildren {
   BasketballRoute: typeof BasketballRouteWithChildren
   BettingRoute: typeof BettingRoute
   FavoritesRoute: typeof FavoritesRoute
-  NewsRoute: typeof NewsRoute
+  NewsRoute: typeof NewsRouteWithChildren
   TennisRoute: typeof TennisRouteWithChildren
   IndexGameIdRoute: typeof IndexGameIdRoute
 }
@@ -216,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TennisIndexRouteImport
       parentRoute: typeof TennisRoute
     }
+    '/news/': {
+      id: '/news/'
+      path: '/'
+      fullPath: '/news/'
+      preLoaderRoute: typeof NewsIndexRouteImport
+      parentRoute: typeof NewsRoute
+    }
     '/basketball/': {
       id: '/basketball/'
       path: '/'
@@ -229,6 +258,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tennis/$Id'
       preLoaderRoute: typeof TennisIdRouteImport
       parentRoute: typeof TennisRoute
+    }
+    '/news/$newsId': {
+      id: '/news/$newsId'
+      path: '/$newsId'
+      fullPath: '/news/$newsId'
+      preLoaderRoute: typeof NewsNewsIdRouteImport
+      parentRoute: typeof NewsRoute
     }
     '/index/$gameId': {
       id: '/index/$gameId'
@@ -261,6 +297,18 @@ const BasketballRouteWithChildren = BasketballRoute._addFileChildren(
   BasketballRouteChildren,
 )
 
+interface NewsRouteChildren {
+  NewsNewsIdRoute: typeof NewsNewsIdRoute
+  NewsIndexRoute: typeof NewsIndexRoute
+}
+
+const NewsRouteChildren: NewsRouteChildren = {
+  NewsNewsIdRoute: NewsNewsIdRoute,
+  NewsIndexRoute: NewsIndexRoute,
+}
+
+const NewsRouteWithChildren = NewsRoute._addFileChildren(NewsRouteChildren)
+
 interface TennisRouteChildren {
   TennisIdRoute: typeof TennisIdRoute
   TennisIndexRoute: typeof TennisIndexRoute
@@ -279,7 +327,7 @@ const rootRouteChildren: RootRouteChildren = {
   BasketballRoute: BasketballRouteWithChildren,
   BettingRoute: BettingRoute,
   FavoritesRoute: FavoritesRoute,
-  NewsRoute: NewsRoute,
+  NewsRoute: NewsRouteWithChildren,
   TennisRoute: TennisRouteWithChildren,
   IndexGameIdRoute: IndexGameIdRoute,
 }
