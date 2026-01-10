@@ -1,4 +1,4 @@
-import { GameSummarySchema, ScheduleData, StandingsSchema } from "@/schemas";
+import { BasketballTournamentScheduleSchema, GameSummarySchema, ScheduleData, StandingsSchema, TournamentScheduleSchema } from "@/schemas";
 import { z } from "@hono/zod-openapi";
 
 // Types mimicking the proxy response structure based on user input
@@ -185,8 +185,8 @@ const parseDateString = (dateStr?: string): string => {
 	const parts = dateStr.split(" ");
 	if (parts.length < 1) return new Date().toISOString();
 
-	const dateParts = parts[0].split("/");
-	if (dateParts.length !== 3) return new Date().toISOString();
+	const dateParts = parts[0]?.split("/");
+	if (!dateParts || dateParts.length !== 3) return new Date().toISOString();
 
 	const day = Number.parseInt(dateParts[0] || "0", 10);
 	const month = Number.parseInt(dateParts[1] || "0", 10) - 1; // Months are 0-indexed in JS
@@ -197,8 +197,8 @@ const parseDateString = (dateStr?: string): string => {
 	let seconds = 0;
 
 	if (parts.length > 1) {
-		const timeParts = parts[1].split(":");
-		if (timeParts.length >= 2) {
+		const timeParts = parts[1]?.split(":");
+		if (timeParts && timeParts.length >= 2) {
 			hours = Number.parseInt(timeParts[0] || "0", 10);
 			minutes = Number.parseInt(timeParts[1] || "0", 10);
 			if (timeParts.length === 3) {
@@ -412,5 +412,42 @@ export const transformGameTeamStats = (boxscore: {
 	return {
 		home: transformTeamStats(boxscore.homeTeam),
 		away: transformTeamStats(boxscore.awayTeam),
+	};
+};
+
+export const transformTournamentSchedule = (
+	data: any[],
+	tournamentId: string,
+): z.infer<typeof BasketballTournamentScheduleSchema> => {
+	const filteredGames = data
+		.filter((game) => String(game.tournament?.id) === tournamentId)
+		.map((game) => ({
+			id: String(game.id),
+			status: mapGameStatus(game.status?.shortName),
+			scheduledTime: game.startTimestamp
+				? new Date(game.startTimestamp * 1000).toISOString()
+				: parseDateString(game.date),
+			home: {
+				name: game.homeTeam?.name || "Unknown",
+				alias: game.homeTeam?.shortName || "",
+				points: game.homeTeam?.score?.current ?? null,
+			},
+			away: {
+				name: game.awayTeam?.name || "Unknown",
+				alias: game.awayTeam?.shortName || "",
+				points: game.awayTeam?.score?.current ?? null,
+			},
+			...(game.gameClock
+				? { clock: `${game.gameClock.minute}:${game.gameClock.second}` }
+				: {}),
+		}));
+
+	return {
+		games: filteredGames,
+		total: filteredGames.length,
+		competition: {
+			name: data[0].tournament.name,
+			id: data[0].tournament.id,
+		}	
 	};
 };

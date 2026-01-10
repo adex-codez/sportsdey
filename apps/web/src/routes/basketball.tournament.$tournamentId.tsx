@@ -1,8 +1,9 @@
+import { createFileRoute } from '@tanstack/react-router'
 import { apiRequest } from '@/lib/api';
 import BasketballAccordionComponentCard from '@/shared/BasketballAccordionComponentCard';
 import { useAppSelector } from '@/store/hook';
 import type { RootState } from '@/store';
-import type { BasketballScheduleData } from '@/types/api';
+import type { BasketballTournamentScheduleData } from '@/types/api';
 import type { League } from '@/types/basketball';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
@@ -14,6 +15,10 @@ import { useSearch, useNavigate } from '@tanstack/react-router';
 import { EmptyState } from '@/components/EmptyState';
 import { useCurrentFilter } from '@/hooks/use-current-filter';
 
+export const Route = createFileRoute('/basketball/tournament/$tournamentId')({
+  component: RouteComponent,
+})
+
 const formatDate = (date: Date) => {
   return {
     year: date.getFullYear(),
@@ -22,8 +27,9 @@ const formatDate = (date: Date) => {
   }
 }
 
-const BasketballPage = () => {
-  const search = useSearch({ from: '/basketball/' }) as { league?: string };
+function RouteComponent() {
+const { tournamentId } = Route.useParams();
+  const search = useSearch({ from: '/basketball' }) as { league?: string };
   const navigate = useNavigate();
   const activeLeague = search.league;
 
@@ -32,11 +38,13 @@ const BasketballPage = () => {
   const { year, month, day } = formatDate(selectedDate);
 
   const { data: scheduleData, isLoading, error, isError, refetch } = useQuery({
-    queryKey: ['basketball', 'schedule', year, month, day],
+    queryKey: ['basketball', 'schedule', year, month, day, tournamentId],
+    retry: true,
+    refetchInterval: 30 * 1000,
     queryFn: () => {
       const paddedMonth = month.toString().padStart(2, '0');
       const paddedDay = day.toString().padStart(2, '0');
-      return apiRequest<BasketballScheduleData>(`basketball/schedule?date=${paddedDay}/${paddedMonth}/${year}&language=en`);
+      return apiRequest<BasketballTournamentScheduleData>(`basketball/tournament/${tournamentId}?date=${paddedDay}/${paddedMonth}/${year}&language=en`);
     },
   });
 
@@ -182,48 +190,48 @@ const BasketballPage = () => {
 
     let countryDisplay = "International";
     if (code) {
-      if (code === 'us') countryDisplay = "USA";
-      else if (code === 'au') countryDisplay = "Australia";
-      else if (code === 'es') countryDisplay = "Spain";
-      else if (code === 'fr') countryDisplay = "France";
-      else if (code === 'de') countryDisplay = "Germany";
-      else if (code === 'it') countryDisplay = "Italy";
-      else if (code === 'tr') countryDisplay = "Turkey";
-      else if (code === 'gr') countryDisplay = "Greece";
-      else if (code === 'lt') countryDisplay = "Lithuania";
-      else if (code === 'cn') countryDisplay = "China";
-      else if (code === 'ar') countryDisplay = "Argentina";
-      else if (code === 'br') countryDisplay = "Brazil";
-      else if (code === 'il') countryDisplay = "Israel";
-      else if (code === 'si') countryDisplay = "Slovenia";
-      else if (code === 'bg') countryDisplay = "Bulgaria";
-      else if (code === 'rs') countryDisplay = "Serbia";
-      else if (code === 'hr') countryDisplay = "Croatia";
-      else if (code === 'ru') countryDisplay = "Russia";
-      else if (code === 'jp') countryDisplay = "Japan";
-      else if (code === 'ph') countryDisplay = "Philippines";
-      else if (code === 'pl') countryDisplay = "Poland";
-      else if (code === 'kr') countryDisplay = "South Korea";
-      else if (code === 'qa') countryDisplay = "Qatar";
-      else if (code === 'dz') countryDisplay = "Algeria";
-      else if (code === 'eu') countryDisplay = "Europe";
-      else if (code === 'gb') countryDisplay = "United Kingdom";
-      else if (code === 'pt') countryDisplay = "Portugal";
-      else if (code === 'cz') countryDisplay = "Czech Republic";
-      else if (code === 'ro') countryDisplay = "Romania";
-      else if (code === 'be') countryDisplay = "Belgium";
-      else if (code === 'nl') countryDisplay = "Netherlands";
-      else if (code === 'is') countryDisplay = "Iceland";
-      else if (code === 'lv') countryDisplay = "Latvia";
-      else if (code === 'ee') countryDisplay = "Estonia";
-      else if (code === 'no') countryDisplay = "Norway";
-      else if (code === 'dk') countryDisplay = "Denmark";
-      else if (code === 'fi') countryDisplay = "Finland";
-      else if (code === 'se') countryDisplay = "Sweden";
-      else if (code === 'tw') countryDisplay = "Taiwan";
+      if (code === 'us') countryDisplay = 'USA';
+      else if (code === 'au') countryDisplay = 'Australia';
+      else if (code === 'es') countryDisplay = 'Spain';
+      else if (code === 'fr') countryDisplay = 'France';
+      else if (code === 'de') countryDisplay = 'Germany';
+      else if (code === 'it') countryDisplay = 'Italy';
+      else if (code === 'tr') countryDisplay = 'Turkey';
+      else if (code === 'gr') countryDisplay = 'Greece';
+      else if (code === 'lt') countryDisplay = 'Lithuania';
+      else if (code === 'cn') countryDisplay = 'China';
+      else if (code === 'ar') countryDisplay = 'Argentina';
+      else if (code === 'br') countryDisplay = 'Brazil';
+      else if (code === 'il') countryDisplay = 'Israel';
+      else if (code === 'si') countryDisplay = 'Slovenia';
+      else if (code === 'bg') countryDisplay = 'Bulgaria';
+      else if (code === 'rs') countryDisplay = 'Serbia';
+      else if (code === 'hr') countryDisplay = 'Croatia';
+      else if (code === 'ru') countryDisplay = 'Russia';
+      else if (code === 'jp') countryDisplay = 'Japan';
+      else if (code === 'ph') countryDisplay = 'Philippines';
+      else if (code === 'pl') countryDisplay = 'Poland';
+      else if (code === 'kr') countryDisplay = 'South Korea';
+      else if (code === 'qa') countryDisplay = 'Qatar';
+      else if (code === 'dz') countryDisplay = 'Algeria';
+      else if (code === 'eu') countryDisplay = 'Europe';
+      else if (code === 'gb') countryDisplay = 'United Kingdom';
+      else if (code === 'pt') countryDisplay = 'Portugal';
+      else if (code === 'cz') countryDisplay = 'Czech Republic';
+      else if (code === 'ro') countryDisplay = 'Romania';
+      else if (code === 'be') countryDisplay = 'Belgium';
+      else if (code === 'nl') countryDisplay = 'Netherlands';
+      else if (code === 'is') countryDisplay = 'Iceland';
+      else if (code === 'lv') countryDisplay = 'Latvia';
+      else if (code === 'ee') countryDisplay = 'Estonia';
+      else if (code === 'no') countryDisplay = 'Norway';
+      else if (code === 'dk') countryDisplay = 'Denmark';
+      else if (code === 'fi') countryDisplay = 'Finland';
+      else if (code === 'se') countryDisplay = 'Sweden';
+      else if (code === 'tw') countryDisplay = 'Taiwan';
       else countryDisplay = name.split(' ')[0] || name;
     } else {
-      countryDisplay = name.includes('League') ? "International" : name;
+      countryDisplay = name.includes('League') ? 'International' : name;
     }
 
     const flagUrl = code && code !== 'eu'
@@ -237,66 +245,65 @@ const BasketballPage = () => {
   const { currentFilter: activeFilter } = useCurrentFilter();
 
   const leagues: League[] = useMemo(() => {
-    if (!scheduleData?.competitions) return [];
+    if (!scheduleData?.games || !scheduleData.competition) return [];
 
-    return scheduleData.competitions.map((comp) => {
-      const { country, flag } = getCompetitionInfo(comp.name);
+    const comp = scheduleData.competition;
+    const { country, flag } = getCompetitionInfo(comp.name);
 
-      const mappedMatches = comp.games.map((game) => {
-        const formatTime = (dateStr?: string) => {
-          if (!dateStr) return undefined;
-          try {
-            return new Date(dateStr).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-          } catch {
-            return undefined;
-          }
-        };
+    const mappedMatches = scheduleData.games.map((game) => {
+      const formatTime = (dateStr?: string) => {
+        if (!dateStr) return undefined;
+        try {
+          return new Date(dateStr).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        } catch {
+          return undefined;
+        }
+      };
 
-        const isLive = !!game.clock || !['closed', 'cancelled', 'scheduled', 'ns'].includes(game.status.toLowerCase());
-        const isFinished = ['closed', 'ft', 'aot'].includes(game.status.toLowerCase());
-        const isUpcoming = !isLive && !isFinished;
-
-        return {
-          id: game.id,
-          team1: game.home.name,
-          team2: game.away.name,
-          score1: game.home.points ?? undefined,
-          score2: game.away.points ?? undefined,
-          status: game.status === 'closed' ? 'FT' : (game.clock ? 'Live' : game.status),
-          time: game.clock || formatTime(game.scheduledTime || game.time) || "00:00",
-          clock: game.clock,
-          isLive,
-          isFinished,
-          isUpcoming
-        };
-      });
-
-
-      const filteredMatches = mappedMatches.filter(match => {
-        if (activeFilter === 'all') return true;
-        if (activeFilter === 'live') return match.isLive;
-        if (activeFilter === 'finished') return match.isFinished;
-        if (activeFilter === 'upcoming') return match.isUpcoming;
-        return true;
-      });
+      const isLive = !!game.clock || !['closed', 'cancelled', 'scheduled', 'ns'].includes(game.status.toLowerCase());
+      const isFinished = ['closed', 'ft', 'aot'].includes(game.status.toLowerCase());
+      const isUpcoming = !isLive && !isFinished;
 
       return {
-        id: comp.id,
-        country,
-        leagueName: comp.name,
-        flag: flag,
-        matches: filteredMatches
+        id: game.id,
+        team1: game.home.name,
+        team2: game.away.name,
+        score1: game.home.points ?? undefined,
+        score2: game.away.points ?? undefined,
+        status: game.status === 'closed' ? 'FT' : (game.clock ? 'Live' : game.status),
+        time: game.clock || formatTime(game.scheduledTime || game.time) || "00:00",
+        clock: game.clock,
+        isLive,
+        isFinished,
+        isUpcoming
       };
-    })
-      .filter(league => league.matches.length > 0)
-      .filter(league => !activeLeague || league.leagueName === activeLeague);
-  }, [scheduleData, activeFilter, activeLeague]);
+    });
+
+
+    const filteredMatches = mappedMatches.filter(match => {
+      if (activeFilter === 'all') return true;
+      if (activeFilter === 'live') return match.isLive;
+      if (activeFilter === 'finished') return match.isFinished;
+      if (activeFilter === 'upcoming') return match.isUpcoming;
+      return true;
+    });
+
+    if (filteredMatches.length === 0) return [];
+
+    return [{
+      id: comp.id.toString(),
+      country,
+      leagueName: comp.name,
+      flag: flag,
+      matches: filteredMatches
+    }];
+      
+  }, [scheduleData, activeFilter]);
 
   const counts = useMemo(() => {
-    if (!scheduleData?.competitions) return { all: 0, live: 0, finished: 0, upcoming: 0 };
+    if (!scheduleData?.games) return { all: 0, live: 0, finished: 0, upcoming: 0 };
 
-    let allGames: any[] = [];
-    scheduleData.competitions.forEach(c => allGames.push(...c.games));
+    const allGames = scheduleData.games;
 
     return {
       all: allGames.length,
@@ -318,6 +325,7 @@ const BasketballPage = () => {
       </div>
     );
   }
+  
   if (isLoading) {
 		return (
 			<div className="flex flex-col items-center justify-center space-y-2">
@@ -349,13 +357,12 @@ const BasketballPage = () => {
 
       {!isLoading && leagues.length === 0 && (
         <EmptyState
-          title={`No ${activeFilter === 'all' ? '' : activeFilter} basketball matches`}
+          title={`No ${activeFilter === `all` ? `` : activeFilter} basketball matches`}
           description={`We couldn't find any matches matching your criteria for this date.`}
         />
       )}
       {!isLoading && leagues.map((league) => (
         <BasketballAccordionComponentCard
-          tournamentId={league.id}
           key={league.id}
           country={league.country}
           league={league.leagueName}
@@ -367,5 +374,3 @@ const BasketballPage = () => {
     </div>
   )
 }
-
-export default BasketballPage

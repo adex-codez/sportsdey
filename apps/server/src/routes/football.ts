@@ -8,6 +8,7 @@ import {
   VideoResponseSchema,
   MatchStatsSchema,
   FullStandingsSchema,
+  TournamentScheduleSchema,
 } from "@/schemas";
 // import type { ScheduleRes } from "@/types";
 // import type { StandingsRes, TeamStanding } from "@/types/football";
@@ -20,6 +21,7 @@ import {
   transformProxyStats,
   transformProxyTopScorers,
   transformFullProxyStandings,
+  transformTournamentSchedule,
 } from "@/utils/football";
 import { jsonZodErrorFormatter } from "@/utils/zod";
 import { footballVideosQuery } from "@/validators";
@@ -139,14 +141,13 @@ footballRoute.openapi(
 
       const data = (await upstream.json()) as any[];
 
-      // Transform the data before returning
       const transformedData = transformProxySchedule(data);
 
       await c.env.sportsdey_ns.put(
         `football_schedule_${date}_${status}`,
         JSON.stringify({
           data: transformedData,
-          expiresAt: Date.now() + 5000,
+          expiresAt: Date.now() + 30 * 1000
         })
       );
 
@@ -167,6 +168,144 @@ footballRoute.openapi(
               field: "server",
               message:
                 "An unexpected error occurred while processing your request",
+              code: "internal_error",
+            },
+          ],
+        },
+        500
+      );
+    }
+  }
+);
+
+footballRoute.openapi(
+  createRoute({
+    method: "get",
+    path: "/tournament/{tournamentId}",
+    request: {
+      params: z.object({
+        tournamentId: z.string().openapi({
+          description: "Tournament ID",
+          example: "2",
+        }),
+      }),
+      query: z.object({
+        date: z.string().openapi({
+          description: "Schedule date (DD-MM-YYYY)",
+          example: "15/09/2024",
+        }),
+      }),
+    },
+    responses: {
+      200: {
+        description: "Filtered tournament schedule",
+        content: {
+          "application/json": {
+            schema: successResponseSchema(TournamentScheduleSchema),
+          },
+        },
+      },
+      500: {
+        content: {
+          "application/json": {
+            schema: ErrorResponseSchema,
+          },
+        },
+        description: "Internal server error",
+      },
+      502: {
+        content: {
+          "application/json": {
+            schema: ErrorResponseSchema,
+          },
+        },
+        description: "Bad gateway - external API error",
+      },
+    },
+    tags: ["Football"],
+    summary: "Get football schedule for a given date filtered by tournament ID",
+  }),
+  async (c) => {
+    const { tournamentId } = c.req.valid("param");
+    const { date } = c.req.valid("query");
+    const base = c.env.PROXY_URL;
+    const proxySecret = c.env.PROXY_SECRET;
+    const cleanBase = base.replace(/\/+$/, "");
+    const url = `${cleanBase}/soccer/match/list?date=${date}`;
+
+    const cacheKey = `football_tournament_schedule_${tournamentId}_${date}`;
+    const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+      data: any;
+      expiresAt: number;
+    } | null;
+
+    if (cachedData && Date.now() <= cachedData.expiresAt) {
+      return c.json(
+        {
+          success: true as const,
+          data: cachedData.data,
+        },
+        200
+      );
+    }
+
+    try {
+      const upstream = await fetch(url, {
+        headers: {
+          "X-Proxy-Auth": proxySecret,
+          Accept: "application/json",
+        },
+      });
+
+      if (!upstream.ok) {
+        return c.json(
+          {
+            success: false as const,
+            error: "External API error",
+            details: [
+              {
+                field: "proxy_api",
+                message: `Proxy API returned status ${upstream.status}`,
+                code: "external_api_error",
+              },
+            ],
+          },
+          502
+        );
+      }
+
+      const rawData = (await upstream.json()) as any[];
+
+      const filteredData = rawData.filter(
+        (match: any) => match.tournament?.id?.toString() === tournamentId
+      );
+
+      const transformedata = transformTournamentSchedule(filteredData);
+
+      await c.env.sportsdey_ns.put(
+        cacheKey,
+        JSON.stringify({
+          data: transformedata,
+          expiresAt: Date.now() + 30 * 1000,
+        })
+      );
+
+      return c.json(
+        {
+          success: true as const,
+          data: transformedata,
+        },
+        200
+      );
+    } catch (err) {
+      return c.json(
+        {
+          success: false as const,
+          error: "Internal server error",
+          details: [
+            {
+              field: "server",
+              message: "An unexpected error occurred while processing your request",
               code: "internal_error",
             },
           ],

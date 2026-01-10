@@ -138,3 +138,11 @@ export const GameTeamStatsSchema = z.object({
 	home: TeamStatsSchema,
 	away: TeamStatsSchema,
 });
+export const BasketballTournamentScheduleSchema = z.object({
+	games: z.array(ScheduledGameSchema),
+	total: z.number(),
+	competition: z.object({
+		name: z.string(),
+		id: z.number(),
+	})
+});

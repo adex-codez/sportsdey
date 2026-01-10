@@ -3,22 +3,26 @@ import Instagram from "@/logos/instagram.svg?react";
 import Telegram from "@/logos/telegram.svg?react";
 import X from "@/logos/x.svg?react";
 
-const socials = [
+export const socials = [
 	{
 		id: 1,
 		icon: Facebook,
+		link: "https://www.facebook.com/sportsdey247",
 	},
 	{
 		id: 2,
 		icon: X,
+		link: "https://X.com/sportsdey247",
 	},
 	{
 		id: 3,
 		icon: Instagram,
+		link: "https://Instagram.com/Sportsdey247",
 	},
 	{
 		id: 4,
 		icon: Telegram,
+		link: "https://t.me/sportsdey",
 	},
 ];
 const Socials = () => {
@@ -29,13 +33,16 @@ const Socials = () => {
 					For more update follow us on:
 				</p>
 				<div className="flex items-center gap-2">
-					{socials.map(({ icon: Icon, id }) => (
-						<div
+					{socials.map(({ icon: Icon, id, link }) => (
+						<a
 							key={id}
+							href={link}
+							target="_blank"
+							rel="noopener noreferrer"
 							className="flex size-8 items-center justify-center rounded-full bg-white p-2"
 						>
 							<Icon />
-						</div>
+						</a>
 					))}
 				</div>
 			</div>

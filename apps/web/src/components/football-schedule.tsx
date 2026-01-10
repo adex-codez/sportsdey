@@ -1,11 +1,10 @@
-import { Link, useSearch, useNavigate } from "@tanstack/react-router";
+import { Link, useSearch, useNavigate, useRouter } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { useMemo, useState, useTransition } from "react";
 import { useFootballSchedule } from "@/hooks/use-fooball-schedule";
 import type { FiltersType } from "@/lib/data";
 import { formatTime } from "@/lib/utils";
-import Favourite from "@/logos/favourite.svg?react";
 import { Filters } from "./filters";
 import {
 	Accordion,
@@ -18,9 +17,11 @@ import { useAppSelector } from "@/store/hook";
 import type { RootState } from "@/store";
 import { useFavorites } from "@/hooks/useFavorites";
 import { MatchCard } from "@/shared/BasketballAccordionComponentCard";
+import { useCurrentFilter } from "@/hooks/use-current-filter";
 
 const FootballSchedule = () => {
 	const { isFavoriteMatch, toggleFavoriteMatch } = useFavorites();
+	const router = useRouter();
 	const search = useSearch({ from: "/" }) as {
 		league?: string;
 		sports?: string;
@@ -32,7 +33,7 @@ const FootballSchedule = () => {
 		(state: RootState) => state.date.selectedDate,
 	);
 	const selectedDate = new Date(selectedDateString);
-	const [currentFilter, setCurrentFilter] = useState<FiltersType>("all");
+	const { currentFilter, changeCurrentFilter } = useCurrentFilter();
 	const [isPending, startTransition] = useTransition();
 	const { data: schedules, isLoading } = useFootballSchedule(
 		`${selectedDate.getDate().toString().padStart(2, "0")}/${(selectedDate.getMonth() + 1).toString().padStart(2, "0")}/${selectedDate.getFullYear()}`,
@@ -85,13 +86,13 @@ const FootballSchedule = () => {
 
 		for (const competition of schedules.competitions) {
 			const matchingMatches = competition.matches.filter((match) => {
-				if (currentFilter === "all") return true;
+				// if (currentFilter === "all" || filter === "all") return true;
 				if (currentFilter === "finished")
 					return match.match_status === "closed";
-				if (currentFilter === "upcoming") return match.match_status === "SCH";
+				if (currentFilter === "upcoming") return match.match_status === "SCH" || match.match_status === "AET";
 				if (currentFilter === "live")
 					return (
-						match.match_status !== "closed" && match.match_status !== "SCH"
+						match.match_status !== "closed" && match.match_status !== "SCH" && match.match_status !== "AET" && match.match_status !== "FTO"
 					);
 				return false;
 			});
@@ -127,7 +128,7 @@ const FootballSchedule = () => {
 
 	const handleFilterChange = (filterValue: string) => {
 		startTransition(() => {
-			setCurrentFilter(filterValue as FiltersType);
+			changeCurrentFilter(filterValue as any);
 		});
 	};
 
@@ -184,16 +185,19 @@ const FootballSchedule = () => {
 						<Accordion
 							key={`${competition.competition.id}`}
 							type="single"
-							collapsible
+							collapsible={false}
 							defaultValue={`${competition.competition.id}`}
 						>
 							<AccordionItem
 								value={`${competition.competition.id}`}
 								className="w-full rounded-2xl bg-white"
 							>
-								<AccordionTrigger className="cursor-pointer rounded-none border-gray-100 px-4 font-bold text-primary [&[data-state=open]]:border-b">
-									{competition.competition.name}
-								</AccordionTrigger>
+								<Link to="/index/tournament/$tournamentId" params={{ tournamentId: competition.competition.id }}>
+									<AccordionTrigger className="cursor-pointer rounded-none border-gray-100 px-4 font-bold text-primary [&[data-state=open]]:border-b">
+										{competition.competition.name}
+									</AccordionTrigger>
+								</Link>
+								
 								<AccordionContent className="cursor-pointer overflow-hidden">
 									<div>
 										{competition.matches.map((match, index) => (
@@ -208,6 +212,7 @@ const FootballSchedule = () => {
 													time={formatTime(new Date(match.start_time))}
 													score1={match.competitors.home.score}
 													score2={match.competitors.away.score}
+													clock={match.clock?.played}
 													isFavorite={
 														match.id ? isFavoriteMatch(match.id) : false
 													}

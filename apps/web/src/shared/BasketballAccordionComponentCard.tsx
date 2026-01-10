@@ -8,6 +8,7 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import React, { useState } from "react";
 import { useFavorites } from "@/hooks/useFavorites";
+import { formatTimeFromString } from "@/lib/utils";
 
 const BasketballComponentHeader: React.FC<BasketballComponentHeaderProps> = ({
 	flag,
@@ -80,6 +81,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
 	player2Sets,
 	status = "FT",
 	isFavorite = false,
+	clock,
 	time,
 	onFavoriteToggle,
 	id,
@@ -121,6 +123,9 @@ const MatchCard: React.FC<MatchCardProps> = ({
 		s.includes("finished") ||
 		s === "closed" ||
 		s === "ended" ||
+    s === "fto" ||
+    s === "fpt" ||
+    s === "fpo"
 		s === "ft";
 	const isLive =
 		s === "live" ||
@@ -138,7 +143,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
 		>
 			<div
 				className={`flex items-center justify-center capitalize w-[35px] h-[35px] rounded-[10px] ${
-					s !== "sch"
+					s !== "sch" && s !== "scheduled" && !isFinished
 						? "bg-[#0E8F1A] text-white text-[9px] font-medium animate-pulse"
 						: "text-muted-foreground text-xs font-medium"
 				}`}
@@ -147,11 +152,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
 					if (hideFinishedStatus && isFinished) return null;
 					if (isFinished) return "FT";
 
-					return (s !== "sch" && s !== "ft" && s !== "scheduled")
-						? time
-						: (s === "scheduled" || s === "sch") && time
-							? time
-							: status || time;
+					return s === "sch" || s === "scheduled" ? time : clock ? formatTimeFromString(clock) : status;
 				})()}
 			</div>
 
@@ -271,6 +272,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
 const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
 	country,
 	league,
+	tournamentId,
 	flag,
 	matches,
 	defaultExpanded = true,
@@ -384,18 +386,39 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
 		return routePath;
 	};
 
+	const isTournamentPage = pathname.includes("/basketball/tournament/");
+
 	return (
 		<div className="w-full bg-white rounded-2xl overflow-hidden shadow-sm">
-			<BasketballComponentHeader
-				flag={flag}
-				country={country}
-				league={league}
-				isExpanded={isExpanded}
-				onToggle={() => setIsExpanded(!isExpanded)}
-				imageUrl={imageUrl}
-				isFavorite={isFavoriteLeague(league)}
-				onFavoriteToggle={handleLeagueFavoriteToggle}
-			/>
+			{!isTournamentPage && tournamentId ? (
+				<Link
+					to="/basketball/tournament/$tournamentId"
+					params={{ tournamentId: String(tournamentId) }}
+				>
+					<BasketballComponentHeader
+						flag={flag}
+						country={country}
+						league={league}
+						isExpanded={isExpanded}
+						// onToggle={() => setIsExpanded(!isExpanded)}
+						imageUrl={imageUrl}
+						isFavorite={isFavoriteLeague(league)}
+						onFavoriteToggle={handleLeagueFavoriteToggle}
+					/>
+				</Link>
+			) : (
+				<BasketballComponentHeader
+					flag={flag}
+					country={country}
+					league={league}
+					isExpanded={isExpanded}
+					// onToggle={() => setIsExpanded(!isExpanded)}
+					imageUrl={imageUrl}
+					isFavorite={isFavoriteLeague(league)}
+					onFavoriteToggle={handleLeagueFavoriteToggle}
+				/>
+			)}
+			
 
 			{isExpanded && matches && (
 				<div className="flex flex-col">

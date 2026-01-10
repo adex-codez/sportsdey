@@ -190,3 +190,37 @@ export const FullStandingsSchema = z.object({
 		}),
 	),
 });
+
+export const TournamentScheduleSchema = z.object({
+	total_matches: z.number(),
+	competition: z.object({
+		name: z.string(),
+		id: z.number(),
+	}),
+	matches: z.array(
+		z.object({
+			id: z.string(),
+			competitors: z.object({
+				home: z.object({
+					id: z.string(),
+					name: z.string(),
+					score: z.number(),
+				}),
+				away: z.object({
+					id: z.string(),
+					name: z.string(),
+					score: z.number(),
+				}),
+			}),
+			date: z.string(),
+			match_status: z.string(),
+			clock: z
+				.object({
+					played: z.string(),
+				})
+				.optional(),
+		}),
+	),
+});
+
+

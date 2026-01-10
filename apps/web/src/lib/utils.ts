@@ -22,6 +22,15 @@ export function formatDateTimeWithoutSeconds(dateTimeString: string): string {
   return `${date} ${timeWithoutSeconds}`;
 }
 
+export function formatTimeFromString(secondsStr: string) {
+  const totalSeconds = Number(secondsStr) || 0
+
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+}
+
 // async function searchYouTubeVideos(topic) {
 // 	const API_KEY = "YOUR_API_KEY"; // Replace with your actual API key
 // 	const BASE_URL = "https://www.googleapis.com/youtube/v3/search";

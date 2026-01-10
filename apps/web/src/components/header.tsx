@@ -17,10 +17,12 @@ import { useCurrentSport } from "@/hooks/use-current-sport";
 import { SPORTS } from "@/lib/constants";
 import { useActiveTab } from "./active-tab-context";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useCurrentFilter } from "@/hooks/use-current-filter";
+import { socials } from "./socials";
 
 export default function Header() {
 	const currentSport = useCurrentSport();
-	const { setTab } = useActiveTab();
+	const { setTab, tab } = useActiveTab();
 	const { totalFavoritesCount } = useFavorites();
 
 	const links = [
@@ -41,6 +43,7 @@ export default function Header() {
 	const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 	const { date, setDate } = useDateContext();
 	const weekDates = useWeekDates(date);
+	const { currentFilter, changeCurrentFilter } = useCurrentFilter();
 	const location = useLocation();
 	const router = useRouter();
 
@@ -115,8 +118,8 @@ export default function Header() {
 					</div>
 				</div>
 
-				<div className="hidden min-w-0 gap-2 lg:flex">
-					<Button className="flex gap-2 rounded-full bg-[#FFFFFF33]">
+				<div className="min-w-0">
+					{/* <Button className="flex gap-2 rounded-full bg-[#FFFFFF33]">
 						<WorldIcon />
 						EN
 						<ChevronDown />
@@ -124,7 +127,7 @@ export default function Header() {
 					<Button className="rounded-full bg-accent">
 						Bet code converter
 						<ChevronRight />
-					</Button>
+					</Button> */}
 				</div>
 
 				{/* MOBILE SLIDE MENU */}
@@ -152,7 +155,11 @@ export default function Header() {
 						)}
 					>
 						<div className="flex min-w-0 justify-between p-4">
-							<div />
+							<img
+								src="/sportsdey-logo.png"
+								className="h-10"
+								alt="sportsdey's logo"
+							/>
 							<button
 								ref={closeButtonRef}
 								type="button"
@@ -164,57 +171,109 @@ export default function Header() {
 							</button>
 						</div>
 
-						<div className="min-w-0 space-y-8 px-8">
-							<div className="space-y-4">
-								<p className="font-semibold text-lg">Menu</p>
-								<hr />
-								<ul className="space-y-2">
+						<div className="min-w-0 space-y-8 text-base">
+							<div className="">
+								<div className="w-full px-4 bg-[#202120] py-4 text-base">
+									Features
+								</div>
+								<ul className="space-y-4 px-4 mt-4">
 									<li
+										className={cn(
+											"cursor-pointer",
+											currentFilter === "all" ? "text-accent" : "",
+										)}
 										onClick={() => {
-											setTab("scores");
-											router.navigate({
-												to:
-													currentSport === "tennis"
-														? "/tennis"
-														: currentSport === "basketball"
-															? "/basketball"
-															: "/",
-												search: {
-													league: undefined,
-													sports: currentSport,
-												} as any,
-											});
+											setOpen(false);
+											changeCurrentFilter("all");
 										}}
 									>
-										Scores
+										All
 									</li>
 									<li
+										className={cn(
+											"cursor-pointer",
+											currentFilter === "live" ? "text-accent" : "",
+										)}
 										onClick={() => {
-											setTab("favourites");
-											router.navigate({
-												to: "/favorites",
-												search: { sports: currentSport },
-											});
+											setOpen(false);
+											changeCurrentFilter("live");
 										}}
 									>
-										Favourites ({totalFavoritesCount})
+										Live
 									</li>
 									<li
+										className={cn(
+											"cursor-pointer",
+											currentFilter === "finished" ? "text-accent" : "",
+										)}
 										onClick={() => {
-											setTab("news");
-											router.navigate({
-												to: "/news",
-												search: { sports: currentSport },
-											});
+											setOpen(false);
+											changeCurrentFilter("finished");
 										}}
 									>
-										News
+										Finished
+									</li>
+									<li
+										className={cn(
+											"cursor-pointer",
+											currentFilter === "upcoming" ? "text-accent" : "",
+										)}
+										onClick={() => {
+											setOpen(false);
+											changeCurrentFilter("upcoming");
+										}}
+									>
+										Upcoming
 									</li>
 								</ul>
 							</div>
-
-							<p>My Teams</p>
-							<p>My Leagues</p>
+<div className="">
+								<div className="w-full px-4 bg-[#202120] py-4 text-base">
+									Info
+								</div>
+								<ul className="space-y-4 px-4 mt-4">
+									<li
+										className={cn(
+											"cursor-pointer",
+											tab === "betting" ? "text-accent" : "",
+										)}
+										onClick={() => {
+											setOpen(false);
+											setTab("betting")
+											router.navigate({ to: "/betting" });
+										}}
+									>
+										Betting
+									</li>
+									{/* <li
+									>
+										About us
+									</li>
+									<li
+									>
+										Finished
+									</li> */}
+								</ul>
+							</div>
+<div className="">
+								<div className="w-full px-4 bg-[#202120] py-4 text-base">
+									Social Links
+								</div>
+								<div className="flex items-center gap-2 px-4 mt-4">
+									{socials.map(({ icon: Icon, id, link }) => (
+										<a
+											key={id}
+											href={link}
+											target="_blank"
+							rel="noopener noreferrer"
+							className="flex size-8 items-center justify-center rounded-full bg-white p-2"
+						>
+							<Icon />
+						</a>
+					))}
+				</div>
+								
+							</div>
 						</div>
 					</aside>
 				</div>

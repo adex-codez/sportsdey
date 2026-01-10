@@ -27,6 +27,14 @@ export interface BasketballScheduleData {
   competitions: BasketballCompetition[];
 }
 
+export interface BasketballTournamentScheduleData {
+  games: BasketballGame[];
+  competition: {
+    id: string;
+    name: string;
+  } 
+}
+
 export interface BasketballScheduleResponse {
   success: boolean;
   data: BasketballScheduleData;

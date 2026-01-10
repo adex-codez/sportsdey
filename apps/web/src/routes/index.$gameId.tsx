@@ -177,6 +177,8 @@ function RouteComponent() {
 				competitionCountry=""
 				matchStatus={
 					matchStatus === "finished" ||
+					matchStatus === "FPT" ||
+					matchStatus === "FTO" ||
 					matchStatus === "closed" ||
 					matchStatus === "FT"
 						? "FT"

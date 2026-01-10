@@ -9,9 +9,8 @@ export function useFootballMatchInfo(gameId: string, lang: string) {
 			return apiRequest<FootballMatchInfoType>(endpoint);
 		},
 		retry: true,
-		// refetchInterval: (query) => {
-		//   console.log(query.state.data?.status)
-  //     return query.state.data?.status === "finished" ? 2 * 60 * 1000 : 5000
-		// }
+		refetchInterval: (query) => {
+      return query.state.data?.status === "finished" ? 2 * 60 * 1000 : 5000
+		}
 	});
 }

@@ -30,7 +30,7 @@ export interface BasketballComponentHeaderProps {
 	league: string;
 	matchCount?: number;
 	isExpanded: boolean;
-	onToggle: () => void;
+	onToggle?: () => void;
 	imageUrl?: string;
 	isFavorite?: boolean;
 	onFavoriteToggle?: (e: React.MouseEvent) => void;
@@ -42,6 +42,7 @@ export interface MatchCardProps {
 	team2: string;
 	player1Sets?: SetScore[];
 	player2Sets?: SetScore[];
+	clock?:string
 	score1?: number;
 	score2?: number;
 	status?: MatchStatus | string;
@@ -56,6 +57,7 @@ export interface MatchCardProps {
 export interface BasketballAccordionComponentCardProps {
 	country: string;
 	league: string;
+	tournamentId?: string;
 	flag?: string;
 	matches: Match[];
 	defaultExpanded?: boolean;

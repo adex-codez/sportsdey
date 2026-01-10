@@ -1,3 +1,4 @@
+import type { TournamentScheduleSchema } from "@/schemas";
 import type {
 	CompetitionGroup,
 	H2HMatch,
@@ -5,6 +6,7 @@ import type {
 	TransformedMatchInfo,
 	TransformedResponse,
 } from "@/types/football";
+import type z from "zod";
 
 export function transformProxySchedule(data: any[]): TransformedResponse {
 	const competitionMap = new Map<string, CompetitionGroup>();
@@ -12,6 +14,8 @@ export function transformProxySchedule(data: any[]): TransformedResponse {
 	data.forEach((matchData) => {
 		const { tournament, homeTeam, awayTeam, status, times, date, id } =
 			matchData;
+		if(status.shortName === "PSP") return;
+if(status.shortName === "CNC") return;
 
 		const competitionId = tournament.id;
 
@@ -58,7 +62,9 @@ export function transformProxySchedule(data: any[]): TransformedResponse {
 	const priorityLeagues = [
 		"Champions League",
 		"English Premier League",
-		"La Liga",
+		"Spanish La Liga",
+		"Spanish La Liga 2",
+		"African Cup of Nations",
 		"Serie A",
 		"French Ligue 1",
 	];
@@ -68,10 +74,10 @@ export function transformProxySchedule(data: any[]): TransformedResponse {
 		const bName = b.competition.name;
 
 		const aIndex = priorityLeagues.findIndex((league) =>
-			aName.includes(league),
+			aName === league,
 		);
 		const bIndex = priorityLeagues.findIndex((league) =>
-			bName.includes(league),
+			bName === league,
 		);
 
 		if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
@@ -286,4 +292,41 @@ export function transformFullProxyStandings(data: any[]): import("@/types/footba
 		tournament,
 		standings,
 	};
+}
+
+export function transformTournamentSchedule(data: any[]): z.infer<typeof TournamentScheduleSchema> {
+	const matches = data.map((matchData) => {
+		const { homeTeam, awayTeam, status, times, date, id } = matchData;
+
+		return {
+			id: id,
+			competitors: {
+				home: {
+					id: homeTeam.id,
+					name: homeTeam.name,
+					score: homeTeam.score?.current ?? 0,
+				},
+				away: {
+					id: awayTeam.id,
+					name: awayTeam.name,
+					score: awayTeam.score?.current ?? 0,
+				},
+			},
+			date: date,
+			match_status: status.shortName === "FT" ? "closed" : status.shortName,
+			...(times?.currentMinute
+				? {
+						clock: {
+							played: times.currentMinute.toString(),
+						},
+					}
+				: {}),
+		};
+	});
+	
+	const competition = {
+		name: data[0].tournament.name,
+		id: data[0].tournament.id,
+	}
+	return { matches, total_matches: matches.length, competition };
 }

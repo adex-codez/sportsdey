@@ -1,5 +1,4 @@
 export type FootballSchedule = {
-  total_matches: number;
   competitions: {
     competition: {
       id: string;
@@ -31,6 +30,35 @@ export type FootballSchedule = {
       };
     }[];
   }[];
+  total_matches: number
+};
+
+export type TournamentFootballSchedule = {
+    competition: {
+        id: string;
+        name: string;
+    } 
+    matches: {
+      id: string;
+      competitors: {
+        home: {
+          id: string;
+          name: string;
+          score: number;
+        };
+        away: {
+          id: string;
+          name: string;
+          score: number;
+        };
+      };
+      date: string;
+      match_status: string;
+      clock?: {
+        played: string;
+      };
+    }[];
+total_matches: number
 };
 
 export type FootballMatchInfoType = {

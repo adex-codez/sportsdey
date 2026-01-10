@@ -5,6 +5,7 @@ import {
 	GameTeamStatsSchema,
 	ScheduleData,
 	StandingsSchema,
+	BasketballTournamentScheduleSchema,
 	VideoResponseSchema,
 	successResponseSchema,
 } from "@/schemas";
@@ -14,6 +15,7 @@ import {
 	transformGameTeamStats,
 	transformProxySchedule,
 	transformProxyStandings,
+	transformTournamentSchedule,
 } from "@/utils/basketball";
 import { jsonZodErrorFormatter } from "@/utils/zod";
 import {
@@ -838,6 +840,159 @@ basketballRoute.openapi(
 							field: "server",
 							message:
 								"An unexpected error occurred while processing your request",
+							code: "internal_error",
+						},
+					],
+				},
+				500,
+			);
+		}
+	},
+	jsonZodErrorFormatter,
+);
+
+const basketballTournamentMatchesRoute = createRoute({
+	method: "get",
+	path: "/tournament/{tournamentId}",
+	summary: "Get matches for a specific tournament on a date",
+	description: "Retrieves matches for a specific tournament on a given date.",
+	request: {
+		params: basketballStandingsParam,
+		query: basketballScheduleQuery,
+	},
+	responses: {
+		200: {
+			content: {
+				"application/json": {
+					schema: successResponseSchema(BasketballTournamentScheduleSchema),
+				},
+			},
+			description: "Successfully retrieved tournament matches",
+		},
+		400: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "Bad request",
+		},
+		500: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "Internal server error",
+		},
+		502: {
+			content: {
+				"application/json": {
+					schema: ErrorResponseSchema,
+				},
+			},
+			description: "External API error",
+		},
+	},
+	tags: ["Basketball"],
+});
+
+basketballRoute.openapi(
+	basketballTournamentMatchesRoute,
+	async (c) => {
+		try {
+			const { tournamentId } = c.req.valid("param");
+			const { date } = c.req.valid("query");
+
+			const proxyUrl = c.env.PROXY_URL;
+			const proxySecret = c.env.PROXY_SECRET;
+
+			if (!proxyUrl || !proxySecret) {
+				return c.json(
+					{
+						success: false as const,
+						error: "Configuration error",
+						details: [
+							{
+								field: "server",
+								message: "Proxy configuration missing",
+								code: "config_error",
+							},
+						],
+					},
+					500,
+				);
+			}
+
+			const cacheKey = `basketball_tournament_${tournamentId}_matches_${date}`;
+			const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+				data: any;
+				expiresAt: number;
+			} | null;
+
+			if (cachedData && Date.now() <= cachedData.expiresAt) {
+				return c.json(
+					{
+						success: true as const,
+						data: cachedData.data,
+					},
+					200,
+				);
+			}
+
+			const apiUrl = `${proxyUrl}basketball/match/list?date=${date}`;
+
+			const response = await fetch(apiUrl, {
+				headers: {
+					"X-Proxy-Auth": proxySecret,
+				},
+			});
+
+			if (!response.ok) {
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [
+							{
+								field: "proxy_api",
+								message: `Proxy API returned status ${response.status}`,
+								code: "external_api_error",
+							},
+						],
+					},
+					502,
+				);
+			}
+
+			const data = await response.json();
+			const transformedData = transformTournamentSchedule(data as any[], tournamentId);
+
+			await c.env.sportsdey_ns.put(
+				cacheKey,
+				JSON.stringify({
+					data: transformedData,
+					expiresAt: Date.now() + 30 * 1000,
+				}),
+			);
+
+			return c.json(
+				{
+					success: true as const,
+					data: transformedData,
+				},
+				200,
+			);
+		} catch (error) {
+			console.error(error);
+			return c.json(
+				{
+					success: false as const,
+					error: "Internal server error",
+					details: [
+						{
+							field: "server",
+							message: "An unexpected error occurred",
 							code: "internal_error",
 						},
 					],

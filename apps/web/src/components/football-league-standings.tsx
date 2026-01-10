@@ -4,7 +4,7 @@ type FootballStandingsProps = {
   standings: FootballMatchInfoType["standings"];
 }
 export const FootballStandings = ({ standings }: FootballStandingsProps) => {
-  if(!standings) return null;
+  if(!standings || standings.length === 0) return null;
   return (
     <div className="rounded-2xl bg-white">
 				<div className="flex justify-between items-center px-4 py-2 font-semibold">
