@@ -121,7 +121,7 @@ const Sidebar = () => {
 											className="w-8 h-8 object-contain"
 										/>
 										<span
-											className="text-sm font-medium truncate max-w-[120px]"
+											className="text-sm font-medium truncate max-w-30"
 											title={team.name}
 										>
 											{team.name}
