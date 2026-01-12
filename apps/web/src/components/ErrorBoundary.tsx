@@ -52,13 +52,13 @@ export class ErrorBoundary extends Component<Props, State> {
                             We encountered an unexpected error. Please try refreshing the page.
                         </p>
 
-                        {this.state.error && (
+                        {/* {this.state.error && (
                             <div className="mb-6 rounded-md bg-gray-100 p-4">
                                 <p className="text-sm text-gray-700">
                                     <strong>Error:</strong> {this.state.error.message}
                                 </p>
                             </div>
-                        )}
+                        )} */}
 
                         <button
                             onClick={this.handleRefresh}

@@ -174,6 +174,7 @@ function RouteComponent() {
 				hostTeamScore={gameInfo.competitors.home.score}
 				guestTeamName={gameInfo.competitors.away.name}
 				guestTeamScore={gameInfo.competitors.away.score}
+				clock={gameInfo.clock}
 				competitionCountry=""
 				matchStatus={
 					matchStatus === "finished" ||

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCurrentSport } from "@/hooks/use-current-sport";
-import { useState } from "react";
+import {  useState } from "react";
 import { cn } from "@/lib/utils";
 import { VideosTab } from "@/components/news-videos";
 import { NewsPage } from "@/components/news-page";
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/news/")({
 });
 
 function RouteComponent() {
-	const sport = useCurrentSport();
+	const sports = useCurrentSport()
 	const [activeTab, setActiveTab] = useState<"news" | "videos">("news");
 
 	const tabs = [
@@ -39,8 +39,8 @@ function RouteComponent() {
 				))}
 			</div>
 
-			{activeTab === "videos" && <VideosTab sport={sport} />}
-			{activeTab === "news" && <NewsPage sport={sport} />}
+			{activeTab === "videos" && <VideosTab sport={sports!} />}
+			{activeTab === "news" && <NewsPage sport={sports!} />}
 		</div>
 	);
 }

@@ -24,6 +24,9 @@ export default function Header() {
 	const currentSport = useCurrentSport();
 	const { setTab, tab } = useActiveTab();
 	const { totalFavoritesCount } = useFavorites();
+	useEffect(() => {
+		console.log(currentSport);
+	}, [currentSport]);
 
 	const links = [
 		{ to: "/", label: "Football", icon: FootballIcon, sport: SPORTS.FOOTBALL },
@@ -103,6 +106,7 @@ export default function Header() {
 									key={to}
 									to={to as string}
 									onClick={() => setTab("scores")}
+									search={{ sports: sport }}
 									className={cn(
 										"flex shrink-0 gap-2 pb-2",
 										currentSport === sport
@@ -227,7 +231,7 @@ export default function Header() {
 									</li>
 								</ul>
 							</div>
-<div className="">
+							<div className="">
 								<div className="w-full px-4 bg-[#202120] py-4 text-base">
 									Info
 								</div>
@@ -239,7 +243,7 @@ export default function Header() {
 										)}
 										onClick={() => {
 											setOpen(false);
-											setTab("betting")
+											setTab("betting");
 											router.navigate({ to: "/betting" });
 										}}
 									>
@@ -255,7 +259,7 @@ export default function Header() {
 									</li> */}
 								</ul>
 							</div>
-<div className="">
+							<div className="">
 								<div className="w-full px-4 bg-[#202120] py-4 text-base">
 									Social Links
 								</div>
@@ -265,14 +269,13 @@ export default function Header() {
 											key={id}
 											href={link}
 											target="_blank"
-							rel="noopener noreferrer"
-							className="flex size-8 items-center justify-center rounded-full bg-white p-2"
-						>
-							<Icon />
-						</a>
-					))}
-				</div>
-								
+											rel="noopener noreferrer"
+											className="flex size-8 items-center justify-center rounded-full bg-white p-2"
+										>
+											<Icon />
+										</a>
+									))}
+								</div>
 							</div>
 						</div>
 					</aside>
@@ -309,17 +312,19 @@ export default function Header() {
 								Betting
 							</Link>
 						</li>
-						<li>
-							<a
-								href="#"
-								className="font-semibold text-secondary text-sm"
-								onClick={() => {
+						<li
+							onClick={() => {
 									setTab("news");
 									router.navigate({
 										to: "/news",
 										search: { sports: currentSport },
 									});
 								}}
+						>
+							<a
+								href="#"
+								className="font-semibold text-secondary text-sm"
+								
 							>
 								News
 							</a>

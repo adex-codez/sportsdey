@@ -330,6 +330,7 @@ const BasketBallDetailsPage = () => {
           matchStatus={
             gameDetails.status
           }
+          clock={gameDetails.clock}
           hostTeamScore={gameDetails.home.points}
           guestTeamScore={gameDetails.away.points}
           guestTeamLogo={getBasketballTeamLogo(gameDetails.away.name)}

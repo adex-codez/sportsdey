@@ -22,13 +22,14 @@ export function formatDateTimeWithoutSeconds(dateTimeString: string): string {
   return `${date} ${timeWithoutSeconds}`;
 }
 
-export function formatTimeFromString(secondsStr: string) {
-  const totalSeconds = Number(secondsStr) || 0
+export function formatClock(playedMinutesStr: number | string) {
+  if(typeof playedMinutesStr === "string") {
+    return playedMinutesStr
+  }
+ const minutes = playedMinutesStr
+  const seconds = 0
 
-  const minutes = Math.floor(totalSeconds / 60)
-  const seconds = totalSeconds % 60
-
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}` 
 }
 
 // async function searchYouTubeVideos(topic) {

@@ -17,6 +17,8 @@ import Header from "../components/header";
 import appCss from "../index.css?url";
 import { Provider } from "react-redux";
 import { store } from "@/store";
+import { SPORTS } from "@/lib/constants";
+import z from "zod";
 
 export type RouterAppContext = {};
 
@@ -48,6 +50,11 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 				title: "sportsdey",
 			},
 		],
+	}),
+	validateSearch: z.object({
+			sports: z
+				.enum([SPORTS.FOOTBALL, SPORTS.TENNIS, SPORTS.BASKETBALL])
+				.optional(),
 	}),
 
 	component: RootDocument,

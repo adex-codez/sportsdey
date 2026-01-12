@@ -25,9 +25,7 @@ export type FootballSchedule = {
       };
       start_time: string;
       match_status: string;
-      clock?: {
-        played: string;
-      };
+      clock?: number;
     }[];
   }[];
   total_matches: number
@@ -54,9 +52,7 @@ export type TournamentFootballSchedule = {
       };
       date: string;
       match_status: string;
-      clock?: {
-        played: string;
-      };
+      clock?: number;
     }[];
 total_matches: number
 };
@@ -87,10 +83,7 @@ export type FootballMatchInfoType = {
     stadium: string;
     capacity: number;
   };
-  clock?: {
-    played: string;
-    stoppage_time_played?: string;
-  };
+  clock?: number; 
   status: string | { name: string; shortname: string };
   standings?: {
     id: string;
