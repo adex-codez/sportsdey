@@ -7,9 +7,6 @@ import type { Sport } from "@/lib/constants";
 import { useEffect } from "react";
 
 export const NewsPage = ({sport}: {sport: Sport}) => {
-	useEffect(() => {
-		console.log("sports", sport)
-	}, [])
 	const { data, isLoading } = useNewsData(sport);
 	if (isLoading) {
 		return (

@@ -39,6 +39,5 @@ export const getNewsById = createServerFn({ method: "GET" })
     `,
 			{ id },
 		);
-		console.log(response);
 		return response;
 	});

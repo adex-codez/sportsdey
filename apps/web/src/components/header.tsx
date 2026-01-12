@@ -23,10 +23,7 @@ import { socials } from "./socials";
 export default function Header() {
 	const currentSport = useCurrentSport();
 	const { setTab, tab } = useActiveTab();
-	const { totalFavoritesCount } = useFavorites();
-	useEffect(() => {
-		console.log(currentSport);
-	}, [currentSport]);
+	// const { totalFavoritesCount } = useFavorites();
 
 	const links = [
 		{ to: "/", label: "Football", icon: FootballIcon, sport: SPORTS.FOOTBALL },

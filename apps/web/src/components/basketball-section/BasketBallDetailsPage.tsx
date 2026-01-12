@@ -335,7 +335,7 @@ const BasketBallDetailsPage = () => {
           guestTeamScore={gameDetails.away.points}
           guestTeamLogo={getBasketballTeamLogo(gameDetails.away.name)}
           guestTeamName={gameDetails.away.name}
-          isUpcoming={gameDetails.status === 'scheduled'}
+          isUpcoming={gameDetails.status.toLowerCase() === 'scheduled'}
           countdownText={countdown}
           scheduledDate={gameDetails.date ? format(safeParseDate(gameDetails.date), 'dd/MM/yyyy') : undefined}
           scheduledTime={gameDetails.date ? format(safeParseDate(gameDetails.date), 'HH:mm') : undefined}

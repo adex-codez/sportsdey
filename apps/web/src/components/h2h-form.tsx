@@ -9,9 +9,6 @@ type H2HFormProps = {
 }
 
 export const H2HForm = ({ homeH2H, awayH2H, homeName, awayName }: H2HFormProps) => {
-  useEffect(() => {
-    console.log(homeH2H, awayH2H) 
-  }, [homeH2H, awayH2H]);
   if(!homeH2H || !awayH2H) return null;
    return (
       <div className="rounded-2xl bg-white">

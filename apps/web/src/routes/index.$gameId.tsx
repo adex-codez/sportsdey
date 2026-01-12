@@ -60,9 +60,6 @@ function RouteComponent() {
 		typeof gameInfo?.status === "string"
 			? gameInfo?.status
 			: gameInfo?.status?.shortname;
-	useEffect(() => {
-		console.log(statsData);
-	}, [statsData]);
 
 	useEffect(() => {
 		if (tab === "table") {
