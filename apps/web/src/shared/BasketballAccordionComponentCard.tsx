@@ -142,7 +142,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
 			className={`grid cursor-pointer ${hideFinishedStatus ? "grid-cols-[40px_1fr_40px]" : "grid-cols-[50px_1fr_40px]"} items-center gap-x-4 px-5 py-3.5 border-b border-border hover:bg-muted/30 transition-colors last:border-b-0`}
 		>
 			<div
-				className={`flex items-center justify-center capitalize w-[35px] h-[35px] rounded-[10px] ${
+				className={`flex items-center justify-center capitalize w-8.75 h-8.75 rounded-[10px] ${
 					s !== "sch" && s !== "scheduled" && !isFinished
 						? "bg-[#0E8F1A] text-white text-[9px] font-medium animate-pulse"
 						: "text-muted-foreground text-xs font-medium"
