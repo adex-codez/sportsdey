@@ -181,7 +181,7 @@ export function TeamStats({ teams, className, isLoading }: TeamStatsProps) {
       <Accordion type="multiple" className="w-full">
         {teams.map((team, idx) => (
           <AccordionItem key={idx} value={`item-${idx}`} className="border-b border-[#C8C8C8]">
-            <AccordionTrigger className="px-3 py-3 hover:no-underline hover:bg-gray-50">
+            <AccordionTrigger className="px-3 py-3 hover:no-underline hover:bg-gray-50" isCollapsible={true}>
               <div className="flex items-center gap-x-2">
                 {team.teamLogo && (
                   <img src={team.teamLogo || "/placeholder.svg"} alt={team.teamName} className="w-6 h-6 object-contain" />

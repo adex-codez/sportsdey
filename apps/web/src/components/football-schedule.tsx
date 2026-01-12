@@ -193,7 +193,7 @@ const FootballSchedule = () => {
 								className="w-full rounded-2xl bg-white"
 							>
 								<Link to="/index/tournament/$tournamentId" params={{ tournamentId: competition.competition.id }}>
-									<AccordionTrigger className="cursor-pointer rounded-none border-gray-100 px-4 font-bold text-primary [&[data-state=open]]:border-b">
+									<AccordionTrigger className="cursor-pointer rounded-none border-gray-100 px-4 font-bold text-primary [&[data-state=open]]:border-b" isCollapsible={false}>
 										{competition.competition.name}
 									</AccordionTrigger>
 								</Link>
