@@ -53,6 +53,7 @@ const BasketballComponentHeader: React.FC<BasketballComponentHeaderProps> = ({
 					<button
 						onClick={(e) => {
 							e.stopPropagation();
+							e.preventDefault();
 							onFavoriteToggle?.(e);
 						}}
 						className={`text-sm border-none bg-transparent cursor-pointer transition-colors ml-1 ${
@@ -292,6 +293,7 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
 
 	const handleLeagueFavoriteToggle = (e: React.MouseEvent) => {
 		e.stopPropagation();
+		e.preventDefault();
 		toggleFavoriteLeague({
 			id: league, // Using league name as ID for now as per common pattern in this app
 			name: league,
@@ -393,8 +395,7 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
 			{!isTournamentPage && tournamentId ? (
 				<Link
 					to="/basketball/tournament/$tournamentId"
-					params={{ tournamentId: String(tournamentId) }}
-				>
+						params={{ tournamentId: String(tournamentId) }} search={{ league } as any}>
 					<BasketballComponentHeader
 						flag={flag}
 						country={country}
