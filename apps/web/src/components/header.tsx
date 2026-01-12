@@ -85,6 +85,7 @@ export default function Header() {
 					>
 						<Menu width={36} height={36} color="#f4f4f4" />
 					</button>
+					<Link to="/" search={{league: undefined, sports: currentSport}}>
 					<div className="flex min-w-0 justify-center self-center">
 						<img
 							src="/sportsdey-logo.png"
@@ -92,6 +93,7 @@ export default function Header() {
 							alt="sportsdey's logo"
 						/>
 					</div>
+</Link>
 					<div className="lg:hidden" />
 				</div>
 

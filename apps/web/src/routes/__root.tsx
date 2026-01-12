@@ -67,11 +67,7 @@ function RootDocument() {
 				<head>
 					<HeadContent />
 					<link rel="icon" href="/Favicon.svg" type="image/svg+xml" />
-					<script
-						async
-						src="https://www.googletagmanager.com/gtag/js?id=G-NYYV5808XG"
-					/>
-					<script
+										<script
 						dangerouslySetInnerHTML={{
 							__html: `
         (function(w,d,s,l,i){w[l]=w[l]||[];
