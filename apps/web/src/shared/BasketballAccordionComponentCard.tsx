@@ -8,7 +8,7 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import React, { useState } from "react";
 import { useFavorites } from "@/hooks/useFavorites";
-import { formatTimeFromString } from "@/lib/utils";
+import { formatClock } from "@/lib/utils";
 
 const BasketballComponentHeader: React.FC<BasketballComponentHeaderProps> = ({
 	flag,
@@ -152,7 +152,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
 					if (hideFinishedStatus && isFinished) return null;
 					if (isFinished) return "FT";
 
-					return s === "sch" || s === "scheduled" ? time : clock ? formatTimeFromString(clock) : status;
+					return clock && clock !== "" ? formatClock(clock) : s === "sch" || s === "scheduled" ? time : status;
 				})()}
 			</div>
 
@@ -433,6 +433,7 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
 								team1={match.team1}
 								team2={match.team2}
 								time={match.time}
+								clock={match.clock}
 								player1Sets={match.player1Sets}
 								player2Sets={match.player2Sets}
 								score1={match.score1}

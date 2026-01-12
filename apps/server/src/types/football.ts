@@ -56,9 +56,7 @@ export type TransformedMatch = {
 	};
 	start_time: string;
 	match_status: string;
-	clock?: {
-		played: string;
-	};
+	clock?: number;
 };
 
 export type CompetitionGroup = {
@@ -136,10 +134,7 @@ export type TransformedMatchInfo = {
 		stadium: string;
 		// capacity: number;
 	};
-	clock?: {
-		played: string;
-		stoppage_time_played?: string;
-	};
+	clock?: number, 
 	status: {
 		name: string;
 		shortname: string;
@@ -213,6 +208,9 @@ export type ProxyMatchSummary = {
 			temperatureF: number;
 		};
 	};
+	times?: {
+		currentMinute: number 
+	}
 	date: string;
 	id: number;
 	tournament: {

@@ -23,10 +23,7 @@ export const TransformedMatchInfoSchema = z.object({
 		// capacity: z.number(),
 	}),
 	clock: z
-		.object({
-			played: z.string(),
-			stoppage_time_played: z.string().optional(),
-		})
+		.number()
 		.optional(),
 	status: z.object({
 		name: z.string(),
@@ -130,11 +127,7 @@ export const TransformedResponseSchema = z.object({
 					}),
 					date: z.string(),
 					match_status: z.string(),
-					clock: z
-						.object({
-							played: z.string(),
-						})
-						.optional(),
+					clock: z.number().optional(),
 				}),
 			),
 		}),
@@ -215,9 +208,7 @@ export const TournamentScheduleSchema = z.object({
 			date: z.string(),
 			match_status: z.string(),
 			clock: z
-				.object({
-					played: z.string(),
-				})
+				.number()
 				.optional(),
 		}),
 	),

@@ -22,6 +22,7 @@ export interface Match {
 	id?: string;
 	date?: string;
 	time?: string;
+	clock?: string;
 }
 
 export interface BasketballComponentHeaderProps {
@@ -42,7 +43,7 @@ export interface MatchCardProps {
 	team2: string;
 	player1Sets?: SetScore[];
 	player2Sets?: SetScore[];
-	clock?:string
+	clock?:number | string
 	score1?: number;
 	score2?: number;
 	status?: MatchStatus | string;

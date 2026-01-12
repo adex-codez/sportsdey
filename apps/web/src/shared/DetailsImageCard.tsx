@@ -1,6 +1,6 @@
 import { TabNavigation } from "@/components/ui/tab-navigation";
+import { formatClock } from "@/lib/utils";
 import type { DetailsImageProps } from "@/types/basketball";
-import { useEffect } from "react";
 
 interface DetailsImageCardProps extends DetailsImageProps {
   competitionName: string;
@@ -25,10 +25,12 @@ interface DetailsImageCardProps extends DetailsImageProps {
   countdownText?: string;
   scheduledDate?: string;
   scheduledTime?: string;
+  clock?: number | string;
 }
 
 const DetailsImageCard = ({ competitionName,
   competitionCountry,
+  clock,
   hostTeamName,
   guestTeamName,
   hostTeamLogo,
@@ -61,7 +63,7 @@ const DetailsImageCard = ({ competitionName,
     truncate            
     block
   ">
-            {competitionCountry} - {competitionName}
+            {competitionCountry ? `${competitionCountry} - ${competitionName}` : competitionName}
           </span>
           <button
             onClick={onFavoriteToggle}
@@ -122,7 +124,7 @@ const DetailsImageCard = ({ competitionName,
                     ? 'text-[#0E8F1A]'
                     : 'text-[#1BAA04]'
                     }`}>
-                    {matchStatus.toLowerCase() === 'finished a.e.t.' ? "Closed" : matchStatus}
+                    {clock && clock !== "" ? formatClock(clock)  :(matchStatus?.toLowerCase() === 'finished a.e.t.' || matchStatus?.toLowerCase() === 'finished' || matchStatus?.toLowerCase() === 'ft') ? "Closed" : matchStatus}
                   </span>
                 </>
               )}

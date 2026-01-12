@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import Bet from "@/logos/bet.svg?react";
 import News from "@/logos/news.svg?react";
 import Score from "@/logos/score.svg?react";
+import Favourite from "@/logos/favourite.svg?react";
 import { type Tabs, useActiveTab } from "./active-tab-context";
 import { useCurrentSport } from "@/hooks/use-current-sport";
 import { useRouter } from "@tanstack/react-router";
@@ -16,7 +17,7 @@ const bottomBarItems: { id: number; item: Tabs; icon: React.FC<React.SVGProps<SV
 	{
 		id: 2,
 		item: "favourites",
-		icon: Bet,
+		icon: Favourite,
 	},
 	{
 		id: 3,

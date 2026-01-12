@@ -122,7 +122,7 @@ newsRoute.openapi(
 				nextPageToken: data.nextPageToken,
 				prevPageToken: data.prevPageToken,
 				videos: data.items.map((item: any) => ({
-					videoEmbedUrl: `https://www.youtube.com/embed/${item.id.videoId}`,
+					videoId: item.id.videoId,
 					publishedAt: item.snippet.publishedAt,
 					title: item.snippet.title,
 				})),

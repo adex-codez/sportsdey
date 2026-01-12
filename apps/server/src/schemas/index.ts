@@ -22,7 +22,7 @@ export const ErrorResponseSchema = z.object({
 });
 
 export const VideoSchema = z.object({
-	videoEmbedUrl: z.string(),
+	videoId: z.string(),
 	publishedAt: z.string(),
 	title: z.string(),
 });

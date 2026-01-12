@@ -21,7 +21,7 @@ import { useCurrentFilter } from "@/hooks/use-current-filter";
 
 const FootballSchedule = () => {
 	const { isFavoriteMatch, toggleFavoriteMatch } = useFavorites();
-	const router = useRouter();
+	// const router = useRouter();
 	const search = useSearch({ from: "/" }) as {
 		league?: string;
 		sports?: string;
@@ -212,7 +212,7 @@ const FootballSchedule = () => {
 													time={formatTime(new Date(match.start_time))}
 													score1={match.competitors.home.score}
 													score2={match.competitors.away.score}
-													clock={match.clock?.played}
+													clock={match.clock}
 													isFavorite={
 														match.id ? isFavoriteMatch(match.id) : false
 													}

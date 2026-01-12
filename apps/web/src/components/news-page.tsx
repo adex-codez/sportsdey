@@ -3,8 +3,13 @@ import { Loader2 } from "lucide-react";
 import { PortableText } from "@portabletext/react";
 import { urlFor } from "@/lib/sanity";
 import { Link } from "@tanstack/react-router";
+import type { Sport } from "@/lib/constants";
+import { useEffect } from "react";
 
-export const NewsPage = ({sport}: {sport: string}) => {
+export const NewsPage = ({sport}: {sport: Sport}) => {
+	useEffect(() => {
+		console.log("sports", sport)
+	}, [])
 	const { data, isLoading } = useNewsData(sport);
 	if (isLoading) {
 		return (

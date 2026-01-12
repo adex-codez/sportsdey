@@ -47,9 +47,7 @@ if(status.shortName === "CNC") return;
 			match_status: status.shortName === "FT" ? "closed" : status.shortName,
 			...(times?.currentMinute
 				? {
-						clock: {
-								played: times.currentMinute.toString(),
-							},
+						clock: times.currentMinute,
 					}
 				: {}),
 		};
@@ -124,6 +122,7 @@ export function transformProxyMatchInfo(
 			date_time: summary.date,
 			stadium: summary.info?.stadium?.name ?? "",
 		},
+		...(summary.times ? {clock: summary.times?.currentMinute} : {}),
 		status: {
 			name: summary.status.name,
 			shortname: summary.status.shortName,
@@ -316,9 +315,7 @@ export function transformTournamentSchedule(data: any[]): z.infer<typeof Tournam
 			match_status: status.shortName === "FT" ? "closed" : status.shortName,
 			...(times?.currentMinute
 				? {
-						clock: {
-							played: times.currentMinute.toString(),
-						},
+						clock: times.currentMinute,
 					}
 				: {}),
 		};
