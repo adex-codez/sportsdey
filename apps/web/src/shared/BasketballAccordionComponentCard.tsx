@@ -125,7 +125,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
 		s === "ended" ||
     s === "fto" ||
     s === "fpt" ||
-    s === "fpo"
+    s === "fpo" ||
 		s === "ft";
 	const isLive =
 		s === "live" ||
