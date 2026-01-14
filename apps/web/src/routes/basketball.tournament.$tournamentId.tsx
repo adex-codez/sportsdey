@@ -7,7 +7,7 @@ import type { BasketballTournamentScheduleData } from '@/types/api';
 import type { League } from '@/types/basketball';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import FixtureFilterHeaders from '@/shared/FixtureFilterHeaders';
 import { ErrorState } from '@/components/ErrorState';
 import { useApiError } from '@/hooks/useApiError';
@@ -47,6 +47,7 @@ const { tournamentId } = Route.useParams();
       return apiRequest<BasketballTournamentScheduleData>(`basketball/tournament/${tournamentId}?date=${paddedDay}/${paddedMonth}/${year}&language=en`);
     },
   });
+
 
   const { isNetworkError } = useApiError({ error, isError, refetch });
 
@@ -238,6 +239,7 @@ const { tournamentId } = Route.useParams();
       ? `https://flagcdn.com/w40/${code}.png`
       : code === 'eu' ? '/International.png'
         : '/International.png';
+    console.log("flagUrl", flagUrl, "countryDisplay", countryDisplay)
 
     return { country: countryDisplay, flag: flagUrl };
   };
@@ -289,6 +291,7 @@ const { tournamentId } = Route.useParams();
     });
 
     if (filteredMatches.length === 0) return [];
+
 
     return [{
       id: comp.id.toString(),

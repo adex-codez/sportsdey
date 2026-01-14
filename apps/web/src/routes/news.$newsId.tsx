@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { getNewsById } from "@/lib/news-server";
 import { PortableText } from "@portabletext/react";
 import { urlFor } from "@/lib/sanity";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/news/$newsId")({
 	loader: ({ params }) => getNewsById({ data: params.newsId }),
@@ -10,23 +11,46 @@ export const Route = createFileRoute("/news/$newsId")({
 
 function RouteComponent() {
 	const news = Route.useLoaderData();
+	useEffect(() => {
+		console.log(news.body);
+	}, []);
 
 	if (!news)
 		return <div className="p-8 text-center uppercase">News not found</div>;
 
 	return (
-		<div className="mx-auto max-w-4xl rounded-xl bg-white p-4 shadow-sm">
-			<img
-				src={urlFor(news.image).url()}
-				alt={news.title}
-				className="mb-6 h-[400px] w-full rounded-lg object-cover"
-			/>
+		<div className="mx-auto max-w-3xl rounded-xl bg-white p-4 shadow-sm">
+				<div className="w-full pb-[65%] relative rounded-lg overflow-hidden">
+				<img
+					src={urlFor(news.image).url()}
+					alt={news.title}
+					className="absolute top-0 left-0 w-full h-full object-cover"
+				/>
+				</div>
 			<h1 className="mb-4 text-3xl font-bold">{news.title}</h1>
 			<p className="mb-8 text-sm text-gray-400">
 				{new Date(news.publishedAt).toLocaleDateString()}
 			</p>
 			<div className="prose prose-sm sm:prose-base lg:prose-lg max-w-none">
-				<PortableText value={news.body} />
+				<PortableText
+					value={news.body}
+					components={{
+						block: {
+							normal: ({ children }) => {
+								const text = Array.isArray(children)
+									? children.join("").trim()
+									: "";
+
+								// empty block → spacer
+								if (!text) {
+									return <div className="h-4" />;
+								}
+
+								return <p className="mb-4">{children}</p>;
+							},
+						},
+					}}
+				/>
 			</div>
 		</div>
 	);

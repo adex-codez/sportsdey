@@ -1,997 +1,1009 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { z } from "zod";
 import {
-  ErrorResponseSchema,
-  successResponseSchema,
-  TransformedMatchInfoSchema,
-  TransformedResponseSchema,
-  VideoResponseSchema,
-  MatchStatsSchema,
-  FullStandingsSchema,
-  TournamentScheduleSchema,
+	ErrorResponseSchema,
+	successResponseSchema,
+	TransformedMatchInfoSchema,
+	TransformedResponseSchema,
+	VideoResponseSchema,
+	MatchStatsSchema,
+	FullStandingsSchema,
+	TournamentScheduleSchema,
 } from "@/schemas";
 // import type { ScheduleRes } from "@/types";
 // import type { StandingsRes, TeamStanding } from "@/types/football";
 // import { fetchWithErrorHandling } from "@/utils";
 import {
-  transformProxyH2H,
-  transformProxyMatchInfo,
-  transformProxySchedule,
-  transformProxyStandings,
-  transformProxyStats,
-  transformProxyTopScorers,
-  transformFullProxyStandings,
-  transformTournamentSchedule,
+	transformProxyH2H,
+	transformProxyMatchInfo,
+	transformProxySchedule,
+	transformProxyStandings,
+	transformProxyStats,
+	transformProxyTopScorers,
+	transformFullProxyStandings,
+	transformTournamentSchedule,
 } from "@/utils/football";
 import { jsonZodErrorFormatter } from "@/utils/zod";
 import { footballVideosQuery } from "@/validators";
 const footballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 
 footballRoute.openapi(
-  createRoute({
-    method: "get",
-    path: "/{status}",
-    request: {
-      params: z.object({
-        status: z.string().openapi({
-          description: "Matches status either all, scheduled and live",
-          example: "all",
-        }),
-      }),
-      query: z.object({
-        lang: z
-          .string()
-          .optional()
-          .openapi({ description: "Language code", example: "en" }),
-        date: z.string().openapi({
-          description: "Schedule date (DD-MM-YYYY)",
-          example: "15/09/2024",
-        }),
-      }),
-    },
-    responses: {
-      200: {
-        description: "Transformed football schedule",
-        content: {
-          "application/json": {
-            schema: successResponseSchema(TransformedResponseSchema),
-          },
-        },
-      },
-      500: {
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-        description: "Internal server error",
-      },
-      502: {
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-        description: "Bad gateway - external API error",
-      },
-    },
-    tags: ["Football"],
-    summary: "Get football schedule for a given date",
-  }),
-  async (c) => {
-    const { status } = c.req.valid("param");
-    const { date } = c.req.valid("query");
-    const base = c.env.PROXY_URL;
-    const proxySecret = c.env.PROXY_SECRET;
+	createRoute({
+		method: "get",
+		path: "/{status}",
+		request: {
+			params: z.object({
+				status: z.string().openapi({
+					description: "Matches status either all, scheduled and live",
+					example: "all",
+				}),
+			}),
+			query: z.object({
+				lang: z
+					.string()
+					.optional()
+					.openapi({ description: "Language code", example: "en" }),
+				date: z.string().openapi({
+					description: "Schedule date (DD-MM-YYYY)",
+					example: "15/09/2024",
+				}),
+			}),
+		},
+		responses: {
+			200: {
+				description: "Transformed football schedule",
+				content: {
+					"application/json": {
+						schema: successResponseSchema(TransformedResponseSchema),
+					},
+				},
+			},
+			500: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "Internal server error",
+			},
+			502: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "Bad gateway - external API error",
+			},
+		},
+		tags: ["Football"],
+		summary: "Get football schedule for a given date",
+	}),
+	async (c) => {
+		const { status } = c.req.valid("param");
+		const { date } = c.req.valid("query");
+		const base = c.env.PROXY_URL;
+		const proxySecret = c.env.PROXY_SECRET;
 
-    let url = "";
-    const cleanBase = base.replace(/\/+$/, "");
+		let url = "";
+		const cleanBase = base.replace(/\/+$/, "");
 
-    if (status === "all") {
-      url = `${cleanBase}/soccer/match/list?date=${date}`;
-    } else {
-      url = `${cleanBase}/soccer/match/list/${encodeURIComponent(
-        status
-      )}/?date=${date}`;
-    }
+		if (status === "all") {
+			url = `${cleanBase}/soccer/match/list?date=${date}`;
+		} else {
+			url = `${cleanBase}/soccer/match/list/${encodeURIComponent(
+				status,
+			)}/?date=${date}`;
+		}
 
+		const cachedData = (await c.env.sportsdey_ns.get(
+			`football_schedule_${date}_${status}`,
+			"json",
+		)) as {
+			data: any;
+			expiresAt: number;
+		} | null;
 
-    const cachedData = (await c.env.sportsdey_ns.get(
-      `football_schedule_${date}_${status}`,
-      "json"
-    )) as {
-      data: any;
-      expiresAt: number;
-    } | null;
+		if (cachedData && Date.now() <= cachedData.expiresAt) {
+			return c.json(
+				{
+					success: true as const,
+					data: cachedData.data,
+				},
+				200,
+			);
+		}
 
-    if (cachedData && Date.now() <= cachedData.expiresAt) {
-      return c.json(
-        {
-          success: true as const,
-          data: cachedData.data,
-        },
-        200
-      );
-    }
+		try {
+			const upstream = await fetch(url, {
+				headers: {
+					"X-Proxy-Auth": proxySecret,
+					Accept: "application/json",
+				},
+			});
 
-    try {
-      const upstream = await fetch(url, {
-        headers: {
-          "X-Proxy-Auth": proxySecret,
-          Accept: "application/json",
-        },
-      });
+			if (!upstream.ok) {
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [
+							{
+								field: "proxy_api",
+								message: `Proxy API returned status ${upstream.status}`,
+								code: "external_api_error",
+							},
+						],
+					},
+					502,
+				);
+			}
 
-      if (!upstream.ok) {
-        return c.json(
-          {
-            success: false as const,
-            error: "External API error",
-            details: [
-              {
-                field: "proxy_api",
-                message: `Proxy API returned status ${upstream.status}`,
-                code: "external_api_error",
-              },
-            ],
-          },
-          502
-        );
-      }
+			const data = (await upstream.json()) as any[];
 
-      const data = (await upstream.json()) as any[];
+			const transformedData = transformProxySchedule(data);
 
-      const transformedData = transformProxySchedule(data);
+			await c.env.sportsdey_ns.put(
+				`football_schedule_${date}_${status}`,
+				JSON.stringify({
+					data: transformedData,
+					expiresAt: Date.now() + 30 * 1000,
+				}),
+			);
 
-      await c.env.sportsdey_ns.put(
-        `football_schedule_${date}_${status}`,
-        JSON.stringify({
-          data: transformedData,
-          expiresAt: Date.now() + 30 * 1000
-        })
-      );
-
-      return c.json(
-        {
-          success: true as const,
-          data: transformedData,
-        },
-        200
-      );
-    } catch (err) {
-      return c.json(
-        {
-          success: false as const,
-          error: "Internal server error",
-          details: [
-            {
-              field: "server",
-              message:
-                "An unexpected error occurred while processing your request",
-              code: "internal_error",
-            },
-          ],
-        },
-        500
-      );
-    }
-  }
+			return c.json(
+				{
+					success: true as const,
+					data: transformedData,
+				},
+				200,
+			);
+		} catch (err) {
+			return c.json(
+				{
+					success: false as const,
+					error: "Internal server error",
+					details: [
+						{
+							field: "server",
+							message:
+								"An unexpected error occurred while processing your request",
+							code: "internal_error",
+						},
+					],
+				},
+				500,
+			);
+		}
+	},
 );
 
 footballRoute.openapi(
-  createRoute({
-    method: "get",
-    path: "/tournament/{tournamentId}",
-    request: {
-      params: z.object({
-        tournamentId: z.string().openapi({
-          description: "Tournament ID",
-          example: "2",
-        }),
-      }),
-      query: z.object({
-        date: z.string().openapi({
-          description: "Schedule date (DD-MM-YYYY)",
-          example: "15/09/2024",
-        }),
-      }),
-    },
-    responses: {
-      200: {
-        description: "Filtered tournament schedule",
-        content: {
-          "application/json": {
-            schema: successResponseSchema(TournamentScheduleSchema),
-          },
-        },
-      },
-      500: {
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-        description: "Internal server error",
-      },
-      502: {
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-        description: "Bad gateway - external API error",
-      },
-    },
-    tags: ["Football"],
-    summary: "Get football schedule for a given date filtered by tournament ID",
-  }),
-  async (c) => {
-    const { tournamentId } = c.req.valid("param");
-    const { date } = c.req.valid("query");
-    const base = c.env.PROXY_URL;
-    const proxySecret = c.env.PROXY_SECRET;
-    const cleanBase = base.replace(/\/+$/, "");
-    const url = `${cleanBase}/soccer/match/list?date=${date}`;
+	createRoute({
+		method: "get",
+		path: "/tournament/{tournamentId}",
+		request: {
+			params: z.object({
+				tournamentId: z.string().openapi({
+					description: "Tournament ID",
+					example: "2",
+				}),
+			}),
+			query: z.object({
+				date: z.string().openapi({
+					description: "Schedule date (DD-MM-YYYY)",
+					example: "15/09/2024",
+				}),
+			}),
+		},
+		responses: {
+			200: {
+				description: "Filtered tournament schedule",
+				content: {
+					"application/json": {
+						schema: successResponseSchema(TournamentScheduleSchema),
+					},
+				},
+			},
+			500: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "Internal server error",
+			},
+			502: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "Bad gateway - external API error",
+			},
+		},
+		tags: ["Football"],
+		summary: "Get football schedule for a given date filtered by tournament ID",
+	}),
+	async (c) => {
+		const { tournamentId } = c.req.valid("param");
+		const { date } = c.req.valid("query");
+		const base = c.env.PROXY_URL;
+		const proxySecret = c.env.PROXY_SECRET;
+		const cleanBase = base.replace(/\/+$/, "");
+		const url = `${cleanBase}/soccer/match/list?date=${date}`;
 
-    const cacheKey = `football_tournament_schedule_${tournamentId}_${date}`;
-    const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-      data: any;
-      expiresAt: number;
-    } | null;
+		const cacheKey = `football_tournament_schedule_${tournamentId}_${date}`;
+		const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+			data: any;
+			expiresAt: number;
+		} | null;
 
-    if (cachedData && Date.now() <= cachedData.expiresAt) {
-      return c.json(
-        {
-          success: true as const,
-          data: cachedData.data,
-        },
-        200
-      );
-    }
+		if (cachedData && Date.now() <= cachedData.expiresAt) {
+			return c.json(
+				{
+					success: true as const,
+					data: cachedData.data,
+				},
+				200,
+			);
+		}
 
-    try {
-      const upstream = await fetch(url, {
-        headers: {
-          "X-Proxy-Auth": proxySecret,
-          Accept: "application/json",
-        },
-      });
+		try {
+			const upstream = await fetch(url, {
+				headers: {
+					"X-Proxy-Auth": proxySecret,
+					Accept: "application/json",
+				},
+			});
 
-      if (!upstream.ok) {
-        return c.json(
-          {
-            success: false as const,
-            error: "External API error",
-            details: [
-              {
-                field: "proxy_api",
-                message: `Proxy API returned status ${upstream.status}`,
-                code: "external_api_error",
-              },
-            ],
-          },
-          502
-        );
-      }
+			if (!upstream.ok) {
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [
+							{
+								field: "proxy_api",
+								message: `Proxy API returned status ${upstream.status}`,
+								code: "external_api_error",
+							},
+						],
+					},
+					502,
+				);
+			}
 
-      const rawData = (await upstream.json()) as any[];
+			const rawData = (await upstream.json()) as any[];
 
-      const filteredData = rawData.filter(
-        (match: any) => match.tournament?.id?.toString() === tournamentId
-      );
+			const filteredData = rawData.filter(
+				(match: any) => match.tournament?.id?.toString() === tournamentId,
+			);
 
-      const transformedata = transformTournamentSchedule(filteredData);
+			if (filteredData.length === 0) {
+				return c.json(
+					{
+						success: true as const,
+						data: {
+							matches: [],
+							total_matches: 0,
+							competition: {
+								id: tournamentId,
+								name: "Unknown Competition",
+							},
+						},
+					},
+					200,
+				);
+			}
+			const transformedata = transformTournamentSchedule(filteredData);
 
-      await c.env.sportsdey_ns.put(
-        cacheKey,
-        JSON.stringify({
-          data: transformedata,
-          expiresAt: Date.now() + 30 * 1000,
-        })
-      );
+			await c.env.sportsdey_ns.put(
+				cacheKey,
+				JSON.stringify({
+					data: transformedata,
+					expiresAt: Date.now() + 30 * 1000,
+				}),
+			);
 
-      return c.json(
-        {
-          success: true as const,
-          data: transformedata,
-        },
-        200
-      );
-    } catch (err) {
-      return c.json(
-        {
-          success: false as const,
-          error: "Internal server error",
-          details: [
-            {
-              field: "server",
-              message: "An unexpected error occurred while processing your request",
-              code: "internal_error",
-            },
-          ],
-        },
-        500
-      );
-    }
-  }
+			return c.json(
+				{
+					success: true as const,
+					data: transformedata,
+				},
+				200,
+			);
+		} catch (err) {
+			return c.json(
+				{
+					success: false as const,
+					error: "Internal server error",
+					details: [
+						{
+							field: "server",
+							message:
+								"An unexpected error occurred while processing your request",
+							code: "internal_error",
+						},
+					],
+				},
+				500,
+			);
+		}
+	},
 );
 
 footballRoute.openapi(
-  createRoute({
-    method: "get",
-    path: "/match/{id}",
-    request: {
-      params: z.object({
-        id: z.string().openapi({
-          description: "Match ID",
-          example: "1953516",
-        }),
-      }),
-      query: z.object({
-        lang: z
-          .string()
-          .optional()
-          .openapi({ description: "Language code", example: "en" }),
-      }),
-    },
-    responses: {
-      200: {
-        description: "Match info",
-        content: {
-          "application/json": {
-            schema: successResponseSchema(TransformedMatchInfoSchema),
-          },
-        },
-      },
-      400: {
-        description: "Bad request - invalid parameters or upstream error",
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-      },
-      500: {
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-        description: "Internal server error",
-      },
-      502: {
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-        description: "Bad gateway - external API error",
-      },
-    },
-    tags: ["Football"],
-    summary: "Get football match info by ID",
-  }),
-  async (c) => {
-    const { id } = c.req.valid("param");
-    const base = c.env.PROXY_URL;
-    const proxySecret = c.env.PROXY_SECRET;
-    const cleanBase = base.replace(/\/+$/, "");
-    const summaryUrl = `${cleanBase}/soccer/match/summary?matchId=${id}`;
+	createRoute({
+		method: "get",
+		path: "/match/{id}",
+		request: {
+			params: z.object({
+				id: z.string().openapi({
+					description: "Match ID",
+					example: "1953516",
+				}),
+			}),
+			query: z.object({
+				lang: z
+					.string()
+					.optional()
+					.openapi({ description: "Language code", example: "en" }),
+			}),
+		},
+		responses: {
+			200: {
+				description: "Match info",
+				content: {
+					"application/json": {
+						schema: successResponseSchema(TransformedMatchInfoSchema),
+					},
+				},
+			},
+			400: {
+				description: "Bad request - invalid parameters or upstream error",
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+			},
+			500: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "Internal server error",
+			},
+			502: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "Bad gateway - external API error",
+			},
+		},
+		tags: ["Football"],
+		summary: "Get football match info by ID",
+	}),
+	async (c) => {
+		const { id } = c.req.valid("param");
+		const base = c.env.PROXY_URL;
+		const proxySecret = c.env.PROXY_SECRET;
+		const cleanBase = base.replace(/\/+$/, "");
+		const summaryUrl = `${cleanBase}/soccer/match/summary?matchId=${id}`;
 
-    const cachedData = (await c.env.sportsdey_ns.get(
-      `match_${id}`,
-      "json"
-    )) as {
-      data: any;
-      expiresAt: number;
-    } | null;
+		const cachedData = (await c.env.sportsdey_ns.get(
+			`match_${id}`,
+			"json",
+		)) as {
+			data: any;
+			expiresAt: number;
+		} | null;
 
-    if (cachedData && Date.now() <= cachedData.expiresAt) {
-      return c.json(
-        {
-          success: true as const,
-          data: cachedData.data,
-        },
-        200
-      );
-    }
+		if (cachedData && Date.now() <= cachedData.expiresAt) {
+			return c.json(
+				{
+					success: true as const,
+					data: cachedData.data,
+				},
+				200,
+			);
+		}
 
-    try {
-      // 1. Fetch Match Summary
-      const summaryRes = await fetch(summaryUrl, {
-        headers: {
-          "X-Proxy-Auth": proxySecret,
-          Accept: "application/json",
-        },
-      });
+		try {
+			// 1. Fetch Match Summary
+			const summaryRes = await fetch(summaryUrl, {
+				headers: {
+					"X-Proxy-Auth": proxySecret,
+					Accept: "application/json",
+				},
+			});
 
-      if (!summaryRes.ok) {
-        return c.json(
-          {
-            success: false as const,
-            error: "External API error",
-            details: [
-              {
-                field: "proxy_api",
-                message: `Proxy API (summary) returned status ${summaryRes.status}`,
-                code: "external_api_error",
-              },
-            ],
-          },
-          502
-        );
-      }
+			if (!summaryRes.ok) {
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [
+							{
+								field: "proxy_api",
+								message: `Proxy API (summary) returned status ${summaryRes.status}`,
+								code: "external_api_error",
+							},
+						],
+					},
+					502,
+				);
+			}
 
-      const summaryData = (await summaryRes.json()) as any;
-      const tournamentId = summaryData.tournament?.id;
+			const summaryData = (await summaryRes.json()) as any;
+			const tournamentId = summaryData.tournament?.id;
 
-      if (!tournamentId) {
-        return c.json(
-          {
-            success: false as const,
-            error: "Data missing",
-            details: [
-              {
-                field: "proxy_api",
-                message: "Tournament ID missing in summary",
-                code: "external_api_error",
-              },
-            ],
-          },
-          502
-        );
-      }
+			if (!tournamentId) {
+				return c.json(
+					{
+						success: false as const,
+						error: "Data missing",
+						details: [
+							{
+								field: "proxy_api",
+								message: "Tournament ID missing in summary",
+								code: "external_api_error",
+							},
+						],
+					},
+					502,
+				);
+			}
 
-      const standingsUrl = `${cleanBase}/soccer/tournament/standings?tournamentId=${tournamentId}`;
-      const leadersUrl = `${cleanBase}/soccer/tournament/leaderboard/goal?tournamentId=${tournamentId}`;
-      const h2hUrl = `${cleanBase}/soccer/h2h/match/list/recent?matchId=${id}`;
-      const standingsCacheKey = `standing_${tournamentId}`;
+			const standingsUrl = `${cleanBase}/soccer/tournament/standings?tournamentId=${tournamentId}`;
+			const leadersUrl = `${cleanBase}/soccer/tournament/leaderboard/goal?tournamentId=${tournamentId}`;
+			const h2hUrl = `${cleanBase}/soccer/h2h/match/list/recent?matchId=${id}`;
+			const standingsCacheKey = `standing_${tournamentId}`;
 
-      const [leadersRes, h2hRes, cachedStandings] = await Promise.all([
-        fetch(leadersUrl, {
-          headers: { "X-Proxy-Auth": proxySecret, Accept: "application/json" },
-        }),
-        fetch(h2hUrl, {
-          headers: { "X-Proxy-Auth": proxySecret, Accept: "application/json" },
-        }),
-        c.env.sportsdey_ns.get(standingsCacheKey, "json") as Promise<{
-          data: any;
-          expiresAt: number;
-        } | null>,
-      ]);
+			const [leadersRes, h2hRes, cachedStandings] = await Promise.all([
+				fetch(leadersUrl, {
+					headers: { "X-Proxy-Auth": proxySecret, Accept: "application/json" },
+				}),
+				fetch(h2hUrl, {
+					headers: { "X-Proxy-Auth": proxySecret, Accept: "application/json" },
+				}),
+				c.env.sportsdey_ns.get(standingsCacheKey, "json") as Promise<{
+					data: any;
+					expiresAt: number;
+				} | null>,
+			]);
 
-      let standingsData: any[] = [];
+			let standingsData: any[] = [];
 
-      if (cachedStandings && Date.now() <= cachedStandings.expiresAt) {
-        standingsData = cachedStandings.data;
-      } else {
-        const standingsRes = await fetch(standingsUrl, {
-          headers: { "X-Proxy-Auth": proxySecret, Accept: "application/json" },
-        });
+			if (cachedStandings && Date.now() <= cachedStandings.expiresAt) {
+				standingsData = cachedStandings.data;
+			} else {
+				const standingsRes = await fetch(standingsUrl, {
+					headers: { "X-Proxy-Auth": proxySecret, Accept: "application/json" },
+				});
 
-        if (standingsRes.ok) {
-          standingsData = (await standingsRes.json()) as any[];
-          await c.env.sportsdey_ns.put(
-            standingsCacheKey,
-            JSON.stringify({
-              data: standingsData,
-              expiresAt: Date.now() + 12 * 60 * 60 * 1000,
-            })
-          );
-        }
-      }
+				if (standingsRes.ok) {
+					standingsData = (await standingsRes.json()) as any[];
+					await c.env.sportsdey_ns.put(
+						standingsCacheKey,
+						JSON.stringify({
+							data: standingsData,
+							expiresAt: Date.now() + 12 * 60 * 60 * 1000,
+						}),
+					);
+				}
+			}
 
-      let leadersData: any[] = [];
-      if (leadersRes.ok) {
-        const lead = await leadersRes.json();
-        leadersData = lead as any[];
-      }
+			let leadersData: any[] = [];
+			if (leadersRes.ok) {
+				const lead = await leadersRes.json();
+				leadersData = lead as any[];
+			}
 
-      let h2hData: any = null;
-      if (h2hRes.ok) {
-        const data = await h2hRes.json();
-        h2hData = data;
-      }
+			let h2hData: any = null;
+			if (h2hRes.ok) {
+				const data = await h2hRes.json();
+				h2hData = data;
+			}
 
-      const homeTeamId = summaryData.homeTeam.id.toString();
-      const awayTeamId = summaryData.awayTeam.id.toString();
-      const teamIds = [homeTeamId, awayTeamId];
+			const homeTeamId = summaryData.homeTeam.id.toString();
+			const awayTeamId = summaryData.awayTeam.id.toString();
+			const teamIds = [homeTeamId, awayTeamId];
 
-      const transformedStandings = transformProxyStandings(
-        standingsData,
-        teamIds
-      );
-      const transformedTopScorers = transformProxyTopScorers(leadersData);
-      const transformedH2H = transformProxyH2H(h2hData, homeTeamId, awayTeamId);
-      const transformedData = transformProxyMatchInfo(
-        summaryData,
-        transformedStandings,
-        transformedTopScorers,
-        transformedH2H
-      );
+			const transformedStandings = transformProxyStandings(
+				standingsData,
+				teamIds,
+			);
+			const transformedTopScorers = transformProxyTopScorers(leadersData);
+			const transformedH2H = transformProxyH2H(h2hData, homeTeamId, awayTeamId);
+			const transformedData = transformProxyMatchInfo(
+				summaryData,
+				transformedStandings,
+				transformedTopScorers,
+				transformedH2H,
+			);
 
-      const isFinished =
-        transformedData.status.shortname === "FT" ||
-        transformedData.status.name === "Full Time" ||
-        transformedData.status.name === "Ended"; // covering bases
+			const isFinished =
+				transformedData.status.shortname === "FT" ||
+				transformedData.status.name === "Full Time" ||
+				transformedData.status.name === "Ended"; // covering bases
 
-      await c.env.sportsdey_ns.put(
-        `match_${id}`,
-        JSON.stringify({
-          data: transformedData,
-          expiresAt: isFinished
-            ? Date.now() + 2 * 60 * 1000 // 2 mins for finished
-            : Date.now() + 5000, // 5 secs for live/others
-        })
-      );
+			await c.env.sportsdey_ns.put(
+				`match_${id}`,
+				JSON.stringify({
+					data: transformedData,
+					expiresAt: isFinished
+						? Date.now() + 2 * 60 * 1000 // 2 mins for finished
+						: Date.now() + 5000, // 5 secs for live/others
+				}),
+			);
 
-      return c.json(
-        {
-          success: true as const,
-          data: transformedData,
-        },
-        200
-      );
-    } catch (err) {
-      return c.json(
-        {
-          success: false as const,
-          error: "Internal server error",
-          details: [
-            {
-              field: "server",
-              message:
-                "An unexpected error occurred while processing your request",
-              code: "internal_error",
-            },
-          ],
-        },
-        500
-      );
-    }
-  },
-  jsonZodErrorFormatter
+			return c.json(
+				{
+					success: true as const,
+					data: transformedData,
+				},
+				200,
+			);
+		} catch (err) {
+			return c.json(
+				{
+					success: false as const,
+					error: "Internal server error",
+					details: [
+						{
+							field: "server",
+							message:
+								"An unexpected error occurred while processing your request",
+							code: "internal_error",
+						},
+					],
+				},
+				500,
+			);
+		}
+	},
+	jsonZodErrorFormatter,
 );
 
 footballRoute.openapi(
-  createRoute({
-    method: "get",
-    path: "/match/{id}/stats",
-    request: {
-      params: z.object({
-        id: z.string().openapi({
-          description: "Match ID",
-          example: "1985541",
-        }),
-      }),
-    },
-    responses: {
-      200: {
-        description: "Match statistics",
-        content: {
-          "application/json": {
-            schema: successResponseSchema(MatchStatsSchema),
-          },
-        },
-      },
-      404: {
-        description: "Match not found or stats unavailable",
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-      },
-      500: {
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-        description: "Internal server error",
-      },
-      502: {
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-        description: "Bad gateway - external API error",
-      },
-    },
-    tags: ["Football"],
-    summary: "Get football match statistics by ID",
-  }),
-  async (c) => {
-    const { id } = c.req.valid("param");
-    const base = c.env.PROXY_URL;
-    const proxySecret = c.env.PROXY_SECRET;
-    const cleanBase = base.replace(/\/+$/, "");
-    const url = `${cleanBase}/soccer/match/statistics?matchId=${id}`;
+	createRoute({
+		method: "get",
+		path: "/match/{id}/stats",
+		request: {
+			params: z.object({
+				id: z.string().openapi({
+					description: "Match ID",
+					example: "1985541",
+				}),
+			}),
+		},
+		responses: {
+			200: {
+				description: "Match statistics",
+				content: {
+					"application/json": {
+						schema: successResponseSchema(MatchStatsSchema),
+					},
+				},
+			},
+			404: {
+				description: "Match not found or stats unavailable",
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+			},
+			500: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "Internal server error",
+			},
+			502: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "Bad gateway - external API error",
+			},
+		},
+		tags: ["Football"],
+		summary: "Get football match statistics by ID",
+	}),
+	async (c) => {
+		const { id } = c.req.valid("param");
+		const base = c.env.PROXY_URL;
+		const proxySecret = c.env.PROXY_SECRET;
+		const cleanBase = base.replace(/\/+$/, "");
+		const url = `${cleanBase}/soccer/match/statistics?matchId=${id}`;
 
-    const cacheKey = `match_stats_${id}`;
-    const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-      data: any;
-      expiresAt: number;
-    } | null;
+		const cacheKey = `match_stats_${id}`;
+		const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+			data: any;
+			expiresAt: number;
+		} | null;
 
-    if (cachedData && Date.now() <= cachedData.expiresAt) {
-      return c.json(
-        {
-          success: true as const,
-          data: cachedData.data,
-        },
-        200
-      );
-    }
+		if (cachedData && Date.now() <= cachedData.expiresAt) {
+			return c.json(
+				{
+					success: true as const,
+					data: cachedData.data,
+				},
+				200,
+			);
+		}
 
-    try {
-      const response = await fetch(url, {
-        headers: {
-          "X-Proxy-Auth": proxySecret,
-          Accept: "application/json",
-        },
-      });
+		try {
+			const response = await fetch(url, {
+				headers: {
+					"X-Proxy-Auth": proxySecret,
+					Accept: "application/json",
+				},
+			});
 
-      if (!response.ok) {
-        return c.json(
-          {
-            success: false as const,
-            error: "External API error",
-            details: [
-              {
-                field: "proxy_api",
-                message: `Proxy API returned status ${response.status}`,
-                code: "external_api_error",
-              },
-            ],
-          },
-          502
-        );
-      }
+			if (!response.ok) {
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [
+							{
+								field: "proxy_api",
+								message: `Proxy API returned status ${response.status}`,
+								code: "external_api_error",
+							},
+						],
+					},
+					502,
+				);
+			}
 
-      const data = (await response.json()) as any;
+			const data = (await response.json()) as any;
 
-      if (!data || !data.homeTeam || !data.awayTeam) {
-        return c.json(
-          {
-            success: false as const,
-            error: "Not Found",
-            details: [
-              {
-                field: "matchId",
-                message: "Statistics not available for this match",
-                code: "not_found",
-              },
-            ],
-          },
-          404
-        );
-      }
+			if (!data || !data.homeTeam || !data.awayTeam) {
+				return c.json(
+					{
+						success: false as const,
+						error: "Not Found",
+						details: [
+							{
+								field: "matchId",
+								message: "Statistics not available for this match",
+								code: "not_found",
+							},
+						],
+					},
+					404,
+				);
+			}
 
-      const transformedData = transformProxyStats(data);
+			const transformedData = transformProxyStats(data);
 
-      await c.env.sportsdey_ns.put(
-        cacheKey,
-        JSON.stringify({
-          data: transformedData,
-          expiresAt: Date.now() + 60 * 1000, // Cache for 1 minute
-        })
-      );
+			await c.env.sportsdey_ns.put(
+				cacheKey,
+				JSON.stringify({
+					data: transformedData,
+					expiresAt: Date.now() + 60 * 1000, // Cache for 1 minute
+				}),
+			);
 
-      return c.json(
-        {
-          success: true as const,
-          data: transformedData,
-        },
-        200
-      );
-    } catch (err) {
-      console.error("Match stats error:", err);
-      return c.json(
-        {
-          success: false as const,
-          error: "Internal server error",
-          details: [
-            {
-              field: "server",
-              message: "An unexpected error occurred",
-              code: "internal_error",
-            },
-          ],
-        },
-        500
-      );
-    }
-  }
-);
-
-
-
-
-
-footballRoute.openapi(
-  createRoute({
-    method: "get",
-    path: "/standings/{tournamentId}",
-    request: {
-      params: z.object({
-        tournamentId: z.string().openapi({
-          description: "Tournament ID",
-          example: "2",
-        }),
-      }),
-    },
-    responses: {
-      200: {
-        description: "Tournament standings",
-        content: {
-          "application/json": {
-            schema: successResponseSchema(FullStandingsSchema),
-          },
-        },
-      },
-      500: {
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-        description: "Internal server error",
-      },
-      502: {
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-        description: "Bad gateway - external API error",
-      },
-    },
-    tags: ["Football"],
-    summary: "Get football tournament standings by tournament ID",
-  }),
-  async (c) => {
-    const { tournamentId } = c.req.valid("param");
-    const base = c.env.PROXY_URL;
-    const proxySecret = c.env.PROXY_SECRET;
-    const cleanBase = base.replace(/\/+$/, "");
-    const url = `${cleanBase}/soccer/tournament/standings?tournamentId=${tournamentId}`;
-
-    const cacheKey = `tournament_standings_${tournamentId}`;
-    const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-      data: any;
-      expiresAt: number;
-    } | null;
-
-    if (cachedData && Date.now() <= cachedData.expiresAt) {
-      return c.json(
-        {
-          success: true as const,
-          data: cachedData.data,
-        },
-        200
-      );
-    }
-
-    try {
-      const response = await fetch(url, {
-        headers: {
-          "X-Proxy-Auth": proxySecret,
-          Accept: "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        return c.json(
-          {
-            success: false as const,
-            error: "External API error",
-            details: [
-              {
-                field: "proxy_api",
-                message: `Proxy API returned status ${response.status}`,
-                code: "external_api_error",
-              },
-            ],
-          },
-          502
-        );
-      }
-
-      const data = (await response.json()) as any[];
-      const transformedData = transformFullProxyStandings(data);
-
-      await c.env.sportsdey_ns.put(
-        cacheKey,
-        JSON.stringify({
-          data: transformedData,
-          expiresAt: Date.now() + 12 * 60 * 60 * 1000, // Cache for 12 hours
-        })
-      );
-
-      return c.json(
-        {
-          success: true as const,
-          data: transformedData,
-        },
-        200
-      );
-    } catch (err) {
-      console.error("Standings error:", err);
-      return c.json(
-        {
-          success: false as const,
-          error: "Internal server error",
-          details: [
-            {
-              field: "server",
-              message: "An unexpected error occurred",
-              code: "internal_error",
-            },
-          ],
-        },
-        500
-      );
-    }
-  }
+			return c.json(
+				{
+					success: true as const,
+					data: transformedData,
+				},
+				200,
+			);
+		} catch (err) {
+			console.error("Match stats error:", err);
+			return c.json(
+				{
+					success: false as const,
+					error: "Internal server error",
+					details: [
+						{
+							field: "server",
+							message: "An unexpected error occurred",
+							code: "internal_error",
+						},
+					],
+				},
+				500,
+			);
+		}
+	},
 );
 
 footballRoute.openapi(
-  createRoute({
-    method: "get",
-    path: "/videos",
-    summary: "Get YouTube videos for a football match",
-    description:
-      "Retrieves YouTube videos related to a specific football match query, ordered by date. If there is only nextPageToken that means that's the first set of videos. If there is only prevPageToken that means that's the last set of videos. If both nextPageToken and prevPageToken are present then there are more videos available. You can pass any of the two to the pageToken query so for pagination",
-    request: {
-      query: footballVideosQuery,
-    },
-    responses: {
-      200: {
-        content: {
-          "application/json": {
-            schema: successResponseSchema(VideoResponseSchema),
-          },
-        },
-        description: "Successfully retrieved videos",
-      },
-      400: {
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-        description: "Bad request",
-      },
-      500: {
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-        description: "Internal server error",
-      },
-      502: {
-        content: {
-          "application/json": {
-            schema: ErrorResponseSchema,
-          },
-        },
-        description: "External API error",
-      },
-    },
-    tags: ["Football"],
-  }),
-  async (c) => {
-    try {
-      const { query, pageToken } = c.req.valid("query");
-      const apiKey = c.env?.YOUTUBE_API_KEY;
+	createRoute({
+		method: "get",
+		path: "/standings/{tournamentId}",
+		request: {
+			params: z.object({
+				tournamentId: z.string().openapi({
+					description: "Tournament ID",
+					example: "2",
+				}),
+			}),
+		},
+		responses: {
+			200: {
+				description: "Tournament standings",
+				content: {
+					"application/json": {
+						schema: successResponseSchema(FullStandingsSchema),
+					},
+				},
+			},
+			500: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "Internal server error",
+			},
+			502: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "Bad gateway - external API error",
+			},
+		},
+		tags: ["Football"],
+		summary: "Get football tournament standings by tournament ID",
+	}),
+	async (c) => {
+		const { tournamentId } = c.req.valid("param");
+		const base = c.env.PROXY_URL;
+		const proxySecret = c.env.PROXY_SECRET;
+		const cleanBase = base.replace(/\/+$/, "");
+		const url = `${cleanBase}/soccer/tournament/standings?tournamentId=${tournamentId}`;
 
-      if (!apiKey) {
-        return c.json(
-          {
-            success: false as const,
-            error: "Configuration error",
-            details: [
-              {
-                field: "YOUTUBE_API_KEY",
-                message: "YouTube API key is missing",
-                code: "missing_api_key",
-              },
-            ],
-          },
-          500
-        );
-      }
+		const cacheKey = `tournament_standings_${tournamentId}`;
+		const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+			data: any;
+			expiresAt: number;
+		} | null;
 
-      const cacheKey = `football_videos_${query}_${pageToken || "first"}`;
-      const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-        data: any;
-        expiresAt: number;
-      } | null;
+		if (cachedData && Date.now() <= cachedData.expiresAt) {
+			return c.json(
+				{
+					success: true as const,
+					data: cachedData.data,
+				},
+				200,
+			);
+		}
 
-      if (cachedData && Date.now() <= cachedData.expiresAt) {
-        return c.json(
-          {
-            success: true as const,
-            data: cachedData.data,
-          },
-          200
-        );
-      }
+		try {
+			const response = await fetch(url, {
+				headers: {
+					"X-Proxy-Auth": proxySecret,
+					Accept: "application/json",
+				},
+			});
 
-      let apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
-        query
-      )}&type=video&order=date&key=${apiKey}&maxResults=10`;
-      if (pageToken) {
-        apiUrl += `&pageToken=${pageToken}`;
-      }
+			if (!response.ok) {
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [
+							{
+								field: "proxy_api",
+								message: `Proxy API returned status ${response.status}`,
+								code: "external_api_error",
+							},
+						],
+					},
+					502,
+				);
+			}
 
-      const response = await fetch(apiUrl);
+			const data = (await response.json()) as any[];
+			const transformedData = transformFullProxyStandings(data);
 
-      if (!response.ok) {
-        return c.json(
-          {
-            success: false as const,
-            error: "External API error",
-            details: [
-              {
-                field: "youtube_api",
-                message: `YouTube API returned status ${response.status}`,
-                code: "external_api_error",
-              },
-            ],
-          },
-          502
-        );
-      }
+			await c.env.sportsdey_ns.put(
+				cacheKey,
+				JSON.stringify({
+					data: transformedData,
+					expiresAt: Date.now() + 12 * 60 * 60 * 1000, // Cache for 12 hours
+				}),
+			);
 
-      const data: any = await response.json();
-      const transformedData = {
-        nextPageToken: data.nextPageToken,
-        prevPageToken: data.prevPageToken,
-        videos: data.items.map((item: any) => ({
-          videoId: item.id.videoId,
-          publishedAt: item.snippet.publishedAt,
-          title: item.snippet.title,
-        })),
-      };
+			return c.json(
+				{
+					success: true as const,
+					data: transformedData,
+				},
+				200,
+			);
+		} catch (err) {
+			console.error("Standings error:", err);
+			return c.json(
+				{
+					success: false as const,
+					error: "Internal server error",
+					details: [
+						{
+							field: "server",
+							message: "An unexpected error occurred",
+							code: "internal_error",
+						},
+					],
+				},
+				500,
+			);
+		}
+	},
+);
 
-      await c.env.sportsdey_ns.put(
-        cacheKey,
-        JSON.stringify({
-          data: transformedData,
-          expiresAt: Date.now() + 10 * 60 * 1000, // Cache for 10 minutes
-        })
-      );
+footballRoute.openapi(
+	createRoute({
+		method: "get",
+		path: "/videos",
+		summary: "Get YouTube videos for a football match",
+		description:
+			"Retrieves YouTube videos related to a specific football match query, ordered by date. If there is only nextPageToken that means that's the first set of videos. If there is only prevPageToken that means that's the last set of videos. If both nextPageToken and prevPageToken are present then there are more videos available. You can pass any of the two to the pageToken query so for pagination",
+		request: {
+			query: footballVideosQuery,
+		},
+		responses: {
+			200: {
+				content: {
+					"application/json": {
+						schema: successResponseSchema(VideoResponseSchema),
+					},
+				},
+				description: "Successfully retrieved videos",
+			},
+			400: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "Bad request",
+			},
+			500: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "Internal server error",
+			},
+			502: {
+				content: {
+					"application/json": {
+						schema: ErrorResponseSchema,
+					},
+				},
+				description: "External API error",
+			},
+		},
+		tags: ["Football"],
+	}),
+	async (c) => {
+		try {
+			const { query, pageToken } = c.req.valid("query");
+			const apiKey = c.env?.YOUTUBE_API_KEY;
 
-      return c.json(
-        {
-          success: true as const,
-          data: transformedData,
-        },
-        200
-      );
-    } catch (error) {
-      return c.json(
-        {
-          success: false as const,
-          error: "Internal server error",
-          details: [
-            {
-              field: "server",
-              message:
-                "An unexpected error occurred while processing your request",
-              code: "internal_error",
-            },
-          ],
-        },
-        500
-      );
-    }
-  },
-  jsonZodErrorFormatter
+			if (!apiKey) {
+				return c.json(
+					{
+						success: false as const,
+						error: "Configuration error",
+						details: [
+							{
+								field: "YOUTUBE_API_KEY",
+								message: "YouTube API key is missing",
+								code: "missing_api_key",
+							},
+						],
+					},
+					500,
+				);
+			}
+
+			const cacheKey = `football_videos_${query}_${pageToken || "first"}`;
+			const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+				data: any;
+				expiresAt: number;
+			} | null;
+
+			if (cachedData && Date.now() <= cachedData.expiresAt) {
+				return c.json(
+					{
+						success: true as const,
+						data: cachedData.data,
+					},
+					200,
+				);
+			}
+
+			let apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+				query,
+			)}&type=video&order=date&key=${apiKey}&maxResults=10`;
+			if (pageToken) {
+				apiUrl += `&pageToken=${pageToken}`;
+			}
+
+			const response = await fetch(apiUrl);
+
+			if (!response.ok) {
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [
+							{
+								field: "youtube_api",
+								message: `YouTube API returned status ${response.status}`,
+								code: "external_api_error",
+							},
+						],
+					},
+					502,
+				);
+			}
+
+			const data: any = await response.json();
+			const transformedData = {
+				nextPageToken: data.nextPageToken,
+				prevPageToken: data.prevPageToken,
+				videos: data.items.map((item: any) => ({
+					videoId: item.id.videoId,
+					publishedAt: item.snippet.publishedAt,
+					title: item.snippet.title,
+				})),
+			};
+
+			await c.env.sportsdey_ns.put(
+				cacheKey,
+				JSON.stringify({
+					data: transformedData,
+					expiresAt: Date.now() + 10 * 60 * 1000, // Cache for 10 minutes
+				}),
+			);
+
+			return c.json(
+				{
+					success: true as const,
+					data: transformedData,
+				},
+				200,
+			);
+		} catch (error) {
+			return c.json(
+				{
+					success: false as const,
+					error: "Internal server error",
+					details: [
+						{
+							field: "server",
+							message:
+								"An unexpected error occurred while processing your request",
+							code: "internal_error",
+						},
+					],
+				},
+				500,
+			);
+		}
+	},
+	jsonZodErrorFormatter,
 );
 
 export default footballRoute;

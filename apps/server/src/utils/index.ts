@@ -37,3 +37,36 @@ export async function fetchWithErrorHandling(url: string, apiKey: string) {
 		},
 	};
 }
+
+export const parseDateString = (dateStr?: string): string => {
+	if (!dateStr) return new Date().toISOString();
+	// Expecting "DD/MM/YYYY HH:mm:ss"
+	const parts = dateStr.split(" ");
+	if (parts.length < 1) return new Date().toISOString();
+
+	const dateParts = parts[0]?.split("/");
+	if (!dateParts || dateParts.length !== 3) return new Date().toISOString();
+
+	const day = Number.parseInt(dateParts[0] || "0", 10);
+	const month = Number.parseInt(dateParts[1] || "0", 10) - 1; // Months are 0-indexed in JS
+	const year = Number.parseInt(dateParts[2] || "0", 10);
+
+	let hours = 0;
+	let minutes = 0;
+	let seconds = 0;
+
+	if (parts.length > 1) {
+		const timeParts = parts[1]?.split(":");
+		if (timeParts && timeParts.length >= 2) {
+			hours = Number.parseInt(timeParts[0] || "0", 10);
+			minutes = Number.parseInt(timeParts[1] || "0", 10);
+			if (timeParts.length === 3) {
+				seconds = Number.parseInt(timeParts[2] || "0", 10);
+			}
+		}
+	}
+
+	return new Date(
+		Date.UTC(year, month, day, hours, minutes, seconds),
+	).toISOString();
+};

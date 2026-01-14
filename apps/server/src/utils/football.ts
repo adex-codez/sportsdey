@@ -7,6 +7,7 @@ import type {
 	TransformedResponse,
 } from "@/types/football";
 import type z from "zod";
+import { parseDateString } from ".";
 
 export function transformProxySchedule(data: any[]): TransformedResponse {
 	const competitionMap = new Map<string, CompetitionGroup>();
@@ -43,7 +44,7 @@ if(status.shortName === "CNC") return;
 					score: awayTeam.score?.current ?? 0,
 				},
 			},
-			start_time: date,
+			start_time: parseDateString(date),
 			match_status: status.shortName === "FT" ? "closed" : status.shortName,
 			...(times?.currentMinute
 				? {
@@ -294,6 +295,7 @@ export function transformFullProxyStandings(data: any[]): import("@/types/footba
 }
 
 export function transformTournamentSchedule(data: any[]): z.infer<typeof TournamentScheduleSchema> {
+	
 	const matches = data.map((matchData) => {
 		const { homeTeam, awayTeam, status, times, date, id } = matchData;
 
@@ -311,7 +313,7 @@ export function transformTournamentSchedule(data: any[]): z.infer<typeof Tournam
 					score: awayTeam.score?.current ?? 0,
 				},
 			},
-			date: date,
+			start_time: parseDateString(date),
 			match_status: status.shortName === "FT" ? "closed" : status.shortName,
 			...(times?.currentMinute
 				? {

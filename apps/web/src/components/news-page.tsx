@@ -34,11 +34,11 @@ export const NewsPage = ({sport}: {sport: Sport}) => {
 						key={news._id}
 						className="flex flex-col p-4 border border-gray-100 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow space-y-2 cursor-pointer"
 					>
-						<div className="w-full h-[200px] rounded-lg overflow-hidden">
+						<div className="w-full pb-[100%] relative rounded-lg overflow-hidden">
 							<img
 								src={urlFor(news.image).url()}
 								alt={`${news.title}'s poster`}
-								className="w-full h-full object-cover"
+								className="absolute top-0 left-0 w-full h-full object-cover object-center"
 							/>
 						</div>
 						<p className="text-sm font-bold mb-2 line-clamp-2">{news.title}</p>

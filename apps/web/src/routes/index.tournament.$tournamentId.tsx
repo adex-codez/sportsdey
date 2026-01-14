@@ -40,7 +40,7 @@ const { isFavoriteMatch, toggleFavoriteMatch } = useFavorites();
 	const { currentFilter, changeCurrentFilter } = useCurrentFilter();
 	const [isPending, startTransition] = useTransition();
 	const { data: schedules, isLoading } = useTournamentFootballSchedule(
-		`${selectedDate.getDate().toString().padStart(2, `0`)}/${(selectedDate.getMonth() + 1).toString().padStart(2, `0`)}/${selectedDate.getFullYear()}`,
+		`${selectedDate.getDate().toString().padStart(2, "0")}/${(selectedDate.getMonth() + 1).toString().padStart(2, "0")}/${selectedDate.getFullYear()}`,
 		tournamentId,
 	)
 
@@ -201,10 +201,10 @@ const { isFavoriteMatch, toggleFavoriteMatch } = useFavorites();
 								<MatchCard
 									team1={match.competitors.home.name}
 									team2={match.competitors.away.name}
-									time={formatTime(new Date(match.date))}
+									time={formatTime(new Date(match.start_time))}
 									score1={match.competitors.home.score}
 									score2={match.competitors.away.score}
-									clock={match.clock?.played}
+									clock={match.clock}
 									isFavorite={
 										match.id ? isFavoriteMatch(match.id) : false
 									}
