@@ -205,7 +205,7 @@ export const TournamentScheduleSchema = z.object({
 					score: z.number(),
 				}),
 			}),
-			date: z.string(),
+			start_time: z.string(),
 			match_status: z.string(),
 			clock: z
 				.number()

@@ -40,7 +40,7 @@ function RouteComponent() {
 	const { currentFilter, changeCurrentFilter } = useCurrentFilter();
 	const [isPending, startTransition] = useTransition();
 	const { data: schedules, isLoading } = useTournamentFootballSchedule(
-		`${selectedDate.getDate().toString().padStart(2, `0`)}/${(selectedDate.getMonth() + 1).toString().padStart(2, `0`)}/${selectedDate.getFullYear()}`,
+		`${selectedDate.getDate().toString().padStart(2, "0")}/${(selectedDate.getMonth() + 1).toString().padStart(2, "0")}/${selectedDate.getFullYear()}`,
 		tournamentId,
 	)
 

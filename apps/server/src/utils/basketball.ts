@@ -1,5 +1,6 @@
 import { BasketballTournamentScheduleSchema, GameSummarySchema, ScheduleData, StandingsSchema, TournamentScheduleSchema } from "@/schemas";
 import { z } from "@hono/zod-openapi";
+import { parseDateString } from ".";
 
 // Types mimicking the proxy response structure based on user input
 interface ProxyPlayerStats {
@@ -87,6 +88,7 @@ interface ProxyGameSummary {
 export const transformProxySchedule = (
 	data: any[],
 ): z.infer<typeof ScheduleData> => {
+	
 	// Group games by tournament/competition
 	const groupedGames = data.reduce(
 		(acc, game) => {
@@ -104,9 +106,7 @@ export const transformProxySchedule = (
 			acc[tournamentId].games.push({
 				id: String(game.id),
 				status: mapGameStatus(game.status?.shortName),
-				scheduledTime: game.startTimestamp
-					? new Date(game.startTimestamp * 1000).toISOString()
-					: parseDateString(game.date), // Handle DD/MM/YYYY HH:mm:ss
+				scheduledTime: parseDateString(game.date),
 				home: {
 					name: game.homeTeam?.name || "Unknown",
 					alias: game.homeTeam?.shortName || "",
@@ -179,38 +179,7 @@ const mapGameStatus = (
 	}
 };
 
-const parseDateString = (dateStr?: string): string => {
-	if (!dateStr) return new Date().toISOString();
-	// Expecting "DD/MM/YYYY HH:mm:ss"
-	const parts = dateStr.split(" ");
-	if (parts.length < 1) return new Date().toISOString();
 
-	const dateParts = parts[0]?.split("/");
-	if (!dateParts || dateParts.length !== 3) return new Date().toISOString();
-
-	const day = Number.parseInt(dateParts[0] || "0", 10);
-	const month = Number.parseInt(dateParts[1] || "0", 10) - 1; // Months are 0-indexed in JS
-	const year = Number.parseInt(dateParts[2] || "0", 10);
-
-	let hours = 0;
-	let minutes = 0;
-	let seconds = 0;
-
-	if (parts.length > 1) {
-		const timeParts = parts[1]?.split(":");
-		if (timeParts && timeParts.length >= 2) {
-			hours = Number.parseInt(timeParts[0] || "0", 10);
-			minutes = Number.parseInt(timeParts[1] || "0", 10);
-			if (timeParts.length === 3) {
-				seconds = Number.parseInt(timeParts[2] || "0", 10);
-			}
-		}
-	}
-
-	return new Date(
-		Date.UTC(year, month, day, hours, minutes, seconds),
-	).toISOString();
-};
 
 export const transformGameSummary = (
 	summary: ProxyGameSummary,
@@ -421,6 +390,10 @@ export const transformTournamentSchedule = (
 ): z.infer<typeof BasketballTournamentScheduleSchema> => {
 	const filteredGames = data
 		.filter((game) => String(game.tournament?.id) === tournamentId)
+	
+	const tournament = filteredGames[0].tournament
+	
+	const games = filteredGames
 		.map((game) => ({
 			id: String(game.id),
 			status: mapGameStatus(game.status?.shortName),
@@ -442,12 +415,14 @@ export const transformTournamentSchedule = (
 				: {}),
 		}));
 
+		
+
 	return {
-		games: filteredGames,
-		total: filteredGames.length,
+		games: games,
+		total: games.length,
 		competition: {
-			name: data[0].tournament.name,
-			id: data[0].tournament.id,
+			name: tournament.name,
+			id: tournament.id,
 		}	
 	};
 };
