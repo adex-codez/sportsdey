@@ -94,14 +94,18 @@ footballRoute.openapi(
 				status,
 			)}/?date=${date}`;
 		}
+		const cacheKey = `football_schedule_${date}_${status}` 
+		
 
-		const cachedData = (await c.env.sportsdey_ns.get(
-			`football_schedule_${date}_${status}`,
-			"json",
-		)) as {
-			data: any;
-			expiresAt: number;
-		} | null;
+		let cachedData = null;
+			try {
+				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+					data: any;
+					expiresAt: number;
+				} | null;
+			} catch (e) {
+				cachedData = null;
+			}
 
 		if (cachedData && Date.now() <= cachedData.expiresAt) {
 			return c.json(
@@ -143,7 +147,7 @@ footballRoute.openapi(
 			const transformedData = transformProxySchedule(data);
 
 			await c.env.sportsdey_ns.put(
-				`football_schedule_${date}_${status}`,
+				cacheKey,
 				JSON.stringify({
 					data: transformedData,
 					expiresAt: Date.now() + 30 * 1000,
@@ -233,10 +237,17 @@ footballRoute.openapi(
 		const url = `${cleanBase}/soccer/match/list?date=${date}`;
 
 		const cacheKey = `football_tournament_schedule_${tournamentId}_${date}`;
-		const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-			data: any;
-			expiresAt: number;
-		} | null;
+
+		let cachedData = null;
+			try {
+				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+					data: any;
+					expiresAt: number;
+				} | null;
+			} catch (e) {
+				cachedData = null;
+			}
+		
 
 		if (cachedData && Date.now() <= cachedData.expiresAt) {
 			return c.json(
@@ -394,13 +405,17 @@ footballRoute.openapi(
 		const cleanBase = base.replace(/\/+$/, "");
 		const summaryUrl = `${cleanBase}/soccer/match/summary?matchId=${id}`;
 
-		const cachedData = (await c.env.sportsdey_ns.get(
-			`match_${id}`,
-			"json",
-		)) as {
-			data: any;
-			expiresAt: number;
-		} | null;
+		const cacheKey = `match_${id}`
+
+		let cachedData = null;
+			try {
+				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+					data: any;
+					expiresAt: number;
+				} | null;
+			} catch (e) {
+				cachedData = null;
+			}
 
 		if (cachedData && Date.now() <= cachedData.expiresAt) {
 			return c.json(
@@ -626,10 +641,15 @@ footballRoute.openapi(
 		const url = `${cleanBase}/soccer/match/statistics?matchId=${id}`;
 
 		const cacheKey = `match_stats_${id}`;
-		const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-			data: any;
-			expiresAt: number;
-		} | null;
+		let cachedData = null;
+			try {
+				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+					data: any;
+					expiresAt: number;
+				} | null;
+			} catch (e) {
+				cachedData = null;
+			}
 
 		if (cachedData && Date.now() <= cachedData.expiresAt) {
 			return c.json(
@@ -771,10 +791,15 @@ footballRoute.openapi(
 		const url = `${cleanBase}/soccer/tournament/standings?tournamentId=${tournamentId}`;
 
 		const cacheKey = `tournament_standings_${tournamentId}`;
-		const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-			data: any;
-			expiresAt: number;
-		} | null;
+		let cachedData = null;
+			try {
+				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+					data: any;
+					expiresAt: number;
+				} | null;
+			} catch (e) {
+				cachedData = null;
+			}
 
 		if (cachedData && Date.now() <= cachedData.expiresAt) {
 			return c.json(
@@ -918,10 +943,15 @@ footballRoute.openapi(
 			}
 
 			const cacheKey = `football_videos_${query}_${pageToken || "first"}`;
-			const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-				data: any;
-				expiresAt: number;
-			} | null;
+			let cachedData = null;
+			try {
+				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+					data: any;
+					expiresAt: number;
+				} | null;
+			} catch (e) {
+				cachedData = null;
+			}
 
 			if (cachedData && Date.now() <= cachedData.expiresAt) {
 				return c.json(

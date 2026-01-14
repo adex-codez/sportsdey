@@ -146,7 +146,7 @@ basketballRoute.openapi(
 					502,
 				);
 			}
-			console.log(response.body);
+			
 
 			const data = await response.json();
 
@@ -262,10 +262,15 @@ basketballRoute.openapi(
 			}
 
 			const cacheKey = `basketball_tournament_${tournamentId}_matches_${date}`;
-			const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-				data: any;
-				expiresAt: number;
-			} | null;
+			let cachedData = null;
+			try {
+				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+					data: any;
+					expiresAt: number;
+				} | null;
+			} catch (e) {
+				cachedData = null;
+			}
 
 			if (cachedData && Date.now() <= cachedData.expiresAt) {
 				return c.json(
@@ -308,6 +313,10 @@ basketballRoute.openapi(
 				tournamentId,
 			);
 
+			console.log(transformedData)
+
+			
+
 			await c.env.sportsdey_ns.put(
 				cacheKey,
 				JSON.stringify({
@@ -324,6 +333,7 @@ basketballRoute.openapi(
 				200,
 			);
 		} catch (error) {
+			
 			return c.json(
 				{
 					success: false as const,
@@ -423,10 +433,15 @@ basketballRoute.openapi(
 			}
 
 			const cacheKey = `basketball_game_${gameId}`;
-			const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-				data: any;
-				expiresAt: number;
-			} | null;
+			let cachedData = null;
+			try {
+				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+					data: any;
+					expiresAt: number;
+				} | null;
+			} catch (e) {
+				cachedData = null;
+			}
 
 			if (cachedData && Date.now() <= cachedData.expiresAt) {
 				return c.json(
@@ -615,10 +630,15 @@ basketballRoute.openapi(
 			}
 
 			const cacheKey = `basketball_game_${gameId}_stats`;
-			const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-				data: any;
-				expiresAt: number;
-			} | null;
+			let cachedData = null;
+			try {
+				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+					data: any;
+					expiresAt: number;
+				} | null;
+			} catch (e) {
+				cachedData = null;
+			}
 
 			if (cachedData && Date.now() <= cachedData.expiresAt) {
 				return c.json(
@@ -781,10 +801,15 @@ basketballRoute.openapi(
 			}
 
 			const cacheKey = `basketball_standings_${tournamentId}`;
-			const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-				data: any;
-				expiresAt: number;
-			} | null;
+			let cachedData = null;
+			try {
+				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+					data: any;
+					expiresAt: number;
+				} | null;
+			} catch (e) {
+				cachedData = null;
+			}
 
 			if (cachedData && Date.now() <= cachedData.expiresAt) {
 				return c.json(
@@ -925,10 +950,15 @@ basketballRoute.openapi(
 			}
 
 			const cacheKey = `basketball_videos_${query}_${pageToken || "first"}`;
-			const cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-				data: any;
-				expiresAt: number;
-			} | null;
+			let cachedData = null;
+			try {
+				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+					data: any;
+					expiresAt: number;
+				} | null;
+			} catch (e) {
+				cachedData = null;
+			}
 
 			if (cachedData && Date.now() <= cachedData.expiresAt) {
 				return c.json(

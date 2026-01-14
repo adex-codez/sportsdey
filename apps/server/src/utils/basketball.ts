@@ -390,6 +390,10 @@ export const transformTournamentSchedule = (
 ): z.infer<typeof BasketballTournamentScheduleSchema> => {
 	const filteredGames = data
 		.filter((game) => String(game.tournament?.id) === tournamentId)
+	
+	const tournament = filteredGames[0].tournament
+	
+	const games = filteredGames
 		.map((game) => ({
 			id: String(game.id),
 			status: mapGameStatus(game.status?.shortName),
@@ -411,12 +415,14 @@ export const transformTournamentSchedule = (
 				: {}),
 		}));
 
+		
+
 	return {
-		games: filteredGames,
-		total: filteredGames.length,
+		games: games,
+		total: games.length,
 		competition: {
-			name: data[0].tournament.name,
-			id: data[0].tournament.id,
+			name: tournament.name,
+			id: tournament.id,
 		}	
 	};
 };
