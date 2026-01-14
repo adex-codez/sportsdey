@@ -51,6 +51,7 @@ export type TournamentFootballSchedule = {
         };
       };
       date: string;
+      start_time?: string;
       match_status: string;
       clock?: number;
     }[];

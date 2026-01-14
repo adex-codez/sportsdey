@@ -19,14 +19,14 @@ const FixtureFilterHeaders = ({ counts }: FixtureFilterHeadersProps) => {
   ] as const;
 
   return (
-    <div className='w-full mt-64 lg:mt-0 flex items-start justify-between gap-x-2 '>
-      <div className="hidden lg:flex items-center gap-x-2">
+    <div className='w-full mt-64 lg:mt-0 flex items-start justify-between gap-x-2 overflow-x-auto no-scrollbar'>
+      <div className="hidden lg:flex items-center gap-x-2 flex-shrink-0">
 
         {
           data.map((item, index) => (<Badge totalNumber={item.count} label={item.label} key={index} />))
         }
       </div>
-      <div className="hidden lg:flex">
+      <div className="hidden lg:flex flex-shrink-0">
         <CalendarBadge />
       </div>
 

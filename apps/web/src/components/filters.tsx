@@ -16,7 +16,7 @@ export const Filters = ({
 	};
 }) => {
 	return (
-		<div className="hidden flex-wrap justify-center gap-4 lg:flex">
+		<div className="hidden lg:flex w-full overflow-x-auto no-scrollbar pb-2 gap-4">
 			{filters.map((filter) => (
 				//biome-ignore lint: a11y/useKeyWithClickEvents
 				<div

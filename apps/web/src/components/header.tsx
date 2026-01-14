@@ -85,15 +85,15 @@ export default function Header() {
 					>
 						<Menu width={36} height={36} color="#f4f4f4" />
 					</button>
-					<Link to="/" search={{league: undefined, sports: currentSport}}>
-					<div className="flex min-w-0 justify-center self-center">
-						<img
-							src="/sportsdey-logo.png"
-							className="h-10"
-							alt="sportsdey's logo"
-						/>
-					</div>
-</Link>
+					<Link to="/" search={{ league: undefined, sports: currentSport }}>
+						<div className="flex min-w-0 justify-center self-center">
+							<img
+								src="/sportsdey-logo.png"
+								className="h-10"
+								alt="sportsdey's logo"
+							/>
+						</div>
+					</Link>
 					<div className="lg:hidden" />
 				</div>
 
@@ -313,17 +313,17 @@ export default function Header() {
 						</li>
 						<li
 							onClick={() => {
-									setTab("news");
-									router.navigate({
-										to: "/news",
-										search: { sports: currentSport },
-									});
-								}}
+								setTab("news");
+								router.navigate({
+									to: "/news",
+									search: { sports: currentSport },
+								});
+							}}
 						>
 							<a
 								href="#"
 								className="font-semibold text-secondary text-sm"
-								
+
 							>
 								News
 							</a>
@@ -354,54 +354,79 @@ export default function Header() {
 				</div>
 
 				{!location.pathname.startsWith("/news") &&
-				!location.pathname.startsWith("/betting") ? (
+					!location.pathname.startsWith("/betting") ? (
 					<div className="flex w-full items-center justify-between bg-[#202120] px-4 py-2 md:gap-0 md:px-6">
-						{weekDates.map((weekDate, index) => (
-							//@biome-ignore lint
-							<div
-								key={`date-${index}`}
-								onClick={() => {
-									setDate(weekDate);
-									if (hasPathParams) {
-										const target =
-											currentSport === SPORTS.TENNIS
-												? "/tennis"
-												: currentSport === SPORTS.BASKETBALL
-													? "/basketball"
-													: "/";
-										router.navigate({
-											to: target,
-											search: {
-												league: undefined,
-												sports: currentSport,
-											} as any,
-										});
-									}
-								}}
-								className={cn(
-									"flex flex-col text-center",
-									weekDate.toDateString() === date.toDateString()
-										? "text-secondary"
-										: "text-[#6C7073]",
-								)}
-							>
-								<p
-									className={cn(
-										"font-medium",
-										weekDate.toDateString() === date.toDateString()
-											? "text-base"
-											: "text-sm",
-									)}
-								>
-									{weekDate.toDateString() === new Date().toDateString()
-										? "Today"
-										: new Intl.DateTimeFormat("en-US", {
-												weekday: "short",
-											}).format(weekDate)}
-								</p>
-								<p className="">{weekDate.getDate()}</p>
-							</div>
-						))}
+						{(() => {
+							const today = new Date();
+							const day = today.getDay(); // 0 is Sunday
+							const diff = today.getDate() - day;
+
+							const minDate = new Date(today);
+							minDate.setDate(diff);
+							minDate.setHours(0, 0, 0, 0);
+
+							const maxDate = new Date(minDate);
+							maxDate.setDate(minDate.getDate() + 7);
+							maxDate.setHours(23, 59, 59, 999);
+
+							return weekDates.map((weekDate, index) => {
+								const isDisabled = weekDate < minDate || weekDate > maxDate;
+
+								return (
+									//@biome-ignore lint
+									<div
+										key={`date-${index}`}
+										onClick={() => {
+											if (isDisabled) return;
+											setDate(weekDate);
+											if (hasPathParams) {
+												const target =
+													currentSport === SPORTS.TENNIS
+														? "/tennis"
+														: currentSport === SPORTS.BASKETBALL
+															? "/basketball"
+															: "/";
+												router.navigate({
+													to: target,
+													search: {
+														league: undefined,
+														sports: currentSport,
+													} as any,
+												});
+											}
+										}}
+										className={cn(
+											"flex flex-col text-center",
+											isDisabled
+												? "opacity-30 cursor-not-allowed pointer-events-none"
+												: "",
+											!isDisabled &&
+												weekDate.toDateString() === date.toDateString()
+												? "text-secondary"
+												: !isDisabled
+													? "text-[#6C7073]"
+													: "text-[#6C7073]",
+										)}
+									>
+										<p
+											className={cn(
+												"font-medium",
+												weekDate.toDateString() === date.toDateString()
+													? "text-base"
+													: "text-sm",
+											)}
+										>
+											{weekDate.toDateString() === new Date().toDateString()
+												? "Today"
+												: new Intl.DateTimeFormat("en-US", {
+													weekday: "short",
+												}).format(weekDate)}
+										</p>
+										<p className="">{weekDate.getDate()}</p>
+									</div>
+								);
+							});
+						})()}
 						<button
 							type="button"
 							className="rounded-lg border border-[#777] bg-primary p-2 active:scale-95 transition-transform opacity-50 cursor-not-allowed"

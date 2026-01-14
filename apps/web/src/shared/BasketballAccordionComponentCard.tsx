@@ -56,11 +56,10 @@ const BasketballComponentHeader: React.FC<BasketballComponentHeaderProps> = ({
 							e.preventDefault();
 							onFavoriteToggle?.(e);
 						}}
-						className={`text-sm border-none bg-transparent cursor-pointer transition-colors ml-1 ${
-							isFavorite
-								? "text-yellow-400"
-								: "text-[#C8C8C8] hover:text-yellow-400"
-						}`}
+						className={`text-sm border-none bg-transparent cursor-pointer transition-colors ml-1 ${isFavorite
+							? "text-yellow-400"
+							: "text-[#C8C8C8] hover:text-yellow-400"
+							}`}
 					>
 						★
 					</button>
@@ -90,6 +89,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
 	hideFinishedStatus = false,
 }) => {
 	const { state } = useRouter();
+	console.log("time", time)
 	const pathname = state.location.pathname;
 	const isTennisRoute =
 		pathname.includes("/tennis") || pathname.includes("tennis");
@@ -124,9 +124,9 @@ const MatchCard: React.FC<MatchCardProps> = ({
 		s.includes("finished") ||
 		s === "closed" ||
 		s === "ended" ||
-    s === "fto" ||
-    s === "fpt" ||
-    s === "fpo" ||
+		s === "fto" ||
+		s === "fpt" ||
+		s === "fpo" ||
 		s === "ft";
 	const isLive =
 		s === "live" ||
@@ -135,7 +135,13 @@ const MatchCard: React.FC<MatchCardProps> = ({
 		s === "q3" ||
 		s === "q4" ||
 		s === "ht" ||
-		s === "ot";
+		s === "ot" ||
+		s === "1h" ||
+		s === "2h" ||
+		s === "break" ||
+		s === "half time" ||
+		// Heuristic: if status is not SCH/Scheduled and not Finished, and scores are present, let's treat as live or at least show scores
+		(s !== "sch" && s !== "scheduled" && !isFinished);
 	const shouldShowScores = isLive || isFinished;
 
 	const cardContent = (
@@ -143,11 +149,10 @@ const MatchCard: React.FC<MatchCardProps> = ({
 			className={`grid cursor-pointer ${hideFinishedStatus ? "grid-cols-[40px_1fr_40px]" : "grid-cols-[50px_1fr_40px]"} items-center gap-x-4 px-5 py-3.5 border-b border-border hover:bg-muted/30 transition-colors last:border-b-0`}
 		>
 			<div
-				className={`flex items-center justify-center capitalize w-8.75 h-8.75 rounded-[10px] ${
-					s !== "sch" && s !== "scheduled" && !isFinished
-						? "bg-[#0E8F1A] text-white text-[9px] font-medium animate-pulse"
-						: "text-muted-foreground text-xs font-medium"
-				}`}
+				className={`flex items-center justify-center capitalize w-8.75 h-8.75 rounded-[10px] ${s !== "sch" && s !== "scheduled" && !isFinished
+					? "bg-[#0E8F1A] text-white text-[9px] font-medium animate-pulse"
+					: "text-muted-foreground text-xs font-medium"
+					}`}
 			>
 				{(() => {
 					if (hideFinishedStatus && isFinished) return null;
@@ -169,15 +174,14 @@ const MatchCard: React.FC<MatchCardProps> = ({
 							{player1Sets.map((set, idx) => (
 								<span
 									key={idx}
-									className={`w-4 text-center transition-all duration-300 ${
-										s === "live" ? "animate-[fadeIn_0.5s_ease-in-out]" : ""
-									}`}
+									className={`w-4 text-center transition-all duration-300 ${s === "live" ? "animate-[fadeIn_0.5s_ease-in-out]" : ""
+										}`}
 								>
 									{shouldShowScores
 										? renderSetScore(
-												set,
-												set.games > (player2Sets[idx]?.games ?? 0),
-											)
+											set,
+											set.games > (player2Sets[idx]?.games ?? 0),
+										)
 										: ""}
 								</span>
 							))}
@@ -193,15 +197,14 @@ const MatchCard: React.FC<MatchCardProps> = ({
 							{player2Sets.map((set, idx) => (
 								<span
 									key={idx}
-									className={`w-4 text-center transition-all duration-300 ${
-										s === "live" ? "animate-[fadeIn_0.5s_ease-in-out]" : ""
-									}`}
+									className={`w-4 text-center transition-all duration-300 ${s === "live" ? "animate-[fadeIn_0.5s_ease-in-out]" : ""
+										}`}
 								>
 									{shouldShowScores
 										? renderSetScore(
-												set,
-												set.games > (player1Sets[idx]?.games ?? 0),
-											)
+											set,
+											set.games > (player1Sets[idx]?.games ?? 0),
+										)
 										: ""}
 								</span>
 							))}
@@ -243,11 +246,10 @@ const MatchCard: React.FC<MatchCardProps> = ({
 					e.preventDefault();
 					onFavoriteToggle?.();
 				}}
-				className={`text-xl border-none bg-transparent cursor-pointer transition-colors ${
-					isFavorite
-						? "text-yellow-400"
-						: "text-[#C8C8C8] hover:text-yellow-400"
-				}`}
+				className={`text-xl border-none bg-transparent cursor-pointer transition-colors ${isFavorite
+					? "text-yellow-400"
+					: "text-[#C8C8C8] hover:text-yellow-400"
+					}`}
 			>
 				★
 			</button>
@@ -285,7 +287,7 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
 		isFavoriteMatch,
 		toggleFavoriteMatch,
 	} = useFavorites();
-	const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+	const [isExpanded] = useState(defaultExpanded);
 	const router = useRouter();
 	const pathname = router.state.location.pathname;
 	const isTennisRoute = pathname.includes("tennis");
@@ -295,7 +297,7 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
 		e.stopPropagation();
 		e.preventDefault();
 		toggleFavoriteLeague({
-			id: league, // Using league name as ID for now as per common pattern in this app
+			id: league,
 			name: league,
 			country,
 			flag,
@@ -395,7 +397,9 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
 			{!isTournamentPage && tournamentId ? (
 				<Link
 					to="/basketball/tournament/$tournamentId"
-						params={{ tournamentId: String(tournamentId) }} search={{ league } as any}>
+					params={{ tournamentId: String(tournamentId) }}
+					search={{ league, country, flag } as any}
+				>
 					<BasketballComponentHeader
 						flag={flag}
 						country={country}
@@ -419,7 +423,7 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
 					onFavoriteToggle={handleLeagueFavoriteToggle}
 				/>
 			)}
-			
+
 
 			{isExpanded && matches && (
 				<div className="flex flex-col">

@@ -26,7 +26,24 @@ export const DatePicker = ({
 					</div>
 				</PopoverTrigger>
 				<PopoverContent className="w-auto overflow-hidden p-0" align="start">
-					<Calendar mode="single" selected={date} onSelect={setDate} required />
+					<Calendar
+						mode="single"
+						selected={date}
+						onSelect={setDate}
+						required
+						disabled={(date) => {
+							const today = new Date();
+							const minDate = new Date(today);
+							minDate.setDate(today.getDate() - 7);
+							minDate.setHours(0, 0, 0, 0);
+
+							const maxDate = new Date(today);
+							maxDate.setDate(today.getDate() + 7);
+							maxDate.setHours(23, 59, 59, 999);
+
+							return date < minDate || date > maxDate;
+						}}
+					/>
 				</PopoverContent>
 			</Popover>
 		</div>
