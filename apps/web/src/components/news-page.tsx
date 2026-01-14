@@ -6,7 +6,7 @@ import { Link } from "@tanstack/react-router";
 import type { Sport } from "@/lib/constants";
 import { useEffect } from "react";
 
-export const NewsPage = ({sport}: {sport: Sport}) => {
+export const NewsPage = ({ sport }: { sport: Sport }) => {
 	const { data, isLoading } = useNewsData(sport);
 	if (isLoading) {
 		return (
@@ -43,7 +43,30 @@ export const NewsPage = ({sport}: {sport: Sport}) => {
 						</div>
 						<p className="text-sm font-bold mb-2 line-clamp-2">{news.title}</p>
 						<div className="text-sm text-gray-600 line-clamp-3">
-							<PortableText value={news.body} />
+							<PortableText
+								value={news.body}
+								components={{
+									block: {
+										normal: ({ children }: any) => {
+											const text = children.join("").trim();
+											if (!text) return <div className="h-4" />; // empty line spacer
+											return <p className="mb-4 leading-relaxed">{children}</p>;
+										},
+									},
+									marks: {
+										link: ({ value, children }: any) => (
+											<a
+												href={value?.href}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="text-blue-600 underline"
+											>
+												{children}
+											</a>
+										),
+									},
+								}}
+							/>
 						</div>
 						<p className="text-[10px] text-gray-400 mt-auto">
 							{new Date(news.publishedAt).toLocaleDateString()}

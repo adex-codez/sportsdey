@@ -128,9 +128,9 @@ const FootballSchedule = () => {
 
 	return (
 		<div>
-			<div className="sticky top-[-16px] z-10 bg-background/95 backdrop-blur-sm px-1 py-4 flex items-center justify-between">
+			<div className="sticky top-[-16px] z-10 bg-background/95 backdrop-blur-sm px-1 py-4 lg:flex items-center justify-between hidden">
 				<FixtureFilterHeaders counts={filtersCount} />
-				{/* <DatePicker date={date} setDate={setDate} /> */}
+				
 			</div>
 			{isPending && (
 				<div className="flex items-center justify-center py-4">
