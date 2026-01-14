@@ -1,11 +1,10 @@
-import { Link, useSearch, useNavigate, useRouter } from "@tanstack/react-router";
+import { Link, useSearch, useNavigate } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import { Loader2 } from "lucide-react";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useTransition } from "react";
 import { useFootballSchedule } from "@/hooks/use-fooball-schedule";
-import type { FiltersType } from "@/lib/data";
 import { formatTime } from "@/lib/utils";
-import { Filters } from "./filters";
+import FixtureFilterHeaders from "@/shared/FixtureFilterHeaders";
 import {
 	Accordion,
 	AccordionContent,
@@ -18,13 +17,14 @@ import type { RootState } from "@/store";
 import { useFavorites } from "@/hooks/useFavorites";
 import { MatchCard } from "@/shared/BasketballAccordionComponentCard";
 import { useCurrentFilter } from "@/hooks/use-current-filter";
+import { type Sport } from "@/lib/constants";
 
 const FootballSchedule = () => {
 	const { isFavoriteMatch, toggleFavoriteMatch } = useFavorites();
 	// const router = useRouter();
 	const search = useSearch({ from: "/" }) as {
 		league?: string;
-		sports?: string;
+		sports?: Sport;
 	};
 	const navigate = useNavigate();
 	const activeLeague = search.league;
@@ -33,8 +33,8 @@ const FootballSchedule = () => {
 		(state: RootState) => state.date.selectedDate,
 	);
 	const selectedDate = new Date(selectedDateString);
-	const { currentFilter, changeCurrentFilter } = useCurrentFilter();
-	const [isPending, startTransition] = useTransition();
+	const { currentFilter } = useCurrentFilter();
+	const [isPending] = useTransition();
 	const { data: schedules, isLoading } = useFootballSchedule(
 		`${selectedDate.getDate().toString().padStart(2, "0")}/${(selectedDate.getMonth() + 1).toString().padStart(2, "0")}/${selectedDate.getFullYear()}`,
 		"en",
@@ -43,35 +43,35 @@ const FootballSchedule = () => {
 	const filtersCount = useMemo(() => {
 		if (!schedules) {
 			return {
-				allCount: 0,
-				liveCount: 0,
-				finishedCount: 0,
-				upcomingCount: 0,
+				all: 0,
+				live: 0,
+				finished: 0,
+				upcoming: 0,
 			};
 		}
 
-		const allCount = schedules.total_matches;
-		let liveCount = 0;
-		let finishedCount = 0;
-		let upcomingCount = 0;
+		const all = schedules.total_matches;
+		let live = 0;
+		let finished = 0;
+		let upcoming = 0;
 
 		schedules.competitions.forEach((competition) => {
 			competition.matches.forEach((match) => {
 				if (match.match_status === "closed") {
-					finishedCount++;
+					finished++;
 				} else if (match.match_status === "SCH") {
-					upcomingCount++;
+					upcoming++;
 				} else {
-					liveCount++;
+					live++;
 				}
 			});
 		});
 
 		return {
-			allCount,
-			liveCount,
-			finishedCount,
-			upcomingCount,
+			all,
+			live,
+			finished,
+			upcoming,
 		};
 	}, [schedules]);
 
@@ -107,8 +107,8 @@ const FootballSchedule = () => {
 
 		const finalCompetitions = activeLeague
 			? filteredCompetitions.filter(
-					(comp) => comp.competition.name === activeLeague,
-				)
+				(comp) => comp.competition.name === activeLeague,
+			)
 			: filteredCompetitions;
 
 		return {
@@ -126,20 +126,10 @@ const FootballSchedule = () => {
 		);
 	}
 
-	const handleFilterChange = (filterValue: string) => {
-		startTransition(() => {
-			changeCurrentFilter(filterValue as any);
-		});
-	};
-
 	return (
 		<div>
 			<div className="sticky top-[-16px] z-10 bg-background/95 backdrop-blur-sm px-1 py-4 flex items-center justify-between">
-				<Filters
-					currentFilter={currentFilter}
-					setCurrentFilter={handleFilterChange}
-					filtersCount={filtersCount}
-				/>
+				<FixtureFilterHeaders counts={filtersCount} />
 				{/* <DatePicker date={date} setDate={setDate} /> */}
 			</div>
 			{isPending && (
@@ -197,7 +187,7 @@ const FootballSchedule = () => {
 										{competition.competition.name}
 									</AccordionTrigger>
 								</Link>
-								
+
 								<AccordionContent className="cursor-pointer overflow-hidden">
 									<div>
 										{competition.matches.map((match, index) => (

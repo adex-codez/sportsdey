@@ -180,7 +180,7 @@ const TennisPage = () => {
 
   return (
     <div className='space-y-4 mb-32 lg:mb-0'>
-      <div className='hidden w-full lg:block sticky top-[-16px] z-10 bg-background/95 backdrop-blur-sm px-1 py-4'>
+      <div className='hidden w-full lg:block sticky top-0 z-10 bg-background/95 backdrop-blur-sm px-1 py-4'>
         <TennisFixtureFilterHeaders counts={counts} />
       </div>
       {tennisLeagues.length === 0 ? (

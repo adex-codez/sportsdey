@@ -50,7 +50,8 @@ export type TournamentFootballSchedule = {
           score: number;
         };
       };
-      start_time: string;
+      date: string;
+      start_time?: string;
       match_status: string;
       clock?: number;
     }[];

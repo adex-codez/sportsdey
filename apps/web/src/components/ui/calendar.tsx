@@ -11,6 +11,7 @@ import {
 } from "react-day-picker";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 function Calendar({
 	className,
@@ -210,6 +211,16 @@ function CalendarDayButton({
 				className,
 			)}
 			{...props}
+			disabled={false}
+			onClick={(e) => {
+				if (modifiers.disabled) {
+					e.preventDefault();
+					e.stopPropagation();
+					toast.info("Schedule for this date is not available");
+					return;
+				}
+				props.onClick?.(e);
+			}}
 		/>
 	);
 }
