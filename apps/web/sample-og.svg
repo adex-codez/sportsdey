@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <style>
+      @font-face {
+        font-family: 'Inter';
+        src: url(data:font/woff2;base64,BASE64_DATA_HERE) format('woff2');
+        font-weight: 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: 'Inter';
+        src: url(data:font/woff2;base64,BASE64_DATA_HERE) format('woff2');
+        font-weight: 400;
+        font-style: normal;
+      }
+    </style>
+  </defs>
+
+  <rect width="1200" height="630" fill="white"/>
+
+  <image x="0" y="0" width="480" height="630" preserveAspectRatio="xMidYMid slice" xlink:href="https://cdn.sanity.io/images/abc123/image.jpg"/>
+
+  <rect x="480" y="0" width="720" height="630" fill="white"/>
+
+  <g transform="translate(520, 185)">
+    <text font-family="Inter, sans-serif" font-size="48" font-weight="700" fill="#111827">
+      <tspan x="0" dy="0">Champions League Final 2025</tspan>
+      <tspan x="0" dy="55">Preview and Analysis</tspan>
+    </text>
+
+    <text y="150" font-family="Inter, sans-serif" font-size="24" fill="#374151">
+      <tspan x="0" dy="0">Get ready for the biggest match of</tspan>
+      <tspan x="0" dy="35">the season as top teams battle it</tspan>
+      <tspan x="0" dy="35">out for glory...</tspan>
+    </text>
+  </g>
+
+
+</svg>

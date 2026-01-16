@@ -16,9 +16,13 @@ export default defineConfig({
 		svgr(),
 	],
 	server: {
+		headers: {
+			"Cross-Origin-Opener-Policy": "same-origin",
+			"Cross-Origin-Embedder-Policy": "require-corp",
+		},
 		proxy: {
 			"/api": {
-				target: "https://sportsdey-server.adeaduratimilehin.workers.dev",
+				target: "https://sportsdey.com",
 				changeOrigin: true,
 			},
 		},

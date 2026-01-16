@@ -188,6 +188,20 @@ export default function Header() {
 										onClick={() => {
 											setOpen(false);
 											changeCurrentFilter("all");
+											setTab("scores");
+											const target =
+												currentSport === SPORTS.TENNIS
+													? "/tennis"
+													: currentSport === SPORTS.BASKETBALL
+														? "/basketball"
+														: "/";
+											router.navigate({
+												to: target,
+												search: {
+													league: undefined,
+													sports: currentSport,
+												} as any,
+											});
 										}}
 									>
 										All
@@ -200,6 +214,20 @@ export default function Header() {
 										onClick={() => {
 											setOpen(false);
 											changeCurrentFilter("live");
+											setTab("scores");
+											const target =
+												currentSport === SPORTS.TENNIS
+													? "/tennis"
+													: currentSport === SPORTS.BASKETBALL
+														? "/basketball"
+														: "/";
+											router.navigate({
+												to: target,
+												search: {
+													league: undefined,
+													sports: currentSport,
+												} as any,
+											});
 										}}
 									>
 										Live
@@ -212,6 +240,20 @@ export default function Header() {
 										onClick={() => {
 											setOpen(false);
 											changeCurrentFilter("finished");
+											setTab("scores");
+											const target =
+												currentSport === SPORTS.TENNIS
+													? "/tennis"
+													: currentSport === SPORTS.BASKETBALL
+														? "/basketball"
+														: "/";
+											router.navigate({
+												to: target,
+												search: {
+													league: undefined,
+													sports: currentSport,
+												} as any,
+											});
 										}}
 									>
 										Finished
@@ -224,6 +266,20 @@ export default function Header() {
 										onClick={() => {
 											setOpen(false);
 											changeCurrentFilter("upcoming");
+											setTab("scores");
+											const target =
+												currentSport === SPORTS.TENNIS
+													? "/tennis"
+													: currentSport === SPORTS.BASKETBALL
+														? "/basketball"
+														: "/";
+											router.navigate({
+												to: target,
+												search: {
+													league: undefined,
+													sports: currentSport,
+												} as any,
+											});
 										}}
 									>
 										Upcoming
@@ -320,11 +376,7 @@ export default function Header() {
 								});
 							}}
 						>
-							<a
-								href="#"
-								className="font-semibold text-secondary text-sm"
-
-							>
+							<a href="#" className="font-semibold text-secondary text-sm">
 								News
 							</a>
 						</li>
@@ -354,7 +406,7 @@ export default function Header() {
 				</div>
 
 				{!location.pathname.startsWith("/news") &&
-					!location.pathname.startsWith("/betting") ? (
+				!location.pathname.startsWith("/betting") ? (
 					<div className="flex w-full items-center justify-between bg-[#202120] px-4 py-2 md:gap-0 md:px-6">
 						{(() => {
 							const today = new Date();
@@ -419,8 +471,8 @@ export default function Header() {
 											{weekDate.toDateString() === new Date().toDateString()
 												? "Today"
 												: new Intl.DateTimeFormat("en-US", {
-													weekday: "short",
-												}).format(weekDate)}
+														weekday: "short",
+													}).format(weekDate)}
 										</p>
 										<p className="">{weekDate.getDate()}</p>
 									</div>

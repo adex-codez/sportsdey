@@ -4,7 +4,6 @@ import { PortableText } from "@portabletext/react";
 import { urlFor } from "@/lib/sanity";
 import { Link } from "@tanstack/react-router";
 import type { Sport } from "@/lib/constants";
-import { useEffect } from "react";
 
 export const NewsPage = ({ sport }: { sport: Sport }) => {
 	const { data, isLoading } = useNewsData(sport);
@@ -29,8 +28,8 @@ export const NewsPage = ({ sport }: { sport: Sport }) => {
 			<div className="px-4 py-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 				{data?.map((news: any) => (
 					<Link
-						to="/news/$newsId"
-						params={{ newsId: news._id }}
+						to="/news/$slug"
+						params={{ slug: news.slug?.current }}
 						key={news._id}
 						className="flex flex-col p-4 border border-gray-100 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow space-y-2 cursor-pointer"
 					>
@@ -43,30 +42,7 @@ export const NewsPage = ({ sport }: { sport: Sport }) => {
 						</div>
 						<p className="text-sm font-bold mb-2 line-clamp-2">{news.title}</p>
 						<div className="text-sm text-gray-600 line-clamp-3">
-							<PortableText
-								value={news.body}
-								components={{
-									block: {
-										normal: ({ children }: any) => {
-											const text = children.join("").trim();
-											if (!text) return <div className="h-4" />; // empty line spacer
-											return <p className="mb-4 leading-relaxed">{children}</p>;
-										},
-									},
-									marks: {
-										link: ({ value, children }: any) => (
-											<a
-												href={value?.href}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="text-blue-600 underline"
-											>
-												{children}
-											</a>
-										),
-									},
-								}}
-							/>
+							<PortableText value={news.body} />
 						</div>
 						<p className="text-[10px] text-gray-400 mt-auto">
 							{new Date(news.publishedAt).toLocaleDateString()}

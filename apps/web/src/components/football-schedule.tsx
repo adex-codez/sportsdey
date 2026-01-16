@@ -18,6 +18,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { MatchCard } from "@/shared/BasketballAccordionComponentCard";
 import { useCurrentFilter } from "@/hooks/use-current-filter";
 import { type Sport } from "@/lib/constants";
+import { BetConverter } from "./bet-converter";
 
 const FootballSchedule = () => {
 	const { isFavoriteMatch, toggleFavoriteMatch } = useFavorites();
@@ -164,6 +165,8 @@ const FootballSchedule = () => {
 					</button>
 				</div>
 			)}
+
+			<BetConverter />
 			<div className="space-y-4">
 				{filteredSchedules?.competitions.length === 0 ? (
 					<EmptyState

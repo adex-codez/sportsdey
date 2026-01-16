@@ -19,9 +19,10 @@ import { Route as TennisIndexRouteImport } from './routes/tennis.index'
 import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as BasketballIndexRouteImport } from './routes/basketball.index'
 import { Route as TennisIdRouteImport } from './routes/tennis/$Id'
-import { Route as NewsNewsIdRouteImport } from './routes/news.$newsId'
+import { Route as NewsSlugRouteImport } from './routes/news.$slug'
 import { Route as IndexGameIdRouteImport } from './routes/index.$gameId'
 import { Route as BasketballIdRouteImport } from './routes/basketball/$Id'
+import { Route as NewsSlugOgRouteImport } from './routes/news.$slug.og'
 import { Route as IndexTournamentTournamentIdRouteImport } from './routes/index.tournament.$tournamentId'
 import { Route as BasketballTournamentTournamentIdRouteImport } from './routes/basketball.tournament.$tournamentId'
 
@@ -75,9 +76,9 @@ const TennisIdRoute = TennisIdRouteImport.update({
   path: '/$Id',
   getParentRoute: () => TennisRoute,
 } as any)
-const NewsNewsIdRoute = NewsNewsIdRouteImport.update({
-  id: '/$newsId',
-  path: '/$newsId',
+const NewsSlugRoute = NewsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
   getParentRoute: () => NewsRoute,
 } as any)
 const IndexGameIdRoute = IndexGameIdRouteImport.update({
@@ -89,6 +90,11 @@ const BasketballIdRoute = BasketballIdRouteImport.update({
   id: '/$Id',
   path: '/$Id',
   getParentRoute: () => BasketballRoute,
+} as any)
+const NewsSlugOgRoute = NewsSlugOgRouteImport.update({
+  id: '/og',
+  path: '/og',
+  getParentRoute: () => NewsSlugRoute,
 } as any)
 const IndexTournamentTournamentIdRoute =
   IndexTournamentTournamentIdRouteImport.update({
@@ -112,13 +118,14 @@ export interface FileRoutesByFullPath {
   '/tennis': typeof TennisRouteWithChildren
   '/basketball/$Id': typeof BasketballIdRoute
   '/index/$gameId': typeof IndexGameIdRoute
-  '/news/$newsId': typeof NewsNewsIdRoute
+  '/news/$slug': typeof NewsSlugRouteWithChildren
   '/tennis/$Id': typeof TennisIdRoute
   '/basketball/': typeof BasketballIndexRoute
   '/news/': typeof NewsIndexRoute
   '/tennis/': typeof TennisIndexRoute
   '/basketball/tournament/$tournamentId': typeof BasketballTournamentTournamentIdRoute
   '/index/tournament/$tournamentId': typeof IndexTournamentTournamentIdRoute
+  '/news/$slug/og': typeof NewsSlugOgRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -126,13 +133,14 @@ export interface FileRoutesByTo {
   '/favorites': typeof FavoritesRoute
   '/basketball/$Id': typeof BasketballIdRoute
   '/index/$gameId': typeof IndexGameIdRoute
-  '/news/$newsId': typeof NewsNewsIdRoute
+  '/news/$slug': typeof NewsSlugRouteWithChildren
   '/tennis/$Id': typeof TennisIdRoute
   '/basketball': typeof BasketballIndexRoute
   '/news': typeof NewsIndexRoute
   '/tennis': typeof TennisIndexRoute
   '/basketball/tournament/$tournamentId': typeof BasketballTournamentTournamentIdRoute
   '/index/tournament/$tournamentId': typeof IndexTournamentTournamentIdRoute
+  '/news/$slug/og': typeof NewsSlugOgRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -144,13 +152,14 @@ export interface FileRoutesById {
   '/tennis': typeof TennisRouteWithChildren
   '/basketball/$Id': typeof BasketballIdRoute
   '/index/$gameId': typeof IndexGameIdRoute
-  '/news/$newsId': typeof NewsNewsIdRoute
+  '/news/$slug': typeof NewsSlugRouteWithChildren
   '/tennis/$Id': typeof TennisIdRoute
   '/basketball/': typeof BasketballIndexRoute
   '/news/': typeof NewsIndexRoute
   '/tennis/': typeof TennisIndexRoute
   '/basketball/tournament/$tournamentId': typeof BasketballTournamentTournamentIdRoute
   '/index/tournament/$tournamentId': typeof IndexTournamentTournamentIdRoute
+  '/news/$slug/og': typeof NewsSlugOgRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -163,13 +172,14 @@ export interface FileRouteTypes {
     | '/tennis'
     | '/basketball/$Id'
     | '/index/$gameId'
-    | '/news/$newsId'
+    | '/news/$slug'
     | '/tennis/$Id'
     | '/basketball/'
     | '/news/'
     | '/tennis/'
     | '/basketball/tournament/$tournamentId'
     | '/index/tournament/$tournamentId'
+    | '/news/$slug/og'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -177,13 +187,14 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/basketball/$Id'
     | '/index/$gameId'
-    | '/news/$newsId'
+    | '/news/$slug'
     | '/tennis/$Id'
     | '/basketball'
     | '/news'
     | '/tennis'
     | '/basketball/tournament/$tournamentId'
     | '/index/tournament/$tournamentId'
+    | '/news/$slug/og'
   id:
     | '__root__'
     | '/'
@@ -194,13 +205,14 @@ export interface FileRouteTypes {
     | '/tennis'
     | '/basketball/$Id'
     | '/index/$gameId'
-    | '/news/$newsId'
+    | '/news/$slug'
     | '/tennis/$Id'
     | '/basketball/'
     | '/news/'
     | '/tennis/'
     | '/basketball/tournament/$tournamentId'
     | '/index/tournament/$tournamentId'
+    | '/news/$slug/og'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -286,11 +298,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TennisIdRouteImport
       parentRoute: typeof TennisRoute
     }
-    '/news/$newsId': {
-      id: '/news/$newsId'
-      path: '/$newsId'
-      fullPath: '/news/$newsId'
-      preLoaderRoute: typeof NewsNewsIdRouteImport
+    '/news/$slug': {
+      id: '/news/$slug'
+      path: '/$slug'
+      fullPath: '/news/$slug'
+      preLoaderRoute: typeof NewsSlugRouteImport
       parentRoute: typeof NewsRoute
     }
     '/index/$gameId': {
@@ -306,6 +318,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/basketball/$Id'
       preLoaderRoute: typeof BasketballIdRouteImport
       parentRoute: typeof BasketballRoute
+    }
+    '/news/$slug/og': {
+      id: '/news/$slug/og'
+      path: '/og'
+      fullPath: '/news/$slug/og'
+      preLoaderRoute: typeof NewsSlugOgRouteImport
+      parentRoute: typeof NewsSlugRoute
     }
     '/index/tournament/$tournamentId': {
       id: '/index/tournament/$tournamentId'
@@ -340,13 +359,25 @@ const BasketballRouteWithChildren = BasketballRoute._addFileChildren(
   BasketballRouteChildren,
 )
 
+interface NewsSlugRouteChildren {
+  NewsSlugOgRoute: typeof NewsSlugOgRoute
+}
+
+const NewsSlugRouteChildren: NewsSlugRouteChildren = {
+  NewsSlugOgRoute: NewsSlugOgRoute,
+}
+
+const NewsSlugRouteWithChildren = NewsSlugRoute._addFileChildren(
+  NewsSlugRouteChildren,
+)
+
 interface NewsRouteChildren {
-  NewsNewsIdRoute: typeof NewsNewsIdRoute
+  NewsSlugRoute: typeof NewsSlugRouteWithChildren
   NewsIndexRoute: typeof NewsIndexRoute
 }
 
 const NewsRouteChildren: NewsRouteChildren = {
-  NewsNewsIdRoute: NewsNewsIdRoute,
+  NewsSlugRoute: NewsSlugRouteWithChildren,
   NewsIndexRoute: NewsIndexRoute,
 }
 
