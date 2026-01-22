@@ -65,9 +65,9 @@ function RootDocument() {
 		<Provider store={store}>
 			<html lang="en" className="dark">
 				<head>
-					<HeadContent />
-					<link rel="icon" href="/Favicon.svg" type="image/svg+xml" />
 					<script
+						id="gtm-script"
+						key="gtm-script"
 						dangerouslySetInnerHTML={{
 							__html: `
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -78,9 +78,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       `,
 						}}
 					/>
+					<HeadContent />
+					<link rel="icon" href="/Favicon.svg" type="image/svg+xml" />
 					<link rel="stylesheet" href={appCss} />
 				</head>
 				<body suppressHydrationWarning>
+					<noscript>
+						<iframe
+							src="https://www.googletagmanager.com/ns.html?id=GTM-5JZSLR3K"
+							height="0"
+							width="0"
+							style={{ display: "none", visibility: "hidden" }}
+							title="Google Tag Manager"
+						/>
+					</noscript>
 					<QueryClientProvider client={queryClient}>
 						<ErrorBoundary>
 							<Providers>
@@ -113,15 +124,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 							<Scripts />
 						</ErrorBoundary>
 					</QueryClientProvider>
-					<noscript>
-						<iframe
-							src="https://www.googletagmanager.com/ns.html?id=GTM-5JZSLR3K"
-							height="0"
-							width="0"
-							style={{ display: "none", visibility: "hidden" }}
-							title="Google Tag Manager"
-						/>
-					</noscript>
 				</body>
 			</html>
 		</Provider>
