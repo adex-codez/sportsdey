@@ -3,6 +3,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { getNewsBySlug } from "@/lib/news-server";
 import { urlFor } from "@/lib/sanity";
+import { formatRelativeTime } from "@/lib/utils";
+import { ShareButton } from "@/components/ShareButton";
 
 function getDescription(body: any): string {
 	if (!Array.isArray(body)) return "Read the latest news on SportsDey";
@@ -20,7 +22,7 @@ export const Route = createFileRoute("/news/$slug")({
 		const siteUrl = import.meta.env.VITE_PUBLIC_URL || "http://localhost:3001";
 		const title = loaderData?.title || "News | SportsDey";
 		const description = getDescription(loaderData?.body);
-		const image = `${siteUrl}/news/${loaderData?.slug?.current}/og`;
+		const image = loaderData?.image ? urlFor(loaderData.image).width(1200).height(630).url() : `${siteUrl}/news/${loaderData?.slug?.current}/og`;
 
 		return {
 			meta: [
@@ -95,9 +97,16 @@ function RouteComponent() {
 				/>
 			</div>
 			<h1 className="mb-4 font-bold text-3xl">{news.title}</h1>
-			<p className="mb-8 text-gray-400 text-sm">
-				{new Date(news.publishedAt).toLocaleDateString()}
-			</p>
+			<div className="flex items-center justify-between mb-8">
+				<p className="text-gray-400 text-sm">
+					{formatRelativeTime(news.publishedAt)}
+				</p>
+				<ShareButton
+					url={window.location.href}
+					title={news.title}
+					className="bg-gray-50 hover:bg-gray-100"
+				/>
+			</div>
 			<div className="prose prose-sm sm:prose-base lg:prose-lg max-w-none">
 				<PortableText
 					value={news.body}
