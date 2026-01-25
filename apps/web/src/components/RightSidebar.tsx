@@ -8,6 +8,7 @@ import { useNewsVideos } from "@/hooks/use-news-videos";
 import { urlFor } from "@/lib/sanity";
 import { formatRelativeTime } from "@/lib/utils";
 
+
 const RightSidebar = () => {
 	const sport = useCurrentSport() || "football";
 	const { data: newsData, isLoading: isNewsLoading } = useNewsData(sport);
@@ -39,49 +40,38 @@ const RightSidebar = () => {
 		return null;
 	}
 
-	return (
-		<div className="space-y-6 pb-24">
-			{/* News Widget - Only show if news exists */}
-			{latestNews && (
-				<div className="overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-card">
-					<div className="flex items-center justify-between border-gray-100 border-b px-4 py-3 dark:border-[#5A5F63]">
-						<h3 className="font-bold text-lg text-primary dark:text-white">
-							News
-						</h3>
-						<Link
-							to="/news"
-							search={{ sports: sport }}
-							className="flex cursor-pointer items-center gap-1 font-semibold text-gray-400 text-xs hover:text-accent"
-						>
-							<ChevronRight className="h-5 w-5" />
-						</Link>
-					</div>
-					<div className="p-4">
-						<div className="group relative mb-3 aspect-video w-full cursor-pointer overflow-hidden rounded-xl">
-							{latestNews.image ? (
-								<img
-									src={urlFor(latestNews.image).url()}
-									alt={latestNews.title}
-									className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-								/>
-							) : (
-								<div className="h-full w-full bg-gray-100" />
-							)}
-						</div>
-						<h4
-							onClick={() =>
-								navigate({
-									to: "/news/$slug",
-									params: { slug: latestNews.slug?.current },
-								})
-							}
-							className="mb-2 line-clamp-2 cursor-pointer font-bold text-primary text-sm transition-colors hover:text-accent dark:text-white"
-						>
-							{latestNews.title}
-						</h4>
-						<p className="mb-4 text-gray-400 text-xs">
-							{formatRelativeTime(latestNews.publishedAt)}
-						</p>
+    return (
+        <div className="space-y-6 pb-24">
+            {/* News Widget - Only show if news exists */}
+            {latestNews && (
+                <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                        <h3 className="font-bold text-lg text-primary">News</h3>
+                        <Link
+                            to="/news"
+                            search={{ sports: sport }}
+                            className="text-xs font-semibold text-gray-400 hover:text-accent flex items-center gap-1"
+                        >
+                            <ChevronRight className="w-5 h-5" />
+                        </Link>
+                    </div>
+                    <div className="p-4" onClick={() => navigate({ to: `/news/$newsId`, params: { newsId: latestNews._id } })}>
+                        <div className="relative aspect-video w-full rounded-xl overflow-hidden mb-3 cursor-pointer group">
+                            <img
+                                src={urlFor(latestNews.image).url()}
+                                alt={latestNews.title}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            />
+                        </div>
+                        <h4
+                            onClick={() => navigate({ to: `/news/$newsId`, params: { newsId: latestNews._id } })}
+                            className="font-bold text-sm text-primary mb-2 line-clamp-2 cursor-pointer hover:text-accent transition-colors"
+                        >
+                            {latestNews.title}
+                        </h4>
+                        <p className="text-xs text-gray-400 mb-4">
+                            {formatRelativeTime(latestNews.publishedAt)}
+                        </p>
 
 						<button
 							onClick={() => navigate({ to: "/news" })}

@@ -1,7 +1,8 @@
 import { PortableText } from "@portabletext/react";
 import { Link } from "@tanstack/react-router";
-import { Loader2 } from "lucide-react";
+import type { Sport } from "@/lib/constants";
 import { useNewsData } from "@/hooks/use-news-data";
+import { Loader2 } from "lucide-react";
 import { urlFor } from "@/lib/sanity";
 
 export const NewsPage = ({ sport }: { sport: string }) => {
@@ -49,7 +50,7 @@ export const NewsPage = ({ sport }: { sport: string }) => {
 						<div className="line-clamp-3 text-gray-600 text-sm dark:text-gray-400">
 							<PortableText value={news.body} />
 						</div>
-						<p className="mt-auto text-[10px] text-gray-400">
+						<p className="text-[10px] text-gray-400 mt-auto">
 							{new Date(news.publishedAt).toLocaleDateString()}
 						</p>
 					</Link>

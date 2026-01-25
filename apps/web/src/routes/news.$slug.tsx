@@ -7,6 +7,8 @@ import type { BannerData } from "@/lib/banners-server";
 import { getBanners } from "@/lib/banners-server";
 import { getNewsBySlug } from "@/lib/news-server";
 import { urlFor } from "@/lib/sanity";
+import { formatRelativeTime } from "@/lib/utils";
+import { ShareButton } from "@/components/ShareButton";
 
 interface NewsAuthor {
 	_id: string;
@@ -48,7 +50,7 @@ export const Route = createFileRoute("/news/$slug")({
 		const data = loaderData.news as NewsItem | null;
 		const title = data?.title || "News | SportsDey";
 		const description = getDescription(data?.body);
-		const image = `${siteUrl}/news/${data?.slug?.current}/og`;
+		const image = data?.image ? urlFor(data.image).width(1200).height(630).url() : `${siteUrl}/news/${data?.slug?.current}/og`;
 
 		return {
 			meta: [
@@ -137,9 +139,16 @@ function RouteComponent() {
 				)}
 			</div>
 			<h1 className="mb-4 font-bold text-3xl">{news.title}</h1>
-			<p className="mb-6 text-gray-400 text-sm">
-				{new Date(news.publishedAt).toLocaleDateString()}
-			</p>
+			<div className="flex items-center justify-between mb-8">
+				<p className="text-gray-400 text-sm">
+					{formatRelativeTime(news.publishedAt)}
+				</p>
+				<ShareButton
+					url={window.location.href}
+					title={news.title}
+					className="bg-gray-50 hover:bg-gray-100"
+				/>
+			</div>
 			{news.author && (
 				<Link
 					to="/authors/$slug"

@@ -65,11 +65,11 @@ function RootDocument() {
 	return (
 		<Provider store={store}>
 			<ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-				<html lang="en">
+				<html lang="en" className="dark">
 					<head>
-						<HeadContent />
-						<link rel="icon" href="/Favicon.svg" type="image/svg+xml" />
 						<script
+							id="gtm-script"
+							key="gtm-script"
 							dangerouslySetInnerHTML={{
 								__html: `
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -80,9 +80,20 @@ function RootDocument() {
       `,
 							}}
 						/>
+						<HeadContent />
+						<link rel="icon" href="/Favicon.svg" type="image/svg+xml" />
 						<link rel="stylesheet" href={appCss} />
 					</head>
 					<body suppressHydrationWarning>
+						<noscript>
+							<iframe
+								src="https://www.googletagmanager.com/ns.html?id=GTM-5JZSLR3K"
+								height="0"
+								width="0"
+								style={{ display: "none", visibility: "hidden" }}
+								title="Google Tag Manager"
+							/>
+						</noscript>
 						<QueryClientProvider client={queryClient}>
 							<ErrorBoundary>
 								<Providers>
@@ -93,11 +104,11 @@ function RootDocument() {
 										</header>
 
 										<main className="flex-1 overflow-hidden">
-											<div className="mx-4 grid h-full py-4 md:gap-8 lg:mx-[104px] lg:grid-cols-[20%_80%]">
-												<aside className="no-scrollbar hidden h-full overflow-y-auto pr-4 lg:block">
+											<div className="mx-4 md:gap-8 lg:mx-[104px] grid h-full lg:grid-cols-[20%_80%] py-4">
+												<aside className="hidden lg:block h-full overflow-y-auto no-scrollbar pr-4">
 													<Sidebar />
 												</aside>
-												<section className="no-scrollbar h-full min-w-0 overflow-y-auto">
+												<section className="h-full overflow-y-auto no-scrollbar min-w-0">
 													<Outlet />
 												</section>
 											</div>
@@ -115,15 +126,6 @@ function RootDocument() {
 								<Scripts />
 							</ErrorBoundary>
 						</QueryClientProvider>
-						<noscript>
-							<iframe
-								src="https://www.googletagmanager.com/ns.html?id=GTM-5JZSLR3K"
-								height="0"
-								width="0"
-								style={{ display: "none", visibility: "hidden" }}
-								title="Google Tag Manager"
-							/>
-						</noscript>
 					</body>
 				</html>
 			</ThemeProvider>
