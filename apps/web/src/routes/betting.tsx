@@ -1,14 +1,18 @@
-import { cn } from "@/lib/utils";
 import { createFileRoute } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import BannerCarousel from "@/components/BannerCarousel";
+import { getBanners } from "@/lib/banners-server";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/betting")({
+	loader: () => getBanners(),
 	component: RouteComponent,
 });
 
 function RouteComponent() {
 	const [isIframeLoading, setIsIframeLoading] = useState(true);
+	const banners = Route.useLoaderData() || [];
 	useEffect(() => {
 		const timer = setTimeout(() => setIsIframeLoading(false), 5000);
 		const handleMessage = (event: MessageEvent) => {
@@ -29,8 +33,10 @@ function RouteComponent() {
 			clearTimeout(timer);
 		};
 	}, []);
+
 	return (
-		<div className="my-5">
+		<div className="my-5 space-y-4">
+			{banners.length > 0 && <BannerCarousel banners={banners} />}
 			{isIframeLoading && (
 				<div className="absolute inset-0 flex items-center justify-center">
 					<Loader2 className="h-8 w-8 animate-spin text-primary" />

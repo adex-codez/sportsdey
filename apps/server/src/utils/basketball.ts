@@ -1,5 +1,11 @@
-import { BasketballTournamentScheduleSchema, GameSummarySchema, ScheduleData, StandingsSchema, TournamentScheduleSchema } from "@/schemas";
-import { z } from "@hono/zod-openapi";
+import type { z } from "@hono/zod-openapi";
+import {
+	type BasketballTournamentScheduleSchema,
+	type GameSummarySchema,
+	type ScheduleData,
+	type StandingsSchema,
+	TournamentScheduleSchema,
+} from "@/schemas";
 import { parseDateString } from ".";
 
 // Types mimicking the proxy response structure based on user input
@@ -88,7 +94,6 @@ interface ProxyGameSummary {
 export const transformProxySchedule = (
 	data: any[],
 ): z.infer<typeof ScheduleData> => {
-	
 	// Group games by tournament/competition
 	const groupedGames = data.reduce(
 		(acc, game) => {
@@ -178,8 +183,6 @@ const mapGameStatus = (
 			return "scheduled"; // Default fallback
 	}
 };
-
-
 
 export const transformGameSummary = (
 	summary: ProxyGameSummary,
@@ -388,34 +391,32 @@ export const transformTournamentSchedule = (
 	data: any[],
 	tournamentId: string,
 ): z.infer<typeof BasketballTournamentScheduleSchema> => {
-	const filteredGames = data
-		.filter((game) => String(game.tournament?.id) === tournamentId)
-	
-	const tournament = filteredGames[0].tournament
-	
-	const games = filteredGames
-		.map((game) => ({
-			id: String(game.id),
-			status: mapGameStatus(game.status?.shortName),
-			scheduledTime: game.startTimestamp
-				? new Date(game.startTimestamp * 1000).toISOString()
-				: parseDateString(game.date),
-			home: {
-				name: game.homeTeam?.name || "Unknown",
-				alias: game.homeTeam?.shortName || "",
-				points: game.homeTeam?.score?.current ?? null,
-			},
-			away: {
-				name: game.awayTeam?.name || "Unknown",
-				alias: game.awayTeam?.shortName || "",
-				points: game.awayTeam?.score?.current ?? null,
-			},
-			...(game.gameClock
-				? { clock: `${game.gameClock.minute}:${game.gameClock.second}` }
-				: {}),
-		}));
+	const filteredGames = data.filter(
+		(game) => String(game.tournament?.id) === tournamentId,
+	);
 
-		
+	const tournament = filteredGames[0].tournament;
+
+	const games = filteredGames.map((game) => ({
+		id: String(game.id),
+		status: mapGameStatus(game.status?.shortName),
+		scheduledTime: game.startTimestamp
+			? new Date(game.startTimestamp * 1000).toISOString()
+			: parseDateString(game.date),
+		home: {
+			name: game.homeTeam?.name || "Unknown",
+			alias: game.homeTeam?.shortName || "",
+			points: game.homeTeam?.score?.current ?? null,
+		},
+		away: {
+			name: game.awayTeam?.name || "Unknown",
+			alias: game.awayTeam?.shortName || "",
+			points: game.awayTeam?.score?.current ?? null,
+		},
+		...(game.gameClock
+			? { clock: `${game.gameClock.minute}:${game.gameClock.second}` }
+			: {}),
+	}));
 
 	return {
 		games: games,
@@ -423,6 +424,6 @@ export const transformTournamentSchedule = (
 		competition: {
 			name: tournament.name,
 			id: tournament.id,
-		}	
+		},
 	};
 };

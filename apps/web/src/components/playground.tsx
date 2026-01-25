@@ -1,3 +1,1 @@
-const Playground = () => {
-	
-};
+const Playground = () => {};

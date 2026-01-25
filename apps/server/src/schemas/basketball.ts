@@ -74,7 +74,7 @@ export const TeamSchema = z.object({
 		quarter2: z.number(),
 		quarter3: z.number(),
 		quarter4: z.number(),
-	})
+	}),
 	// statistics: z
 	// 	.object({
 	// 		minutes: z.string(),
@@ -144,5 +144,5 @@ export const BasketballTournamentScheduleSchema = z.object({
 	competition: z.object({
 		name: z.string(),
 		id: z.number(),
-	})
+	}),
 });

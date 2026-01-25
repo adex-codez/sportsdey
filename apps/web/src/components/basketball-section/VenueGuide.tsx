@@ -1,13 +1,14 @@
-
 const VenueGuide = ({ venueName }: { venueName: string }) => {
-  return (
-    <div className="w-full rounded-full h-10 bg-white">
-      <div className="w-full h-full flex items-center justify-between px-4">
-        <p className="text-xs md:text-sm font-semibold text-primary">Venue Guide</p>
-        <p className="text-[#040C01] text-[10px]">{venueName}</p>
-      </div>
-    </div>
-  )
-}
+	return (
+		<div className="h-10 w-full rounded-full bg-white">
+			<div className="flex h-full w-full items-center justify-between px-4">
+				<p className="font-semibold text-primary text-xs md:text-sm">
+					Venue Guide
+				</p>
+				<p className="text-[#040C01] text-[10px]">{venueName}</p>
+			</div>
+		</div>
+	);
+};
 
-export default VenueGuide
+export default VenueGuide;

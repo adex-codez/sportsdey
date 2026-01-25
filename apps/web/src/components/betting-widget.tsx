@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 export default function BettingWidget() {
 	const [isIframeLoading, setIsIframeLoading] = useState(true);
@@ -38,7 +38,7 @@ export default function BettingWidget() {
 				title="sportsdey betting widget"
 				src="https://bet.sportsdey.com/?mode=widget"
 				className={cn(
-					"rounded-2xl transition-opacity duration-500",
+					"rounded-2xl transition-opacity duration-500 dark:bg-card",
 					isIframeLoading ? "opacity-0" : "opacity-100",
 				)}
 				style={{ width: "100%", border: "0", overflow: "hidden" }}

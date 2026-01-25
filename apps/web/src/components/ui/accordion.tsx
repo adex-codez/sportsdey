@@ -27,7 +27,9 @@ function AccordionTrigger({
 	className,
 	children,
 	...props
-}: React.ComponentProps<typeof AccordionPrimitive.Trigger> & {isCollapsible?: boolean}) {
+}: React.ComponentProps<typeof AccordionPrimitive.Trigger> & {
+	isCollapsible?: boolean;
+}) {
 	return (
 		<AccordionPrimitive.Header className="flex">
 			<AccordionPrimitive.Trigger
@@ -39,7 +41,11 @@ function AccordionTrigger({
 				{...props}
 			>
 				{children}
-				{props.isCollapsible ? <ChevronDownIcon className="text-primary pointer-events-none text-xs shrink-0 translate-y-0.5 transition-transform duration-200" /> : <ChevronLeft className="text-primary pointer-events-none text-xs shrink-0 translate-y-0.5 transition-transform duration-200" /> }
+				{props.isCollapsible ? (
+					<ChevronDownIcon className="pointer-events-none shrink-0 translate-y-0.5 text-primary text-xs transition-transform duration-200" />
+				) : (
+					<ChevronLeft className="pointer-events-none shrink-0 translate-y-0.5 text-primary text-xs transition-transform duration-200" />
+				)}
 			</AccordionPrimitive.Trigger>
 		</AccordionPrimitive.Header>
 	);

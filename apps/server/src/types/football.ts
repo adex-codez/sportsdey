@@ -121,11 +121,13 @@ export type TransformedMatchInfo = {
 		home: {
 			id: string;
 			name: string;
+			shortName: string;
 			score?: number;
 		};
 		away: {
 			id: string;
 			name: string;
+			shortName: string;
 			score?: number;
 		};
 	};
@@ -134,7 +136,7 @@ export type TransformedMatchInfo = {
 		stadium: string;
 		// capacity: number;
 	};
-	clock?: number, 
+	clock?: number;
 	status: {
 		name: string;
 		shortname: string;
@@ -209,8 +211,8 @@ export type ProxyMatchSummary = {
 		};
 	};
 	times?: {
-		currentMinute: number 
-	}
+		currentMinute: number;
+	};
 	date: string;
 	id: number;
 	tournament: {

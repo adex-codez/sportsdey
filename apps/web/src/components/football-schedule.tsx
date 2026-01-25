@@ -1,26 +1,31 @@
-import { Link, useSearch, useNavigate } from "@tanstack/react-router";
-import { X } from "lucide-react";
-import { Loader2 } from "lucide-react";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { Loader2, X } from "lucide-react";
 import { useMemo, useTransition } from "react";
+import BannerCarousel from "@/components/BannerCarousel";
+import { useCurrentFilter } from "@/hooks/use-current-filter";
 import { useFootballSchedule } from "@/hooks/use-fooball-schedule";
+import { useFavorites } from "@/hooks/useFavorites";
+import type { BannerData } from "@/lib/banners-server";
+import type { Sport } from "@/lib/constants";
 import { formatTime } from "@/lib/utils";
+import { MatchCard } from "@/shared/BasketballAccordionComponentCard";
 import FixtureFilterHeaders from "@/shared/FixtureFilterHeaders";
+import type { RootState } from "@/store";
+import { useAppSelector } from "@/store/hook";
+import { BetConverter } from "./bet-converter";
+import { EmptyState } from "./EmptyState";
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from "./ui/accordion";
-import { EmptyState } from "./EmptyState";
-import { useAppSelector } from "@/store/hook";
-import type { RootState } from "@/store";
-import { useFavorites } from "@/hooks/useFavorites";
-import { MatchCard } from "@/shared/BasketballAccordionComponentCard";
-import { useCurrentFilter } from "@/hooks/use-current-filter";
-import { type Sport } from "@/lib/constants";
-import { BetConverter } from "./bet-converter";
 
-const FootballSchedule = () => {
+interface FootballScheduleProps {
+	banners?: BannerData[];
+}
+
+const FootballSchedule = ({ banners }: FootballScheduleProps) => {
 	const { isFavoriteMatch, toggleFavoriteMatch } = useFavorites();
 	// const router = useRouter();
 	const search = useSearch({ from: "/" }) as {
@@ -90,10 +95,14 @@ const FootballSchedule = () => {
 				// if (currentFilter === "all" || filter === "all") return true;
 				if (currentFilter === "finished")
 					return match.match_status === "closed";
-				if (currentFilter === "upcoming") return match.match_status === "SCH" || match.match_status === "AET";
+				if (currentFilter === "upcoming")
+					return match.match_status === "SCH" || match.match_status === "AET";
 				if (currentFilter === "live")
 					return (
-						match.match_status !== "closed" && match.match_status !== "SCH" && match.match_status !== "AET" && match.match_status !== "FTO"
+						match.match_status !== "closed" &&
+						match.match_status !== "SCH" &&
+						match.match_status !== "AET" &&
+						match.match_status !== "FTO"
 					);
 				return false;
 			});
@@ -108,8 +117,8 @@ const FootballSchedule = () => {
 
 		const finalCompetitions = activeLeague
 			? filteredCompetitions.filter(
-				(comp) => comp.competition.name === activeLeague,
-			)
+					(comp) => comp.competition.name === activeLeague,
+				)
 			: filteredCompetitions;
 
 		return {
@@ -129,10 +138,10 @@ const FootballSchedule = () => {
 
 	return (
 		<div>
-			<div className="sticky top-[-16px] z-10 bg-background/95 backdrop-blur-sm px-1 py-4 lg:flex items-center justify-between hidden">
+			<div className="sticky top-[-16px] z-10 hidden items-center justify-between bg-background/95 px-1 py-4 backdrop-blur-sm lg:flex">
 				<FixtureFilterHeaders counts={filtersCount} />
-				
 			</div>
+			{banners && banners.length > 0 && <BannerCarousel banners={banners} />}
 			{isPending && (
 				<div className="flex items-center justify-center py-4">
 					<Loader2 className="mr-2 animate-spin" width={20} height={20} />
@@ -141,12 +150,12 @@ const FootballSchedule = () => {
 			)}
 
 			{activeLeague && !isLoading && (
-				<div className="flex items-center justify-between bg-accent/10 border border-accent/20 px-4 py-3 rounded-xl mb-4">
+				<div className="mb-4 flex items-center justify-between rounded-xl border border-accent/20 bg-accent/10 px-4 py-3">
 					<div className="flex items-center gap-2">
-						<span className="text-sm font-medium text-primary">
+						<span className="font-medium text-primary text-sm">
 							Filtered by:
 						</span>
-						<span className="text-sm font-bold text-accent">
+						<span className="font-bold text-accent text-sm">
 							{activeLeague}
 						</span>
 					</div>
@@ -157,16 +166,16 @@ const FootballSchedule = () => {
 								search: { league: undefined, sports: search.sports },
 							})
 						}
-						className="flex items-center gap-1 text-xs font-bold text-accent hover:bg-accent/20 px-2 py-1 rounded-lg transition-colors"
+						className="flex items-center gap-1 rounded-lg px-2 py-1 font-bold text-accent text-xs transition-colors hover:bg-accent/20"
 						type="button"
 					>
-						<X className="w-3 h-3" />
+						<X className="h-3 w-3" />
 						Clear Filter
 					</button>
 				</div>
 			)}
 
-			<BetConverter />
+			{/* <BetConverter /> */}
 			<div className="space-y-4">
 				{filteredSchedules?.competitions.length === 0 ? (
 					<EmptyState
@@ -185,8 +194,14 @@ const FootballSchedule = () => {
 								value={`${competition.competition.id}`}
 								className="w-full rounded-2xl bg-white"
 							>
-								<Link to="/index/tournament/$tournamentId" params={{ tournamentId: competition.competition.id }}>
-									<AccordionTrigger className="cursor-pointer rounded-none border-gray-100 px-4 font-bold text-primary [&[data-state=open]]:border-b" isCollapsible={false}>
+								<Link
+									to="/index/tournament/$tournamentId"
+									params={{ tournamentId: competition.competition.id }}
+								>
+									<AccordionTrigger
+										className="cursor-pointer rounded-none border-gray-100 px-4 font-bold text-primary [&[data-state=open]]:border-b"
+										isCollapsible={false}
+									>
 										{competition.competition.name}
 									</AccordionTrigger>
 								</Link>

@@ -7,18 +7,19 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { Provider } from "react-redux";
+import z from "zod";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Footer from "@/components/footer";
 import { Providers } from "@/components/providers";
 import Sidebar from "@/components/sidebar";
 import Socials from "@/components/socials";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { SPORTS } from "@/lib/constants";
+import { store } from "@/store";
 import Header from "../components/header";
 import appCss from "../index.css?url";
-import { Provider } from "react-redux";
-import { store } from "@/store";
-import { SPORTS } from "@/lib/constants";
-import z from "zod";
 
 export type RouterAppContext = {};
 
@@ -63,67 +64,69 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 function RootDocument() {
 	return (
 		<Provider store={store}>
-			<html lang="en" className="dark">
-				<head>
-					<HeadContent />
-					<link rel="icon" href="/Favicon.svg" type="image/svg+xml" />
-					<script
-						dangerouslySetInnerHTML={{
-							__html: `
+			<ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+				<html lang="en">
+					<head>
+						<HeadContent />
+						<link rel="icon" href="/Favicon.svg" type="image/svg+xml" />
+						<script
+							dangerouslySetInnerHTML={{
+								__html: `
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-5JZSLR3K');
+ new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+ 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+ })(window,document,'script','dataLayer','GTM-5JZSLR3K');
       `,
-						}}
-					/>
-					<link rel="stylesheet" href={appCss} />
-				</head>
-				<body suppressHydrationWarning>
-					<QueryClientProvider client={queryClient}>
-						<ErrorBoundary>
-							<Providers>
-								<div className="flex h-svh flex-col overflow-hidden">
-									<header className="shrink-0">
-										<Header />
-										<Socials />
-									</header>
-
-									<main className="flex-1 overflow-hidden">
-										<div className="mx-4 md:gap-8 lg:mx-[104px] grid h-full lg:grid-cols-[20%_80%] py-4">
-											<aside className="hidden lg:block h-full overflow-y-auto no-scrollbar pr-4">
-												<Sidebar />
-											</aside>
-											<section className="h-full overflow-y-auto no-scrollbar min-w-0">
-												<Outlet />
-											</section>
-										</div>
-									</main>
-
-									<footer className="shrink-0 lg:hidden">
-										<Footer />
-									</footer>
-								</div>
-							</Providers>
-
-							<Toaster richColors position="top-right" />
-							<TanStackRouterDevtools position="bottom-right" />
-							<ReactQueryDevtools initialIsOpen={false} />
-							<Scripts />
-						</ErrorBoundary>
-					</QueryClientProvider>
-					<noscript>
-						<iframe
-							src="https://www.googletagmanager.com/ns.html?id=GTM-5JZSLR3K"
-							height="0"
-							width="0"
-							style={{ display: "none", visibility: "hidden" }}
-							title="Google Tag Manager"
+							}}
 						/>
-					</noscript>
-				</body>
-			</html>
+						<link rel="stylesheet" href={appCss} />
+					</head>
+					<body suppressHydrationWarning>
+						<QueryClientProvider client={queryClient}>
+							<ErrorBoundary>
+								<Providers>
+									<div className="flex h-svh flex-col overflow-hidden">
+										<header className="shrink-0">
+											<Header />
+											<Socials />
+										</header>
+
+										<main className="flex-1 overflow-hidden">
+											<div className="mx-4 grid h-full py-4 md:gap-8 lg:mx-[104px] lg:grid-cols-[20%_80%]">
+												<aside className="no-scrollbar hidden h-full overflow-y-auto pr-4 lg:block">
+													<Sidebar />
+												</aside>
+												<section className="no-scrollbar h-full min-w-0 overflow-y-auto">
+													<Outlet />
+												</section>
+											</div>
+										</main>
+
+										<footer className="shrink-0 lg:hidden">
+											<Footer />
+										</footer>
+									</div>
+								</Providers>
+
+								<Toaster richColors position="top-right" />
+								<TanStackRouterDevtools position="bottom-right" />
+								<ReactQueryDevtools initialIsOpen={false} />
+								<Scripts />
+							</ErrorBoundary>
+						</QueryClientProvider>
+						<noscript>
+							<iframe
+								src="https://www.googletagmanager.com/ns.html?id=GTM-5JZSLR3K"
+								height="0"
+								width="0"
+								style={{ display: "none", visibility: "hidden" }}
+								title="Google Tag Manager"
+							/>
+						</noscript>
+					</body>
+				</html>
+			</ThemeProvider>
 		</Provider>
 	);
 }

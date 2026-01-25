@@ -40,9 +40,9 @@
 				"useExhaustiveDependencies": "info"
 			},
 			"a11y": {
-        "noStaticElementInteractions": "error",
+				"noStaticElementInteractions": "error",
 				"useKeyWithClickEvents": "error"
-      },
+			},
 			"nursery": {
 				"useSortedClasses": {
 					"level": "warn",

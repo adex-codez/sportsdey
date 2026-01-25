@@ -10,7 +10,7 @@ export function useFootballMatchInfo(gameId: string, lang: string) {
 		},
 		retry: true,
 		refetchInterval: (query) => {
-      return query.state.data?.status === "finished" ? 2 * 60 * 1000 : 5000
-		}
+			return query.state.data?.status === "finished" ? 2 * 60 * 1000 : 5000;
+		},
 	});
 }

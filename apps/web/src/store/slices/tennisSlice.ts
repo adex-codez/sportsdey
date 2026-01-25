@@ -1,24 +1,23 @@
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-
-export type FilterType = 'all' | 'live' | 'finished' | 'upcoming';
+export type FilterType = "all" | "live" | "finished" | "upcoming";
 
 interface TennisState {
-  activeFilter: FilterType;
+	activeFilter: FilterType;
 }
 
 const initialState: TennisState = {
-  activeFilter: 'all',
+	activeFilter: "all",
 };
 
 const tennisSlice = createSlice({
-  name: 'tennis',
-  initialState,
-  reducers: {
-    setActiveFilter: (state, action: PayloadAction<FilterType>) => {
-      state.activeFilter = action.payload;
-    },
-  },
+	name: "tennis",
+	initialState,
+	reducers: {
+		setActiveFilter: (state, action: PayloadAction<FilterType>) => {
+			state.activeFilter = action.payload;
+		},
+	},
 });
 
 export const { setActiveFilter } = tennisSlice.actions;

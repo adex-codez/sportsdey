@@ -1,38 +1,36 @@
-import { SearchX, Calendar } from 'lucide-react';
+import { Calendar, SearchX } from "lucide-react";
 
 interface EmptyStateProps {
-    title: string;
-    description?: string;
-    iconType?: 'search' | 'calendar';
+	title: string;
+	description?: string;
+	iconType?: "search" | "calendar";
 }
 
 export function EmptyState({
-    title,
-    description,
-    iconType = 'search'
+	title,
+	description,
+	iconType = "search",
 }: EmptyStateProps) {
-    return (
-        <div className="flex flex-col items-center justify-center py-20 px-4 text-center animate-in fade-in zoom-in duration-500">
-            <div className="mb-6 relative">
-                <div className="absolute inset-0 bg-accent/5 rounded-full blur-2xl animate-pulse" />
-                <div className="relative flex items-center justify-center size-20 rounded-full bg-white shadow-xl shadow-accent/5 ring-1 ring-accent/10">
-                    {iconType === 'search' ? (
-                        <SearchX className="size-10 text-accent/60" />
-                    ) : (
-                        <Calendar className="size-10 text-accent/60" />
-                    )}
-                </div>
-            </div>
+	return (
+		<div className="fade-in zoom-in flex animate-in flex-col items-center justify-center px-4 py-20 text-center duration-500">
+			<div className="relative mb-6">
+				<div className="absolute inset-0 animate-pulse rounded-full bg-accent/5 blur-2xl" />
+				<div className="relative flex size-20 items-center justify-center rounded-full bg-white shadow-accent/5 shadow-xl ring-1 ring-accent/10">
+					{iconType === "search" ? (
+						<SearchX className="size-10 text-accent/60" />
+					) : (
+						<Calendar className="size-10 text-accent/60" />
+					)}
+				</div>
+			</div>
 
-            <h3 className="text-lg font-bold text-primary mb-2">
-                {title}
-            </h3>
+			<h3 className="mb-2 font-bold text-lg text-primary">{title}</h3>
 
-            {description && (
-                <p className="text-sm text-gray-400 max-w-[280px] leading-relaxed italic">
-                    {description}
-                </p>
-            )}
-        </div>
-    );
+			{description && (
+				<p className="max-w-[280px] text-gray-400 text-sm italic leading-relaxed">
+					{description}
+				</p>
+			)}
+		</div>
+	);
 }

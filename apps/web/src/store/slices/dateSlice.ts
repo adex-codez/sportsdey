@@ -1,21 +1,21 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 interface DateState {
-  selectedDate: string;
+	selectedDate: string;
 }
 
 const initialState: DateState = {
-  selectedDate: new Date().toISOString(),
+	selectedDate: new Date().toISOString(),
 };
 
 const dateSlice = createSlice({
-  name: 'date',
-  initialState,
-  reducers: {
-    setDate: (state, action: PayloadAction<string>) => {
-      state.selectedDate = action.payload;
-    },
-  },
+	name: "date",
+	initialState,
+	reducers: {
+		setDate: (state, action: PayloadAction<string>) => {
+			state.selectedDate = action.payload;
+		},
+	},
 });
 
 export const { setDate } = dateSlice.actions;

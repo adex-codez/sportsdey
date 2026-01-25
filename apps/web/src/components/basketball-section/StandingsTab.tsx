@@ -1,173 +1,264 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { cn } from "@/lib/utils"
-import type { FilterType, TeamStanding } from '@/types/basketball'
-import { StandingsSkeleton } from "./StandingsSkeleton"
-
-
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import type { FilterType, TeamStanding } from "@/types/basketball";
+import { StandingsSkeleton } from "./StandingsSkeleton";
 
 interface StandingsTableProps {
-  teams: TeamStanding[]
-  className?: string
-  onSeeAllClick?: () => void
-  isLoading?: boolean
+	teams: TeamStanding[];
+	className?: string;
+	onSeeAllClick?: () => void;
+	isLoading?: boolean;
 }
 
 function FilterTabs({
-  activeFilter,
-  onFilterChange,
+	activeFilter,
+	onFilterChange,
 }: {
-  activeFilter: FilterType
-  onFilterChange: (filter: FilterType) => void
+	activeFilter: FilterType;
+	onFilterChange: (filter: FilterType) => void;
 }) {
-  const filters: { id: FilterType; label: string }[] = [
-    { id: "all", label: "All" },
-  ]
+	const filters: { id: FilterType; label: string }[] = [
+		{ id: "all", label: "All" },
+	];
 
-  return (
-    <div className="flex mb-4 gap-x-3">
-      {filters.map((filter) => (
-        <button
-          key={filter.id}
-          onClick={() => onFilterChange(filter.id)}
-          className={cn(
-            "w-[73px] cursor-pointer md:w-[146px] h-10 rounded-full text-sm font-medium transition-colors",
-            activeFilter === filter.id ? "bg-[#1BAA04] text-white" : "bg-white text-primary",
-          )}
-        >
-          {filter.label}
-        </button>
-      ))}
-    </div>
-  )
+	return (
+		<div className="mb-4 flex gap-x-3">
+			{filters.map((filter) => (
+				<button
+					key={filter.id}
+					onClick={() => onFilterChange(filter.id)}
+					className={cn(
+						"h-10 w-[73px] cursor-pointer rounded-full font-medium text-sm transition-colors md:w-[146px]",
+						activeFilter === filter.id
+							? "bg-[#1BAA04] text-white"
+							: "bg-white text-primary",
+					)}
+				>
+					{filter.label}
+				</button>
+			))}
+		</div>
+	);
 }
 
 function StandingsView({
-  teams,
-  onSeeAllClick,
+	teams,
+	onSeeAllClick,
 }: {
-  teams: TeamStanding[]
-  onSeeAllClick?: () => void
+	teams: TeamStanding[];
+	onSeeAllClick?: () => void;
 }) {
-  const hasData = (key: keyof TeamStanding) => {
-    return teams.some(team => {
-      const val = team[key];
-      return val !== undefined && val !== null && val !== "";
-    });
-  };
+	const hasData = (key: keyof TeamStanding) => {
+		return teams.some((team) => {
+			const val = team[key];
+			return val !== undefined && val !== null && val !== "";
+		});
+	};
 
-  const showP = hasData('played');
-  const showW = hasData('wins');
-  const showL = hasData('losses');
-  const showStr = hasData('streak');
-  const showGB = hasData('gamesBehind');
-  const showDiff = hasData('diff');
-  const showPct = hasData('pct');
+	const showP = hasData("played");
+	const showW = hasData("wins");
+	const showL = hasData("losses");
+	const showStr = hasData("streak");
+	const showGB = hasData("gamesBehind");
+	const showDiff = hasData("diff");
+	const showPct = hasData("pct");
 
-  return (
-    <div className="bg-white border-0 shadow-xs py-4 rounded-xl max-w-screen">
-      <div className="overflow-x-auto max-w-[calc(100vw-2rem)] md:max-w-none no-scrollbar">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-primary text-[10px]">
-              <th className="text-center w-[50px] py-2 sticky left-0 bg-white z-20"></th>
-              <th className="text-left py-2 pr-4 sticky left-[50px] bg-white z-20 font-medium text-xs shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Standings</th>
-              {showP && <th className="text-center py-2 px-2 font-medium">P</th>}
-              {showW && <th className="text-center py-2 px-2 font-medium">W</th>}
-              {showL && <th className="text-center py-2 px-2 font-medium">L</th>}
-              {showStr && <th className="text-center py-2 px-2 font-medium">Str</th>}
-              {showGB && <th className="text-center py-2 px-2 font-medium">GB</th>}
-              {showDiff && <th className="text-center py-2 px-2 font-medium">DIFF</th>}
-              {showPct && <th className="text-center py-2 px-2 font-medium">PCT</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {teams.map((team, index) => (
-              <tr
-                key={index}
-                className={cn(
-                  "border-t border-[#C8C8C8]",
-                  team.isHighlighted ? "bg-[#EDF6EB]" : "bg-white",
-                )}
-              >
-                <td className={cn(
-                  "text-center w-[50px] py-2.5 text-[11.92px] sticky left-0 z-10",
-                  team.isHighlighted ? "text-[#1BAA04] bg-[#EDF6EB]" : "text-primary bg-white",
-                  [1, 2, 3].includes(index + 1) ? "border-l-4 border-[#1BBD2A]" : [4, 5].includes(index + 1) ? "border-l-4 border-[#E5A400]" : ""
-                )}>
-                  {index + 1}
-                </td>
-                <td className={cn(
-                  "py-2.5 pr-4 font-medium text-[11.92px] whitespace-nowrap sticky left-[50px] z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]",
-                  team.isHighlighted ? "text-[#1BAA04] bg-[#EDF6EB]" : "text-primary bg-white"
-                )}>
-                  {team.name}
-                </td>
-                {showP && <td className={cn("py-2.5 px-2 text-[10.21px] text-center", team.isHighlighted ? "text-[#1BAA04]" : "text-primary")}>{team.played}</td>}
-                {showW && <td className={cn("py-2.5 px-2 text-[10.21px] text-center", team.isHighlighted ? "text-[#1BAA04]" : "text-primary")}>{team.wins}</td>}
-                {showL && <td className={cn("py-2.5 px-2 text-[10.21px] text-center", team.isHighlighted ? "text-[#1BAA04]" : "text-primary")}>{team.losses}</td>}
-                {showStr && <td className={cn("py-2.5 px-2 text-[10.21px] text-center", team.isHighlighted ? "text-[#1BAA04]" : "text-primary")}>{team.streak}</td>}
-                {showGB && <td className={cn("py-2.5 px-2 text-[10.21px] text-center", team.isHighlighted ? "text-[#1BAA04]" : "text-primary")}>{team.gamesBehind}</td>}
-                {showDiff && <td className={cn("py-2.5 px-2 text-[10.21px] text-center", team.isHighlighted ? "text-[#1BAA04]" : "text-primary")}>{team.diff}</td>}
-                {showPct && <td className={cn("py-2.5 px-2 text-[10.21px] text-center", team.isHighlighted ? "text-[#1BAA04]" : "text-primary")}>{team.pct}</td>}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {onSeeAllClick && (
-        <button
-          onClick={onSeeAllClick}
-          className="w-full text-center text-[10px] underline cursor-pointer text-primary hover:text-primary py-3 mt-2"
-        >
-          See all Standings
-        </button>
-      )}
-    </div>
-  )
+	return (
+		<div className="max-w-screen rounded-xl border-0 bg-white py-4 shadow-xs">
+			<div className="no-scrollbar max-w-[calc(100vw-2rem)] overflow-x-auto md:max-w-none">
+				<table className="w-full text-sm">
+					<thead>
+						<tr className="text-[10px] text-primary">
+							<th className="sticky left-0 z-20 w-[50px] bg-white py-2 text-center" />
+							<th className="sticky left-[50px] z-20 bg-white py-2 pr-4 text-left font-medium text-xs shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+								Standings
+							</th>
+							{showP && (
+								<th className="px-2 py-2 text-center font-medium">P</th>
+							)}
+							{showW && (
+								<th className="px-2 py-2 text-center font-medium">W</th>
+							)}
+							{showL && (
+								<th className="px-2 py-2 text-center font-medium">L</th>
+							)}
+							{showStr && (
+								<th className="px-2 py-2 text-center font-medium">Str</th>
+							)}
+							{showGB && (
+								<th className="px-2 py-2 text-center font-medium">GB</th>
+							)}
+							{showDiff && (
+								<th className="px-2 py-2 text-center font-medium">DIFF</th>
+							)}
+							{showPct && (
+								<th className="px-2 py-2 text-center font-medium">PCT</th>
+							)}
+						</tr>
+					</thead>
+					<tbody>
+						{teams.map((team, index) => (
+							<tr
+								key={index}
+								className={cn(
+									"border-[#C8C8C8] border-t",
+									team.isHighlighted ? "bg-[#EDF6EB]" : "bg-white",
+								)}
+							>
+								<td
+									className={cn(
+										"sticky left-0 z-10 w-[50px] py-2.5 text-center text-[11.92px]",
+										team.isHighlighted
+											? "bg-[#EDF6EB] text-[#1BAA04]"
+											: "bg-white text-primary",
+										[1, 2, 3].includes(index + 1)
+											? "border-[#1BBD2A] border-l-4"
+											: [4, 5].includes(index + 1)
+												? "border-[#E5A400] border-l-4"
+												: "",
+									)}
+								>
+									{index + 1}
+								</td>
+								<td
+									className={cn(
+										"sticky left-[50px] z-10 whitespace-nowrap py-2.5 pr-4 font-medium text-[11.92px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]",
+										team.isHighlighted
+											? "bg-[#EDF6EB] text-[#1BAA04]"
+											: "bg-white text-primary",
+									)}
+								>
+									{team.name}
+								</td>
+								{showP && (
+									<td
+										className={cn(
+											"px-2 py-2.5 text-center text-[10.21px]",
+											team.isHighlighted ? "text-[#1BAA04]" : "text-primary",
+										)}
+									>
+										{team.played}
+									</td>
+								)}
+								{showW && (
+									<td
+										className={cn(
+											"px-2 py-2.5 text-center text-[10.21px]",
+											team.isHighlighted ? "text-[#1BAA04]" : "text-primary",
+										)}
+									>
+										{team.wins}
+									</td>
+								)}
+								{showL && (
+									<td
+										className={cn(
+											"px-2 py-2.5 text-center text-[10.21px]",
+											team.isHighlighted ? "text-[#1BAA04]" : "text-primary",
+										)}
+									>
+										{team.losses}
+									</td>
+								)}
+								{showStr && (
+									<td
+										className={cn(
+											"px-2 py-2.5 text-center text-[10.21px]",
+											team.isHighlighted ? "text-[#1BAA04]" : "text-primary",
+										)}
+									>
+										{team.streak}
+									</td>
+								)}
+								{showGB && (
+									<td
+										className={cn(
+											"px-2 py-2.5 text-center text-[10.21px]",
+											team.isHighlighted ? "text-[#1BAA04]" : "text-primary",
+										)}
+									>
+										{team.gamesBehind}
+									</td>
+								)}
+								{showDiff && (
+									<td
+										className={cn(
+											"px-2 py-2.5 text-center text-[10.21px]",
+											team.isHighlighted ? "text-[#1BAA04]" : "text-primary",
+										)}
+									>
+										{team.diff}
+									</td>
+								)}
+								{showPct && (
+									<td
+										className={cn(
+											"px-2 py-2.5 text-center text-[10.21px]",
+											team.isHighlighted ? "text-[#1BAA04]" : "text-primary",
+										)}
+									>
+										{team.pct}
+									</td>
+								)}
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+			{onSeeAllClick && (
+				<button
+					onClick={onSeeAllClick}
+					className="mt-2 w-full cursor-pointer py-3 text-center text-[10px] text-primary underline hover:text-primary"
+				>
+					See all Standings
+				</button>
+			)}
+		</div>
+	);
 }
 
 function StandingsTab({
-  teams,
-  className,
-  onSeeAllClick,
-  conference,
-  onConferenceChange,
-  homeTeam,
-  awayTeam,
-  hideConference,
-  isLoading
+	teams,
+	className,
+	onSeeAllClick,
+	conference,
+	onConferenceChange,
+	homeTeam,
+	awayTeam,
+	hideConference,
+	isLoading,
 }: StandingsTableProps & {
-  conference: 'western' | 'eastern'
-  onConferenceChange: (conference: 'western' | 'eastern') => void
-  homeTeam?: string
-  awayTeam?: string
-  hideConference?: boolean
+	conference: "western" | "eastern";
+	onConferenceChange: (conference: "western" | "eastern") => void;
+	homeTeam?: string;
+	awayTeam?: string;
+	hideConference?: boolean;
 }) {
-  const [activeFilter, setActiveFilter] = useState<FilterType>("all")
+	const [activeFilter, setActiveFilter] = useState<FilterType>("all");
 
-  const isTeamHighlighted = (teamName: string) => {
-    if (!homeTeam && !awayTeam) return false;
-    return teamName === homeTeam || teamName === awayTeam;
-  }
+	const isTeamHighlighted = (teamName: string) => {
+		if (!homeTeam && !awayTeam) return false;
+		return teamName === homeTeam || teamName === awayTeam;
+	};
 
-  const enhancedTeams = teams.map(team => ({
-    ...team,
-    isHighlighted: isTeamHighlighted(team.name)
-  }));
+	const enhancedTeams = teams.map((team) => ({
+		...team,
+		isHighlighted: isTeamHighlighted(team.name),
+	}));
 
-  if (isLoading) {
-    return (
-      <div className={cn("rounded-lg", className)}>
-        <StandingsSkeleton />
-      </div>
-    );
-  }
+	if (isLoading) {
+		return (
+			<div className={cn("rounded-lg", className)}>
+				<StandingsSkeleton />
+			</div>
+		);
+	}
 
-  return (
-    <div className={cn("rounded-lg", className)}>
-      {/* {!hideConference && (
+	return (
+		<div className={cn("rounded-lg", className)}>
+			{/* {!hideConference && (
         <div className="flex gap-x-3 mb-4">
           <button
             onClick={() => onConferenceChange('western')}
@@ -194,11 +285,14 @@ function StandingsTab({
         </div>
       )} */}
 
-      <FilterTabs activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+			<FilterTabs
+				activeFilter={activeFilter}
+				onFilterChange={setActiveFilter}
+			/>
 
-      <StandingsView teams={enhancedTeams} onSeeAllClick={onSeeAllClick} />
-    </div>
-  )
+			<StandingsView teams={enhancedTeams} onSeeAllClick={onSeeAllClick} />
+		</div>
+	);
 }
 
-export default StandingsTab
+export default StandingsTab;

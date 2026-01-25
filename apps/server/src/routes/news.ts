@@ -153,13 +153,13 @@ newsRoute.openapi(
 							field: "server",
 							message:
 								"An unexpected error occurred while processing your request",
-								code: "internal_error",
-							},
-						],
-					},
-					500,
-				);
-			}
+							code: "internal_error",
+						},
+					],
+				},
+				500,
+			);
+		}
 	},
 	jsonZodErrorFormatter,
 );

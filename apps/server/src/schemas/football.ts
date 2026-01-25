@@ -9,11 +9,13 @@ export const TransformedMatchInfoSchema = z.object({
 		home: z.object({
 			id: z.string(),
 			name: z.string(),
+			shortName: z.string(),
 			score: z.number(),
 		}),
 		away: z.object({
 			id: z.string(),
 			name: z.string(),
+			shortName: z.string(),
 			score: z.number(),
 		}),
 	}),
@@ -22,9 +24,7 @@ export const TransformedMatchInfoSchema = z.object({
 		stadium: z.string(),
 		// capacity: z.number(),
 	}),
-	clock: z
-		.number()
-		.optional(),
+	clock: z.number().optional(),
 	status: z.object({
 		name: z.string(),
 		shortname: z.string(),
@@ -207,11 +207,7 @@ export const TournamentScheduleSchema = z.object({
 			}),
 			start_time: z.string(),
 			match_status: z.string(),
-			clock: z
-				.number()
-				.optional(),
+			clock: z.number().optional(),
 		}),
 	),
 });
-
-

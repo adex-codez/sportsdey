@@ -1,14 +1,15 @@
+import { Link, useRouter } from "@tanstack/react-router";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import { useFavorites } from "@/hooks/useFavorites";
+import { formatClock } from "@/lib/utils";
 import type {
 	BasketballAccordionComponentCardProps,
 	BasketballComponentHeaderProps,
 	MatchCardProps,
 	SetScore,
 } from "@/types/basketball";
-import { Link, useRouter } from "@tanstack/react-router";
-import { ChevronDown, ChevronRight } from "lucide-react";
-import React, { useState } from "react";
-import { useFavorites } from "@/hooks/useFavorites";
-import { formatClock } from "@/lib/utils";
 
 const BasketballComponentHeader: React.FC<BasketballComponentHeaderProps> = ({
 	flag,
@@ -22,50 +23,54 @@ const BasketballComponentHeader: React.FC<BasketballComponentHeaderProps> = ({
 }) => {
 	return (
 		<div
-			className="w-full flex justify-between items-center border-b px-5 py-4 cursor-pointer transition-colors"
+			className="flex w-full cursor-pointer items-center justify-between border-b px-5 py-4 transition-colors"
 			onClick={onToggle}
 		>
-			<div className="flex gap-x-3 items-center">
+			<div className="flex items-center gap-x-3">
 				{flag ? (
 					<img
 						src={flag}
 						alt={`${country} flag`}
-						className="w-6 h-6 rounded-full"
+						className="h-6 w-6 rounded-full"
 					/>
 				) : imageUrl ? (
 					<img
 						src={imageUrl}
 						alt={`${country} flag`}
-						className="w-6 h-6 rounded-full"
+						className="h-6 w-6 rounded-full"
 					/>
 				) : (
 					<img
 						src={`/${country}.png`}
 						alt={`${country} flag`}
-						className="w-6 h-6 rounded-full"
+						className="h-6 w-6 rounded-full"
 					/>
 				)}
 				<div className="inline-flex items-center gap-x-1 text-sm">
-					<p className="font-bold text-primary">
+					<p className="font-bold text-primary dark:text-white">
 						{country === "South Korea" ? "S/Korea" : country}
 					</p>
-					-<p className="text-primary font-bold text-xs">{league}</p>
+					-
+					<p className="font-bold text-primary text-xs dark:text-white">
+						{league}
+					</p>
 					<button
 						onClick={(e) => {
 							e.stopPropagation();
 							e.preventDefault();
 							onFavoriteToggle?.(e);
 						}}
-						className={`text-sm border-none bg-transparent cursor-pointer transition-colors ml-1 ${isFavorite
-							? "text-yellow-400"
-							: "text-[#C8C8C8] hover:text-yellow-400"
-							}`}
+						className={`ml-1 cursor-pointer border-none bg-transparent text-sm transition-colors ${
+							isFavorite
+								? "text-yellow-400"
+								: "text-[#C8C8C8] hover:text-yellow-400"
+						}`}
 					>
 						★
 					</button>
 				</div>
 			</div>
-			<span className={`text-xs text-primary`}>
+			<span className={"text-primary text-xs dark:text-white"}>
 				{isExpanded ? <ChevronRight /> : <ChevronDown />}
 			</span>
 		</div>
@@ -89,7 +94,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
 	hideFinishedStatus = false,
 }) => {
 	const { state } = useRouter();
-	console.log("time", time)
+	console.log("time", time);
 	const pathname = state.location.pathname;
 	const isTennisRoute =
 		pathname.includes("/tennis") || pathname.includes("tennis");
@@ -99,7 +104,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
 			<span className={isWinner ? "font-semibold" : ""}>
 				{set.games}
 				{set.tiebreak !== undefined && (
-					<sup className="text-[9px] align-super ml-0.5 font-medium">
+					<sup className="ml-0.5 align-super font-medium text-[9px]">
 						{set.tiebreak}
 					</sup>
 				)}
@@ -146,65 +151,72 @@ const MatchCard: React.FC<MatchCardProps> = ({
 
 	const cardContent = (
 		<div
-			className={`grid cursor-pointer ${hideFinishedStatus ? "grid-cols-[40px_1fr_40px]" : "grid-cols-[50px_1fr_40px]"} items-center gap-x-4 px-5 py-3.5 border-b border-border hover:bg-muted/30 transition-colors last:border-b-0`}
+			className={`grid cursor-pointer dark:text-white ${hideFinishedStatus ? "grid-cols-[40px_1fr_40px]" : "grid-cols-[50px_1fr_40px]"} items-center gap-x-4 border-border border-b px-5 py-3.5 transition-colors last:border-b-0 hover:bg-muted/30`}
 		>
 			<div
-				className={`flex items-center justify-center capitalize w-8.75 h-8.75 rounded-[10px] ${s !== "sch" && s !== "scheduled" && !isFinished
-					? "bg-[#0E8F1A] text-white text-[9px] font-medium animate-pulse"
-					: "text-muted-foreground text-xs font-medium"
-					}`}
+				className={`flex h-8.75 w-8.75 items-center justify-center rounded-[10px] capitalize ${
+					s !== "sch" && s !== "scheduled" && !isFinished
+						? "animate-pulse bg-[#0E8F1A] font-medium text-[9px] text-white"
+						: "font-medium text-muted-foreground text-xs"
+				}`}
 			>
 				{(() => {
 					if (hideFinishedStatus && isFinished) return null;
 					if (isFinished) return "FT";
 
-					return clock && clock !== "" ? formatClock(clock) : s === "sch" || s === "scheduled" ? time : status;
+					return clock && clock !== ""
+						? formatClock(clock)
+						: s === "sch" || s === "scheduled"
+							? time
+							: status;
 				})()}
 			</div>
 
 			{isTennisRoute && player1Sets && player2Sets ? (
 				<div className="flex flex-col gap-1.5 text-sm">
-					<div className="flex justify-between items-center">
+					<div className="flex items-center justify-between">
 						<span
 							className={`text-foreground transition-all duration-300 ${shouldShowScores && calculateSetsWon(player1Sets, player2Sets) > calculateSetsWon(player2Sets, player1Sets) ? "font-semibold" : ""}`}
 						>
 							{team1}
 						</span>
-						<div className="flex gap-3 min-w-20 justify-end font-mono text-foreground">
+						<div className="flex min-w-20 justify-end gap-3 font-mono text-foreground">
 							{player1Sets.map((set, idx) => (
 								<span
 									key={idx}
-									className={`w-4 text-center transition-all duration-300 ${s === "live" ? "animate-[fadeIn_0.5s_ease-in-out]" : ""
-										}`}
+									className={`w-4 text-center transition-all duration-300 ${
+										s === "live" ? "animate-[fadeIn_0.5s_ease-in-out]" : ""
+									}`}
 								>
 									{shouldShowScores
 										? renderSetScore(
-											set,
-											set.games > (player2Sets[idx]?.games ?? 0),
-										)
+												set,
+												set.games > (player2Sets[idx]?.games ?? 0),
+											)
 										: ""}
 								</span>
 							))}
 						</div>
 					</div>
-					<div className="flex justify-between items-center">
+					<div className="flex items-center justify-between">
 						<span
 							className={`text-foreground transition-all duration-300 ${shouldShowScores && calculateSetsWon(player2Sets, player1Sets) > calculateSetsWon(player1Sets, player2Sets) ? "font-semibold" : ""}`}
 						>
 							{team2}
 						</span>
-						<div className="flex gap-3 min-w-20 justify-end font-mono text-foreground">
+						<div className="flex min-w-20 justify-end gap-3 font-mono text-foreground">
 							{player2Sets.map((set, idx) => (
 								<span
 									key={idx}
-									className={`w-4 text-center transition-all duration-300 ${s === "live" ? "animate-[fadeIn_0.5s_ease-in-out]" : ""
-										}`}
+									className={`w-4 text-center transition-all duration-300 ${
+										s === "live" ? "animate-[fadeIn_0.5s_ease-in-out]" : ""
+									}`}
 								>
 									{shouldShowScores
 										? renderSetScore(
-											set,
-											set.games > (player1Sets[idx]?.games ?? 0),
-										)
+												set,
+												set.games > (player1Sets[idx]?.games ?? 0),
+											)
 										: ""}
 								</span>
 							))}
@@ -213,26 +225,26 @@ const MatchCard: React.FC<MatchCardProps> = ({
 				</div>
 			) : (
 				<div className="flex flex-col gap-1.5 text-sm">
-					<div className="flex justify-between items-center">
+					<div className="flex items-center justify-between">
 						<span
-							className={`text-primary ${shouldShowScores && (score1 != null && score2 != null && score1 > score2) ? "font-semibold" : ""}`}
+							className={`text-primary dark:text-white ${shouldShowScores && (score1 != null && score2 != null && score1 > score2) ? "font-semibold" : ""}`}
 						>
 							{team1}
 						</span>
 						<span
-							className={`text-primary min-w-10 text-right ${shouldShowScores && (score1 != null && score2 != null && score1 > score2) ? "font-semibold" : ""}`}
+							className={`min-w-10 text-right text-primary dark:text-white ${shouldShowScores && (score1 != null && score2 != null && score1 > score2) ? "font-semibold" : ""}`}
 						>
 							{shouldShowScores && score1 != null ? score1 : ""}
 						</span>
 					</div>
-					<div className="flex justify-between items-center">
+					<div className="flex items-center justify-between">
 						<span
-							className={`text-primary ${shouldShowScores && (score1 != null && score2 != null && score2 > score1) ? "font-semibold" : ""}`}
+							className={`text-primary dark:text-white ${shouldShowScores && (score1 != null && score2 != null && score2 > score1) ? "font-semibold" : ""}`}
 						>
 							{team2}
 						</span>
 						<span
-							className={`text-primary min-w-10 text-right ${shouldShowScores && (score1 != null && score2 != null && score2 > score1) ? "font-semibold" : ""}`}
+							className={`min-w-10 text-right text-primary dark:text-white ${shouldShowScores && (score1 != null && score2 != null && score2 > score1) ? "font-semibold" : ""}`}
 						>
 							{shouldShowScores && score2 != null ? score2 : ""}
 						</span>
@@ -246,10 +258,11 @@ const MatchCard: React.FC<MatchCardProps> = ({
 					e.preventDefault();
 					onFavoriteToggle?.();
 				}}
-				className={`text-xl border-none bg-transparent cursor-pointer transition-colors ${isFavorite
-					? "text-yellow-400"
-					: "text-[#C8C8C8] hover:text-yellow-400"
-					}`}
+				className={`cursor-pointer border-none bg-transparent text-xl transition-colors ${
+					isFavorite
+						? "text-yellow-400"
+						: "text-[#C8C8C8] hover:text-yellow-400"
+				}`}
 			>
 				★
 			</button>
@@ -382,10 +395,10 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
 	const getRoutePath = () => {
 		let routePath = "";
 		if (pathname.includes("/basketball") || pathname.includes("basketball")) {
-			routePath = `/basketball/$Id`;
+			routePath = "/basketball/$Id";
 		}
 		if (pathname.includes("/tennis") || pathname.includes("tennis")) {
-			routePath = `/tennis/$Id`;
+			routePath = "/tennis/$Id";
 		}
 		return routePath;
 	};
@@ -393,7 +406,7 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
 	const isTournamentPage = pathname.includes("/basketball/tournament/");
 
 	return (
-		<div className="w-full bg-white rounded-2xl overflow-hidden shadow-sm">
+		<div className="w-full overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-card">
 			{!isTournamentPage && tournamentId ? (
 				<Link
 					to="/basketball/tournament/$tournamentId"
@@ -423,7 +436,6 @@ const SportAccordionCard: React.FC<BasketballAccordionComponentCardProps> = ({
 					onFavoriteToggle={handleLeagueFavoriteToggle}
 				/>
 			)}
-
 
 			{isExpanded && matches && (
 				<div className="flex flex-col">

@@ -1,13 +1,13 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
+	BasketballTournamentScheduleSchema,
 	ErrorResponseSchema,
 	GameSummarySchema,
 	GameTeamStatsSchema,
 	ScheduleData,
 	StandingsSchema,
-	BasketballTournamentScheduleSchema,
-	VideoResponseSchema,
 	successResponseSchema,
+	VideoResponseSchema,
 } from "@/schemas";
 
 import {
@@ -146,7 +146,6 @@ basketballRoute.openapi(
 					502,
 				);
 			}
-			
 
 			const data = await response.json();
 
@@ -313,9 +312,7 @@ basketballRoute.openapi(
 				tournamentId,
 			);
 
-			console.log(transformedData)
-
-			
+			console.log(transformedData);
 
 			await c.env.sportsdey_ns.put(
 				cacheKey,
@@ -333,7 +330,6 @@ basketballRoute.openapi(
 				200,
 			);
 		} catch (error) {
-			
 			return c.json(
 				{
 					success: false as const,

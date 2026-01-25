@@ -2,29 +2,30 @@ import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { z } from "zod";
 import {
 	ErrorResponseSchema,
+	FullStandingsSchema,
+	MatchStatsSchema,
 	successResponseSchema,
+	TournamentScheduleSchema,
 	TransformedMatchInfoSchema,
 	TransformedResponseSchema,
 	VideoResponseSchema,
-	MatchStatsSchema,
-	FullStandingsSchema,
-	TournamentScheduleSchema,
 } from "@/schemas";
 // import type { ScheduleRes } from "@/types";
 // import type { StandingsRes, TeamStanding } from "@/types/football";
 // import { fetchWithErrorHandling } from "@/utils";
 import {
+	transformFullProxyStandings,
 	transformProxyH2H,
 	transformProxyMatchInfo,
 	transformProxySchedule,
 	transformProxyStandings,
 	transformProxyStats,
 	transformProxyTopScorers,
-	transformFullProxyStandings,
 	transformTournamentSchedule,
 } from "@/utils/football";
 import { jsonZodErrorFormatter } from "@/utils/zod";
 import { footballVideosQuery } from "@/validators";
+
 const footballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 
 footballRoute.openapi(
@@ -94,18 +95,17 @@ footballRoute.openapi(
 				status,
 			)}/?date=${date}`;
 		}
-		const cacheKey = `football_schedule_${date}_${status}` 
-		
+		const cacheKey = `football_schedule_${date}_${status}`;
 
 		let cachedData = null;
-			try {
-				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-					data: any;
-					expiresAt: number;
-				} | null;
-			} catch (e) {
-				cachedData = null;
-			}
+		try {
+			cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+				data: any;
+				expiresAt: number;
+			} | null;
+		} catch (e) {
+			cachedData = null;
+		}
 
 		if (cachedData && Date.now() <= cachedData.expiresAt) {
 			return c.json(
@@ -239,15 +239,14 @@ footballRoute.openapi(
 		const cacheKey = `football_tournament_schedule_${tournamentId}_${date}`;
 
 		let cachedData = null;
-			try {
-				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-					data: any;
-					expiresAt: number;
-				} | null;
-			} catch (e) {
-				cachedData = null;
-			}
-		
+		try {
+			cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+				data: any;
+				expiresAt: number;
+			} | null;
+		} catch (e) {
+			cachedData = null;
+		}
 
 		if (cachedData && Date.now() <= cachedData.expiresAt) {
 			return c.json(
@@ -405,17 +404,17 @@ footballRoute.openapi(
 		const cleanBase = base.replace(/\/+$/, "");
 		const summaryUrl = `${cleanBase}/soccer/match/summary?matchId=${id}`;
 
-		const cacheKey = `match_${id}`
+		const cacheKey = `match_${id}`;
 
 		let cachedData = null;
-			try {
-				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-					data: any;
-					expiresAt: number;
-				} | null;
-			} catch (e) {
-				cachedData = null;
-			}
+		try {
+			cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+				data: any;
+				expiresAt: number;
+			} | null;
+		} catch (e) {
+			cachedData = null;
+		}
 
 		if (cachedData && Date.now() <= cachedData.expiresAt) {
 			return c.json(
@@ -642,14 +641,14 @@ footballRoute.openapi(
 
 		const cacheKey = `match_stats_${id}`;
 		let cachedData = null;
-			try {
-				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-					data: any;
-					expiresAt: number;
-				} | null;
-			} catch (e) {
-				cachedData = null;
-			}
+		try {
+			cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+				data: any;
+				expiresAt: number;
+			} | null;
+		} catch (e) {
+			cachedData = null;
+		}
 
 		if (cachedData && Date.now() <= cachedData.expiresAt) {
 			return c.json(
@@ -792,14 +791,14 @@ footballRoute.openapi(
 
 		const cacheKey = `tournament_standings_${tournamentId}`;
 		let cachedData = null;
-			try {
-				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-					data: any;
-					expiresAt: number;
-				} | null;
-			} catch (e) {
-				cachedData = null;
-			}
+		try {
+			cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+				data: any;
+				expiresAt: number;
+			} | null;
+		} catch (e) {
+			cachedData = null;
+		}
 
 		if (cachedData && Date.now() <= cachedData.expiresAt) {
 			return c.json(

@@ -5,72 +5,69 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-
 export function formatTime(date: Date): string {
-  
 	const hours = String(date.getHours()).padStart(2, "0");
 	const minutes = String(date.getMinutes()).padStart(2, "0");
 	return `${hours}:${minutes}`;
 }
 
-
 export function formatDateTimeWithoutSeconds(dateTimeString: string): string {
-  // Split into date and time parts
-  const [date, timeWithSeconds] = dateTimeString.split(" ");
+	// Split into date and time parts
+	const [date, timeWithSeconds] = dateTimeString.split(" ");
 
-  // Remove the last 3 characters (:SS) from the time
-  const timeWithoutSeconds = timeWithSeconds.slice(0, -3);
+	// Remove the last 3 characters (:SS) from the time
+	const timeWithoutSeconds = timeWithSeconds.slice(0, -3);
 
-  // Return combined: "06/01/2026 20:00"
-  return `${date} ${timeWithoutSeconds}`;
+	// Return combined: "06/01/2026 20:00"
+	return `${date} ${timeWithoutSeconds}`;
 }
 
 export function formatClock(playedMinutesStr: number | string) {
-  if(typeof playedMinutesStr === "string") {
-    return playedMinutesStr
-  }
- const minutes = playedMinutesStr
-  const seconds = 0
+	if (typeof playedMinutesStr === "string") {
+		return playedMinutesStr;
+	}
+	const minutes = playedMinutesStr;
+	const seconds = 0;
 
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}` 
+	return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
 export function formatRelativeTime(dateString: string | Date): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+	const date = new Date(dateString);
+	const now = new Date();
+	const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (diffInSeconds < 60) {
-        return "just now";
-    }
+	if (diffInSeconds < 60) {
+		return "just now";
+	}
 
-    const diffInMinutes = Math.floor(diffInSeconds / 60);
-    if (diffInMinutes < 60) {
-        return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
-    }
+	const diffInMinutes = Math.floor(diffInSeconds / 60);
+	if (diffInMinutes < 60) {
+		return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
+	}
 
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) {
-        return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
-    }
+	const diffInHours = Math.floor(diffInMinutes / 60);
+	if (diffInHours < 24) {
+		return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
+	}
 
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) {
-        return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
-    }
+	const diffInDays = Math.floor(diffInHours / 24);
+	if (diffInDays < 7) {
+		return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
+	}
 
-    const diffInWeeks = Math.floor(diffInDays / 7);
-    if (diffInWeeks < 4) {
-        return `${diffInWeeks} week${diffInWeeks > 1 ? "s" : ""} ago`;
-    }
+	const diffInWeeks = Math.floor(diffInDays / 7);
+	if (diffInWeeks < 4) {
+		return `${diffInWeeks} week${diffInWeeks > 1 ? "s" : ""} ago`;
+	}
 
-    const diffInMonths = Math.floor(diffInDays / 30);
-    if (diffInMonths < 12) {
-        return `${diffInMonths} month${diffInMonths > 1 ? "s" : ""} ago`;
-    }
+	const diffInMonths = Math.floor(diffInDays / 30);
+	if (diffInMonths < 12) {
+		return `${diffInMonths} month${diffInMonths > 1 ? "s" : ""} ago`;
+	}
 
-    const diffInYears = Math.floor(diffInDays / 365);
-    return `${diffInYears} year${diffInYears > 1 ? "s" : ""} ago`;
+	const diffInYears = Math.floor(diffInDays / 365);
+	return `${diffInYears} year${diffInYears > 1 ? "s" : ""} ago`;
 }
 
 // async function searchYouTubeVideos(topic) {

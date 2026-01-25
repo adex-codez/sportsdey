@@ -28,8 +28,8 @@ export const socials = [
 const Socials = () => {
 	return (
 		<div className="my-4 hidden justify-center px-8 md:px-0 lg:flex">
-			<div className="flex h-10 items-center gap-6 rounded-full bg-primary px-6 py-6">
-				<p className="text-secondary text-sm md:text-base">
+			<div className="flex h-10 items-center gap-6 rounded-full bg-primary px-6 py-6 dark:bg-card">
+				<p className="text-secondary text-sm md:text-base dark:text-white">
 					For more update follow us on:
 				</p>
 				<div className="flex items-center gap-2">
@@ -39,7 +39,7 @@ const Socials = () => {
 							href={link}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="flex size-8 items-center justify-center rounded-full bg-white p-2"
+							className="flex size-8 items-center justify-center rounded-full bg-white p-2 dark:bg-white"
 						>
 							<Icon />
 						</a>

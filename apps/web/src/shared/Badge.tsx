@@ -1,24 +1,44 @@
-import { useCurrentFilter } from '@/hooks/use-current-filter'
-import React from 'react'
-
+import React from "react";
+import { useCurrentFilter } from "@/hooks/use-current-filter";
+import { cn } from "@/lib/utils";
 
 interface BadgeProps {
-    label: "all" | "live"| "finished"|"upcoming"
-    totalNumber: number
+	label: "all" | "live" | "finished" | "upcoming";
+	totalNumber: number;
 }
 
-const Badge = ({label, totalNumber}: BadgeProps) => {
-      const { currentFilter: activeFilter, changeCurrentFilter } = useCurrentFilter()
+const Badge = ({ label, totalNumber }: BadgeProps) => {
+	const { currentFilter: activeFilter, changeCurrentFilter } =
+		useCurrentFilter();
 
-      const handleFilterChange = () => {
-        changeCurrentFilter(label)
-      }
-  return (
-        <button onClick={handleFilterChange} title='filter' type='button' className={`cursor-pointer w-max px-4 capitalize flex justify-center gap-x-2 h-12 text-xs items-center rounded-2xl ${activeFilter === label ? "bg-[#4BA53D] text-white": "bg-white text-[#040C01]"}`}>
-            {label}
-            <span className={`w-6 text-[9px] flex justify-center items-center h-6 text-white rounded-full ${activeFilter === label ? "bg-[#456041]": "bg-[#040C01]"}`}>{totalNumber}</span>
-        </button>
-  )
-}
+	const handleFilterChange = () => {
+		changeCurrentFilter(label);
+	};
+	return (
+		<button
+			onClick={handleFilterChange}
+			title="filter"
+			type="button"
+			className={cn(
+				"flex h-12 w-max cursor-pointer items-center justify-center gap-x-2 rounded-2xl px-4 text-xs capitalize",
+				activeFilter === label
+					? "bg-[#4BA53D] text-white dark:bg-[#4BA53D] dark:text-white"
+					: "bg-white text-[#040C01] dark:bg-[#5A5F63] dark:text-white",
+			)}
+		>
+			{label}
+			<span
+				className={cn(
+					"flex h-6 w-6 items-center justify-center rounded-full text-[9px] text-white",
+					activeFilter === label
+						? "bg-[#456041] dark:bg-[#456041]"
+						: "bg-[#040C01] dark:bg-[#040C01]",
+				)}
+			>
+				{totalNumber}
+			</span>
+		</button>
+	);
+};
 
-export default Badge
+export default Badge;

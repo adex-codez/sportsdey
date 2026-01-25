@@ -43,7 +43,7 @@ export interface MatchCardProps {
 	team2: string;
 	player1Sets?: SetScore[];
 	player2Sets?: SetScore[];
-	clock?:number | string
+	clock?: number | string;
 	score1?: number;
 	score2?: number;
 	status?: MatchStatus | string;

@@ -9,9 +9,9 @@ import {
 	DayPicker,
 	getDefaultClassNames,
 } from "react-day-picker";
+import { toast } from "sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 function Calendar({
 	className,

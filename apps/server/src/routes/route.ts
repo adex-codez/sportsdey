@@ -1,9 +1,8 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import basketballRoute from "./basketball";
 import footballRoute from "./football";
-import tennisRoute from "./tennis";
-
 import newsRoute from "./news";
+import tennisRoute from "./tennis";
 
 const routes = new OpenAPIHono();
 

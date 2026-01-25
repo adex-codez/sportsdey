@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api";
-import type { FootballSchedule, TournamentFootballSchedule } from "@/types/football";
+import type {
+	FootballSchedule,
+	TournamentFootballSchedule,
+} from "@/types/football";
 export function useFootballSchedule(date: string, lang: string) {
 	return useQuery({
 		queryKey: ["football-schedule", date, lang],
@@ -13,7 +16,10 @@ export function useFootballSchedule(date: string, lang: string) {
 	});
 }
 
-export function useTournamentFootballSchedule(date: string, tournamentId: string) {
+export function useTournamentFootballSchedule(
+	date: string,
+	tournamentId: string,
+) {
 	return useQuery({
 		queryKey: ["tournament-football-schedule", date, tournamentId],
 		refetchInterval: 5 * 60 * 1000,

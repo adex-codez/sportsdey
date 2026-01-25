@@ -61,9 +61,12 @@ export const tennisVideosQuery = z.object({
 		description: "The search query for the videos",
 		example: "Alcaraz vs Djokovic",
 	}),
-	pageToken: z.string().optional().openapi({
-		param: { name: "pageToken", in: "query" },
-		description: "The token for the next or previous page of results",
-		example: "CAUQAA",
-	}),
+	pageToken: z
+		.string()
+		.optional()
+		.openapi({
+			param: { name: "pageToken", in: "query" },
+			description: "The token for the next or previous page of results",
+			example: "CAUQAA",
+		}),
 });

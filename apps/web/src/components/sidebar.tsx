@@ -1,14 +1,13 @@
+import { Link, useNavigate } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
-import { type PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
+import { useCurrentSport } from "@/hooks/use-current-sport";
+import { useFavorites } from "@/hooks/useFavorites";
+import { SPORTS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useActiveTab } from "./active-tab-context";
-import { Button } from "./ui/button";
-import { useNavigate } from "@tanstack/react-router";
-import { SPORTS } from "@/lib/constants";
-import { useCurrentSport } from "@/hooks/use-current-sport";
 import BettingWidget from "./betting-widget";
-import { useFavorites } from "@/hooks/useFavorites";
-import { Link } from "@tanstack/react-router";
+import { Button } from "./ui/button";
 
 const SidebarItem = ({
 	children,
@@ -22,12 +21,14 @@ const SidebarItem = ({
 }>) => {
 	return (
 		<Link to={link} className="block">
-			<div className="overflow-hidden rounded-2xl bg-white">
+			<div className="overflow-hidden rounded-2xl bg-white dark:bg-[#202120]">
 				<div className="flex items-center justify-between px-6 py-4">
-					<p className="font-semibold text-primary text-xl">{heading}</p>
+					<p className="font-semibold text-primary text-xl dark:text-white">
+						{heading}
+					</p>
 					{Icon && Icon}
 				</div>
-				<hr />
+				<hr className="dark:border-[#5A5F63]" />
 				{children}
 			</div>
 		</Link>
@@ -111,17 +112,17 @@ const Sidebar = () => {
 							to a team to add to favourites.
 						</p>
 					) : (
-						<ul className="px-6 py-4 space-y-3">
+						<ul className="space-y-3 px-6 py-4">
 							{favoriteTeams.map((team) => (
 								<li key={team.id} className="flex items-center justify-between">
 									<div className="flex items-center gap-3">
 										<img
 											src={team.logo || "/Profile.png"}
 											alt={team.name}
-											className="w-8 h-8 object-contain"
+											className="h-8 w-8 object-contain"
 										/>
 										<span
-											className="text-sm font-medium truncate max-w-30"
+											className="max-w-30 truncate font-medium text-sm"
 											title={team.name}
 										>
 											{team.name}
@@ -180,7 +181,7 @@ const Sidebar = () => {
 							the league detail to add to favourites.
 						</p>
 					) : (
-						<ul className="px-6 py-4 space-y-3">
+						<ul className="space-y-3 px-6 py-4">
 							{favoriteLeagues.map((league) => (
 								<li
 									key={league.id}
@@ -190,10 +191,10 @@ const Sidebar = () => {
 										<img
 											src={league.flag || "/International.png"}
 											alt={league.name}
-											className="w-8 h-8 rounded-full object-cover"
+											className="h-8 w-8 rounded-full object-cover"
 										/>
 										<span
-											className="text-sm font-medium truncate max-w-[120px]"
+											className="max-w-[120px] truncate font-medium text-sm"
 											title={league.name}
 										>
 											{league.name}

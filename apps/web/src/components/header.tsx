@@ -6,19 +6,20 @@ import {
 } from "@tanstack/react-router";
 import { CalendarDays, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useCurrentFilter } from "@/hooks/use-current-filter";
+import { useCurrentSport } from "@/hooks/use-current-sport";
 import useWeekDates from "@/hooks/use-weekdates";
+import { useFavorites } from "@/hooks/useFavorites";
+import { SPORTS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import BasketballIcon from "@/logos/basketball.svg?react";
 import FootballIcon from "@/logos/football.svg?react";
 import WorldIcon from "@/logos/world.svg?react";
-import { useDateContext } from "./date-context";
-import { Button } from "./ui/button";
-import { useCurrentSport } from "@/hooks/use-current-sport";
-import { SPORTS } from "@/lib/constants";
 import { useActiveTab } from "./active-tab-context";
-import { useFavorites } from "@/hooks/useFavorites";
-import { useCurrentFilter } from "@/hooks/use-current-filter";
+import { useDateContext } from "./date-context";
 import { socials } from "./socials";
+import { ThemeToggle } from "./theme-toggle";
+import { Button } from "./ui/button";
 
 export default function Header() {
 	const currentSport = useCurrentSport();
@@ -73,9 +74,8 @@ export default function Header() {
 	return (
 		<div className="z-30 w-full pb-4 lg:pb-0">
 			<div className="h-[60px] w-full bg-primary px-4 py-1 text-foreground lg:flex lg:h-20 lg:flex-row lg:items-center lg:justify-between lg:px-[10%] lg:py-1">
-				<div className="flex min-w-0 justify-between">
+				<div className="flex min-w-0 items-center justify-between lg:hidden">
 					<button
-						className="lg:hidden"
 						type="button"
 						onClick={() => setOpen(!open)}
 						ref={menuButtonRef}
@@ -94,10 +94,17 @@ export default function Header() {
 							/>
 						</div>
 					</Link>
-					<div className="lg:hidden" />
+					<ThemeToggle />
 				</div>
 
-				<div className="hidden min-w-0 lg:flex">
+				<div className="hidden min-w-0 lg:flex lg:h-full lg:w-full lg:items-center lg:justify-between">
+					<Link to="/" search={{ league: undefined, sports: currentSport }}>
+						<img
+							src="/sportsdey-logo.png"
+							className="h-12"
+							alt="sportsdey's logo"
+						/>
+					</Link>
 					<div className="overflow-x-auto">
 						<nav className="cust-scrollbar flex w-max gap-4 py-4 font-medium">
 							{links.map(({ to, label, icon: Icon, sport }) => (
@@ -110,7 +117,7 @@ export default function Header() {
 										"flex shrink-0 gap-2 pb-2",
 										currentSport === sport
 											? "border-accent border-b-2 text-accent"
-											: "text-secondary",
+											: "text-secondary dark:text-white",
 									)}
 								>
 									<Icon />
@@ -119,6 +126,7 @@ export default function Header() {
 							))}
 						</nav>
 					</div>
+					<ThemeToggle />
 				</div>
 
 				<div className="min-w-0">
@@ -174,12 +182,12 @@ export default function Header() {
 							</button>
 						</div>
 
-						<div className="min-w-0 space-y-8 text-base">
+						<div className="min-w-0 space-y-8 text-base dark:text-white">
 							<div className="">
-								<div className="w-full px-4 bg-[#202120] py-4 text-base">
+								<div className="w-full bg-[#202120] px-4 py-4 text-base">
 									Features
 								</div>
-								<ul className="space-y-4 px-4 mt-4">
+								<ul className="mt-4 space-y-4 px-4">
 									<li
 										className={cn(
 											"cursor-pointer",
@@ -286,11 +294,11 @@ export default function Header() {
 									</li>
 								</ul>
 							</div>
-							<div className="">
-								<div className="w-full px-4 bg-[#202120] py-4 text-base">
+							<div className="dark:text-white">
+								<div className="w-full bg-[#202120] px-4 py-4 text-base">
 									Info
 								</div>
-								<ul className="space-y-4 px-4 mt-4">
+								<ul className="mt-4 space-y-4 px-4">
 									<li
 										className={cn(
 											"cursor-pointer",
@@ -315,10 +323,10 @@ export default function Header() {
 								</ul>
 							</div>
 							<div className="">
-								<div className="w-full px-4 bg-[#202120] py-4 text-base">
+								<div className="w-full bg-[#202120] px-4 py-4 text-base">
 									Social Links
 								</div>
-								<div className="flex items-center gap-2 px-4 mt-4">
+								<div className="mt-4 flex items-center gap-2 px-4">
 									{socials.map(({ icon: Icon, id, link }) => (
 										<a
 											key={id}
@@ -354,52 +362,79 @@ export default function Header() {
 									search: { league: undefined, sports: currentSport } as any,
 								});
 							}}
-							className="font-semibold text-secondary text-sm"
+							className={cn(
+								"cursor-pointer font-semibold text-lg transition-colors",
+								tab === "scores"
+									? "text-accent"
+									: "text-secondary dark:text-white",
+							)}
 						>
 							Scores
 						</li>
 						<li>
 							<Link
 								to="/betting"
-								className="font-semibold text-secondary text-sm"
+								className={cn(
+									"font-semibold text-lg transition-colors",
+									tab === "betting"
+										? "text-accent"
+										: "text-secondary dark:text-white",
+								)}
 								onClick={() => setTab("betting")}
 							>
 								Betting
 							</Link>
 						</li>
-						<li
-							onClick={() => {
-								setTab("news");
-								router.navigate({
-									to: "/news",
-									search: { sports: currentSport },
-								});
-							}}
-						>
-							<a href="#" className="font-semibold text-secondary text-sm">
+						<li>
+							<Link
+								to="/news"
+								search={{ sports: currentSport, tab: "news" }}
+								className={cn(
+									"font-semibold text-lg transition-colors",
+									tab === "news"
+										? "text-accent"
+										: "text-secondary dark:text-white",
+								)}
+								onClick={() => setTab("news")}
+							>
 								News
-							</a>
+							</Link>
+						</li>
+						<li>
+							<Link
+								to="/news"
+								search={{ sports: currentSport, tab: "videos" }}
+								className={cn(
+									"font-semibold text-lg transition-colors",
+									tab === "videos"
+										? "text-accent"
+										: "text-secondary dark:text-white",
+								)}
+								onClick={() => setTab("videos")}
+							>
+								Videos
+							</Link>
 						</li>
 					</ul>
 				</div>
 
-				<div className="flex w-[98vw] overflow-x-auto md:w-full justify-center">
+				<div className="flex w-[98vw] justify-center overflow-x-auto md:w-full dark:border-[#5A5F63] dark:border-b">
 					{/* <nav className="flex w-max items-center justify-center gap-4 border border-[#414141] md:border-0 px-4 py-4"> */}
-					<nav className="flex w-max items-center justify-center gap-4 px-4 py-4">
+					<nav className="flex w-max items-center justify-center gap-2 px-4 py-3">
 						{links.map(({ to, label, icon: Icon, sport }) => (
 							<Link
 								key={to}
 								to={to as string}
 								onClick={() => setTab("scores")}
 								className={cn(
-									"flex shrink-0 gap-2 whitespace-nowrap",
+									"flex shrink-0 gap-1 whitespace-nowrap",
 									currentSport === sport
-										? "flex-shrink-0 flex gap-2 bg-[#202120] text-secondary border-accent border-2 whitespace-nowrap rounded-full py-2 px-4"
-										: "flex-shrink-0 flex gap-2 text-secondary whitespace-nowrap",
+										? "flex flex-shrink-0 gap-1 whitespace-nowrap rounded-full border-2 border-accent bg-[#202120] px-3 py-1 text-secondary dark:text-white"
+										: "flex flex-shrink-0 gap-1 whitespace-nowrap text-secondary dark:text-white",
 								)}
 							>
-								<Icon />
-								<p>{label}</p>
+								<Icon className="h-4 w-4" />
+								<p className="text-xs">{label}</p>
 							</Link>
 						))}
 					</nav>
@@ -450,7 +485,7 @@ export default function Header() {
 										className={cn(
 											"flex flex-col text-center",
 											isDisabled
-												? "opacity-30 cursor-not-allowed pointer-events-none"
+												? "pointer-events-none cursor-not-allowed opacity-30"
 												: "",
 											!isDisabled &&
 												weekDate.toDateString() === date.toDateString()
@@ -481,7 +516,7 @@ export default function Header() {
 						})()}
 						<button
 							type="button"
-							className="rounded-lg border border-[#777] bg-primary p-2 active:scale-95 transition-transform opacity-50 cursor-not-allowed"
+							className="cursor-not-allowed rounded-lg border border-[#777] bg-primary p-2 opacity-50 transition-transform active:scale-95"
 							title="Calendar disabled for this release"
 						>
 							<CalendarDays className="text-secondary" width={24} height={24} />

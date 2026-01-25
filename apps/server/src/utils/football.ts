@@ -1,3 +1,4 @@
+import type z from "zod";
 import type { TournamentScheduleSchema } from "@/schemas";
 import type {
 	CompetitionGroup,
@@ -6,7 +7,6 @@ import type {
 	TransformedMatchInfo,
 	TransformedResponse,
 } from "@/types/football";
-import type z from "zod";
 import { parseDateString } from ".";
 
 export function transformProxySchedule(data: any[]): TransformedResponse {
@@ -15,8 +15,8 @@ export function transformProxySchedule(data: any[]): TransformedResponse {
 	data.forEach((matchData) => {
 		const { tournament, homeTeam, awayTeam, status, times, date, id } =
 			matchData;
-		if(status.shortName === "PSP") return;
-if(status.shortName === "CNC") return;
+		if (status.shortName === "PSP") return;
+		if (status.shortName === "CNC") return;
 
 		const competitionId = tournament.id;
 
@@ -72,12 +72,8 @@ if(status.shortName === "CNC") return;
 		const aName = a.competition.name;
 		const bName = b.competition.name;
 
-		const aIndex = priorityLeagues.findIndex((league) =>
-			aName === league,
-		);
-		const bIndex = priorityLeagues.findIndex((league) =>
-			bName === league,
-		);
+		const aIndex = priorityLeagues.findIndex((league) => aName === league);
+		const bIndex = priorityLeagues.findIndex((league) => bName === league);
 
 		if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
 		if (aIndex !== -1) return -1;
@@ -107,6 +103,7 @@ export function transformProxyMatchInfo(
 			home: {
 				id: summary.homeTeam.id.toString(),
 				name: summary.homeTeam.name,
+				shortName: summary.homeTeam.shortName,
 				...(summary.homeTeam.score
 					? { score: summary.homeTeam.score.current }
 					: { score: 0 }),
@@ -114,6 +111,7 @@ export function transformProxyMatchInfo(
 			away: {
 				id: summary.awayTeam.id.toString(),
 				name: summary.awayTeam.name,
+				shortName: summary.awayTeam.shortName,
 				...(summary.awayTeam.score
 					? { score: summary.awayTeam.score.current }
 					: { score: 0 }),
@@ -123,7 +121,7 @@ export function transformProxyMatchInfo(
 			date_time: summary.date,
 			stadium: summary.info?.stadium?.name ?? "",
 		},
-		...(summary.times ? {clock: summary.times?.currentMinute} : {}),
+		...(summary.times ? { clock: summary.times?.currentMinute } : {}),
 		status: {
 			name: summary.status.name,
 			shortname: summary.status.shortName,
@@ -262,7 +260,9 @@ export function transformProxyStats(
 	};
 }
 
-export function transformFullProxyStandings(data: any[]): import("@/types/football").FullStandingsResponse {
+export function transformFullProxyStandings(
+	data: any[],
+): import("@/types/football").FullStandingsResponse {
 	if (!data || data.length === 0) {
 		throw new Error("No standings data available");
 	}
@@ -294,8 +294,9 @@ export function transformFullProxyStandings(data: any[]): import("@/types/footba
 	};
 }
 
-export function transformTournamentSchedule(data: any[]): z.infer<typeof TournamentScheduleSchema> {
-	
+export function transformTournamentSchedule(
+	data: any[],
+): z.infer<typeof TournamentScheduleSchema> {
 	const matches = data.map((matchData) => {
 		const { homeTeam, awayTeam, status, times, date, id } = matchData;
 
@@ -322,10 +323,10 @@ export function transformTournamentSchedule(data: any[]): z.infer<typeof Tournam
 				: {}),
 		};
 	});
-	
+
 	const competition = {
 		name: data[0].tournament.name,
 		id: data[0].tournament.id,
-	}
+	};
 	return { matches, total_matches: matches.length, competition };
 }

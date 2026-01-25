@@ -1,24 +1,24 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { format } from "date-fns";
 import { Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { VideosTab } from "@/components/basketball-section/VideosTab";
 import { FootballMatchInfo } from "@/components/football-match-info";
-import { TopScorers } from "@/components/top-scorers";
 import FootballStandingsTab from "@/components/football-section/FootballStandingsTab";
 import FootballStatsTab from "@/components/football-section/FootballStatsTab";
+import { TopScorers } from "@/components/top-scorers";
 import { useFootballMatchInfo } from "@/hooks/use-footmatch-info";
-import DetailsImageCard from "@/shared/DetailsImageCard";
-import { format } from "date-fns";
-import { getTimeUntilStart, safeParseDate } from "@/utils/timeUtils";
-import { useQuery } from "@tanstack/react-query";
+import { useFavorites } from "@/hooks/useFavorites";
 import { apiRequest } from "@/lib/api";
+import DetailsImageCard from "@/shared/DetailsImageCard";
+import ImportantUpdate from "@/shared/ImportantUpdate";
 import type {
 	FootballStandingsResponse,
 	FootballStatsResponse,
 } from "@/types/football";
 import { getTeamLogo } from "@/utils/getTeamLogo";
-import { useFavorites } from "@/hooks/useFavorites";
-import { VideosTab } from "@/components/basketball-section/VideosTab";
-import ImportantUpdate from "@/shared/ImportantUpdate";
+import { getTimeUntilStart, safeParseDate } from "@/utils/timeUtils";
 
 export const Route = createFileRoute("/index/$gameId")({
 	component: RouteComponent,
@@ -102,10 +102,7 @@ function RouteComponent() {
 	const isHomeFavorite = isFavoriteTeam(homeTeamId);
 	const isAwayFavorite = isFavoriteTeam(awayTeamId);
 
-	const handleToggleFavorite = (
-		teamName: string,
-		logo: string = "/Profile.png",
-	) => {
+	const handleToggleFavorite = (teamName: string, logo = "/Profile.png") => {
 		const tournamentName = gameInfo?.competition?.name || "";
 
 		toggleFavoriteTeam({
@@ -201,7 +198,7 @@ function RouteComponent() {
 					{ id: "stats", label: "Stats" },
 					{ id: "table", label: "Table" },
 					{ id: "top_scorers", label: "Top Scorers" },
-					{id: "videos", label: "Videos"}
+					{ id: "videos", label: "Videos" },
 				]}
 				isHomeFavorite={isHomeFavorite}
 				isAwayFavorite={isAwayFavorite}

@@ -1,10 +1,14 @@
-import BasketBallDetailsPage from '@/components/basketball-section/BasketBallDetailsPage'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
+import BasketBallDetailsPage from "@/components/basketball-section/BasketBallDetailsPage";
 
-export const Route = createFileRoute('/basketball/$Id')({
-  component: RouteComponent,
-})
+export const Route = createFileRoute("/basketball/$Id")({
+	component: RouteComponent,
+});
 
 function RouteComponent() {
-  return <div><BasketBallDetailsPage /></div>
+	return (
+		<div>
+			<BasketBallDetailsPage />
+		</div>
+	);
 }

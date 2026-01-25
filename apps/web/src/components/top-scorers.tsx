@@ -1,5 +1,5 @@
-import React from "react";
 import { Handshake, Volleyball } from "lucide-react";
+import type React from "react";
 import type { FootballMatchInfoType } from "@/types/football";
 
 interface TopScorersProps {
@@ -9,43 +9,45 @@ interface TopScorersProps {
 export const TopScorers: React.FC<TopScorersProps> = ({ scorers }) => {
 	if (!scorers || scorers.length === 0)
 		return (
-			<div className="bg-white rounded-2xl p-8 text-center text-gray-400 border border-gray-100 italic">
+			<div className="rounded-2xl border border-gray-100 bg-white p-8 text-center text-gray-400 italic dark:bg-gray dark:text-white">
 				Top scorers data not available for this match.
 			</div>
 		);
 	return (
-		<div className="rounded-2xl bg-white shadow-sm overflow-hidden border border-gray-100 mb-10">
-			<div className="flex justify-between items-center px-4 py-3 bg-gray-50/50 border-b border-gray-100">
-				<span className="text-primary font-bold text-sm">Top Scorers</span>
-				<div className="flex gap-x-6 md:gap-x-10 mr-2 md:mr-6">
-					<div className="flex items-center gap-1 text-[#8E8E8E] font-bold text-[10px] md:text-xs min-w-[40px] justify-center">
+		<div className="mb-10 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-0 dark:bg-card">
+			<div className="flex items-center justify-between border-gray-100 border-b bg-gray-50/50 px-4 py-3 dark:border-[#5A5F63] dark:bg-card">
+				<span className="font-bold text-primary text-sm dark:text-white">
+					Top Scorers
+				</span>
+				<div className="mr-2 flex gap-x-6 md:mr-6 md:gap-x-10">
+					<div className="flex min-w-[40px] items-center justify-center gap-1 font-bold text-[#8E8E8E] text-[10px] md:text-xs dark:text-white">
 						<Volleyball className="size-3" />
 						<span>GS</span>
 					</div>
 				</div>
 			</div>
 
-			<div className="divide-y divide-gray-100">
+			<div className="divide-y divide-gray-100 dark:divide-[#5A5F63]">
 				{scorers.map((scorer, index) => (
 					<div
 						key={scorer.id}
-						className="flex justify-between items-center px-4 py-3.5 hover:bg-gray-50/50 transition-colors"
+						className="flex items-center justify-between px-4 py-3.5 transition-colors hover:bg-gray-50/50"
 					>
-						<div className="flex items-center gap-4 flex-1 min-w-0">
-							<span className="text-[#8E8E8E] font-bold text-xs md:text-sm w-4">
+						<div className="flex min-w-0 flex-1 items-center gap-4">
+							<span className="w-4 font-bold text-[#8E8E8E] text-xs md:text-sm dark:text-white">
 								{index + 1}
 							</span>
-							<div className="flex flex-col min-w-0">
-								<span className="truncate text-primary font-bold text-sm md:text-base">
+							<div className="flex min-w-0 flex-col">
+								<span className="truncate font-bold text-primary text-sm md:text-base dark:text-white">
 									{scorer.name}
 								</span>
-								<span className="truncate text-[#8E8E8E] text-[10px] md:text-xs font-medium">
+								<span className="truncate font-medium text-[#8E8E8E] text-[10px] md:text-xs dark:text-white">
 									{scorer.team.name} ({scorer.team.abbreviation})
 								</span>
 							</div>
 						</div>
-						<div className="flex gap-x-6 md:gap-x-10 mr-2 md:mr-6">
-							<span className="text-primary font-bold text-sm md:text-base w-10 text-center">
+						<div className="mr-2 flex gap-x-6 md:mr-6 md:gap-x-10">
+							<span className="w-10 text-center font-bold text-primary text-sm md:text-base dark:text-white">
 								{scorer.gs}
 							</span>
 						</div>

@@ -1,31 +1,34 @@
-import { Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useMemo, useTransition } from "react";
-import { useTournamentFootballSchedule } from "@/hooks/use-fooball-schedule";
-
-import { formatTime } from "@/lib/utils";
+import BannerCarousel from "@/components/BannerCarousel";
+import { EmptyState } from "@/components/EmptyState";
 import { Filters } from "@/components/filters";
+import RightSidebar from "@/components/RightSidebar";
 import {
 	Accordion,
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
-import { EmptyState } from "@/components/EmptyState";
-import { useAppSelector } from "@/store/hook";
-import type { RootState } from "@/store";
-import { useFavorites } from "@/hooks/useFavorites";
-import { MatchCard } from "@/shared/BasketballAccordionComponentCard";
 import { useCurrentFilter } from "@/hooks/use-current-filter";
-import { createFileRoute } from '@tanstack/react-router'
-import RightSidebar from "@/components/RightSidebar";
+import { useTournamentFootballSchedule } from "@/hooks/use-fooball-schedule";
+import { useFavorites } from "@/hooks/useFavorites";
+import type { BannerData } from "@/lib/banners-server";
+import { getBanners } from "@/lib/banners-server";
+import { formatTime } from "@/lib/utils";
+import { MatchCard } from "@/shared/BasketballAccordionComponentCard";
+import type { RootState } from "@/store";
+import { useAppSelector } from "@/store/hook";
 
-export const Route = createFileRoute('/index/tournament/$tournamentId')({
+export const Route = createFileRoute("/index/tournament/$tournamentId")({
+	loader: () => getBanners(),
 	component: RouteComponent,
-})
+});
 
 function RouteComponent() {
 	const { tournamentId } = Route.useParams();
+	const banners = Route.useLoaderData() as BannerData[];
 	const { isFavoriteMatch, toggleFavoriteMatch } = useFavorites();
 	// const search = useSearch({ from: "/" }) as {
 	// 	league?: string;
@@ -35,16 +38,14 @@ function RouteComponent() {
 
 	const selectedDateString = useAppSelector(
 		(state: RootState) => state.date.selectedDate,
-	)
+	);
 	const selectedDate = new Date(selectedDateString);
 	const { currentFilter, changeCurrentFilter } = useCurrentFilter();
 	const [isPending, startTransition] = useTransition();
 	const { data: schedules, isLoading } = useTournamentFootballSchedule(
 		`${selectedDate.getDate().toString().padStart(2, "0")}/${(selectedDate.getMonth() + 1).toString().padStart(2, "0")}/${selectedDate.getFullYear()}`,
 		tournamentId,
-	)
-
-
+	);
 
 	const filtersCount = useMemo(() => {
 		if (!schedules) {
@@ -53,7 +54,7 @@ function RouteComponent() {
 				liveCount: 0,
 				finishedCount: 0,
 				upcomingCount: 0,
-			}
+			};
 		}
 
 		const allCount = schedules.total_matches;
@@ -67,16 +68,16 @@ function RouteComponent() {
 			} else if (match.match_status === "SCH") {
 				upcomingCount++;
 			} else {
-				liveCount++
+				liveCount++;
 			}
-		})
+		});
 
 		return {
 			allCount,
 			liveCount,
 			finishedCount,
 			upcomingCount,
-		}
+		};
 	}, [schedules]);
 
 	const filteredSchedules = useMemo(() => {
@@ -90,12 +91,15 @@ function RouteComponent() {
 
 		const matchingMatches = schedules.matches.filter((match) => {
 			// if (currentFilter === "all" || filter === "all") return true;
-			if (currentFilter === "finished")
-				return match.match_status === "closed";
-			if (currentFilter === "upcoming") return match.match_status === "SCH" || match.match_status === "AET";
+			if (currentFilter === "finished") return match.match_status === "closed";
+			if (currentFilter === "upcoming")
+				return match.match_status === "SCH" || match.match_status === "AET";
 			if (currentFilter === "live")
 				return (
-					match.match_status !== "closed" && match.match_status !== "SCH" && match.match_status !== "AET" && match.match_status !== "FTO"
+					match.match_status !== "closed" &&
+					match.match_status !== "SCH" &&
+					match.match_status !== "AET" &&
+					match.match_status !== "FTO"
 				);
 			return false;
 		});
@@ -106,11 +110,10 @@ function RouteComponent() {
 			});
 		}
 
-
 		return {
 			...schedules,
 			matches: matchingMatches,
-		}
+		};
 	}, [schedules, currentFilter]);
 
 	if (isLoading) {
@@ -119,14 +122,14 @@ function RouteComponent() {
 				<Loader2 className="animate-spin" width={24} height={24} />
 				<p className="text-gray-500 text-sm">Loading matches...</p>
 			</div>
-		)
+		);
 	}
 
 	const handleFilterChange = (filterValue: string) => {
 		startTransition(() => {
 			changeCurrentFilter(filterValue as any);
-		})
-	}
+		});
+	};
 
 	if (isPending) {
 		return (
@@ -139,9 +142,9 @@ function RouteComponent() {
 
 	return (
 		<div className="h-full">
-			<div className="lg:grid lg:grid-cols-[3fr_1fr] gap-6 h-full items-start">
-				<div className="space-y-6 h-full overflow-y-auto no-scrollbar pb-20">
-					<div className="sticky top-[-16px] z-10 bg-background/95 backdrop-blur-sm px-1 py-4 flex items-center justify-between">
+			<div className="h-full items-start gap-6 lg:grid lg:grid-cols-[3fr_1fr]">
+				<div className="no-scrollbar h-full space-y-6 overflow-y-auto pb-20">
+					<div className="sticky top-[-16px] z-10 flex items-center justify-between bg-background/95 px-1 py-4 backdrop-blur-sm">
 						<Filters
 							currentFilter={currentFilter}
 							setCurrentFilter={handleFilterChange}
@@ -149,6 +152,8 @@ function RouteComponent() {
 						/>
 						{/* <DatePicker date={date} setDate={setDate} /> */}
 					</div>
+
+					{banners.length > 0 && <BannerCarousel banners={banners} />}
 
 					<Accordion
 						key={`${filteredSchedules?.competition.id}`}
@@ -182,7 +187,9 @@ function RouteComponent() {
 													<MatchCard
 														team1={match.competitors.home.name}
 														team2={match.competitors.away.name}
-														time={formatTime(new Date(match.date || match.start_time || ""))}
+														time={formatTime(
+															new Date(match.date || match.start_time || ""),
+														)}
 														score1={match.competitors.home.score}
 														score2={match.competitors.away.score}
 														// clock={match.clock?.played}
@@ -202,7 +209,6 @@ function RouteComponent() {
 													/>
 												</Link>
 											</div>
-
 										))
 									)}
 								</div>
@@ -210,10 +216,10 @@ function RouteComponent() {
 						</AccordionItem>
 					</Accordion>
 				</div>
-				<div className="hidden lg:block h-full overflow-y-auto no-scrollbar pb-20">
+				<div className="no-scrollbar hidden h-full overflow-y-auto pb-20 lg:block">
 					<RightSidebar />
 				</div>
 			</div>
 		</div>
-	)
+	);
 }

@@ -4,17 +4,20 @@ import {
 	successResponseSchema,
 	TennisMatchInfoData,
 	TennisScheduleData,
+	VideoResponseSchema,
 } from "@/schemas";
-import { VideoResponseSchema } from "@/schemas";
+import type {
+	SportRadarTennisGameResponse,
+	SportRadarTennisResponse,
+} from "@/types";
+import { transformTennisData, transformTennisMatchData } from "@/utils/tennis";
+import { jsonZodErrorFormatter } from "@/utils/zod";
 import {
 	tennisGameIdParam,
 	tennisScheduleParam,
 	tennisScheduleQuery,
 	tennisVideosQuery,
 } from "@/validators";
-import { transformTennisData, transformTennisMatchData } from "@/utils/tennis";
-import { jsonZodErrorFormatter } from "@/utils/zod";
-import type { SportRadarTennisGameResponse, SportRadarTennisResponse } from "@/types";
 
 const tennisRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 
@@ -65,87 +68,91 @@ const tennisScheduleRoute = createRoute({
 	tags: ["Tennis"],
 });
 
-tennisRoute.openapi(tennisScheduleRoute, async (c) => {
-	try {
-		const { date } = c.req.valid("param");
-		const { language } = c.req.valid("query");
+tennisRoute.openapi(
+	tennisScheduleRoute,
+	async (c) => {
+		try {
+			const { date } = c.req.valid("param");
+			const { language } = c.req.valid("query");
 
-		const apiKey = c.env?.SPORTRADAR_API_KEY;
-		const cacheKey = `tennis_schedule_${date}_${language}`;
+			const apiKey = c.env?.SPORTRADAR_API_KEY;
+			const cacheKey = `tennis_schedule_${date}_${language}`;
 
-		const cachedData = (await c.env.sportsdey_ns?.get(cacheKey, "json")) as {
-			data: any;
-			expiresAt: number;
-		} | null;
+			const cachedData = (await c.env.sportsdey_ns?.get(cacheKey, "json")) as {
+				data: any;
+				expiresAt: number;
+			} | null;
 
-		if (cachedData && Date.now() <= cachedData.expiresAt) {
+			if (cachedData && Date.now() <= cachedData.expiresAt) {
+				return c.json(
+					{
+						success: true as const,
+						data: cachedData.data,
+					},
+					200,
+				);
+			}
+
+			const apiUrl = `https://api.sportradar.com/tennis/trial/v3/${language}/schedules/${date}/summaries.json?api_key=${apiKey}`;
+
+			const response = await fetch(apiUrl);
+
+			if (!response.ok) {
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [
+							{
+								field: "sportradar_api",
+								message: `SportRadar API returned status ${response.status}`,
+								code: "external_api_error",
+							},
+						],
+					},
+					502,
+				);
+			}
+
+			const apiData: SportRadarTennisResponse = await response.json();
+			const transformedData = transformTennisData(apiData, date);
+
+			await c.env.sportsdey_ns?.put(
+				cacheKey,
+				JSON.stringify({
+					data: transformedData,
+					expiresAt: Date.now() + 5 * 60 * 1000,
+				}),
+			);
+
 			return c.json(
 				{
 					success: true as const,
-					data: cachedData.data,
+					data: transformedData,
 				},
 				200,
 			);
-		}
-
-		const apiUrl = `https://api.sportradar.com/tennis/trial/v3/${language}/schedules/${date}/summaries.json?api_key=${apiKey}`;
-
-		const response = await fetch(apiUrl);
-
-		if (!response.ok) {
+		} catch (error) {
+			console.error("Error fetching tennis schedule:", error);
 			return c.json(
 				{
 					success: false as const,
-					error: "External API error",
+					error: "Internal server error",
 					details: [
 						{
-							field: "sportradar_api",
-							message: `SportRadar API returned status ${response.status}`,
-							code: "external_api_error",
+							field: "server",
+							message:
+								"An unexpected error occurred while processing your request",
+							code: "internal_error",
 						},
 					],
 				},
-				502,
+				500,
 			);
 		}
-
-		const apiData: SportRadarTennisResponse = await response.json();
-		const transformedData = transformTennisData(apiData, date);
-
-		await c.env.sportsdey_ns?.put(
-			cacheKey,
-			JSON.stringify({
-				data: transformedData,
-				expiresAt: Date.now() + 5 * 60 * 1000,
-			}),
-		);
-
-		return c.json(
-			{
-				success: true as const,
-				data: transformedData,
-			},
-			200,
-		);
-	} catch (error) {
-		console.error("Error fetching tennis schedule:", error);
-		return c.json(
-			{
-				success: false as const,
-				error: "Internal server error",
-				details: [
-					{
-						field: "server",
-						message:
-							"An unexpected error occurred while processing your request",
-						code: "internal_error",
-					},
-				],
-			},
-			500,
-		);
-	}
-}, jsonZodErrorFormatter);
+	},
+	jsonZodErrorFormatter,
+);
 
 const tennisGameRoute = createRoute({
 	method: "get",

@@ -1,259 +1,344 @@
-import { createFileRoute, useRouter, Link } from '@tanstack/react-router';
-import { ChevronLeft, Star, Trash2 } from 'lucide-react';
-import { type FavoriteTeam, type FavoriteMatch, useFavorites } from '@/hooks/useFavorites';
-import { useQuery } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/api';
-import { MatchCard, BasketballComponentHeader } from '@/shared/BasketballAccordionComponentCard';
-import { useMemo } from 'react';
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { ChevronLeft, Star, Trash2 } from "lucide-react";
+import { useMemo } from "react";
+import BannerCarousel from "@/components/BannerCarousel";
+import {
+	type FavoriteMatch,
+	type FavoriteTeam,
+	useFavorites,
+} from "@/hooks/useFavorites";
+import { apiRequest } from "@/lib/api";
+import { getBanners } from "@/lib/banners-server";
+import {
+	BasketballComponentHeader,
+	MatchCard,
+} from "@/shared/BasketballAccordionComponentCard";
 
-export const Route = createFileRoute('/favorites')({
-    component: FavoritesPage,
+export const Route = createFileRoute("/favorites")({
+	loader: () => getBanners(),
+	component: FavoritesPage,
 });
 
-const FavoriteMatchCardRow = ({ match, onRemove }: { match: FavoriteMatch; onRemove: () => void }) => {
-    const { data: gameData } = useQuery({
-        queryKey: [match.sport, 'game', match.id],
-        queryFn: () => apiRequest<any>(`${match.sport}/game/${match.id}`),
-        refetchInterval: 30000,
-    });
+const FavoriteMatchCardRow = ({
+	match,
+	onRemove,
+}: {
+	match: FavoriteMatch;
+	onRemove: () => void;
+}) => {
+	const { data: gameData } = useQuery({
+		queryKey: [match.sport, "game", match.id],
+		queryFn: () => apiRequest<any>(`${match.sport}/game/${match.id}`),
+		refetchInterval: 30000,
+	});
 
-    const team1 = gameData?.home?.name || match.team1;
-    const team2 = gameData?.away?.name || match.team2;
-    const score1 = gameData?.home?.points;
-    const score2 = gameData?.away?.points;
-    const status = gameData
-        ? ((gameData?.status === 'closed' || gameData?.status === 'ended' || gameData?.status === 'Finished A.E.T.' || gameData?.status === 'Full Time')
-            ? 'FT'
-            : (gameData?.clock ? 'Live' : (gameData?.status || match.time)))
-        : (match.time || 'Scheduled');
-    const time = gameData?.clock || match.time || "00:00";
+	const team1 = gameData?.home?.name || match.team1;
+	const team2 = gameData?.away?.name || match.team2;
+	const score1 = gameData?.home?.points;
+	const score2 = gameData?.away?.points;
+	const status = gameData
+		? gameData?.status === "closed" ||
+			gameData?.status === "ended" ||
+			gameData?.status === "Finished A.E.T." ||
+			gameData?.status === "Full Time"
+			? "FT"
+			: gameData?.clock
+				? "Live"
+				: gameData?.status || match.time
+		: match.time || "Scheduled";
+	const time = gameData?.clock || match.time || "00:00";
 
+	const getRouteConfig = () => {
+		switch (match.sport) {
+			case "basketball":
+				return { to: "/basketball/$Id" as const, params: { Id: match.id } };
+			case "tennis":
+				return {
+					to: "/tennis/$Id" as const,
+					params: { Id: match.id },
+					search: { country: match.country },
+				};
+			case "football":
+				return { to: "/index/$gameId" as const, params: { gameId: match.id } };
+			default:
+				return { to: "/index/$gameId" as const, params: { gameId: match.id } };
+		}
+	};
 
-    const getRouteConfig = () => {
-        switch (match.sport) {
-            case 'basketball':
-                return { to: '/basketball/$Id' as const, params: { Id: match.id } };
-            case 'tennis':
-                return { to: '/tennis/$Id' as const, params: { Id: match.id }, search: { country: match.country } };
-            case 'football':
-                return { to: '/index/$gameId' as const, params: { gameId: match.id } };
-            default:
-                return { to: '/index/$gameId' as const, params: { gameId: match.id } };
-        }
-    };
+	const routeConfig = getRouteConfig();
 
-    const routeConfig = getRouteConfig();
-
-    return (
-        <div className="bg-white overflow-hidden border-b border-gray-100 last:border-b-0">
-            <Link {...routeConfig} className="block hover:bg-gray-50 transition-colors">
-                <MatchCard
-                    id={match.id}
-                    team1={team1}
-                    team2={team2}
-                    score1={score1}
-                    score2={score2}
-                    status={status}
-                    time={time}
-                    isFavorite={true}
-                    onFavoriteToggle={onRemove}
-                    hideFinishedStatus={true}
-                />
-            </Link>
-        </div>
-    );
+	return (
+		<div className="overflow-hidden border-gray-100 border-b bg-white last:border-b-0">
+			<Link
+				{...routeConfig}
+				className="block transition-colors hover:bg-gray-50"
+			>
+				<MatchCard
+					id={match.id}
+					team1={team1}
+					team2={team2}
+					score1={score1}
+					score2={score2}
+					status={status}
+					time={time}
+					isFavorite={true}
+					onFavoriteToggle={onRemove}
+					hideFinishedStatus={true}
+				/>
+			</Link>
+		</div>
+	);
 };
 
 function FavoritesPage() {
-    const router = useRouter();
-    const { favoriteTeams, favoriteMatches, favoriteLeagues, toggleFavoriteTeam, toggleFavoriteMatch, toggleFavoriteLeague } = useFavorites();
+	const router = useRouter();
+	const banners = Route.useLoaderData() || [];
+	const {
+		favoriteTeams,
+		favoriteMatches,
+		favoriteLeagues,
+		toggleFavoriteTeam,
+		toggleFavoriteMatch,
+		toggleFavoriteLeague,
+	} = useFavorites();
 
-    const teamsGroupedByLeague = useMemo(() => {
-        const groups: Record<string, { league: string; country: string; flag?: string; teams: FavoriteTeam[] }> = {};
+	const teamsGroupedByLeague = useMemo(() => {
+		const groups: Record<
+			string,
+			{ league: string; country: string; flag?: string; teams: FavoriteTeam[] }
+		> = {};
 
-        favoriteTeams.forEach(team => {
-            const leagueKey = team.tournament || 'Other';
-            if (!groups[leagueKey]) {
-                groups[leagueKey] = {
-                    league: leagueKey,
-                    country: team.country || 'International',
-                    flag: team.flag,
-                    teams: []
-                };
-            }
-            groups[leagueKey].teams.push(team);
-        });
+		favoriteTeams.forEach((team) => {
+			const leagueKey = team.tournament || "Other";
+			if (!groups[leagueKey]) {
+				groups[leagueKey] = {
+					league: leagueKey,
+					country: team.country || "International",
+					flag: team.flag,
+					teams: [],
+				};
+			}
+			groups[leagueKey].teams.push(team);
+		});
 
-        return Object.values(groups);
-    }, [favoriteTeams]);
+		return Object.values(groups);
+	}, [favoriteTeams]);
 
-    const matchesGroupedByLeague = useMemo(() => {
-        const groups: Record<string, { league: string; country: string; flag?: string; matches: FavoriteMatch[] }> = {};
+	const matchesGroupedByLeague = useMemo(() => {
+		const groups: Record<
+			string,
+			{
+				league: string;
+				country: string;
+				flag?: string;
+				matches: FavoriteMatch[];
+			}
+		> = {};
 
-        favoriteMatches.forEach(match => {
-            const leagueKey = match.tournament || 'Other';
-            if (!groups[leagueKey]) {
-                groups[leagueKey] = {
-                    league: leagueKey,
-                    country: match.country || 'International',
-                    flag: match.flag,
-                    matches: []
-                };
-            }
-            groups[leagueKey].matches.push(match);
-        });
+		favoriteMatches.forEach((match) => {
+			const leagueKey = match.tournament || "Other";
+			if (!groups[leagueKey]) {
+				groups[leagueKey] = {
+					league: leagueKey,
+					country: match.country || "International",
+					flag: match.flag,
+					matches: [],
+				};
+			}
+			groups[leagueKey].matches.push(match);
+		});
 
-        return Object.values(groups);
-    }, [favoriteMatches]);
+		return Object.values(groups);
+	}, [favoriteMatches]);
 
-    return (
-        <div className="min-h-screen bg-[#f8f9fa] pb-20">
-            {/* Header */}
-            <div className="bg-white px-6 py-5 flex items-center sticky top-0 z-20 shadow-sm mb-4">
-                <button
-                    onClick={() => router.history.back()}
-                    className="mr-5 p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                    <ChevronLeft className="w-6 h-6 text-primary" />
-                </button>
-                <h1 className="text-xl font-bold text-primary">Favorites</h1>
-            </div>
+	return (
+		<div className="min-h-screen bg-[#f8f9fa] pb-20">
+			{banners.length > 0 && (
+				<div className="px-4 lg:container lg:mx-auto">
+					<div className="w-full overflow-hidden rounded-xl">
+						<BannerCarousel banners={banners} />
+					</div>
+				</div>
+			)}
+			{/* Header */}
+			<div className="sticky top-0 z-20 mb-4 flex items-center bg-white px-6 py-5 shadow-sm">
+				<button
+					onClick={() => router.history.back()}
+					className="mr-5 rounded-full p-2 transition-colors hover:bg-gray-100"
+				>
+					<ChevronLeft className="h-6 w-6 text-primary" />
+				</button>
+				<h1 className="font-bold text-primary text-xl">Favorites</h1>
+			</div>
 
-            <div className="space-y-8 px-4 w-full mx-auto">
-                {favoriteTeams.length === 0 && favoriteMatches.length === 0 && favoriteLeagues.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-24 text-center">
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                            <Star className="w-10 h-10 text-gray-300" />
-                        </div>
-                        <h2 className="text-lg font-bold text-primary mb-2">No favorites yet</h2>
-                        <p className="text-gray-500 max-w-[260px] text-sm">
-                            Tap the star icon next to teams or matches to keep track of them here.
-                        </p>
-                    </div>
-                ) : (
-                    <>
-                        {/* Favorite Leagues Section */}
-                        {favoriteLeagues.length > 0 && (
-                            <section className="space-y-4">
-                                <h2 className="text-lg font-bold text-primary ml-1">Favorite Leagues</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                    {favoriteLeagues.map((league) => {
-                                        const sport = league.sport.toLowerCase();
-                                        const to = sport === 'basketball' ? '/basketball' : sport === 'tennis' ? '/tennis' : '/';
-                                        return (
-                                            <div
-                                                key={league.id}
-                                                className="bg-white flex items-center justify-between hover:bg-gray-50 transition-all group rounded-xl border border-gray-100 shadow-sm overflow-hidden"
-                                            >
-                                                <Link
-                                                    to={to as any}
-                                                    search={{ league: league.name, sports: league.sport } as any}
-                                                    className="flex-1 p-4 flex items-center gap-4"
-                                                >
-                                                    <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center p-1.5 border border-gray-100 overflow-hidden">
-                                                        <img
-                                                            src={league.flag || '/International.png'}
-                                                            alt={league.name}
-                                                            className="w-full h-full object-cover rounded-full"
-                                                        />
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="font-bold text-sm text-primary">{league.name}</span>
-                                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{league.country} • {league.sport}</span>
-                                                    </div>
-                                                </Link>
-                                                <button
-                                                    onClick={() => toggleFavoriteLeague(league)}
-                                                    className="text-gray-300 hover:text-red-500 transition-colors p-4"
-                                                >
-                                                    <Trash2 className="w-4 h-4 cursor-pointer" />
-                                                </button>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </section>
-                        )}
+			<div className="mx-auto w-full space-y-8 px-4">
+				{favoriteTeams.length === 0 &&
+				favoriteMatches.length === 0 &&
+				favoriteLeagues.length === 0 ? (
+					<div className="flex flex-col items-center justify-center py-24 text-center">
+						<div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+							<Star className="h-10 w-10 text-gray-300" />
+						</div>
+						<h2 className="mb-2 font-bold text-lg text-primary">
+							No favorites yet
+						</h2>
+						<p className="max-w-[260px] text-gray-500 text-sm">
+							Tap the star icon next to teams or matches to keep track of them
+							here.
+						</p>
+					</div>
+				) : (
+					<>
+						{/* Favorite Leagues Section */}
+						{favoriteLeagues.length > 0 && (
+							<section className="space-y-4">
+								<h2 className="ml-1 font-bold text-lg text-primary">
+									Favorite Leagues
+								</h2>
+								<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+									{favoriteLeagues.map((league) => {
+										const sport = league.sport.toLowerCase();
+										const to =
+											sport === "basketball"
+												? "/basketball"
+												: sport === "tennis"
+													? "/tennis"
+													: "/";
+										return (
+											<div
+												key={league.id}
+												className="group flex items-center justify-between overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all hover:bg-gray-50"
+											>
+												<Link
+													to={to as any}
+													search={
+														{ league: league.name, sports: league.sport } as any
+													}
+													className="flex flex-1 items-center gap-4 p-4"
+												>
+													<div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-gray-50 p-1.5">
+														<img
+															src={league.flag || "/International.png"}
+															alt={league.name}
+															className="h-full w-full rounded-full object-cover"
+														/>
+													</div>
+													<div className="flex flex-col">
+														<span className="font-bold text-primary text-sm">
+															{league.name}
+														</span>
+														<span className="font-bold text-[10px] text-gray-400 uppercase tracking-wider">
+															{league.country} • {league.sport}
+														</span>
+													</div>
+												</Link>
+												<button
+													onClick={() => toggleFavoriteLeague(league)}
+													className="p-4 text-gray-300 transition-colors hover:text-red-500"
+												>
+													<Trash2 className="h-4 w-4 cursor-pointer" />
+												</button>
+											</div>
+										);
+									})}
+								</div>
+							</section>
+						)}
 
-                        {/* Favorite Teams Section */}
-                        {teamsGroupedByLeague.length > 0 && (
-                            <section className="space-y-4">
-                                <h2 className="text-lg font-bold text-primary ml-1">Favorite Teams</h2>
-                                <div className="space-y-4">
-                                    {teamsGroupedByLeague.map((group) => (
-                                        <div key={group.league} className="bg-white rounded-2xl overflow-hidden shadow-sm">
-                                            <BasketballComponentHeader
-                                                league={group.league}
-                                                country={group.country}
-                                                flag={group.flag}
-                                                isExpanded={true}
-                                                onToggle={() => { }}
-                                            />
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4 bg-gray-50/50">
-                                                {group.teams.map((team) => (
-                                                    <div
-                                                        key={team.id}
-                                                        className="bg-white p-4 flex items-center justify-between hover:bg-gray-50 transition-all group rounded-xl border border-gray-100 shadow-sm"
-                                                    >
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center p-1.5 border border-gray-100">
-                                                                <img
-                                                                    src={team.logo || '/Profile.png'}
-                                                                    alt={team.name}
-                                                                    className="w-full h-full object-contain"
-                                                                />
-                                                            </div>
-                                                            <div className="flex flex-col">
-                                                                <span className="font-bold text-sm text-primary">{team.name}</span>
-                                                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{team.sport}</span>
-                                                            </div>
-                                                        </div>
-                                                        <button
-                                                            onClick={() => toggleFavoriteTeam(team)}
-                                                            className="text-gray-300 hover:text-red-500 transition-colors p-2"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
+						{/* Favorite Teams Section */}
+						{teamsGroupedByLeague.length > 0 && (
+							<section className="space-y-4">
+								<h2 className="ml-1 font-bold text-lg text-primary">
+									Favorite Teams
+								</h2>
+								<div className="space-y-4">
+									{teamsGroupedByLeague.map((group) => (
+										<div
+											key={group.league}
+											className="overflow-hidden rounded-2xl bg-white shadow-sm"
+										>
+											<BasketballComponentHeader
+												league={group.league}
+												country={group.country}
+												flag={group.flag}
+												isExpanded={true}
+												onToggle={() => {}}
+											/>
+											<div className="grid grid-cols-1 gap-4 bg-gray-50/50 p-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+												{group.teams.map((team) => (
+													<div
+														key={team.id}
+														className="group flex items-center justify-between rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:bg-gray-50"
+													>
+														<div className="flex items-center gap-4">
+															<div className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-100 bg-gray-50 p-1.5">
+																<img
+																	src={team.logo || "/Profile.png"}
+																	alt={team.name}
+																	className="h-full w-full object-contain"
+																/>
+															</div>
+															<div className="flex flex-col">
+																<span className="font-bold text-primary text-sm">
+																	{team.name}
+																</span>
+																<span className="font-bold text-[10px] text-gray-400 uppercase tracking-wider">
+																	{team.sport}
+																</span>
+															</div>
+														</div>
+														<button
+															onClick={() => toggleFavoriteTeam(team)}
+															className="p-2 text-gray-300 transition-colors hover:text-red-500"
+														>
+															<Trash2 className="h-4 w-4" />
+														</button>
+													</div>
+												))}
+											</div>
+										</div>
+									))}
+								</div>
+							</section>
+						)}
 
-                        {/* Favorite Matches Section */}
-                        {matchesGroupedByLeague.length > 0 && (
-                            <section className="space-y-4">
-                                <h2 className="text-lg font-bold text-primary ml-1">Favorite Matches</h2>
-                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
-                                    {matchesGroupedByLeague.map((group) => (
-                                        <div key={group.league} className="bg-white rounded-2xl overflow-hidden shadow-sm">
-                                            <BasketballComponentHeader
-                                                league={group.league}
-                                                country={group.country}
-                                                flag={group.flag}
-                                                isExpanded={true}
-                                                onToggle={() => { }}
-                                            />
-                                            <div className="divide-y divide-gray-100">
-                                                {group.matches.map((match) => (
-                                                    <FavoriteMatchCardRow
-                                                        key={match.id}
-                                                        match={match}
-                                                        onRemove={() => toggleFavoriteMatch(match)}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
-                    </>
-                )}
-            </div>
-        </div>
-    );
+						{/* Favorite Matches Section */}
+						{matchesGroupedByLeague.length > 0 && (
+							<section className="space-y-4">
+								<h2 className="ml-1 font-bold text-lg text-primary">
+									Favorite Matches
+								</h2>
+								<div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-2">
+									{matchesGroupedByLeague.map((group) => (
+										<div
+											key={group.league}
+											className="overflow-hidden rounded-2xl bg-white shadow-sm"
+										>
+											<BasketballComponentHeader
+												league={group.league}
+												country={group.country}
+												flag={group.flag}
+												isExpanded={true}
+												onToggle={() => {}}
+											/>
+											<div className="divide-y divide-gray-100">
+												{group.matches.map((match) => (
+													<FavoriteMatchCardRow
+														key={match.id}
+														match={match}
+														onRemove={() => toggleFavoriteMatch(match)}
+													/>
+												))}
+											</div>
+										</div>
+									))}
+								</div>
+							</section>
+						)}
+					</>
+				)}
+			</div>
+		</div>
+	);
 }
