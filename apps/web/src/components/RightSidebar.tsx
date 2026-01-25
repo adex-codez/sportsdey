@@ -44,9 +44,9 @@ const RightSidebar = () => {
         <div className="space-y-6 pb-24">
             {/* News Widget - Only show if news exists */}
             {latestNews && (
-                <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                        <h3 className="font-bold text-lg text-primary">News</h3>
+                <div className="bg-white dark:bg-card rounded-2xl overflow-hidden shadow-sm">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-[#5A5F63]">
+                        <h3 className="font-bold text-lg text-primary dark:text-white">News</h3>
                         <Link
                             to="/news"
                             search={{ sports: sport }}
@@ -55,7 +55,7 @@ const RightSidebar = () => {
                             <ChevronRight className="w-5 h-5" />
                         </Link>
                     </div>
-                    <div className="p-4" onClick={() => navigate({ to: `/news/$newsId`, params: { newsId: latestNews._id } })}>
+                    <div className="p-4" onClick={() => navigate({ to: `/news/$slug`, params: { slug: latestNews.slug.current } })}>
                         <div className="relative aspect-video w-full rounded-xl overflow-hidden mb-3 cursor-pointer group">
                             <img
                                 src={urlFor(latestNews.image).url()}
@@ -64,8 +64,8 @@ const RightSidebar = () => {
                             />
                         </div>
                         <h4
-                            onClick={() => navigate({ to: `/news/$newsId`, params: { newsId: latestNews._id } })}
-                            className="font-bold text-sm text-primary mb-2 line-clamp-2 cursor-pointer hover:text-accent transition-colors"
+                            onClick={() => navigate({ to: `/news/$slug`, params: { slug: latestNews.slug.current } })}
+                            className="font-bold text-sm text-primary mb-2 line-clamp-2 cursor-pointer hover:text-accent transition-colors dark:text-white"
                         >
                             {latestNews.title}
                         </h4>
@@ -130,7 +130,7 @@ const RightSidebar = () => {
 
 						<button
 							onClick={() =>
-								navigate({ to: "/news", search: { sports: sport } })
+								navigate({ to: "/news" })
 							}
 							className="mt-2 w-full py-2.5 text-end font-bold text-accent text-xs underline transition-colors"
 						>
