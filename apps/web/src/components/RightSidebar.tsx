@@ -7,6 +7,7 @@ import { urlFor } from "@/lib/sanity";
 import { formatRelativeTime } from "@/lib/utils";
 import { VideoModal } from "@/components/basketball-section/VideoModal";
 import { useState } from "react";
+import { ShareButton } from "./ShareButton";
 
 const RightSidebar = () => {
     const sport = useCurrentSport() || "football";
@@ -56,7 +57,7 @@ const RightSidebar = () => {
                             <ChevronRight className="w-5 h-5" />
                         </Link>
                     </div>
-                    <div className="p-4" onClick={() => navigate({ to: `/news/$newsId`, params: { newsId: latestNews._id } })}>
+                    <div className="p-4" onClick={() => navigate({ to: `/news/$slug`, params: { slug: latestNews.slug?.current } })}>
                         <div className="relative aspect-video w-full rounded-xl overflow-hidden mb-3 cursor-pointer group">
                             <img
                                 src={urlFor(latestNews.image).url()}
@@ -65,14 +66,21 @@ const RightSidebar = () => {
                             />
                         </div>
                         <h4
-                            onClick={() => navigate({ to: `/news/$newsId`, params: { newsId: latestNews._id } })}
+                            onClick={() => navigate({ to: `/news/$slug`, params: { slug: latestNews.slug?.current } })}
                             className="font-bold text-sm text-primary mb-2 line-clamp-2 cursor-pointer hover:text-accent transition-colors"
                         >
                             {latestNews.title}
                         </h4>
-                        <p className="text-xs text-gray-400 mb-4">
-                            {formatRelativeTime(latestNews.publishedAt)}
-                        </p>
+                        <div className="flex items-center justify-between mb-4">
+                            <p className="text-xs text-gray-400">
+                                {formatRelativeTime(latestNews.publishedAt)}
+                            </p>
+                            <ShareButton
+                                url={`${window.location.origin}/news/${latestNews.slug?.current}`}
+                                title={latestNews.title}
+                                className="p-1"
+                            />
+                        </div>
 
                         <button
                             onClick={() => navigate({ to: "/news", search: { sports: sport } })}

@@ -4,6 +4,8 @@ import { PortableText } from "@portabletext/react";
 import { urlFor } from "@/lib/sanity";
 import { Link } from "@tanstack/react-router";
 import type { Sport } from "@/lib/constants";
+import { formatRelativeTime } from "@/lib/utils";
+import { ShareButton } from "./ShareButton";
 
 export const NewsPage = ({ sport }: { sport: Sport }) => {
 	const { data, isLoading } = useNewsData(sport);
@@ -44,9 +46,16 @@ export const NewsPage = ({ sport }: { sport: Sport }) => {
 						<div className="text-sm text-gray-600 line-clamp-3">
 							<PortableText value={news.body} />
 						</div>
-						<p className="text-[10px] text-gray-400 mt-auto">
-							{new Date(news.publishedAt).toLocaleDateString()}
-						</p>
+						<div className="flex items-center justify-between mt-auto">
+							<p className="text-[10px] text-gray-400">
+								{formatRelativeTime(news.publishedAt)}
+							</p>
+							<ShareButton
+								url={`${window.location.origin}/news/${news.slug?.current}`}
+								title={news.title}
+								className="p-1"
+							/>
+						</div>
 					</Link>
 				))}
 			</div>
