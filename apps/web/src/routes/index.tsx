@@ -1,7 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+
 import { useActiveTab } from "@/components/active-tab-context";
 import FootballSchedule from "@/components/football-schedule";
 import RightSidebar from "@/components/RightSidebar";
+
+
 import { getBanners } from "@/lib/banners-server";
 import ImportantUpdate from "@/shared/ImportantUpdate";
 
@@ -10,6 +13,17 @@ export const Route = createFileRoute("/")({
 		league: (search.league as string) || undefined,
 		sports: (search.sports as string) || undefined,
 	}),
+	beforeLoad: ({ search }) => {
+		if (!search.sports) {
+			throw redirect({
+				to: "/news",
+				search: {
+					tab: "news",
+				},
+			});
+		}
+	},
+
 	loader: () => getBanners(),
 	component: HomeComponent,
 });
@@ -25,6 +39,8 @@ function HomeComponent() {
 					{tab === "scores" ? <FootballSchedule banners={banners} /> : null}
 					<ImportantUpdate />
 				</div>
+
+
 				<div className="no-scrollbar hidden h-full overflow-y-auto pb-20 lg:block">
 					<RightSidebar />
 				</div>

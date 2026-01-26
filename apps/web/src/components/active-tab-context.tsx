@@ -21,6 +21,8 @@ export const ActiveTabProvider = ({ children }: PropsWithChildren) => {
 	const [tab, setTab] = useState<Tabs>("scores");
 	const location = useLocation();
 
+
+
 	useEffect(() => {
 		const path = location.pathname;
 		const searchStr = location.search;
