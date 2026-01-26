@@ -34,7 +34,7 @@ export function ThemeToggle() {
 					width={24}
 					height={24}
 					className={cn(
-						"absolute cursor-pointer inset-0 transition-all duration-500 ease-spring rotate-0 scale-100 dark:-rotate-90 dark:scale-0",
+						"absolute cursor-pointer inset-0 transition-all duration-500 ease-spring rotate-0 scale-100 dark:rotate-[360deg] dark:scale-0",
 						theme === "dark" ? "opacity-0" : "opacity-100"
 					)}
 					color="#f4f4f4"
@@ -43,7 +43,7 @@ export function ThemeToggle() {
 					width={24}
 					height={24}
 					className={cn(
-						"absolute cursor-pointer inset-0 transition-all duration-500 ease-spring rotate-90 scale-0 dark:rotate-0 dark:scale-100",
+						"absolute cursor-pointer inset-0 transition-all duration-500 ease-spring rotate-[-360deg] scale-0 dark:rotate-0 dark:scale-100",
 						theme === "dark" ? "opacity-100" : "opacity-0"
 					)}
 					color="#f4f4f4"
