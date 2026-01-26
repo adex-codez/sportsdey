@@ -18,7 +18,7 @@ export function ThemeToggle() {
 				className="flex items-center justify-center cursor-pointer"
 				aria-label="Toggle theme"
 			>
-				<Sun width={24} height={24} color="#f4f4f4" />
+				<Moon width={24} height={24} color="#f4f4f4" />
 			</button>
 		);
 	}
@@ -30,7 +30,7 @@ export function ThemeToggle() {
 			className="group flex items-center justify-center p-2 rounded-full hover:bg-white/10 transition-colors"
 		>
 			<div className="relative h-6 w-6">
-				<Sun
+				<Moon
 					width={24}
 					height={24}
 					className={cn(
@@ -39,7 +39,7 @@ export function ThemeToggle() {
 					)}
 					color="#f4f4f4"
 				/>
-				<Moon
+				<Sun
 					width={24}
 					height={24}
 					className={cn(
