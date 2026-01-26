@@ -325,16 +325,7 @@ export default function Header() {
 										</a>
 									</li>
 
-									<li>
-										<a
-											href="https://hallalotto.com/"
-											target="_blank"
-											rel="noopener noreferrer"
-											className="cursor-pointer block"
-										>
-											Play lottery
-										</a>
-									</li>
+
 
 									{/* <li
 									>
