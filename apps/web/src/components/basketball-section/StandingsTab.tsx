@@ -66,13 +66,13 @@ function StandingsView({
 	const showPct = hasData("pct");
 
 	return (
-		<div className="max-w-screen rounded-xl border-0 bg-white py-4 shadow-xs">
+		<div className="max-w-screen rounded-xl border-0 bg-white dark:bg-card py-4 shadow-xs">
 			<div className="no-scrollbar max-w-[calc(100vw-2rem)] overflow-x-auto md:max-w-none">
 				<table className="w-full text-sm">
 					<thead>
 						<tr className="text-[10px] text-primary">
-							<th className="sticky left-0 z-20 w-[50px] bg-white py-2 text-center" />
-							<th className="sticky left-[50px] z-20 bg-white py-2 pr-4 text-left font-medium text-xs shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+							<th className="sticky left-0 z-20 w-[50px] bg-white dark:bg-card py-2 text-center" />
+							<th className="sticky left-[50px] z-20 bg-white py-2 pr-4 text-left font-medium text-xs shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] dark:bg-card dark:text-white">
 								Standings
 							</th>
 							{showP && (
@@ -104,7 +104,7 @@ function StandingsView({
 								key={index}
 								className={cn(
 									"border-[#C8C8C8] border-t",
-									team.isHighlighted ? "bg-[#EDF6EB]" : "bg-white",
+									team.isHighlighted ? "bg-[#EDF6EB]" : "bg-white dark:bg-card",
 								)}
 							>
 								<td
@@ -112,7 +112,7 @@ function StandingsView({
 										"sticky left-0 z-10 w-[50px] py-2.5 text-center text-[11.92px]",
 										team.isHighlighted
 											? "bg-[#EDF6EB] text-[#1BAA04]"
-											: "bg-white text-primary",
+											: "bg-white text-primary dark:bg-card dark:text-white",
 										[1, 2, 3].includes(index + 1)
 											? "border-[#1BBD2A] border-l-4"
 											: [4, 5].includes(index + 1)
@@ -127,7 +127,7 @@ function StandingsView({
 										"sticky left-[50px] z-10 whitespace-nowrap py-2.5 pr-4 font-medium text-[11.92px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]",
 										team.isHighlighted
 											? "bg-[#EDF6EB] text-[#1BAA04]"
-											: "bg-white text-primary",
+											: "bg-white text-primary dark:bg-card dark:text-white",
 									)}
 								>
 									{team.name}
@@ -136,7 +136,7 @@ function StandingsView({
 									<td
 										className={cn(
 											"px-2 py-2.5 text-center text-[10.21px]",
-											team.isHighlighted ? "text-[#1BAA04]" : "text-primary",
+											team.isHighlighted ? "text-[#1BAA04]" : "text-primary dark:text-white",
 										)}
 									>
 										{team.played}
@@ -146,7 +146,7 @@ function StandingsView({
 									<td
 										className={cn(
 											"px-2 py-2.5 text-center text-[10.21px]",
-											team.isHighlighted ? "text-[#1BAA04]" : "text-primary",
+											team.isHighlighted ? "text-[#1BAA04]" : "text-primary dark:text-white",
 										)}
 									>
 										{team.wins}
@@ -156,7 +156,7 @@ function StandingsView({
 									<td
 										className={cn(
 											"px-2 py-2.5 text-center text-[10.21px]",
-											team.isHighlighted ? "text-[#1BAA04]" : "text-primary",
+											team.isHighlighted ? "text-[#1BAA04]" : "text-primary dark:text-white",
 										)}
 									>
 										{team.losses}
@@ -166,7 +166,7 @@ function StandingsView({
 									<td
 										className={cn(
 											"px-2 py-2.5 text-center text-[10.21px]",
-											team.isHighlighted ? "text-[#1BAA04]" : "text-primary",
+											team.isHighlighted ? "text-[#1BAA04]" : "text-primary dark:text-white",
 										)}
 									>
 										{team.streak}
@@ -176,7 +176,7 @@ function StandingsView({
 									<td
 										className={cn(
 											"px-2 py-2.5 text-center text-[10.21px]",
-											team.isHighlighted ? "text-[#1BAA04]" : "text-primary",
+											team.isHighlighted ? "text-[#1BAA04]" : "text-primary dark:text-white",
 										)}
 									>
 										{team.gamesBehind}
@@ -186,7 +186,7 @@ function StandingsView({
 									<td
 										className={cn(
 											"px-2 py-2.5 text-center text-[10.21px]",
-											team.isHighlighted ? "text-[#1BAA04]" : "text-primary",
+											team.isHighlighted ? "text-[#1BAA04]" : "text-primary dark:text-white",
 										)}
 									>
 										{team.diff}
@@ -196,7 +196,7 @@ function StandingsView({
 									<td
 										className={cn(
 											"px-2 py-2.5 text-center text-[10.21px]",
-											team.isHighlighted ? "text-[#1BAA04]" : "text-primary",
+											team.isHighlighted ? "text-[#1BAA04]" : "text-primary dark:text-white",
 										)}
 									>
 										{team.pct}
@@ -210,7 +210,7 @@ function StandingsView({
 			{onSeeAllClick && (
 				<button
 					onClick={onSeeAllClick}
-					className="mt-2 w-full cursor-pointer py-3 text-center text-[10px] text-primary underline hover:text-primary"
+					className="mt-2 w-full cursor-pointer py-3 text-center text-[10px] text-primary underline hover:text-primary dark:hover:text-white"
 				>
 					See all Standings
 				</button>

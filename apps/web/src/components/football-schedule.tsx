@@ -141,7 +141,11 @@ const FootballSchedule = ({ banners }: FootballScheduleProps) => {
 			<div className="sticky top-[-16px] z-10 hidden items-center justify-between bg-background/95 px-1 py-4 backdrop-blur-sm lg:flex">
 				<FixtureFilterHeaders counts={filtersCount} />
 			</div>
-			{banners && banners.length > 0 && <BannerCarousel banners={banners} />}
+			{banners && banners.length > 0 && (
+				<div className="mb-4">
+					<BannerCarousel banners={banners} />
+				</div>
+			)}
 			{isPending && (
 				<div className="flex items-center justify-center py-4">
 					<Loader2 className="mr-2 animate-spin" width={20} height={20} />
@@ -192,14 +196,14 @@ const FootballSchedule = ({ banners }: FootballScheduleProps) => {
 						>
 							<AccordionItem
 								value={`${competition.competition.id}`}
-								className="w-full rounded-2xl bg-white"
+								className="w-full rounded-2xl bg-white dark:bg-card"
 							>
 								<Link
 									to="/index/tournament/$tournamentId"
 									params={{ tournamentId: competition.competition.id }}
 								>
 									<AccordionTrigger
-										className="cursor-pointer rounded-none border-gray-100 px-4 font-bold text-primary [&[data-state=open]]:border-b"
+										className="cursor-pointer rounded-none border-gray-100 px-4 font-bold text-primary dark:text-white [&[data-state=open]]:border-b"
 										isCollapsible={false}
 									>
 										{competition.competition.name}

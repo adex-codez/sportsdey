@@ -84,14 +84,14 @@ function RouteComponent() {
 		return (
 			<div className="flex h-[40%] flex-col items-center justify-center space-y-2">
 				<Loader2 className="animate-spin" width={48} height={48} />
-				<p className="text-gray-500 text-sm">Loading matches info...</p>
+				<p className="text-gray-500 text-sm dark:text-white">Loading matches info...</p>
 			</div>
 		);
 	}
 	if (!gameInfo) {
 		return (
 			<div className="flex flex-col items-center justify-center space-y-2">
-				<p className="text-gray-500 text-sm">Match info unavailable...</p>
+				<p className="text-gray-500 text-sm dark:text-white">Match info unavailable...</p>
 			</div>
 		);
 	}
