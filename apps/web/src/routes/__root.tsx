@@ -14,6 +14,8 @@ import Footer from "@/components/footer";
 import { Providers } from "@/components/providers";
 import Sidebar from "@/components/sidebar";
 import Socials from "@/components/socials";
+import RegulatoryFooter from "@/components/RegulatoryFooter";
+
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SPORTS } from "@/lib/constants";
@@ -103,20 +105,22 @@ function RootDocument() {
 											<Socials />
 										</header>
 
-										<main className="flex-1 overflow-hidden">
-											<div className="mx-4 md:gap-8 lg:mx-[104px] grid h-full lg:grid-cols-[20%_80%] py-4">
+										<main className="flex-1 overflow-y-auto no-scrollbar">
+											<div className="mx-4 md:gap-8 lg:mx-[104px] grid lg:grid-cols-[20%_80%] py-4">
 												<aside className="hidden lg:block h-full overflow-y-auto no-scrollbar pr-4">
 													<Sidebar />
 												</aside>
-												<section className="h-full overflow-y-auto no-scrollbar min-w-0">
+												<section className="min-w-0">
 													<Outlet />
 												</section>
 											</div>
+											<RegulatoryFooter />
 										</main>
 
 										<footer className="shrink-0 lg:hidden">
 											<Footer />
 										</footer>
+
 									</div>
 								</Providers>
 

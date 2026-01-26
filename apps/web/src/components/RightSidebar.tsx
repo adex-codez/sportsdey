@@ -7,6 +7,8 @@ import { useNewsData } from "@/hooks/use-news-data";
 import { useNewsVideos } from "@/hooks/use-news-videos";
 import { urlFor } from "@/lib/sanity";
 import { formatRelativeTime } from "@/lib/utils";
+import { ShareButton } from "./ShareButton";
+
 
 
 const RightSidebar = () => {
@@ -40,38 +42,46 @@ const RightSidebar = () => {
 		return null;
 	}
 
-    return (
-        <div className="space-y-6 pb-24">
-            {/* News Widget - Only show if news exists */}
-            {latestNews && (
-                <div className="bg-white dark:bg-card rounded-2xl overflow-hidden shadow-sm">
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-[#5A5F63]">
-                        <h3 className="font-bold text-lg text-primary dark:text-white">News</h3>
-                        <Link
-                            to="/news"
-                            search={{ sports: sport }}
-                            className="text-xs font-semibold text-gray-400 hover:text-accent flex items-center gap-1"
-                        >
-                            <ChevronRight className="w-5 h-5" />
-                        </Link>
-                    </div>
-                    <div className="p-4" onClick={() => navigate({ to: `/news/$slug`, params: { slug: latestNews.slug.current } })}>
-                        <div className="relative aspect-video w-full rounded-xl overflow-hidden mb-3 cursor-pointer group">
-                            <img
-                                src={urlFor(latestNews.image).url()}
-                                alt={latestNews.title}
-                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            />
-                        </div>
-                        <h4
-                            onClick={() => navigate({ to: `/news/$slug`, params: { slug: latestNews.slug.current } })}
-                            className="font-bold text-sm text-primary mb-2 line-clamp-2 cursor-pointer hover:text-accent transition-colors dark:text-white"
-                        >
-                            {latestNews.title}
-                        </h4>
-                        <p className="text-xs text-gray-400 mb-4">
-                            {formatRelativeTime(latestNews.publishedAt)}
-                        </p>
+	return (
+		<div className="space-y-6 pb-24">
+			{/* News Widget - Only show if news exists */}
+			{latestNews && (
+				<div className="bg-white dark:bg-card rounded-2xl overflow-hidden shadow-sm">
+					<div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-[#5A5F63]">
+						<div className="flex items-center gap-3">
+							<h3 className="font-bold text-lg text-primary dark:text-white">News</h3>
+							<ShareButton
+								url={window.location.origin}
+								title="Sportsdey - Live Scores & News"
+								className="h-8 w-8"
+							/>
+						</div>
+						<Link
+							to="/news"
+							search={{ sports: sport }}
+							className="text-xs font-semibold text-gray-400 hover:text-accent flex items-center gap-1"
+						>
+							<ChevronRight className="w-5 h-5" />
+						</Link>
+					</div>
+
+					<div className="p-4" onClick={() => navigate({ to: `/news/$slug`, params: { slug: latestNews.slug.current } })}>
+						<div className="relative aspect-video w-full rounded-xl overflow-hidden mb-3 cursor-pointer group">
+							<img
+								src={urlFor(latestNews.image).url()}
+								alt={latestNews.title}
+								className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+							/>
+						</div>
+						<h4
+							onClick={() => navigate({ to: `/news/$slug`, params: { slug: latestNews.slug.current } })}
+							className="font-bold text-sm text-primary mb-2 line-clamp-2 cursor-pointer hover:text-accent transition-colors dark:text-white"
+						>
+							{latestNews.title}
+						</h4>
+						<p className="text-xs text-gray-400 mb-4">
+							{formatRelativeTime(latestNews.publishedAt)}
+						</p>
 
 						<button
 							onClick={() => navigate({ to: "/news" })}

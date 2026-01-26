@@ -7,7 +7,7 @@ import {
 	useState,
 } from "react";
 
-export type Tabs = "scores" | "favourites" | "news" | "betting" | "videos";
+export type Tabs = "scores" | "favourites" | "news" | "betting" | "videos" | "Play lottery";
 
 type ActiveTabContextType = {
 	tab: Tabs;
@@ -20,6 +20,8 @@ const ActiveTabContext = createContext<ActiveTabContextType | undefined>(
 export const ActiveTabProvider = ({ children }: PropsWithChildren) => {
 	const [tab, setTab] = useState<Tabs>("scores");
 	const location = useLocation();
+
+
 
 	useEffect(() => {
 		const path = location.pathname;

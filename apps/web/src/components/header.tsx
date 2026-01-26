@@ -296,7 +296,7 @@ export default function Header() {
 							</div>
 							<div className="dark:text-white">
 								<div className="w-full bg-[#202120] px-4 py-4 text-base">
-									Info
+									Betting
 								</div>
 								<ul className="mt-4 space-y-4 px-4">
 									<li
@@ -310,7 +310,7 @@ export default function Header() {
 											router.navigate({ to: "/betting" });
 										}}
 									>
-										Betting
+										Play bet
 									</li>
 									{/* <li
 									>
@@ -321,6 +321,10 @@ export default function Header() {
 										Finished
 									</li> */}
 								</ul>
+								<ul className="mt-4 space-y-4 px-4">
+								</ul>
+
+
 							</div>
 							<div className="">
 								<div className="w-full bg-[#202120] px-4 py-4 text-base">
@@ -371,7 +375,7 @@ export default function Header() {
 						>
 							Scores
 						</li>
-						<li>
+						{/* <li>
 							<Link
 								to="/betting"
 								className={cn(
@@ -384,7 +388,7 @@ export default function Header() {
 							>
 								Betting
 							</Link>
-						</li>
+						</li> */}
 						<li>
 							<Link
 								to="/news"
@@ -415,6 +419,8 @@ export default function Header() {
 								Videos
 							</Link>
 						</li>
+
+
 					</ul>
 				</div>
 
@@ -441,7 +447,7 @@ export default function Header() {
 				</div>
 
 				{!location.pathname.startsWith("/news") &&
-				!location.pathname.startsWith("/betting") ? (
+					!location.pathname.startsWith("/betting") ? (
 					<div className="flex w-full items-center justify-between bg-[#202120] px-4 py-2 md:gap-0 md:px-6">
 						{(() => {
 							const today = new Date();
@@ -506,8 +512,8 @@ export default function Header() {
 											{weekDate.toDateString() === new Date().toDateString()
 												? "Today"
 												: new Intl.DateTimeFormat("en-US", {
-														weekday: "short",
-													}).format(weekDate)}
+													weekday: "short",
+												}).format(weekDate)}
 										</p>
 										<p className="">{weekDate.getDate()}</p>
 									</div>

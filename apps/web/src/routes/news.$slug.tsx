@@ -47,7 +47,7 @@ export const Route = createFileRoute("/news/$slug")({
 	},
 	head: ({ loaderData }) => {
 		const siteUrl = import.meta.env.VITE_PUBLIC_URL || "http://localhost:3001";
-		const data = loaderData.news as NewsItem | null;
+		const data = loaderData?.news as NewsItem | null;
 		const title = data?.title || "News | SportsDey";
 		const description = getDescription(data?.body);
 		const image = data?.image ? urlFor(data.image).width(1200).height(630).url() : `${siteUrl}/news/${data?.slug?.current}/og`;
