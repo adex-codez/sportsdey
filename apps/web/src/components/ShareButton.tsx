@@ -8,6 +8,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
+
 interface ShareButtonProps {
     url: string;
     title: string;
@@ -64,7 +65,11 @@ export const ShareButton = ({ url, title, className }: ShareButtonProps) => {
                     <Share2 className="w-4 h-4 text-gray-500" />
                 </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-44 bg-white p-2 shadow-xl border border-gray-100 rounded-xl z-[100]">
+            <DropdownMenuContent
+                align="end"
+                className="w-44 bg-white p-2 shadow-xl border border-gray-100 rounded-xl z-[100] animate-in fade-in zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2 duration-200 ease-out"
+            >
+
                 <DropdownMenuItem
                     className="cursor-pointer hover:bg-gray-50 flex items-center gap-3 py-2.5 px-3 rounded-lg focus:outline-none group"
                     onClick={(e) => handleShare("x", e)}

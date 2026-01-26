@@ -7,7 +7,7 @@ import {
 	useState,
 } from "react";
 
-export type Tabs = "scores" | "favourites" | "news" | "betting" | "videos";
+export type Tabs = "scores" | "favourites" | "news" | "betting" | "videos" | "Play lottery";
 
 type ActiveTabContextType = {
 	tab: Tabs;

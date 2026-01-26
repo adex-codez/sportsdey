@@ -1,5 +1,7 @@
 import { createFileRoute, useRouter, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
+import { type Sport } from "@/lib/constants";
+
 import BannerCarousel from "@/components/BannerCarousel";
 import { NewsPage } from "@/components/news-page";
 import { VideosTab } from "@/components/news-videos";
@@ -8,8 +10,15 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/news/")({
 	loader: () => getBanners(),
+	validateSearch: (search: Record<string, unknown>): SearchParams => {
+		return {
+			tab: (search.tab as "news" | "videos") || "news",
+			sports: search.sports as Sport,
+		};
+	},
 	component: RouteComponent,
 });
+
 
 type SportFilter =
 	| "all"
@@ -22,8 +31,9 @@ type SportFilter =
 
 type SearchParams = {
 	tab?: "news" | "videos";
-	sports?: string;
+	sports?: Sport;
 };
+
 
 function RouteComponent() {
 	const search = useSearch({ from: "/news" }) as SearchParams;
@@ -49,7 +59,7 @@ function RouteComponent() {
 
 	return (
 		<div className="">
-			<div className="mb-6 flex flex-wrap gap-4 py-4">
+			<div className="hidden mb-6 lg:flex flex-wrap gap-4 py-4">
 				{tabs.map((tab) => (
 					<div
 						key={tab.id}

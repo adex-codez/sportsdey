@@ -4,6 +4,9 @@ import type { Sport } from "@/lib/constants";
 import { useNewsData } from "@/hooks/use-news-data";
 import { Loader2 } from "lucide-react";
 import { urlFor } from "@/lib/sanity";
+import { formatRelativeTime } from "@/lib/utils";
+import { ShareButton } from "./ShareButton";
+
 
 export const NewsPage = ({ sport }: { sport: string }) => {
 	const { data, isLoading } = useNewsData(sport);
@@ -50,10 +53,18 @@ export const NewsPage = ({ sport }: { sport: string }) => {
 						<div className="line-clamp-3 text-gray-600 text-sm dark:text-gray-400">
 							<PortableText value={news.body} />
 						</div>
-						<p className="text-[10px] text-gray-400 mt-auto">
-							{new Date(news.publishedAt).toLocaleDateString()}
-						</p>
+						<div className="mt-auto flex items-center justify-between">
+							<p className="text-[10px] text-gray-400">
+								{formatRelativeTime(news.publishedAt)}
+							</p>
+							<ShareButton
+								url={`${window.location.origin}/news/${news.slug?.current}`}
+								title={news.title}
+								className="h-8 w-8"
+							/>
+						</div>
 					</Link>
+
 				))}
 			</div>
 		</div>
