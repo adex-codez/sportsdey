@@ -5,7 +5,7 @@ import Bet from "@/logos/bet.svg?react";
 import Favourite from "@/logos/favourite.svg?react";
 import News from "@/logos/news.svg?react";
 import Score from "@/logos/score.svg?react";
-import Video from "@/logos/video.svg?react";
+
 import { type Tabs, useActiveTab } from "./active-tab-context";
 
 const bottomBarItems: {
@@ -13,32 +13,32 @@ const bottomBarItems: {
 	item: Tabs;
 	icon: React.FC<React.SVGProps<SVGSVGElement> & { title?: string }>;
 }[] = [
-	{
-		id: 1,
-		item: "scores",
-		icon: Score,
-	},
-	{
-		id: 2,
-		item: "favourites",
-		icon: Favourite,
-	},
-	{
-		id: 3,
-		item: "betting",
-		icon: Bet,
-	},
-	{
-		id: 4,
-		item: "news",
-		icon: News,
-	},
-	// {
-	// 	id: 5,
-	// 	item: "lives",
-	// 	icon: Lives,
-	// },
-];
+		{
+			id: 1,
+			item: "scores",
+			icon: Score,
+		},
+		{
+			id: 2,
+			item: "favourites",
+			icon: Favourite,
+		},
+		{
+			id: 3,
+			item: "betting",
+			icon: Bet,
+		},
+		{
+			id: 4,
+			item: "news",
+			icon: News,
+		},
+		// {
+		// 	id: 5,
+		// 	item: "lives",
+		// 	icon: Lives,
+		// },
+	];
 const Footer = () => {
 	const currentSport = useCurrentSport();
 	const { tab, setTab } = useActiveTab();
@@ -51,16 +51,18 @@ const Footer = () => {
 					onClick={() => {
 						setTab(item);
 						if (item === "scores") {
+							const targetSport = currentSport || "football";
 							router.navigate({
 								to:
-									currentSport === "tennis"
+									targetSport === "tennis"
 										? "/tennis"
-										: currentSport === "basketball"
+										: targetSport === "basketball"
 											? "/basketball"
 											: "/",
-								search: { league: undefined, sports: currentSport } as any,
+								search: { league: undefined, sports: targetSport } as any,
 							});
 						}
+
 						if (item === "favourites") {
 							router.navigate({
 								to: "/favorites",
@@ -73,6 +75,7 @@ const Footer = () => {
 								search: { sports: currentSport },
 							});
 						}
+
 						if (item === "betting") {
 							router.navigate({ to: "/betting", search: {} as any });
 						}

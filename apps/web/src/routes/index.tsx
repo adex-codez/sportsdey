@@ -1,4 +1,6 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
+
 
 import { useActiveTab } from "@/components/active-tab-context";
 import FootballSchedule from "@/components/football-schedule";
@@ -13,16 +15,12 @@ export const Route = createFileRoute("/")({
 		league: (search.league as string) || undefined,
 		sports: (search.sports as string) || undefined,
 	}),
-	beforeLoad: ({ search }) => {
-		if (!search.sports) {
-			throw redirect({
-				to: "/news",
-				search: {
-					tab: "news",
-				},
-			});
-		}
+	beforeLoad: () => {
+
+		// Smart redirect logic moved to useEffect in component
 	},
+
+
 
 	loader: () => getBanners(),
 	component: HomeComponent,
@@ -31,8 +29,28 @@ export const Route = createFileRoute("/")({
 function HomeComponent() {
 	const { tab } = useActiveTab();
 	const banners = Route.useLoaderData() || [];
+	const search = Route.useSearch();
+	const navigate = Route.useNavigate();
+
+	useEffect(() => {
+		// Smart redirect: Only redirect to news on first visit if no sport is selected
+		// This runs on the client side after hydration
+		if (!search.sports) {
+			const hasVisited = localStorage.getItem("hasVisited");
+			if (!hasVisited) {
+				localStorage.setItem("hasVisited", "true");
+				navigate({
+					to: "/news",
+					search: {
+						tab: "news",
+					},
+				});
+			}
+		}
+	}, [search.sports, navigate]);
 
 	return (
+
 		<div className="h-full px-4 py-2 lg:container lg:mx-auto">
 			<div className="h-full items-start gap-6 lg:grid lg:grid-cols-[3fr_1fr]">
 				<div className="no-scrollbar h-full space-y-6 overflow-y-auto pb-20">

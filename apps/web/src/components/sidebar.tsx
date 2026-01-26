@@ -19,21 +19,30 @@ const SidebarItem = ({
 	icon?: React.ReactNode;
 	link?: string;
 }>) => {
-	return (
-		<Link to={link} className="block">
-			<div className="overflow-hidden rounded-2xl bg-white dark:bg-[#202120]">
-				<div className="flex items-center justify-between px-6 py-4">
-					<p className="font-semibold text-primary text-xl dark:text-white">
-						{heading}
-					</p>
-					{Icon && Icon}
-				</div>
-				<hr className="dark:border-[#5A5F63]" />
-				{children}
+	const Content = (
+		<div className="overflow-hidden rounded-2xl bg-white dark:bg-[#202120]">
+			<div className="flex items-center justify-between px-6 py-4">
+				<p className="font-semibold text-primary text-xl dark:text-white">
+					{heading}
+				</p>
+				{Icon && Icon}
 			</div>
-		</Link>
+			<hr className="dark:border-[#5A5F63]" />
+			{children}
+		</div>
 	);
+
+	if (link) {
+		return (
+			<Link to={link} className="block">
+				{Content}
+			</Link>
+		);
+	}
+
+	return <div>{Content}</div>;
 };
+
 
 const Sidebar = () => {
 	const { tab, setTab } = useActiveTab();
@@ -58,20 +67,23 @@ const Sidebar = () => {
 						)}
 						onClick={() => {
 							setTab("scores");
+							const targetSport = currentSport || SPORTS.FOOTBALL;
 							const target =
-								currentSport === SPORTS.TENNIS
+								targetSport === SPORTS.TENNIS
 									? "/tennis"
-									: currentSport === SPORTS.BASKETBALL
+									: targetSport === SPORTS.BASKETBALL
 										? "/basketball"
 										: "/";
 							navigate({
 								to: target,
-								search: { league: undefined, sports: currentSport } as any,
+								search: { league: undefined, sports: targetSport } as any,
 							});
 						}}
+
 					>
 						Scores
 					</li>
+
 					<li
 						className={cn(
 							"cursor-pointer",
@@ -92,11 +104,26 @@ const Sidebar = () => {
 						)}
 						onClick={() => {
 							setTab("news");
-							navigate({ to: "/news", search: { sports: currentSport } });
+							navigate({
+								to: "/news",
+								search: { sports: currentSport || SPORTS.FOOTBALL },
+							});
 						}}
 					>
 						News
 					</li>
+
+					<li>
+						<a
+							href="https://hallalotto.com/"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="cursor-pointer hover:text-accent transition-colors block"
+						>
+							Play lottery
+						</a>
+					</li>
+
 				</ul>
 			</SidebarItem>
 
