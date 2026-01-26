@@ -85,7 +85,7 @@ export default function Header() {
 					>
 						<Menu width={36} height={36} color="#f4f4f4" />
 					</button>
-					<Link to="/" search={{ league: undefined, sports: currentSport }}>
+					<Link to="/" search={{ league: undefined, sports: currentSport || SPORTS.FOOTBALL }}>
 						<div className="flex min-w-0 justify-center self-center">
 							<img
 								src="/sportsdey-logo.png"
@@ -94,17 +94,19 @@ export default function Header() {
 							/>
 						</div>
 					</Link>
+
 					<ThemeToggle />
 				</div>
 
 				<div className="hidden min-w-0 lg:flex lg:h-full lg:w-full lg:items-center lg:justify-between">
-					<Link to="/" search={{ league: undefined, sports: currentSport }}>
+					<Link to="/" search={{ league: undefined, sports: currentSport || SPORTS.FOOTBALL }}>
 						<img
 							src="/sportsdey-logo.png"
 							className="h-12"
 							alt="sportsdey's logo"
 						/>
 					</Link>
+
 					<div className="overflow-x-auto">
 						<nav className="cust-scrollbar flex w-max gap-4 py-4 font-medium">
 							{links.map(({ to, label, icon: Icon, sport }) => (
@@ -312,6 +314,28 @@ export default function Header() {
 									>
 										Play bet
 									</li>
+									<li>
+										<a
+											href="https://hallalotto.com/"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="cursor-pointer block"
+										>
+											Play lottery
+										</a>
+									</li>
+
+									<li>
+										<a
+											href="https://hallalotto.com/"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="cursor-pointer block"
+										>
+											Play lottery
+										</a>
+									</li>
+
 									{/* <li
 									>
 										About us
@@ -355,17 +379,19 @@ export default function Header() {
 						<li
 							onClick={() => {
 								setTab("scores");
+								const targetSport = currentSport || SPORTS.FOOTBALL;
 								const target =
-									currentSport === SPORTS.TENNIS
+									targetSport === SPORTS.TENNIS
 										? "/tennis"
-										: currentSport === SPORTS.BASKETBALL
+										: targetSport === SPORTS.BASKETBALL
 											? "/basketball"
 											: "/";
 								router.navigate({
 									to: target,
-									search: { league: undefined, sports: currentSport } as any,
+									search: { league: undefined, sports: targetSport } as any,
 								});
 							}}
+
 							className={cn(
 								"cursor-pointer font-semibold text-lg transition-colors",
 								tab === "scores"
@@ -393,6 +419,7 @@ export default function Header() {
 							<Link
 								to="/news"
 								search={{ sports: currentSport, tab: "news" }}
+
 								className={cn(
 									"font-semibold text-lg transition-colors",
 									tab === "news"

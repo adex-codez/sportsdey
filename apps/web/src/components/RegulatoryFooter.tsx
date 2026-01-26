@@ -4,7 +4,7 @@ const RegulatoryFooter = () => {
     return (
         <div className="bg-[#f8f9fa] dark:bg-[#1a1b1a] py-8 px-6 border-t border-gray-200 dark:border-gray-800">
             <div className="max-w-7xl mx-auto text-center space-y-4">
-                <p className="text-secondary dark:text-gray-400 text-xs sm:text-sm leading-relaxed max-w-4xl mx-auto">
+                <p className="text-primary text-left dark:text-gray-400 text-xs sm:text-sm leading-relaxed max-w-4xl mx-auto">
                     This Website and the “Sportsdey” trademark are owned and operated by Halla Gaming Limited,
                     a company established in Nigeria with RC1396896, having its registered address at
                     First floor, Lagos City Mall, Onikan, Lagos state. Halla Gaming Limited is licensed
