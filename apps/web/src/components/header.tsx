@@ -301,7 +301,7 @@ export default function Header() {
 									Betting
 								</div>
 								<ul className="mt-4 space-y-4 px-4">
-									<li
+									{/* <li
 										className={cn(
 											"cursor-pointer",
 											tab === "betting" ? "text-accent" : "",
@@ -313,6 +313,36 @@ export default function Header() {
 										}}
 									>
 										Play bet
+									</li> */}
+									<li>
+										<a
+											href="https://sportsdey.com/betting"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="cursor-pointer block"
+										>
+											SmartBet
+										</a>
+									</li>
+									<li>
+										<a
+											href="https://sportsdey.com/betting"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="cursor-pointer block"
+										>
+											Jackpot
+										</a>
+									</li>
+									<li>
+										<a
+											href="https://sportsdey.com/betting"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="cursor-pointer block"
+										>
+											QuickBetx
+										</a>
 									</li>
 									<li>
 										<a
