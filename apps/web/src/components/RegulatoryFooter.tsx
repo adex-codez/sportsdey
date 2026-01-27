@@ -1,3 +1,5 @@
+import { Button } from "./ui/button";
+import { MessageCircle, FileText, PhoneCall } from "lucide-react";
 
 const RegulatoryFooter = () => {
 
@@ -18,6 +20,28 @@ const RegulatoryFooter = () => {
                     <span className="text-gray-300 dark:text-gray-600">|</span>
                     <span>Please Gamble Responsibly</span>
                 </div>
+            </div>
+            <div className="flex items-center justify-center gap-4 mt-8 flex-wrap">
+                <Button
+                    className="bg-[#25D366] hover:bg-[#25D366]/90 text-white gap-2"
+                    asChild
+                >
+                    <a href="https://wa.link/25tnk8" target="_blank" rel="noopener noreferrer">
+                        <PhoneCall className="h-4 w-4" />
+                        Contact us
+                    </a>
+                </Button>
+
+                <Button
+                    variant="outline"
+                    className="gap-2"
+                    asChild
+                >
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeky7VWLGyycdRGq-fpHsx_wr2UHvS49kautpHliRFz7bYhiw/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer">
+                        <MessageCircle className="h-4 w-4" />
+                        Give Feedback
+                    </a>
+                </Button>
             </div>
         </div>
     );

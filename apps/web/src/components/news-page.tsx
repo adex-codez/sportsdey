@@ -38,10 +38,10 @@ export const NewsPage = ({ sport }: { sport: string }) => {
 						key={news._id}
 						className="flex cursor-pointer flex-col space-y-2 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-0 dark:bg-card"
 					>
-						<div className="relative w-full overflow-hidden rounded-lg pb-[100%]">
+						<div className="relative w-full overflow-hidden rounded-lg pb-[56.25%]">
 							{news.image ? (
 								<img
-									src={urlFor(news.image).url()}
+									src={urlFor(news.image).width(800).height(450).url()}
 									alt={`${news.title}'s poster`}
 									className="absolute top-0 left-0 h-full w-full object-cover object-center"
 								/>
