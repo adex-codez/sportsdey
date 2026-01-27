@@ -312,7 +312,7 @@ basketballRoute.openapi(
 				tournamentId,
 			);
 
-			console.log(transformedData);
+			// console.log(transformedData);
 
 			await c.env.sportsdey_ns.put(
 				cacheKey,
