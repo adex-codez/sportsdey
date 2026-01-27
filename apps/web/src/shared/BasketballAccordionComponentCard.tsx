@@ -60,11 +60,10 @@ const BasketballComponentHeader: React.FC<BasketballComponentHeaderProps> = ({
 							e.preventDefault();
 							onFavoriteToggle?.(e);
 						}}
-						className={`ml-1 cursor-pointer border-none bg-transparent text-sm transition-colors ${
-							isFavorite
+						className={`ml-1 cursor-pointer border-none bg-transparent text-sm transition-colors ${isFavorite
 								? "text-yellow-400"
 								: "text-[#C8C8C8] hover:text-yellow-400"
-						}`}
+							}`}
 					>
 						★
 					</button>
@@ -94,7 +93,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
 	hideFinishedStatus = false,
 }) => {
 	const { state } = useRouter();
-	console.log("time", time);
+	// console.log("time", time);
 	const pathname = state.location.pathname;
 	const isTennisRoute =
 		pathname.includes("/tennis") || pathname.includes("tennis");
@@ -154,11 +153,10 @@ const MatchCard: React.FC<MatchCardProps> = ({
 			className={`grid cursor-pointer dark:text-white ${hideFinishedStatus ? "grid-cols-[40px_1fr_40px]" : "grid-cols-[50px_1fr_40px]"} items-center gap-x-4 border-border border-b px-5 py-3.5 transition-colors last:border-b-0 hover:bg-muted/30`}
 		>
 			<div
-				className={`flex h-8.75 w-8.75 items-center justify-center rounded-[10px] capitalize ${
-					s !== "sch" && s !== "scheduled" && !isFinished
+				className={`flex h-8.75 w-8.75 items-center justify-center rounded-[10px] capitalize ${s !== "sch" && s !== "scheduled" && !isFinished
 						? "animate-pulse bg-[#0E8F1A] font-medium text-[9px] text-white"
 						: "font-medium text-muted-foreground text-xs"
-				}`}
+					}`}
 			>
 				{(() => {
 					if (hideFinishedStatus && isFinished) return null;
@@ -184,15 +182,14 @@ const MatchCard: React.FC<MatchCardProps> = ({
 							{player1Sets.map((set, idx) => (
 								<span
 									key={idx}
-									className={`w-4 text-center transition-all duration-300 ${
-										s === "live" ? "animate-[fadeIn_0.5s_ease-in-out]" : ""
-									}`}
+									className={`w-4 text-center transition-all duration-300 ${s === "live" ? "animate-[fadeIn_0.5s_ease-in-out]" : ""
+										}`}
 								>
 									{shouldShowScores
 										? renderSetScore(
-												set,
-												set.games > (player2Sets[idx]?.games ?? 0),
-											)
+											set,
+											set.games > (player2Sets[idx]?.games ?? 0),
+										)
 										: ""}
 								</span>
 							))}
@@ -208,15 +205,14 @@ const MatchCard: React.FC<MatchCardProps> = ({
 							{player2Sets.map((set, idx) => (
 								<span
 									key={idx}
-									className={`w-4 text-center transition-all duration-300 ${
-										s === "live" ? "animate-[fadeIn_0.5s_ease-in-out]" : ""
-									}`}
+									className={`w-4 text-center transition-all duration-300 ${s === "live" ? "animate-[fadeIn_0.5s_ease-in-out]" : ""
+										}`}
 								>
 									{shouldShowScores
 										? renderSetScore(
-												set,
-												set.games > (player1Sets[idx]?.games ?? 0),
-											)
+											set,
+											set.games > (player1Sets[idx]?.games ?? 0),
+										)
 										: ""}
 								</span>
 							))}
@@ -258,11 +254,10 @@ const MatchCard: React.FC<MatchCardProps> = ({
 					e.preventDefault();
 					onFavoriteToggle?.();
 				}}
-				className={`cursor-pointer border-none bg-transparent text-xl transition-colors ${
-					isFavorite
+				className={`cursor-pointer border-none bg-transparent text-xl transition-colors ${isFavorite
 						? "text-yellow-400"
 						: "text-[#C8C8C8] hover:text-yellow-400"
-				}`}
+					}`}
 			>
 				★
 			</button>
