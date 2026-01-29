@@ -21,7 +21,7 @@ export const DatePicker = ({
 		<div className="hidden justify-center lg:block">
 			<Popover open={open} onOpenChange={setOpen}>
 				<PopoverTrigger asChild>
-					<div className="h-8 w-full cursor-pointer rounded-2xl bg-white px-4 py-2 text-center font-semibold text-sm active:scale-95">
+					<div className="h-8 w-full cursor-pointer rounded-2xl bg-white px-4 py-2 text-center font-semibold text-sm active:scale-95 dark:bg-slate-800 dark:text-white">
 						{formatDate(date)}
 					</div>
 				</PopoverTrigger>

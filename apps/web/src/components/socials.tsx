@@ -22,7 +22,7 @@ export const socials = [
 	{
 		id: 4,
 		icon: Telegram,
-		link: "https://t.me/sportsdey",
+		link: "https://t.me/sportsdey2",
 	},
 ];
 const Socials = () => {

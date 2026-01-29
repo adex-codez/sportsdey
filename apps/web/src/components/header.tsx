@@ -20,6 +20,7 @@ import { useDateContext } from "./date-context";
 import { socials } from "./socials";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "./ui/button";
+import CalendarBadge from "@/shared/CalendarBadge";
 
 export default function Header() {
 	const currentSport = useCurrentSport();
@@ -543,10 +544,10 @@ export default function Header() {
 												: "",
 											!isDisabled &&
 												weekDate.toDateString() === date.toDateString()
-												? "text-secondary"
+												? "text-secondary dark:text-white"
 												: !isDisabled
-													? "text-[#6C7073]"
-													: "text-[#6C7073]",
+													? "text-[#6C7073] dark:text-gray-400"
+													: "text-[#6C7073] dark:text-gray-600",
 										)}
 									>
 										<p
@@ -568,13 +569,14 @@ export default function Header() {
 								);
 							});
 						})()}
-						<button
+						{/* <button
 							type="button"
 							className="cursor-not-allowed rounded-lg border border-[#777] bg-primary p-2 opacity-50 transition-transform active:scale-95"
 							title="Calendar disabled for this release"
 						>
 							<CalendarDays className="text-secondary" width={24} height={24} />
-						</button>
+							
+						</button> */}
 					</div>
 				) : null}
 			</div>
