@@ -8,30 +8,34 @@ import { VideosTab } from "@/components/news-videos";
 import { getBanners } from "@/lib/banners-server";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/news/")({
-	loader: () => getBanners(),
-	validateSearch: (search: Record<string, unknown>): SearchParams => {
-		return {
-			tab: (search.tab as "news" | "videos") || "news",
-			sports: search.sports as Sport,
-		};
-	},
-	component: RouteComponent,
-});
-
-
-type SportFilter =
+type CategoryFilter =
 	| "all"
 	| "football"
 	| "basketball"
 	| "racing"
 	| "tennis"
 	| "boxing"
-	| "mma/ufc";
+	| "mma/ufc"
+	| "politics"
+	| "entertainment";
+
+export const Route = createFileRoute("/news/")({
+	loader: () => getBanners(),
+	validateSearch: (search: Record<string, unknown>): SearchParams => {
+		return {
+			tab: (search.tab as "news" | "videos") || "news",
+			category: search.sports as CategoryFilter,
+		};
+	},
+	component: RouteComponent,
+});
+
+
+
 
 type SearchParams = {
 	tab?: "news" | "videos";
-	sports?: Sport;
+	category?: CategoryFilter;
 };
 
 
@@ -39,7 +43,7 @@ function RouteComponent() {
 	const search = useSearch({ from: "/news" }) as SearchParams;
 	const router = useRouter();
 	const activeTab = search.tab === "videos" ? "videos" : "news";
-	const [sportFilter, setSportFilter] = useState<SportFilter>("all");
+	const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
 	const banners = Route.useLoaderData() || [];
 
 	const tabs = [
@@ -47,7 +51,7 @@ function RouteComponent() {
 		{ id: "videos", label: "Videos" },
 	] as const;
 
-	const sportFilters = [
+	const categoryFilters = [
 		{ id: "all", label: "All" },
 		{ id: "football", label: "Football" },
 		{ id: "basketball", label: "Basketball" },
@@ -55,6 +59,8 @@ function RouteComponent() {
 		{ id: "tennis", label: "Tennis" },
 		{ id: "boxing", label: "Boxing" },
 		{ id: "mma/ufc", label: "MMA/UFC" },
+		{ id: "politics", label: "Politics" },
+		{ id: "entertainment", label: "Entertainment" }
 	] as const;
 
 	return (
@@ -66,7 +72,7 @@ function RouteComponent() {
 						onClick={() =>
 							router.navigate({
 								to: "/news",
-								search: { tab: tab.id, sports: search.sports },
+								search: { tab: tab.id, category: search.category },
 							})
 						}
 						className={cn(
@@ -82,13 +88,13 @@ function RouteComponent() {
 			</div>
 
 			<div className="scrollbar-hide mb-6 flex gap-2 overflow-x-auto py-4">
-				{sportFilters.map((filter) => (
+				{categoryFilters.map((filter) => (
 					<div
 						key={filter.id}
-						onClick={() => setSportFilter(filter.id)}
+						onClick={() => setCategoryFilter(filter.id)}
 						className={cn(
 							"flex h-10 w-max cursor-pointer items-center gap-2 rounded-xl bg-white px-4 font-medium text-sm transition-colors",
-							sportFilter === filter.id
+							categoryFilter === filter.id
 								? "bg-accent text-white"
 								: "text-gray-500 hover:bg-gray-50",
 						)}
@@ -106,8 +112,8 @@ function RouteComponent() {
 				</div>
 			)}
 
-			{activeTab === "videos" && <VideosTab sport={sportFilter} />}
-			{activeTab === "news" && <NewsPage sport={sportFilter} />}
+			{activeTab === "videos" && <VideosTab category={categoryFilter} />}
+			{activeTab === "news" && <NewsPage category={categoryFilter} />}
 		</div>
 	);
 }

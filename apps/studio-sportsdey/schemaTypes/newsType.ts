@@ -23,7 +23,7 @@ export const newsType = defineType({
 			validation: (rule) => rule.required(),
 		}),
 		defineField({
-			name: "sport",
+			name: "category",
 			type: "string",
 			validation: (rule) => rule.required(),
 		}),

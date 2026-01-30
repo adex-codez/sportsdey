@@ -4,12 +4,13 @@ import { useNewsVideos } from "@/hooks/use-news-videos";
 import { VideoCard } from "./basketball-section/VideoCard";
 import { VideoModal } from "./basketball-section/VideoModal";
 
-export function VideosTab({ sport }: { sport: string }) {
+export function VideosTab({ category }: { category: string }) {
 	const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 	const query =
-		sport === "all"
+		category === "all"
 			? "football basketball tennis boxing match highlights live matches news"
-			: `${sport} match highlights live matches news`;
+			: category === "politics" || category === "entertainment" ? `${category} news around the world especially Nigeria`
+			: `${category} match highlights live matches news`;
 	const {
 		data,
 		fetchNextPage,

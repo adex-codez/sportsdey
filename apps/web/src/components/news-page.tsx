@@ -1,6 +1,5 @@
 import { PortableText } from "@portabletext/react";
 import { Link } from "@tanstack/react-router";
-import type { Sport } from "@/lib/constants";
 import { useNewsData } from "@/hooks/use-news-data";
 import { Loader2 } from "lucide-react";
 import { urlFor } from "@/lib/sanity";
@@ -8,8 +7,8 @@ import { formatRelativeTime } from "@/lib/utils";
 import { ShareButton } from "./ShareButton";
 
 
-export const NewsPage = ({ sport }: { sport: string }) => {
-	const { data, isLoading } = useNewsData(sport);
+export const NewsPage = ({ category }: { category: string }) => {
+	const { data, isLoading } = useNewsData(category);
 	if (isLoading) {
 		return (
 			<div className="flex flex-col items-center justify-center space-y-2">

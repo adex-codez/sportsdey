@@ -3,24 +3,24 @@ import { client } from "./sanity";
 
 export const getNews = createServerFn({ method: "GET" })
 	.inputValidator((sport: string) => sport)
-	.handler(async ({ data: sport }) => {
+	.handler(async ({ data: category }) => {
 		const query =
-			sport === "all"
+			category === "all"
 				? `*[_type == "news"] | order(publishedAt desc){
 					_id,
 					title,
 					publishedAt,
-					sport,
+					category,
 					image,
 					slug,
 					body,
 					"author": author->{_id, name, slug, image}
 				}`
-				: `*[_type == "news" && sport == $sport] | order(publishedAt desc){
+				: `*[_type == "news" && category == $category] | order(publishedAt desc){
 					_id,
 					title,
 					publishedAt,
-					sport,
+					category,
 					image,
 					slug,
 					body,
@@ -29,7 +29,7 @@ export const getNews = createServerFn({ method: "GET" })
 
 		const response = await client.fetch(
 			query,
-			sport === "all" ? {} : { sport },
+			category === "all" ? {} : { category },
 		);
 
 		return response;

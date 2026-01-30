@@ -26,7 +26,7 @@ const RightSidebar = () => {
 
 	const handleShowMoreClick = (e: React.MouseEvent) => {
 		e.stopPropagation();
-		navigate({ to: "/news", search: { sports: sport } });
+		navigate({ to: "/news", search: { category: sport } });
 	};
 
 	if (isNewsLoading && isVideoLoading) {
@@ -58,7 +58,7 @@ const RightSidebar = () => {
 						</div>
 						<Link
 							to="/news"
-							search={{ sports: sport }}
+							search={{ category: sport }}
 							className="text-xs font-semibold text-gray-400 hover:text-accent flex items-center gap-1"
 						>
 							<ChevronRight className="w-5 h-5" />
@@ -102,7 +102,7 @@ const RightSidebar = () => {
 						</h3>
 						<Link
 							to="/news"
-							search={{ sports: sport }}
+							search={{ category: sport }}
 							className="flex items-center gap-1 font-semibold text-gray-400 text-xs hover:text-accent"
 						>
 							<ChevronRight className="h-5 w-5" />
