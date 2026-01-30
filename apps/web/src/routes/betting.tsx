@@ -12,19 +12,42 @@ export const Route = createFileRoute("/betting")({
 
 function RouteComponent() {
 	const [isIframeLoading, setIsIframeLoading] = useState(true);
+	const [theme, setTheme] = useState("sportsdeyLite");
 	const banners = Route.useLoaderData() || [];
+	useEffect(() => {
+		// Detect initial theme
+		const isDarkMode = document.documentElement.classList.contains("dark");
+		setTheme(isDarkMode ? "sportsdeyDark" : "sportsdeyLite");
+
+		// Watch for theme changes
+		const observer = new MutationObserver(() => {
+			const isDark = document.documentElement.classList.contains("dark");
+			setTheme(isDark ? "sportsdeyDark" : "sportsdeyLite");
+		});
+
+		observer.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
+
+		return () => observer.disconnect();
+	}, []);
+
 	useEffect(() => {
 		const timer = setTimeout(() => setIsIframeLoading(false), 5000);
 		const handleMessage = (event: MessageEvent) => {
-			if (event.origin !== "https://bet.sportsdey.com") return;
+            if (event.origin !== "https://bet.sportsdey.com") return;
 
-			if (event.data?.type === "SET_IFRAME_HEIGHT") {
-				const iframe = document.getElementById("lobbyWidget");
-				if (iframe) {
-					iframe.style.height = event.data.height + "px";
-				}
-			}
-		};
+            if (event.data?.type === "SET_LOBBY_WIDGET_HEIGHT") {
+                const iframe = document.getElementById(
+                    "bettingWidget"
+                ) as HTMLIFrameElement | null;
+
+                if (iframe && event.data.height) {
+                    iframe.style.height = `${event.data.height}px`;
+                }
+            }
+        }
 
 		window.addEventListener("message", handleMessage);
 
@@ -44,13 +67,17 @@ function RouteComponent() {
 			)}
 			<iframe
 				title="lobby widget"
-				id="lobbyWidget"
+				 src={`https://bet.sportsdey.com/?view=fullPage&theme=${theme}&ticketOpenMode=embedded`}
 				className={cn(
 					"rounded-2xl transition-opacity duration-500",
 					isIframeLoading ? "opacity-0" : "opacity-100",
 				)}
-				src="https://bet.sportsdey.com/?mode=iframe"
-				style={{ width: "100%", border: "0", overflow: "hidden" }}
+				 style={{
+                    width: "100%",
+                    minHeight: "200px",
+                    border: "0",
+                    overflow: "hidden",
+                }}
 			/>
 		</div>
 	);

@@ -4,19 +4,42 @@ import { cn } from "@/lib/utils";
 
 export default function BettingWidget() {
 	const [isIframeLoading, setIsIframeLoading] = useState(true);
+	const [theme, setTheme] = useState("sportsdeyLite");
+
+	useEffect(() => {
+		// Detect initial theme
+		const isDarkMode = document.documentElement.classList.contains("dark");
+		setTheme(isDarkMode ? "sportsdeyDark" : "sportsdeyLite");
+
+		// Watch for theme changes
+		const observer = new MutationObserver(() => {
+			const isDark = document.documentElement.classList.contains("dark");
+			setTheme(isDark ? "sportsdeyDark" : "sportsdeyLite");
+		});
+
+		observer.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
+
+		return () => observer.disconnect();
+	}, []);
+
 	useEffect(() => {
 		const timer = setTimeout(() => setIsIframeLoading(false), 5000);
 		const handleMessage = (event: MessageEvent) => {
-			// console.log(event.origin);
-			if (event.origin !== "https://bet.sportsdey.com") return;
+            if (event.origin !== "https://bet.sportsdey.com") return;
 
-			if (event.data?.type === "SET_IFRAME_HEIGHT") {
-				const iframe = document.getElementById("betting-widget");
-				if (iframe) {
-					iframe.style.height = event.data.height + "px";
-				}
-			}
-		};
+            if (event.data?.type === "SET_LOBBY_SIDEBAR_WIDGET_HEIGHT") {
+                const iframe = document.getElementById(
+                    "lobbySidebarWidget"
+                ) as HTMLIFrameElement | null;
+
+                if (iframe && event.data.height) {
+                    iframe.style.height = `${event.data.height}px`;
+                }
+            }
+        };
 
 		window.addEventListener("message", handleMessage);
 
@@ -34,14 +57,19 @@ export default function BettingWidget() {
 				</div>
 			)}
 			<iframe
-				id="betting-widget"
+				id="lobbySidebarWidget"
+				src={`https://bet.sportsdey.com/?view=sidebar&theme=${theme}&ticketOpenMode=redirect`}
 				title="sportsdey betting widget"
-				src="https://bet.sportsdey.com/?mode=widget"
 				className={cn(
-					"rounded-2xl transition-opacity duration-500 dark:bg-card",
+					"rounded-2xl transition-opacity duration-500 bg-red-200",
 					isIframeLoading ? "opacity-0" : "opacity-100",
 				)}
-				style={{ width: "100%", border: "0", overflow: "hidden" }}
+				style={{
+                    width: "100%",
+                    minHeight: "200px",
+                    border: "0",
+                    overflow: "hidden",
+                }}
 			/>
 		</>
 	);
