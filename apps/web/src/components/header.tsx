@@ -345,7 +345,7 @@ export default function Header() {
 											QuickBetx
 										</a>
 									</li>
-									<li>
+									{/* <li>
 										<a
 											href="https://hallalotto.com/"
 											target="_blank"
@@ -354,7 +354,7 @@ export default function Header() {
 										>
 											Play lottery
 										</a>
-									</li>
+									</li> */}
 
 
 
