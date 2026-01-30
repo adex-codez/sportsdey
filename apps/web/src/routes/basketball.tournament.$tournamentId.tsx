@@ -357,7 +357,7 @@ function RouteComponent() {
 				: code === "eu"
 					? "/International.png"
 					: "/International.png";
-		console.log("flagUrl", flagUrl, "countryDisplay", countryDisplay);
+		// console.log("flagUrl", flagUrl, "countryDisplay", countryDisplay);
 
 		return { country: countryDisplay, flag: flagUrl };
 	};

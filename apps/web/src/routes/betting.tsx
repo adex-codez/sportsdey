@@ -36,18 +36,18 @@ function RouteComponent() {
 	useEffect(() => {
 		const timer = setTimeout(() => setIsIframeLoading(false), 5000);
 		const handleMessage = (event: MessageEvent) => {
-            if (event.origin !== "https://bet.sportsdey.com") return;
+			if (event.origin !== "https://bet.sportsdey.com") return;
 
-            if (event.data?.type === "SET_LOBBY_WIDGET_HEIGHT") {
-                const iframe = document.getElementById(
-                    "bettingWidget"
-                ) as HTMLIFrameElement | null;
+			if (event.data?.type === "SET_LOBBY_WIDGET_HEIGHT") {
+				const iframe = document.getElementById(
+					"bettingWidget"
+				) as HTMLIFrameElement | null;
 
-                if (iframe && event.data.height) {
-                    iframe.style.height = `${event.data.height}px`;
-                }
-            }
-        }
+				if (iframe && event.data.height) {
+					iframe.style.height = `${event.data.height}px`;
+				}
+			}
+		}
 
 		window.addEventListener("message", handleMessage);
 
@@ -66,18 +66,19 @@ function RouteComponent() {
 				</div>
 			)}
 			<iframe
+				id="bettingWidget"
 				title="lobby widget"
-				 src={`https://bet.sportsdey.com/?view=fullPage&theme=${theme}&ticketOpenMode=embedded`}
+				src={`https://bet.sportsdey.com/?view=fullPage&theme=${theme}&ticketOpenMode=embedded`}
 				className={cn(
 					"rounded-2xl transition-opacity duration-500",
 					isIframeLoading ? "opacity-0" : "opacity-100",
 				)}
-				 style={{
-                    width: "100%",
-                    minHeight: "200px",
-                    border: "0",
-                    overflow: "hidden",
-                }}
+				style={{
+					width: "100%",
+					minHeight: "calc(60vh - 250px)",
+					border: "0",
+					overflow: "hidden",
+				}}
 			/>
 		</div>
 	);
