@@ -28,18 +28,18 @@ export default function BettingWidget() {
 	useEffect(() => {
 		const timer = setTimeout(() => setIsIframeLoading(false), 5000);
 		const handleMessage = (event: MessageEvent) => {
-            if (event.origin !== "https://bet.sportsdey.com") return;
+			if (event.origin !== "https://bet.sportsdey.com") return;
 
-            if (event.data?.type === "SET_LOBBY_SIDEBAR_WIDGET_HEIGHT") {
-                const iframe = document.getElementById(
-                    "lobbySidebarWidget"
-                ) as HTMLIFrameElement | null;
+			if (event.data?.type === "SET_LOBBY_SIDEBAR_WIDGET_HEIGHT") {
+				const iframe = document.getElementById(
+					"lobbySidebarWidget"
+				) as HTMLIFrameElement | null;
 
-                if (iframe && event.data.height) {
-                    iframe.style.height = `${event.data.height}px`;
-                }
-            }
-        };
+				if (iframe && event.data.height) {
+					iframe.style.height = `${event.data.height}px`;
+				}
+			}
+		};
 
 		window.addEventListener("message", handleMessage);
 
@@ -65,11 +65,11 @@ export default function BettingWidget() {
 					isIframeLoading ? "opacity-0" : "opacity-100",
 				)}
 				style={{
-                    width: "100%",
-                    minHeight: "200px",
-                    border: "0",
-                    overflow: "hidden",
-                }}
+					width: "100%",
+					minHeight: "200px",
+					border: "0",
+					overflow: "hidden",
+				}}
 			/>
 		</>
 	);

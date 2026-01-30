@@ -109,7 +109,7 @@ function RouteComponent() {
 		banners: BannerData[];
 	};
 	useEffect(() => {
-		console.log(news);
+		// console.log(news);
 	}, []);
 	if (!news)
 		return <div className="p-8 text-center uppercase">News not found</div>;
