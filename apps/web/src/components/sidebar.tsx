@@ -113,16 +113,17 @@ const Sidebar = () => {
 						News
 					</li>
 
-					{/* <li>
+					<li>
 						<a
 							href="https://hallalotto.com/"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="cursor-pointer hover:text-accent transition-colors block"
+							className="cursor-pointer hover:text-accent transition-colors flex items-center gap-2"
 						>
+							<img src="/betting-logo.png" className="h-5 w-5 object-contain" alt="Betting" />
 							Play lottery
 						</a>
-					</li> */}
+					</li>
 
 				</ul>
 			</SidebarItem>
