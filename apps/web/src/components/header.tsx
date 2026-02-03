@@ -348,16 +348,17 @@ export default function Header() {
 											QuickBetx
 										</a>
 									</li>
-									{/* <li>
+									<li>
 										<a
 											href="https://hallalotto.com/"
 											target="_blank"
 											rel="noopener noreferrer"
-											className="cursor-pointer block"
+											className="cursor-pointer flex items-center gap-2"
 										>
+											<img src="/betting-logo.png" className="h-5 w-5 object-contain" alt="Betting" />
 											Play lottery
 										</a>
-									</li> */}
+									</li>
 
 
 
