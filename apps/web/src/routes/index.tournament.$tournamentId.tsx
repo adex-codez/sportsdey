@@ -163,9 +163,9 @@ function RouteComponent() {
 					>
 						<AccordionItem
 							value={`${filteredSchedules?.competition.id}`}
-							className="w-full rounded-2xl bg-white"
+							className="w-full rounded-2xl bg-white dark:bg-card"
 						>
-							<AccordionTrigger className="cursor-pointer rounded-none border-gray-100 px-4 font-bold text-primary [&[data-state=open]]:border-b">
+							<AccordionTrigger className="cursor-pointer rounded-none border-gray-100 px-4 font-bold text-primary dark:text-white [&[data-state=open]]:border-b">
 								{filteredSchedules?.competition.name}
 							</AccordionTrigger>
 
@@ -178,11 +178,11 @@ function RouteComponent() {
 										/>
 									) : (
 										filteredSchedules?.matches.map((match, index) => (
-											<div className="w-full rounded-2xl bg-white">
+											<div key={`${index}+1`} className="w-full rounded-2xl bg-white dark:bg-card">
 												<Link
 													to="/index/$gameId"
 													params={{ gameId: match.id }}
-													key={`${index}+1`}
+													
 												>
 													<MatchCard
 														team1={match.competitors.home.name}
