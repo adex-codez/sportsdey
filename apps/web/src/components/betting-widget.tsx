@@ -50,27 +50,44 @@ export default function BettingWidget() {
 	}, []);
 
 	return (
-		<>
-			{isIframeLoading && (
-				<div className="absolute inset-0 flex items-center justify-center">
-					<Loader2 className="h-8 w-8 animate-spin text-primary" />
-				</div>
-			)}
-			<iframe
-				id="lobbySidebarWidget"
-				src={`https://bet.sportsdey.com/?view=sidebar&theme=${theme}&ticketOpenMode=redirect`}
-				title="sportsdey betting widget"
-				className={cn(
-					"rounded-2xl transition-opacity duration-500 bg-red-200",
-					isIframeLoading ? "opacity-0" : "opacity-100",
+		<div className="overflow-hidden rounded-2xl bg-white dark:bg-[#202120]">
+
+			<hr className="dark:border-[#5A5F63]" />
+			<div className="relative">
+				{isIframeLoading && (
+					<div className="absolute inset-0 flex items-center justify-center py-10">
+						<Loader2 className="h-8 w-8 animate-spin text-primary" />
+					</div>
 				)}
-				style={{
-					width: "100%",
-					minHeight: "200px",
-					border: "0",
-					overflow: "hidden",
-				}}
-			/>
-		</>
+				<iframe
+					id="lobbySidebarWidget"
+					src={`https://bet.sportsdey.com/?view=sidebar&theme=${theme}&ticketOpenMode=redirect`}
+					title="sportsdey betting widget"
+					className={cn(
+						"transition-opacity duration-500",
+						isIframeLoading ? "opacity-0" : "opacity-100",
+					)}
+					style={{
+						width: "100%",
+						minHeight: "200px",
+						border: "0",
+						overflow: "hidden",
+					}}
+				/>
+			</div>
+			<ul className="px-6 pb-6 dark:border-[#5A5F63]">
+				<li>
+					<a
+						href="https://hallalotto.com/"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="flex items-center gap-3 hover:text-accent transition-colors"
+					>
+						<img src="/betting-logo.png" className="h-5 w-5 object-contain" alt="Betting" />
+						<span className="font-medium text-sm">Play lottery</span>
+					</a>
+				</li>
+			</ul>
+		</div>
 	);
 }

@@ -113,17 +113,6 @@ const Sidebar = () => {
 						News
 					</li>
 
-					{/* <li>
-						<a
-							href="https://hallalotto.com/"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="cursor-pointer hover:text-accent transition-colors block"
-						>
-							Play lottery
-						</a>
-					</li> */}
-
 				</ul>
 			</SidebarItem>
 
