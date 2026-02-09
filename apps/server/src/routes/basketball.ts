@@ -17,6 +17,7 @@ import {
 	transformProxyStandings,
 	transformTournamentSchedule,
 } from "@/utils/basketball";
+import { fetchWithTimeout, isTimeoutError } from "@/utils/fetch-with-timeout";
 import { jsonZodErrorFormatter } from "@/utils/zod";
 import {
 	basketballScheduleParam,
@@ -124,11 +125,36 @@ basketballRoute.openapi(
 
 			const apiUrl = `${proxyUrl}basketball/match/list?date=${date}`;
 
-			const response = await fetch(apiUrl, {
-				headers: {
-					"X-Proxy-Auth": proxySecret,
-				},
-			});
+			let response: Response;
+			try {
+				response = await fetchWithTimeout(
+					apiUrl,
+					{
+						headers: {
+							"X-Proxy-Auth": proxySecret,
+						},
+					},
+					10000,
+				);
+			} catch (err) {
+				if (isTimeoutError(err)) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Gateway timeout",
+							details: [
+								{
+									field: "proxy_api",
+									message: "Proxy API request timed out",
+									code: "timeout_error",
+								},
+							],
+						},
+						502,
+					);
+				}
+				throw err;
+			}
 
 			if (!response.ok) {
 				return c.json(
@@ -283,11 +309,36 @@ basketballRoute.openapi(
 
 			const apiUrl = `${proxyUrl}basketball/match/list?date=${date}`;
 
-			const response = await fetch(apiUrl, {
-				headers: {
-					"X-Proxy-Auth": proxySecret,
-				},
-			});
+			let response: Response;
+			try {
+				response = await fetchWithTimeout(
+					apiUrl,
+					{
+						headers: {
+							"X-Proxy-Auth": proxySecret,
+						},
+					},
+					10000,
+				);
+			} catch (err) {
+				if (isTimeoutError(err)) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Gateway timeout",
+							details: [
+								{
+									field: "proxy_api",
+									message: "Proxy API request timed out",
+									code: "timeout_error",
+								},
+							],
+						},
+						502,
+					);
+				}
+				throw err;
+			}
 
 			if (!response.ok) {
 				return c.json(
@@ -449,14 +500,18 @@ basketballRoute.openapi(
 				);
 			}
 
-			// Parallel fetch for summary and boxscore
+			// Parallel fetch for summary and boxscore with timeout
 			const [summaryRes, boxscoreRes] = await Promise.all([
-				fetch(`${proxyUrl}basketball/match/summary?matchId=${gameId}`, {
-					headers: { "X-Proxy-Auth": proxySecret },
-				}),
-				fetch(`${proxyUrl}basketball/match/boxscore?matchId=${gameId}`, {
-					headers: { "X-Proxy-Auth": proxySecret },
-				}),
+				fetchWithTimeout(
+					`${proxyUrl}basketball/match/summary?matchId=${gameId}`,
+					{ headers: { "X-Proxy-Auth": proxySecret } },
+					10000,
+				),
+				fetchWithTimeout(
+					`${proxyUrl}basketball/match/boxscore?matchId=${gameId}`,
+					{ headers: { "X-Proxy-Auth": proxySecret } },
+					10000,
+				),
 			]);
 
 			if (!summaryRes.ok) {
@@ -646,12 +701,34 @@ basketballRoute.openapi(
 				);
 			}
 
-			const response = await fetch(
-				`${proxyUrl}basketball/match/boxscore?matchId=${gameId}`,
-				{
-					headers: { "X-Proxy-Auth": proxySecret },
-				},
-			);
+			let response: Response;
+			try {
+				response = await fetchWithTimeout(
+					`${proxyUrl}basketball/match/boxscore?matchId=${gameId}`,
+					{
+						headers: { "X-Proxy-Auth": proxySecret },
+					},
+					10000,
+				);
+			} catch (err) {
+				if (isTimeoutError(err)) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Gateway timeout",
+							details: [
+								{
+									field: "proxy_api",
+									message: "Proxy API request timed out",
+									code: "timeout_error",
+								},
+							],
+						},
+						502,
+					);
+				}
+				throw err;
+			}
 
 			if (!response.ok) {
 				if (response.status === 404) {
@@ -819,11 +896,36 @@ basketballRoute.openapi(
 
 			const apiUrl = `${proxyUrl}basketball/tournament/standings?tournamentId=${tournamentId}`;
 
-			const response = await fetch(apiUrl, {
-				headers: {
-					"X-Proxy-Auth": proxySecret,
-				},
-			});
+			let response: Response;
+			try {
+				response = await fetchWithTimeout(
+					apiUrl,
+					{
+						headers: {
+							"X-Proxy-Auth": proxySecret,
+						},
+					},
+					10000,
+				);
+			} catch (err) {
+				if (isTimeoutError(err)) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Gateway timeout",
+							details: [
+								{
+									field: "proxy_api",
+									message: "Proxy API request timed out",
+									code: "timeout_error",
+								},
+							],
+						},
+						502,
+					);
+				}
+				throw err;
+			}
 
 			if (!response.ok) {
 				return c.json(
@@ -971,7 +1073,28 @@ basketballRoute.openapi(
 				apiUrl += `&pageToken=${pageToken}`;
 			}
 
-			const response = await fetch(apiUrl);
+			let response: Response;
+			try {
+				response = await fetchWithTimeout(apiUrl, {}, 10000);
+			} catch (err) {
+				if (isTimeoutError(err)) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Gateway timeout",
+							details: [
+								{
+									field: "youtube_api",
+									message: "YouTube API request timed out",
+									code: "timeout_error",
+								},
+							],
+						},
+						502,
+					);
+				}
+				throw err;
+			}
 
 			if (!response.ok) {
 				return c.json(

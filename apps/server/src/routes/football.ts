@@ -10,6 +10,7 @@ import {
 	TransformedResponseSchema,
 	VideoResponseSchema,
 } from "@/schemas";
+import { fetchWithTimeout, isTimeoutError } from "@/utils/fetch-with-timeout";
 // import type { ScheduleRes } from "@/types";
 // import type { StandingsRes, TeamStanding } from "@/types/football";
 // import { fetchWithErrorHandling } from "@/utils";
@@ -118,12 +119,37 @@ footballRoute.openapi(
 		}
 
 		try {
-			const upstream = await fetch(url, {
-				headers: {
-					"X-Proxy-Auth": proxySecret,
-					Accept: "application/json",
-				},
-			});
+			let upstream: Response;
+			try {
+				upstream = await fetchWithTimeout(
+					url,
+					{
+						headers: {
+							"X-Proxy-Auth": proxySecret,
+							Accept: "application/json",
+						},
+					},
+					10000,
+				);
+			} catch (err) {
+				if (isTimeoutError(err)) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Gateway timeout",
+							details: [
+								{
+									field: "proxy_api",
+									message: "Proxy API request timed out",
+									code: "timeout_error",
+								},
+							],
+						},
+						502,
+					);
+				}
+				throw err;
+			}
 
 			if (!upstream.ok) {
 				return c.json(
@@ -259,12 +285,37 @@ footballRoute.openapi(
 		}
 
 		try {
-			const upstream = await fetch(url, {
-				headers: {
-					"X-Proxy-Auth": proxySecret,
-					Accept: "application/json",
-				},
-			});
+			let upstream: Response;
+			try {
+				upstream = await fetchWithTimeout(
+					url,
+					{
+						headers: {
+							"X-Proxy-Auth": proxySecret,
+							Accept: "application/json",
+						},
+					},
+					10000,
+				);
+			} catch (err) {
+				if (isTimeoutError(err)) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Gateway timeout",
+							details: [
+								{
+									field: "proxy_api",
+									message: "Proxy API request timed out",
+									code: "timeout_error",
+								},
+							],
+						},
+						502,
+					);
+				}
+				throw err;
+			}
 
 			if (!upstream.ok) {
 				return c.json(
@@ -428,12 +479,37 @@ footballRoute.openapi(
 
 		try {
 			// 1. Fetch Match Summary
-			const summaryRes = await fetch(summaryUrl, {
-				headers: {
-					"X-Proxy-Auth": proxySecret,
-					Accept: "application/json",
-				},
-			});
+			let summaryRes: Response;
+			try {
+				summaryRes = await fetchWithTimeout(
+					summaryUrl,
+					{
+						headers: {
+							"X-Proxy-Auth": proxySecret,
+							Accept: "application/json",
+						},
+					},
+					10000,
+				);
+			} catch (err) {
+				if (isTimeoutError(err)) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Gateway timeout",
+							details: [
+								{
+									field: "proxy_api",
+									message: "Proxy API (summary) request timed out",
+									code: "timeout_error",
+								},
+							],
+						},
+						502,
+					);
+				}
+				throw err;
+			}
 
 			if (!summaryRes.ok) {
 				return c.json(
@@ -478,12 +554,26 @@ footballRoute.openapi(
 			const standingsCacheKey = `standing_${tournamentId}`;
 
 			const [leadersRes, h2hRes, cachedStandings] = await Promise.all([
-				fetch(leadersUrl, {
-					headers: { "X-Proxy-Auth": proxySecret, Accept: "application/json" },
-				}),
-				fetch(h2hUrl, {
-					headers: { "X-Proxy-Auth": proxySecret, Accept: "application/json" },
-				}),
+				fetchWithTimeout(
+					leadersUrl,
+					{
+						headers: {
+							"X-Proxy-Auth": proxySecret,
+							Accept: "application/json",
+						},
+					},
+					10000,
+				),
+				fetchWithTimeout(
+					h2hUrl,
+					{
+						headers: {
+							"X-Proxy-Auth": proxySecret,
+							Accept: "application/json",
+						},
+					},
+					10000,
+				),
 				c.env.sportsdey_ns.get(standingsCacheKey, "json") as Promise<{
 					data: any;
 					expiresAt: number;
@@ -495,11 +585,30 @@ footballRoute.openapi(
 			if (cachedStandings && Date.now() <= cachedStandings.expiresAt) {
 				standingsData = cachedStandings.data;
 			} else {
-				const standingsRes = await fetch(standingsUrl, {
-					headers: { "X-Proxy-Auth": proxySecret, Accept: "application/json" },
-				});
+				let standingsRes: Response | undefined;
+				try {
+					standingsRes = await fetchWithTimeout(
+						standingsUrl,
+						{
+							headers: {
+								"X-Proxy-Auth": proxySecret,
+								Accept: "application/json",
+							},
+						},
+						10000,
+					);
+				} catch (err) {
+					if (isTimeoutError(err)) {
+						console.warn(
+							`Standings request timed out for tournament ${tournamentId}`,
+						);
+						standingsData = [];
+					} else {
+						throw err;
+					}
+				}
 
-				if (standingsRes.ok) {
+				if (standingsRes && standingsRes.ok) {
 					standingsData = (await standingsRes.json()) as any[];
 					await c.env.sportsdey_ns.put(
 						standingsCacheKey,
@@ -661,12 +770,37 @@ footballRoute.openapi(
 		}
 
 		try {
-			const response = await fetch(url, {
-				headers: {
-					"X-Proxy-Auth": proxySecret,
-					Accept: "application/json",
-				},
-			});
+			let response: Response;
+			try {
+				response = await fetchWithTimeout(
+					url,
+					{
+						headers: {
+							"X-Proxy-Auth": proxySecret,
+							Accept: "application/json",
+						},
+					},
+					10000,
+				);
+			} catch (err) {
+				if (isTimeoutError(err)) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Gateway timeout",
+							details: [
+								{
+									field: "proxy_api",
+									message: "Proxy API request timed out",
+									code: "timeout_error",
+								},
+							],
+						},
+						502,
+					);
+				}
+				throw err;
+			}
 
 			if (!response.ok) {
 				return c.json(
@@ -811,12 +945,37 @@ footballRoute.openapi(
 		}
 
 		try {
-			const response = await fetch(url, {
-				headers: {
-					"X-Proxy-Auth": proxySecret,
-					Accept: "application/json",
-				},
-			});
+			let response: Response;
+			try {
+				response = await fetchWithTimeout(
+					url,
+					{
+						headers: {
+							"X-Proxy-Auth": proxySecret,
+							Accept: "application/json",
+						},
+					},
+					10000,
+				);
+			} catch (err) {
+				if (isTimeoutError(err)) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Gateway timeout",
+							details: [
+								{
+									field: "proxy_api",
+									message: "Proxy API request timed out",
+									code: "timeout_error",
+								},
+							],
+						},
+						502,
+					);
+				}
+				throw err;
+			}
 
 			if (!response.ok) {
 				return c.json(
@@ -969,7 +1128,28 @@ footballRoute.openapi(
 				apiUrl += `&pageToken=${pageToken}`;
 			}
 
-			const response = await fetch(apiUrl);
+			let response: Response;
+			try {
+				response = await fetchWithTimeout(apiUrl, {}, 10000);
+			} catch (err) {
+				if (isTimeoutError(err)) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Gateway timeout",
+							details: [
+								{
+									field: "youtube_api",
+									message: "YouTube API request timed out",
+									code: "timeout_error",
+								},
+							],
+						},
+						502,
+					);
+				}
+				throw err;
+			}
 
 			if (!response.ok) {
 				return c.json(
