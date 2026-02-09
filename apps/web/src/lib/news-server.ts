@@ -1,12 +1,43 @@
 import { createServerFn } from "@tanstack/react-start";
 import { client } from "./sanity";
 
+const SANITY_TIMEOUT = 8000;
+
+async function fetchWithSanityTimeout<T>(
+	query: string,
+	params?: Record<string, unknown>,
+): Promise<T> {
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), SANITY_TIMEOUT);
+
+	try {
+		const result = await client.fetch<T>(query, params, {
+			signal: controller.signal,
+		});
+		clearTimeout(timeoutId);
+		return result;
+	} catch (error) {
+		clearTimeout(timeoutId);
+		if (error instanceof Error && error.name === "AbortError") {
+			console.warn("Sanity API request timed out");
+			throw new Error("Sanity request timed out");
+		}
+		throw error;
+	}
+}
+
 export const getNews = createServerFn({ method: "GET" })
-	.inputValidator((sport: string) => sport)
-	.handler(async ({ data: category }) => {
+	.inputValidator(
+		(data: { category: string; offset?: number; limit?: number }) => data,
+	)
+	.handler(async ({ data }) => {
+		const { category, offset = 0, limit = 12 } = data;
+		const start = offset;
+		const end = offset + limit;
+
 		const query =
 			category === "all"
-				? `*[_type == "news"] | order(publishedAt desc){
+				? `*[_type == "news"] | order(publishedAt desc)[$start...$end]{
 					_id,
 					title,
 					publishedAt,
@@ -16,7 +47,7 @@ export const getNews = createServerFn({ method: "GET" })
 					body,
 					"author": author->{_id, name, slug, image}
 				}`
-				: `*[_type == "news" && category == $category] | order(publishedAt desc){
+				: `*[_type == "news" && category == $category] | order(publishedAt desc)[$start...$end]{
 					_id,
 					title,
 					publishedAt,
@@ -27,20 +58,20 @@ export const getNews = createServerFn({ method: "GET" })
 					"author": author->{_id, name, slug, image}
 				}`;
 
-		const response = await client.fetch(
-			query,
-			category === "all" ? {} : { category },
-		);
-
-		return response;
+		const response = await fetchWithSanityTimeout(query, {
+			start,
+			end,
+			...(category !== "all" ? { category } : {}),
+		});
+		return response || [];
 	});
 
 export const getNewsById = createServerFn({ method: "GET" })
 	.inputValidator((id: string) => id)
 	.handler(async ({ data: id }) => {
-		const response = await client.fetch(
+		const response = await fetchWithSanityTimeout(
 			`
-      *[_type == "news" && _id == $id][0]{
+	      *[_type == "news" && _id == $id][0]{
         _id,
         title,
         publishedAt,
@@ -58,9 +89,9 @@ export const getNewsById = createServerFn({ method: "GET" })
 export const getNewsBySlug = createServerFn({ method: "GET" })
 	.inputValidator((slug: string) => slug)
 	.handler(async ({ data: slug }) => {
-		const response = await client.fetch(
+		const response = await fetchWithSanityTimeout(
 			`
-      *[_type == "news" && slug.current == $slug][0]{
+	      *[_type == "news" && slug.current == $slug][0]{
         _id,
         title,
         publishedAt,
@@ -78,9 +109,9 @@ export const getNewsBySlug = createServerFn({ method: "GET" })
 export const getAuthorBySlug = createServerFn({ method: "GET" })
 	.inputValidator((slug: string) => slug)
 	.handler(async ({ data: slug }) => {
-		const response = await client.fetch(
+		const response = await fetchWithSanityTimeout(
 			`
-      *[_type == "author" && slug.current == $slug][0]{
+	      *[_type == "author" && slug.current == $slug][0]{
         _id,
         name,
         slug,
@@ -105,9 +136,10 @@ export const getNewsByAuthor = createServerFn({ method: "GET" })
 	)
 	.handler(async ({ data }) => {
 		const { authorId, limit = 10, offset = 0 } = data;
-		const response = await client.fetch(
-			`
-      *[_type == "news" && references($authorId)] | order(publishedAt desc) [$offset...$end] {
+		try {
+			const response = await fetchWithSanityTimeout(
+				`
+	      *[_type == "news" && references($authorId)] | order(publishedAt desc) [$offset...$end] {
         _id,
         title,
         publishedAt,
@@ -117,19 +149,28 @@ export const getNewsByAuthor = createServerFn({ method: "GET" })
         sport
       }
     `,
-			{ authorId, offset, end: offset + limit },
-		);
-		return response;
+				{ authorId, offset, end: offset + limit },
+			);
+			return response;
+		} catch {
+			// Return empty array on error to prevent error boundary trigger
+			return [];
+		}
 	});
 
 export const getNewsByAuthorTotal = createServerFn({ method: "GET" })
 	.inputValidator((authorId: string) => authorId)
 	.handler(async ({ data: authorId }) => {
-		const response = await client.fetch(
-			`
-      count(*[_type == "news" && references($authorId)])
-    `,
-			{ authorId },
-		);
-		return response;
+		try {
+			const response = await fetchWithSanityTimeout(
+				`
+	      count(*[_type == "news" && references($authorId)])
+	    `,
+				{ authorId },
+			);
+			return response;
+		} catch {
+			// Return 0 on error to prevent error boundary trigger
+			return 0;
+		}
 	});

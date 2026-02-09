@@ -1,6 +1,28 @@
 import { createServerFn } from "@tanstack/react-start";
 import { client, urlFor } from "./sanity";
 
+const SANITY_TIMEOUT = 5000;
+
+async function fetchWithSanityTimeout<T>(query: string): Promise<T> {
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), SANITY_TIMEOUT);
+
+	try {
+		const result = await client.fetch<T>(query, undefined, {
+			signal: controller.signal,
+		});
+		clearTimeout(timeoutId);
+		return result;
+	} catch (error) {
+		clearTimeout(timeoutId);
+		if (error instanceof Error && error.name === "AbortError") {
+			console.warn("Sanity API request timed out");
+			throw new Error("Sanity request timed out");
+		}
+		throw error;
+	}
+}
+
 export interface BannerData {
 	_id: string;
 	imageUrl: string;
@@ -10,20 +32,20 @@ export interface BannerData {
 
 export const getBanners = createServerFn({ method: "GET" }).handler(
 	async () => {
-		const query = `*[_type == "banner"] | order(_createdAt desc) {
+		const query = `*[_type == "banner"] | order(_createdAt desc)[0...10] {
 			_id,
 			image,
 			url,
 			alt
 		}`;
 
-		const response = await client.fetch(query);
-
-		if (!response || !Array.isArray(response) || response.length === 0) {
-			return [];
-		}
-
 		try {
+			const response = await fetchWithSanityTimeout(query);
+
+			if (!response || !Array.isArray(response) || response.length === 0) {
+				return [];
+			}
+
 			const banners: BannerData[] = response
 				.filter(
 					(item: unknown) =>
@@ -38,6 +60,7 @@ export const getBanners = createServerFn({ method: "GET" }).handler(
 
 			return banners;
 		} catch {
+			// Return empty array on error to prevent error boundary trigger
 			return [];
 		}
 	},

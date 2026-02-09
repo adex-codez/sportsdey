@@ -1,17 +1,42 @@
 import { PortableText } from "@portabletext/react";
 import { Link } from "@tanstack/react-router";
-import { useNewsData } from "@/hooks/use-news-data";
 import { Loader2 } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { useNewsData } from "@/hooks/use-news-data";
 import { urlFor } from "@/lib/sanity";
 import { formatRelativeTime } from "@/lib/utils";
 import { ShareButton } from "./ShareButton";
 
-
 export const NewsPage = ({ category }: { category: string }) => {
-	const { data, isLoading } = useNewsData(category);
+	const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+		useNewsData(category);
+
+	const loadMoreRef = useRef<HTMLDivElement>(null);
+
+	// Intersection Observer for infinite scroll
+	useEffect(() => {
+		if (!loadMoreRef.current) return;
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+					fetchNextPage();
+				}
+			},
+			{ threshold: 0.1, rootMargin: "100px" },
+		);
+
+		observer.observe(loadMoreRef.current);
+
+		return () => observer.disconnect();
+	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+	// Flatten all pages into a single array
+	const allNews = data?.pages.flat() || [];
+
 	if (isLoading) {
 		return (
-			<div className="flex flex-col items-center justify-center space-y-2">
+			<div className="flex flex-col items-center justify-center space-y-2 py-8">
 				<Loader2 className="animate-spin" width={24} height={24} />
 				<p className="text-gray-500 text-sm">Loading news...</p>
 			</div>
@@ -20,7 +45,7 @@ export const NewsPage = ({ category }: { category: string }) => {
 
 	return (
 		<div className="rounded-lg bg-white dark:bg-card/60">
-			{data?.length === 0 ? (
+			{allNews.length === 0 ? (
 				<p className="py-4 text-center text-gray-500 dark:text-white">
 					No news found
 				</p>
@@ -30,7 +55,7 @@ export const NewsPage = ({ category }: { category: string }) => {
 				</p>
 			)}
 			<div className="grid grid-cols-1 gap-4 px-4 py-2 md:grid-cols-2 lg:grid-cols-3">
-				{data?.map((news: any) => (
+				{allNews.map((news: any) => (
 					<Link
 						to="/news/$slug"
 						params={{ slug: news.slug?.current }}
@@ -63,8 +88,22 @@ export const NewsPage = ({ category }: { category: string }) => {
 							/>
 						</div>
 					</Link>
-
 				))}
+			</div>
+
+			{/* Load more trigger */}
+			<div ref={loadMoreRef} className="py-4">
+				{isFetchingNextPage && (
+					<div className="flex flex-col items-center justify-center space-y-2">
+						<Loader2 className="animate-spin" width={24} height={24} />
+						<p className="text-gray-500 text-sm">Loading more...</p>
+					</div>
+				)}
+				{!hasNextPage && allNews.length > 0 && (
+					<p className="py-4 text-center text-gray-400 text-sm">
+						No more news to load
+					</p>
+				)}
 			</div>
 		</div>
 	);
