@@ -323,7 +323,7 @@ export default function Header() {
 											className="cursor-pointer flex items-center gap-2"
 										>
 											<Video className="h-5 w-5 object-contain text-gray-500 dark:text-white" />
-											Tutorial
+											Tutorials
 										</a>
 									</li>
 									<li>
