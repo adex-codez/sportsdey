@@ -115,14 +115,14 @@ const BannerCarousel = ({ banners }: BannerCarouselProps) => {
 				className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/30 p-1.5 text-white/70 backdrop-blur-sm transition-all hover:bg-black/50 hover:text-white disabled:opacity-0 md:left-4 md:p-2 cursor-pointer"
 				onClick={scrollPrev}
 			>
-				<ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
+				<ChevronLeft className="h-4 w-4 md:h-6 md:w-6" />
 			</button>
 
 			<button
 				className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/30 p-1.5 text-white/70 backdrop-blur-sm transition-all hover:bg-black/50 hover:text-white disabled:opacity-0 md:right-4 md:p-2 cursor-pointer"
 				onClick={scrollNext}
 			>
-				<ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
+				<ChevronRight className="h-4 w-4 md:h-6 md:w-6" />
 			</button>
 
 			<div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2">
