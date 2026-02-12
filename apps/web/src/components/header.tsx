@@ -4,7 +4,7 @@ import {
 	useParams,
 	useRouter,
 } from "@tanstack/react-router";
-import { CalendarDays, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
+import { CalendarDays, ChevronDown, ChevronRight, Menu, Video, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useCurrentFilter } from "@/hooks/use-current-filter";
 import { useCurrentSport } from "@/hooks/use-current-sport";
@@ -315,6 +315,17 @@ export default function Header() {
 									>
 										Play bet
 									</li> */}
+									<li>
+										<a
+											href="https://www.youtube.com/playlist?list=PLfYN70E9S81O0_bio6u3c9rc-mhBlbdBn"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="cursor-pointer flex items-center gap-2"
+										>
+											<Video className="h-5 w-5 object-contain text-gray-500 dark:text-white" />
+											Tutorial
+										</a>
+									</li>
 									<li>
 										<a
 											href="https://sportsdey.com/betting"

@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader2, Video } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -75,6 +75,20 @@ export default function BettingWidget() {
 					}}
 				/>
 			</div>
+			<ul className="px-6 pb-6 dark:border-[#5A5F63]">
+				<li>
+					<a
+						href="https://www.youtube.com/playlist?list=PLfYN70E9S81O0_bio6u3c9rc-mhBlbdBn"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="flex items-center gap-3 hover:text-accent transition-colors"
+					>
+						<Video className="h-5 w-5 object-contain text-gray-500 dark:text-white" />
+
+						<span className="font-medium text-sm">Tutorial</span>
+					</a>
+				</li>
+			</ul>
 			<ul className="px-6 pb-6 dark:border-[#5A5F63]">
 				<li>
 					<a
