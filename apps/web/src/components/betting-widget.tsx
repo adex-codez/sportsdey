@@ -85,7 +85,7 @@ export default function BettingWidget() {
 					>
 						<Video className="h-5 w-5 object-contain text-gray-500 dark:text-white" />
 
-						<span className="font-medium text-sm">Tutorial</span>
+						<span className="font-medium text-sm">Tutorials</span>
 					</a>
 				</li>
 			</ul>
