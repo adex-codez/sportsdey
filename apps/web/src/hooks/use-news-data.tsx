@@ -1,9 +1,28 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { getNews } from "@/lib/news-server";
 
-export function useNewsData(sport: string) {
-	return useQuery({
-		queryKey: ["news", sport],
-		queryFn: () => getNews({ data: sport }),
+const LIMIT = 12;
+
+export function useNewsData(category: string) {
+	return useInfiniteQuery({
+		queryKey: ["news", category],
+		queryFn: async ({ pageParam = 0 }) => {
+			const result = await getNews({
+				data: {
+					category,
+					offset: pageParam,
+					limit: LIMIT,
+				},
+			});
+			return result || [];
+		},
+		getNextPageParam: (lastPage, allPages) => {
+			// If we got fewer items than LIMIT, there are no more pages
+			if (!lastPage || lastPage.length < LIMIT) {
+				return undefined;
+			}
+			return allPages.length * LIMIT;
+		},
+		initialPageParam: 0,
 	});
 }

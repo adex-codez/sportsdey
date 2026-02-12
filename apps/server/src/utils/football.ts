@@ -64,8 +64,11 @@ export function transformProxySchedule(data: any[]): TransformedResponse {
 		"Spanish La Liga",
 		"Spanish La Liga 2",
 		"African Cup of Nations",
-		"Serie A",
+		"Italian Serie A",
 		"French Ligue 1",
+    "UEFA Europa League",
+    "Carabao Cup",
+		"Copa del Rey"
 	];
 
 	competitions.sort((a, b) => {

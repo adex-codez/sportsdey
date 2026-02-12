@@ -10,6 +10,7 @@ import type {
 	SportRadarTennisGameResponse,
 	SportRadarTennisResponse,
 } from "@/types";
+import { fetchWithTimeout, isTimeoutError } from "@/utils/fetch-with-timeout";
 import { transformTennisData, transformTennisMatchData } from "@/utils/tennis";
 import { jsonZodErrorFormatter } from "@/utils/zod";
 import {
@@ -95,7 +96,28 @@ tennisRoute.openapi(
 
 			const apiUrl = `https://api.sportradar.com/tennis/trial/v3/${language}/schedules/${date}/summaries.json?api_key=${apiKey}`;
 
-			const response = await fetch(apiUrl);
+			let response: Response;
+			try {
+				response = await fetchWithTimeout(apiUrl, {}, 10000);
+			} catch (err) {
+				if (isTimeoutError(err)) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Gateway timeout",
+							details: [
+								{
+									field: "sportradar_api",
+									message: "SportRadar API request timed out",
+									code: "timeout_error",
+								},
+							],
+						},
+						502,
+					);
+				}
+				throw err;
+			}
 
 			if (!response.ok) {
 				return c.json(
@@ -226,7 +248,28 @@ tennisRoute.openapi(tennisGameRoute, async (c) => {
 
 		const apiUrl = `https://api.sportradar.com/tennis/trial/v3/${language}/sport_events/${encodeURIComponent(gameId)}/summary.json?api_key=${apiKey}`;
 
-		const response = await fetch(apiUrl);
+		let response: Response;
+		try {
+			response = await fetchWithTimeout(apiUrl, {}, 10000);
+		} catch (err) {
+			if (isTimeoutError(err)) {
+				return c.json(
+					{
+						success: false as const,
+						error: "Gateway timeout",
+						details: [
+							{
+								field: "sportradar_api",
+								message: "SportRadar API request timed out",
+								code: "timeout_error",
+							},
+						],
+					},
+					502,
+				);
+			}
+			throw err;
+		}
 
 		if (!response.ok) {
 			return c.json(
@@ -373,7 +416,28 @@ tennisRoute.openapi(
 				apiUrl += `&pageToken=${pageToken}`;
 			}
 
-			const response = await fetch(apiUrl);
+			let response: Response;
+			try {
+				response = await fetchWithTimeout(apiUrl, {}, 10000);
+			} catch (err) {
+				if (isTimeoutError(err)) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Gateway timeout",
+							details: [
+								{
+									field: "youtube_api",
+									message: "YouTube API request timed out",
+									code: "timeout_error",
+								},
+							],
+						},
+						502,
+					);
+				}
+				throw err;
+			}
 
 			if (!response.ok) {
 				return c.json(

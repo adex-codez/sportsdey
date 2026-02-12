@@ -42,8 +42,8 @@ function getStorageItem<T>(key: string, initialValue: T): T {
 	try {
 		const item = window.localStorage.getItem(key);
 		return item ? JSON.parse(item) : initialValue;
-	} catch (error) {
-		console.error(`Error reading localStorage key "${key}":`, error);
+	} catch {
+		// Silently return initial value on error
 		return initialValue;
 	}
 }
@@ -53,8 +53,8 @@ function setStorageItem<T>(key: string, value: T) {
 	try {
 		window.localStorage.setItem(key, JSON.stringify(value));
 		window.dispatchEvent(new Event(FAVORITES_UPDATED_EVENT));
-	} catch (error) {
-		console.error(`Error writing localStorage key "${key}":`, error);
+	} catch {
+		// Silently fail on localStorage error
 	}
 }
 

@@ -4,6 +4,7 @@ import {
 	successResponseSchema,
 	VideoResponseSchema,
 } from "@/schemas";
+import { fetchWithTimeout, isTimeoutError } from "@/utils/fetch-with-timeout";
 import { jsonZodErrorFormatter } from "@/utils/zod";
 import { newsVideosQuery } from "@/validators";
 
@@ -98,7 +99,28 @@ newsRoute.openapi(
 				apiUrl += `&pageToken=${pageToken}`;
 			}
 
-			const response = await fetch(apiUrl);
+			let response: Response;
+			try {
+				response = await fetchWithTimeout(apiUrl, {}, 10000);
+			} catch (err) {
+				if (isTimeoutError(err)) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Gateway timeout",
+							details: [
+								{
+									field: "youtube_api",
+									message: "YouTube API request timed out",
+									code: "timeout_error",
+								},
+							],
+						},
+						502,
+					);
+				}
+				throw err;
+			}
 
 			if (!response.ok) {
 				return c.json(

@@ -9,8 +9,6 @@ import { urlFor } from "@/lib/sanity";
 import { formatRelativeTime } from "@/lib/utils";
 import { ShareButton } from "./ShareButton";
 
-
-
 const RightSidebar = () => {
 	const sport = useCurrentSport() || "football";
 	const { data: newsData, isLoading: isNewsLoading } = useNewsData(sport);
@@ -18,8 +16,9 @@ const RightSidebar = () => {
 	const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 	const navigate = useNavigate();
 
-	// Show only the first news item if available
-	const latestNews = newsData && newsData.length > 0 ? newsData[0] : null;
+	// Get first news item from infinite query pages
+	const allNews = newsData?.pages.flat() || [];
+	const latestNews = allNews.length > 0 ? allNews[0] : null;
 
 	// Show up to 2 videos if available
 	const activeVideos = videoData?.pages[0]?.videos?.slice(0, 2) || [];
@@ -46,10 +45,12 @@ const RightSidebar = () => {
 		<div className="space-y-6 pb-24">
 			{/* News Widget - Only show if news exists */}
 			{latestNews && (
-				<div className="bg-white dark:bg-card rounded-2xl overflow-hidden shadow-sm">
-					<div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-[#5A5F63]">
+				<div className="overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-card">
+					<div className="flex items-center justify-between border-gray-100 border-b px-4 py-3 dark:border-[#5A5F63]">
 						<div className="flex items-center gap-3">
-							<h3 className="font-bold text-lg text-primary dark:text-white">News</h3>
+							<h3 className="font-bold text-lg text-primary dark:text-white">
+								News
+							</h3>
 							<ShareButton
 								url={window.location.origin}
 								title="Sportsdey - Live Scores & News"
@@ -59,27 +60,40 @@ const RightSidebar = () => {
 						<Link
 							to="/news"
 							search={{ category: sport }}
-							className="text-xs font-semibold text-gray-400 hover:text-accent flex items-center gap-1"
+							className="flex items-center gap-1 font-semibold text-gray-400 text-xs hover:text-accent"
 						>
-							<ChevronRight className="w-5 h-5" />
+							<ChevronRight className="h-5 w-5" />
 						</Link>
 					</div>
 
-					<div className="p-4" onClick={() => navigate({ to: `/news/$slug`, params: { slug: latestNews.slug.current } })}>
-						<div className="relative aspect-video w-full rounded-xl overflow-hidden mb-3 cursor-pointer group">
+					<div
+						className="p-4"
+						onClick={() =>
+							navigate({
+								to: "/news/$slug",
+								params: { slug: latestNews.slug.current },
+							})
+						}
+					>
+						<div className="group relative mb-3 aspect-video w-full cursor-pointer overflow-hidden rounded-xl">
 							<img
 								src={urlFor(latestNews.image).url()}
 								alt={latestNews.title}
-								className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+								className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
 							/>
 						</div>
 						<h4
-							onClick={() => navigate({ to: `/news/$slug`, params: { slug: latestNews.slug.current } })}
-							className="font-bold text-sm text-primary mb-2 line-clamp-2 cursor-pointer hover:text-accent transition-colors dark:text-white"
+							onClick={() =>
+								navigate({
+									to: "/news/$slug",
+									params: { slug: latestNews.slug.current },
+								})
+							}
+							className="mb-2 line-clamp-2 cursor-pointer font-bold text-primary text-sm transition-colors hover:text-accent dark:text-white"
 						>
 							{latestNews.title}
 						</h4>
-						<p className="text-xs text-gray-400 mb-4">
+						<p className="mb-4 text-gray-400 text-xs">
 							{formatRelativeTime(latestNews.publishedAt)}
 						</p>
 
@@ -139,9 +153,7 @@ const RightSidebar = () => {
 						))}
 
 						<button
-							onClick={() =>
-								navigate({ to: "/news" })
-							}
+							onClick={() => navigate({ to: "/news" })}
 							className="mt-2 w-full py-2.5 text-end font-bold text-accent text-xs underline transition-colors"
 						>
 							View more
