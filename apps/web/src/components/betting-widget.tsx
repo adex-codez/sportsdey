@@ -25,6 +25,8 @@ export default function BettingWidget() {
 		return () => observer.disconnect();
 	}, []);
 
+	const bettingLogo = "https://res.cloudinary.com/dc59hhvse/image/upload/v1771247662/HB-256xx256_nrpajz.png"
+
 	useEffect(() => {
 		const timer = setTimeout(() => setIsIframeLoading(false), 5000);
 		const handleMessage = (event: MessageEvent) => {
@@ -89,7 +91,7 @@ export default function BettingWidget() {
 					</a>
 				</li>
 			</ul>
-			<ul className="px-6 pb-6 dark:border-[#5A5F63]">
+			{/* <ul className="px-6 pb-6 dark:border-[#5A5F63]">
 				<li>
 					<a
 						href="https://hallalotto.com/"
@@ -97,11 +99,11 @@ export default function BettingWidget() {
 						rel="noopener noreferrer"
 						className="flex items-center gap-3 hover:text-accent transition-colors"
 					>
-						<img src="/betting-logo.png" className="h-5 w-5 object-contain" alt="Betting" />
+						<img src={bettingLogo} className="h-5 w-5 object-contain" alt="Betting" />
 						<span className="font-medium text-sm">Play lottery</span>
 					</a>
 				</li>
-			</ul>
+			</ul> */}
 		</div>
 	);
 }

@@ -52,6 +52,8 @@ export default function Header() {
 	const params = useParams({ strict: false });
 	const hasPathParams = Object.keys(params).length > 0;
 
+	const bettingLogo = "https://res.cloudinary.com/dc59hhvse/image/upload/v1771247662/HB-256xx256_nrpajz.png"
+
 	useEffect(() => {
 		if (open) {
 			document.documentElement.classList.add("overflow-hidden");
@@ -333,7 +335,7 @@ export default function Header() {
 											rel="noopener noreferrer"
 											className="cursor-pointer flex items-center gap-2"
 										>
-											<img src="/betting-logo.png" className="h-5 w-5 object-contain" alt="Betting" />
+											<img src={bettingLogo} className="h-5 w-5 object-contain" alt="Betting" />
 											SmartBet
 										</a>
 									</li>
@@ -344,7 +346,7 @@ export default function Header() {
 											rel="noopener noreferrer"
 											className="cursor-pointer flex items-center gap-2"
 										>
-											<img src="/betting-logo.png" className="h-5 w-5 object-contain" alt="Betting" />
+											<img src={bettingLogo} className="h-5 w-5 object-contain" alt="Betting" />
 											Jackpot
 										</a>
 									</li>
@@ -355,21 +357,21 @@ export default function Header() {
 											rel="noopener noreferrer"
 											className="cursor-pointer flex items-center gap-2"
 										>
-											<img src="/betting-logo.png" className="h-5 w-5 object-contain" alt="Betting" />
+											<img src={bettingLogo} className="h-5 w-5 object-contain" alt="Betting" />
 											QuickBetx
 										</a>
 									</li>
-									<li>
+									{/* <li>
 										<a
 											href="https://hallalotto.com/"
 											target="_blank"
 											rel="noopener noreferrer"
 											className="cursor-pointer flex items-center gap-2"
 										>
-											<img src="/betting-logo.png" className="h-5 w-5 object-contain" alt="Betting" />
+											<img src={bettingLogo} className="h-5 w-5 object-contain" alt="Betting" />
 											Play lottery
 										</a>
-									</li>
+									</li> */}
 
 
 
