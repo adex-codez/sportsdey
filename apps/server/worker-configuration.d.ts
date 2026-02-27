@@ -18,6 +18,7 @@ declare namespace Cloudflare {
 		BROADAGE_API_KEY: string;
 		PROXY_URL: string;
 		PROXY_SECRET: string;
+		STATSCORE_TOKEN: string;
 		DB: D1Database;
 	}
 }
@@ -43,6 +44,7 @@ declare namespace NodeJS {
 				| "BROADAGE_API_KEY"
 				| "PROXY_URL"
 				| "PROXY_SECRET"
+				| "STATSCORE_TOKEN"
 			>
 		> {}
 }

@@ -18,7 +18,6 @@ import {
 	transformFullProxyStandings,
 	transformProxyH2H,
 	transformProxyMatchInfo,
-	transformProxySchedule,
 	transformProxyStandings,
 	transformProxyStats,
 	transformProxyTopScorers,
@@ -31,389 +30,6 @@ import { footballVideosQuery } from "@/validators";
 
 const footballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
 
-// footballRoute.openapi(
-// 	createRoute({
-// 		method: "get",
-// 		path: "/{status}",
-// 		request: {
-// 			params: z.object({
-// 				status: z.string().openapi({
-// 					description: "Matches status either all, scheduled and live",
-// 					example: "all",
-// 				}),
-// 			}),
-// 			query: z.object({
-// 				lang: z
-// 					.string()
-// 					.optional()
-// 					.openapi({ description: "Language code", example: "en" }),
-// 				date: z.string().openapi({
-// 					description: "Schedule date (DD-MM-YYYY)",
-// 					example: "15/09/2024",
-// 				}),
-// 			}),
-// 		},
-// 		responses: {
-// 			200: {
-// 				description: "Transformed football schedule",
-// 				content: {
-// 					"application/json": {
-// 						schema: successResponseSchema(TransformedResponseSchema),
-// 					},
-// 				},
-// 			},
-// 			500: {
-// 				content: {
-// 					"application/json": {
-// 						schema: ErrorResponseSchema,
-// 					},
-// 				},
-// 				description: "Internal server error",
-// 			},
-// 			502: {
-// 				content: {
-// 					"application/json": {
-// 						schema: ErrorResponseSchema,
-// 					},
-// 				},
-// 				description: "Bad gateway - external API error",
-// 			},
-// 		},
-// 		tags: ["Football"],
-// 		summary: "Get football schedule for a given date",
-// 	}),
-// 	async (c) => {
-// 		const { status } = c.req.valid("param");
-// 		const { date } = c.req.valid("query");
-// 		const statscoreToken = c.env.STATSCORE_TOKEN;
-
-// 		if (!statscoreToken) {
-// 			return c.json(
-// 				{
-// 					success: false as const,
-// 					error: "Configuration error",
-// 					details: [
-// 						{
-// 							field: "STATSCORE_TOKEN",
-// 							message: "Statscore API token is missing",
-// 							code: "missing_api_key",
-// 						},
-// 					],
-// 				},
-// 				500,
-// 			);
-// 		}
-
-// 		const cacheKey = `football_schedule_${date}_${status}`;
-
-// 		const [day, month, year] = date.split("/");
-// 		const dateFrom = `${year}-${month}-${day} 00:00:00`;
-// 		const dateTo = `${year}-${month}-${day} 23:59:59`;
-
-// 		const url = `https://api.statscore.com/v2/events?token=${statscoreToken}&sport_id=5&date_from=${encodeURIComponent(
-// 			dateFrom,
-// 		)}&date_to=${encodeURIComponent(dateTo)}`;
-
-// 		let cachedData = null;
-// 		try {
-// 			cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-// 				data: any;
-// 				expiresAt: number;
-// 			} | null;
-// 		} catch (e) {
-// 			cachedData = null;
-// 		}
-
-// 		if (cachedData && Date.now() <= cachedData.expiresAt) {
-// 			return c.json(
-// 				{
-// 					success: true as const,
-// 					data: cachedData.data,
-// 				},
-// 				200,
-// 			);
-// 		}
-
-// 		try {
-// 			let upstream: Response;
-// 			try {
-// 				upstream = await fetchWithTimeout(
-// 					url,
-// 					{
-// 						headers: {
-// 							Accept: "application/json",
-// 						},
-// 					},
-// 					10000,
-// 				);
-// 			} catch (err) {
-// 				if (isTimeoutError(err)) {
-// 					return c.json(
-// 						{
-// 							success: false as const,
-// 							error: "Gateway timeout",
-// 							details: [
-// 								{
-// 									field: "statscore_api",
-// 									message: "Statscore API request timed out",
-// 									code: "timeout_error",
-// 								},
-// 							],
-// 						},
-// 						502,
-// 					);
-// 				}
-// 				throw err;
-// 			}
-
-// 			if (!upstream.ok) {
-// 				console.log(await upstream.json());
-// 				return c.json(
-// 					{
-// 						success: false as const,
-// 						error: "External API error",
-// 						details: [
-// 							{
-// 								field: "statscore_api",
-// 								message: `Statscore API returned status ${upstream.status}`,
-// 								code: "external_api_error",
-// 							},
-// 						],
-// 					},
-// 					502,
-// 				);
-// 			}
-
-// 			const data = (await upstream.json()) as any;
-
-// 			const transformedData = transformSchedule(data);
-
-// 			await c.env.sportsdey_ns.put(
-// 				cacheKey,
-// 				JSON.stringify({
-// 					data: transformedData,
-// 					expiresAt: Date.now() + 30 * 1000,
-// 				}),
-// 			);
-
-// 			return c.json(
-// 				{
-// 					success: true as const,
-// 					data: transformedData,
-// 				},
-// 				200,
-// 			);
-// 		} catch (err) {
-// 			return c.json(
-// 				{
-// 					success: false as const,
-// 					error: "Internal server error",
-// 					details: [
-// 						{
-// 							field: "server",
-// 							message:
-// 								"An unexpected error occurred while processing your request",
-// 							code: "internal_error",
-// 						},
-// 					],
-// 				},
-// 				500,
-// 			);
-// 		}
-// 	},
-// );
-
-// footballRoute.openapi(
-// 	createRoute({
-// 		method: "get",
-// 		path: "/tournament/{tournamentId}",
-// 		request: {
-// 			params: z.object({
-// 				tournamentId: z.string().openapi({
-// 					description: "Tournament ID",
-// 					example: "2",
-// 				}),
-// 			}),
-// 			query: z.object({
-// 				date: z.string().openapi({
-// 					description: "Schedule date (DD-MM-YYYY)",
-// 					example: "15/09/2024",
-// 				}),
-// 			}),
-// 		},
-// 		responses: {
-// 			200: {
-// 				description: "Filtered tournament schedule",
-// 				content: {
-// 					"application/json": {
-// 						schema: successResponseSchema(TournamentScheduleSchema),
-// 					},
-// 				},
-// 			},
-// 			500: {
-// 				content: {
-// 					"application/json": {
-// 						schema: ErrorResponseSchema,
-// 					},
-// 				},
-// 				description: "Internal server error",
-// 			},
-// 			502: {
-// 				content: {
-// 					"application/json": {
-// 						schema: ErrorResponseSchema,
-// 					},
-// 				},
-// 				description: "Bad gateway - external API error",
-// 			},
-// 		},
-// 		tags: ["Football"],
-// 		summary: "Get football schedule for a given date filtered by tournament ID",
-// 	}),
-// 	async (c) => {
-// 		const { tournamentId } = c.req.valid("param");
-// 		const { date } = c.req.valid("query");
-// 		const statscoreToken = c.env.STATSCORE_TOKEN;
-
-// 		if (!statscoreToken) {
-// 			return c.json(
-// 				{
-// 					success: false as const,
-// 					error: "Configuration error",
-// 					details: [
-// 						{
-// 							field: "STATSCORE_TOKEN",
-// 							message: "Statscore API token is missing",
-// 							code: "missing_api_key",
-// 						},
-// 					],
-// 				},
-// 				500,
-// 			);
-// 		}
-
-// 		const cacheKey = `football_tournament_schedule_${tournamentId}_${date}`;
-
-// 		const [day, month, year] = date.split("/");
-// 		const dateFrom = `${year}-${month}-${day} 00:00:00`;
-// 		const dateTo = `${year}-${month}-${day} 23:59:59`;
-
-// 		const url = `https://api.statscore.com/v2/events?token=${statscoreToken}&sport_id=5&date_from=${encodeURIComponent(
-// 			dateFrom,
-// 		)}&date_to=${encodeURIComponent(dateTo)}&events_details=yes&hasCompetitionsOrder=true`;
-
-// 		let cachedData = null;
-// 		try {
-// 			cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
-// 				data: any;
-// 				expiresAt: number;
-// 			} | null;
-// 		} catch (e) {
-// 			cachedData = null;
-// 		}
-
-// 		if (cachedData && Date.now() <= cachedData.expiresAt) {
-// 			return c.json(
-// 				{
-// 					success: true as const,
-// 					data: cachedData.data,
-// 				},
-// 				200,
-// 			);
-// 		}
-
-// 		try {
-// 			let upstream: Response;
-// 			try {
-// 				upstream = await fetchWithTimeout(
-// 					url,
-// 					{
-// 						headers: {
-// 							Accept: "application/json",
-// 						},
-// 					},
-// 					10000,
-// 				);
-// 			} catch (err) {
-// 				if (isTimeoutError(err)) {
-// 					return c.json(
-// 						{
-// 							success: false as const,
-// 							error: "Gateway timeout",
-// 							details: [
-// 								{
-// 									field: "statscore_api",
-// 									message: "Statscore API request timed out",
-// 									code: "timeout_error",
-// 								},
-// 							],
-// 						},
-// 						502,
-// 					);
-// 				}
-// 				throw err;
-// 			}
-
-// 			if (!upstream.ok) {
-// 				return c.json(
-// 					{
-// 						success: false as const,
-// 						error: "External API error",
-// 						details: [
-// 							{
-// 								field: "statscore_api",
-// 								message: `Statscore API returned status ${upstream.status}`,
-// 								code: "external_api_error",
-// 							},
-// 						],
-// 					},
-// 					502,
-// 				);
-// 			}
-
-// 			const rawData = (await upstream.json()) as any;
-
-// 			const transformedData = transformTournamentSchedule(
-// 				rawData,
-// 				tournamentId,
-// 			);
-
-// 			await c.env.sportsdey_ns.put(
-// 				cacheKey,
-// 				JSON.stringify({
-// 					data: transformedData,
-// 					expiresAt: Date.now() + 30 * 1000,
-// 				}),
-// 			);
-
-// 			return c.json(
-// 				{
-// 					success: true as const,
-// 					data: transformedData,
-// 				},
-// 				200,
-// 			);
-// 		} catch (err) {
-// 			return c.json(
-// 				{
-// 					success: false as const,
-// 					error: "Internal server error",
-// 					details: [
-// 						{
-// 							field: "server",
-// 							message:
-// 								"An unexpected error occurred while processing your request",
-// 							code: "internal_error",
-// 						},
-// 					],
-// 				},
-// 				500,
-// 			);
-// 		}
-// 	},
-// );
-//
-//
 footballRoute.openapi(
 	createRoute({
 		method: "get",
@@ -468,20 +84,34 @@ footballRoute.openapi(
 	async (c) => {
 		const { status } = c.req.valid("param");
 		const { date } = c.req.valid("query");
-		const base = c.env.PROXY_URL;
-		const proxySecret = c.env.PROXY_SECRET;
+		const statscoreToken = c.env.STATSCORE_TOKEN;
 
-		let url = "";
-		const cleanBase = base.replace(/\/+$/, "");
-
-		if (status === "all") {
-			url = `${cleanBase}/soccer/match/list?date=${date}`;
-		} else {
-			url = `${cleanBase}/soccer/match/list/${encodeURIComponent(
-				status,
-			)}/?date=${date}`;
+		if (!statscoreToken) {
+			return c.json(
+				{
+					success: false as const,
+					error: "Configuration error",
+					details: [
+						{
+							field: "STATSCORE_TOKEN",
+							message: "Statscore API token is missing",
+							code: "missing_api_key",
+						},
+					],
+				},
+				500,
+			);
 		}
+
 		const cacheKey = `football_schedule_${date}_${status}`;
+
+		const [day, month, year] = date.split("/");
+		const dateFrom = `${year}-${month}-${day} 00:00:00`;
+		const dateTo = `${year}-${month}-${day} 23:59:59`;
+
+		const url = `https://api.statscore.com/v2/events?token=${statscoreToken}&sport_id=5&date_from=${encodeURIComponent(
+			dateFrom,
+		)}&date_to=${encodeURIComponent(dateTo)}`;
 
 		let cachedData = null;
 		try {
@@ -510,7 +140,6 @@ footballRoute.openapi(
 					url,
 					{
 						headers: {
-							"X-Proxy-Auth": proxySecret,
 							Accept: "application/json",
 						},
 					},
@@ -524,8 +153,8 @@ footballRoute.openapi(
 							error: "Gateway timeout",
 							details: [
 								{
-									field: "proxy_api",
-									message: "Proxy API request timed out",
+									field: "statscore_api",
+									message: "Statscore API request timed out",
 									code: "timeout_error",
 								},
 							],
@@ -537,14 +166,15 @@ footballRoute.openapi(
 			}
 
 			if (!upstream.ok) {
+				console.log(await upstream.json());
 				return c.json(
 					{
 						success: false as const,
 						error: "External API error",
 						details: [
 							{
-								field: "proxy_api",
-								message: `Proxy API returned status ${upstream.status}`,
+								field: "statscore_api",
+								message: `Statscore API returned status ${upstream.status}`,
 								code: "external_api_error",
 							},
 						],
@@ -553,9 +183,9 @@ footballRoute.openapi(
 				);
 			}
 
-			const data = (await upstream.json()) as any[];
+			const data = (await upstream.json()) as any;
 
-			const transformedData = transformProxySchedule(data);
+			const transformedData = transformSchedule(data);
 
 			await c.env.sportsdey_ns.put(
 				cacheKey,
@@ -642,12 +272,34 @@ footballRoute.openapi(
 	async (c) => {
 		const { tournamentId } = c.req.valid("param");
 		const { date } = c.req.valid("query");
-		const base = c.env.PROXY_URL;
-		const proxySecret = c.env.PROXY_SECRET;
-		const cleanBase = base.replace(/\/+$/, "");
-		const url = `${cleanBase}/soccer/match/list?date=${date}`;
+		const statscoreToken = c.env.STATSCORE_TOKEN;
+
+		if (!statscoreToken) {
+			return c.json(
+				{
+					success: false as const,
+					error: "Configuration error",
+					details: [
+						{
+							field: "STATSCORE_TOKEN",
+							message: "Statscore API token is missing",
+							code: "missing_api_key",
+						},
+					],
+				},
+				500,
+			);
+		}
 
 		const cacheKey = `football_tournament_schedule_${tournamentId}_${date}`;
+
+		const [day, month, year] = date.split("/");
+		const dateFrom = `${year}-${month}-${day} 00:00:00`;
+		const dateTo = `${year}-${month}-${day} 23:59:59`;
+
+		const url = `https://api.statscore.com/v2/events?token=${statscoreToken}&sport_id=5&date_from=${encodeURIComponent(
+			dateFrom,
+		)}&date_to=${encodeURIComponent(dateTo)}&events_details=yes&hasCompetitionsOrder=true`;
 
 		let cachedData = null;
 		try {
@@ -676,7 +328,6 @@ footballRoute.openapi(
 					url,
 					{
 						headers: {
-							"X-Proxy-Auth": proxySecret,
 							Accept: "application/json",
 						},
 					},
@@ -690,8 +341,8 @@ footballRoute.openapi(
 							error: "Gateway timeout",
 							details: [
 								{
-									field: "proxy_api",
-									message: "Proxy API request timed out",
+									field: "statscore_api",
+									message: "Statscore API request timed out",
 									code: "timeout_error",
 								},
 							],
@@ -709,8 +360,8 @@ footballRoute.openapi(
 						error: "External API error",
 						details: [
 							{
-								field: "proxy_api",
-								message: `Proxy API returned status ${upstream.status}`,
+								field: "statscore_api",
+								message: `Statscore API returned status ${upstream.status}`,
 								code: "external_api_error",
 							},
 						],
@@ -719,34 +370,17 @@ footballRoute.openapi(
 				);
 			}
 
-			const rawData = (await upstream.json()) as any[];
+			const rawData = (await upstream.json()) as any;
 
-			const filteredData = rawData.filter(
-				(match: any) => match.tournament?.id?.toString() === tournamentId,
+			const transformedData = transformTournamentSchedule(
+				rawData,
+				tournamentId,
 			);
-
-			if (filteredData.length === 0) {
-				return c.json(
-					{
-						success: true as const,
-						data: {
-							matches: [],
-							total_matches: 0,
-							competition: {
-								id: tournamentId,
-								name: "Unknown Competition",
-							},
-						},
-					},
-					200,
-				);
-			}
-			const transformedata = transformTournamentSchedule(filteredData);
 
 			await c.env.sportsdey_ns.put(
 				cacheKey,
 				JSON.stringify({
-					data: transformedata,
+					data: transformedData,
 					expiresAt: Date.now() + 30 * 1000,
 				}),
 			);
@@ -754,7 +388,7 @@ footballRoute.openapi(
 			return c.json(
 				{
 					success: true as const,
-					data: transformedata,
+					data: transformedData,
 				},
 				200,
 			);
