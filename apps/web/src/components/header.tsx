@@ -4,7 +4,7 @@ import {
 	useParams,
 	useRouter,
 } from "@tanstack/react-router";
-import { CalendarDays, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
+import { CalendarDays, ChevronDown, ChevronRight, Menu, Video, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useCurrentFilter } from "@/hooks/use-current-filter";
 import { useCurrentSport } from "@/hooks/use-current-sport";
@@ -51,6 +51,8 @@ export default function Header() {
 
 	const params = useParams({ strict: false });
 	const hasPathParams = Object.keys(params).length > 0;
+
+	const bettingLogo = "https://res.cloudinary.com/dc59hhvse/image/upload/v1771247662/HB-256xx256_nrpajz.png"
 
 	useEffect(() => {
 		if (open) {
@@ -317,12 +319,23 @@ export default function Header() {
 									</li> */}
 									<li>
 										<a
+											href="https://www.youtube.com/playlist?list=PLfYN70E9S81O0_bio6u3c9rc-mhBlbdBn"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="cursor-pointer flex items-center gap-2"
+										>
+											<Video className="h-5 w-5 object-contain text-gray-500 dark:text-white" />
+											Tutorials
+										</a>
+									</li>
+									<li>
+										<a
 											href="https://sportsdey.com/betting"
 											target="_blank"
 											rel="noopener noreferrer"
 											className="cursor-pointer flex items-center gap-2"
 										>
-											<img src="/betting-logo.png" className="h-5 w-5 object-contain" alt="Betting" />
+											<img src={bettingLogo} className="h-5 w-5 object-contain" alt="Betting" />
 											SmartBet
 										</a>
 									</li>
@@ -333,7 +346,7 @@ export default function Header() {
 											rel="noopener noreferrer"
 											className="cursor-pointer flex items-center gap-2"
 										>
-											<img src="/betting-logo.png" className="h-5 w-5 object-contain" alt="Betting" />
+											<img src={bettingLogo} className="h-5 w-5 object-contain" alt="Betting" />
 											Jackpot
 										</a>
 									</li>
@@ -344,21 +357,21 @@ export default function Header() {
 											rel="noopener noreferrer"
 											className="cursor-pointer flex items-center gap-2"
 										>
-											<img src="/betting-logo.png" className="h-5 w-5 object-contain" alt="Betting" />
+											<img src={bettingLogo} className="h-5 w-5 object-contain" alt="Betting" />
 											QuickBetx
 										</a>
 									</li>
-									<li>
+									{/* <li>
 										<a
 											href="https://hallalotto.com/"
 											target="_blank"
 											rel="noopener noreferrer"
 											className="cursor-pointer flex items-center gap-2"
 										>
-											<img src="/betting-logo.png" className="h-5 w-5 object-contain" alt="Betting" />
+											<img src={bettingLogo} className="h-5 w-5 object-contain" alt="Betting" />
 											Play lottery
 										</a>
-									</li>
+									</li> */}
 
 
 
