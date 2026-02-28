@@ -90,6 +90,8 @@ export const verification = sqliteTable(
 export const userRelations = relations(user, ({ many }) => ({
 	sessions: many(session),
 	accounts: many(account),
+	wallets: many(wallet),
+	walletTransactions: many(walletTransaction),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -105,3 +107,58 @@ export const accountRelations = relations(account, ({ one }) => ({
 		references: [user.id],
 	}),
 }));
+
+export const wallet = sqliteTable("wallet", {
+	id: text("id").primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" })
+		.unique(),
+	balance: integer("balance").notNull().default(0),
+	createdAt: integer("created_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.notNull(),
+	updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.$onUpdate(() => /* @__PURE__ */ new Date())
+		.notNull(),
+});
+
+export const walletTransaction = sqliteTable(
+	"wallet_transaction",
+	{
+		id: text("id").primaryKey(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		amount: integer("amount").notNull(),
+		type: text("type").notNull(),
+		reference: text("reference").notNull().unique(),
+		status: text("status").notNull(),
+		createdAt: integer("created_at", { mode: "timestamp_ms" })
+			.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+			.notNull(),
+	},
+	(table) => [
+		index("wallet_transaction_userId_idx").on(table.userId),
+		index("wallet_transaction_status_idx").on(table.status),
+	],
+);
+
+export const walletRelations = relations(wallet, ({ one, many }) => ({
+	user: one(user, {
+		fields: [wallet.userId],
+		references: [user.id],
+	}),
+	transactions: many(walletTransaction),
+}));
+
+export const walletTransactionRelations = relations(
+	walletTransaction,
+	({ one }) => ({
+		user: one(user, {
+			fields: [walletTransaction.userId],
+			references: [user.id],
+		}),
+	}),
+);

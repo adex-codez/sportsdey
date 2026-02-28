@@ -1,20 +1,37 @@
-import { env } from "cloudflare:workers";
 import { swaggerUI } from "@hono/swagger-ui";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { createAuth } from "./auth";
 import routes from "./routes/route";
+import type { CloudflareBindings } from "./types";
 
-const app = new OpenAPIHono();
+const app = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
 
 app.use(logger());
 app.use(
 	"/*",
 	cors({
-		origin: "*",
+		origin: (origin) => origin,
 		allowMethods: ["GET", "POST", "OPTIONS"],
+		credentials: true,
 	}),
 );
+
+app.use("*", async (c, next) => {
+	const auth = createAuth(c.env);
+	const session = await auth.api.getSession({
+		headers: c.req.raw.headers,
+	});
+	c.set("session", session);
+	c.set("user", session?.user ?? null);
+	await next();
+});
+
+app.on(["GET", "POST"], "/auth/*", async (c) => {
+	const auth = createAuth(c.env);
+	return auth.handler(c.req.raw);
+});
 
 app.route("/", routes);
 
