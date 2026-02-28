@@ -15,7 +15,27 @@
   ],
 	"observability": {
 		"enabled": true
-	}
+	},
+  "env": {
+      "staging": {
+        "name": "staging-web",
+        "routes": [
+          {
+            "pattern": "stagingweb.sportsdey.com",
+            "custom_domain": true
+          }
+        ],
+      },
+      "production": {
+            "name": "prod-web",
+            "routes": [
+              {
+                "pattern": "sportsdey.com",
+                "custom_domain": true
+              }
+          ],
+      }
+  }
 	// "kv_namespaces": [
 	//   {
 	//     "binding": "CACHE",

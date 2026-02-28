@@ -23,6 +23,9 @@ import { Route as NewsSlugRouteImport } from './routes/news.$slug'
 import { Route as IndexGameIdRouteImport } from './routes/index.$gameId'
 import { Route as BasketballIdRouteImport } from './routes/basketball/$Id'
 import { Route as AuthorsSlugRouteImport } from './routes/authors.$slug'
+import { Route as AuthSignUpRouteImport } from './routes/auth/sign-up'
+import { Route as AuthSignInRouteImport } from './routes/auth/sign-in'
+import { Route as AuthLayoutRouteImport } from './routes/auth/_layout'
 import { Route as NewsSlugOgRouteImport } from './routes/news.$slug.og'
 import { Route as IndexTournamentTournamentIdRouteImport } from './routes/index.tournament.$tournamentId'
 import { Route as BasketballTournamentTournamentIdRouteImport } from './routes/basketball.tournament.$tournamentId'
@@ -97,6 +100,21 @@ const AuthorsSlugRoute = AuthorsSlugRouteImport.update({
   path: '/authors/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthSignUpRoute = AuthSignUpRouteImport.update({
+  id: '/auth/sign-up',
+  path: '/auth/sign-up',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSignInRoute = AuthSignInRouteImport.update({
+  id: '/auth/sign-in',
+  path: '/auth/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLayoutRoute = AuthLayoutRouteImport.update({
+  id: '/auth/_layout',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NewsSlugOgRoute = NewsSlugOgRouteImport.update({
   id: '/og',
   path: '/og',
@@ -122,6 +140,9 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof FavoritesRoute
   '/news': typeof NewsRouteWithChildren
   '/tennis': typeof TennisRouteWithChildren
+  '/auth': typeof AuthLayoutRoute
+  '/auth/sign-in': typeof AuthSignInRoute
+  '/auth/sign-up': typeof AuthSignUpRoute
   '/authors/$slug': typeof AuthorsSlugRoute
   '/basketball/$Id': typeof BasketballIdRoute
   '/index/$gameId': typeof IndexGameIdRoute
@@ -138,6 +159,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/betting': typeof BettingRoute
   '/favorites': typeof FavoritesRoute
+  '/auth': typeof AuthLayoutRoute
+  '/auth/sign-in': typeof AuthSignInRoute
+  '/auth/sign-up': typeof AuthSignUpRoute
   '/authors/$slug': typeof AuthorsSlugRoute
   '/basketball/$Id': typeof BasketballIdRoute
   '/index/$gameId': typeof IndexGameIdRoute
@@ -158,6 +182,9 @@ export interface FileRoutesById {
   '/favorites': typeof FavoritesRoute
   '/news': typeof NewsRouteWithChildren
   '/tennis': typeof TennisRouteWithChildren
+  '/auth/_layout': typeof AuthLayoutRoute
+  '/auth/sign-in': typeof AuthSignInRoute
+  '/auth/sign-up': typeof AuthSignUpRoute
   '/authors/$slug': typeof AuthorsSlugRoute
   '/basketball/$Id': typeof BasketballIdRoute
   '/index/$gameId': typeof IndexGameIdRoute
@@ -179,6 +206,9 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/news'
     | '/tennis'
+    | '/auth'
+    | '/auth/sign-in'
+    | '/auth/sign-up'
     | '/authors/$slug'
     | '/basketball/$Id'
     | '/index/$gameId'
@@ -195,6 +225,9 @@ export interface FileRouteTypes {
     | '/'
     | '/betting'
     | '/favorites'
+    | '/auth'
+    | '/auth/sign-in'
+    | '/auth/sign-up'
     | '/authors/$slug'
     | '/basketball/$Id'
     | '/index/$gameId'
@@ -214,6 +247,9 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/news'
     | '/tennis'
+    | '/auth/_layout'
+    | '/auth/sign-in'
+    | '/auth/sign-up'
     | '/authors/$slug'
     | '/basketball/$Id'
     | '/index/$gameId'
@@ -234,6 +270,9 @@ export interface RootRouteChildren {
   FavoritesRoute: typeof FavoritesRoute
   NewsRoute: typeof NewsRouteWithChildren
   TennisRoute: typeof TennisRouteWithChildren
+  AuthLayoutRoute: typeof AuthLayoutRoute
+  AuthSignInRoute: typeof AuthSignInRoute
+  AuthSignUpRoute: typeof AuthSignUpRoute
   AuthorsSlugRoute: typeof AuthorsSlugRoute
   IndexGameIdRoute: typeof IndexGameIdRoute
   IndexTournamentTournamentIdRoute: typeof IndexTournamentTournamentIdRoute
@@ -339,6 +378,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthorsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/sign-up': {
+      id: '/auth/sign-up'
+      path: '/auth/sign-up'
+      fullPath: '/auth/sign-up'
+      preLoaderRoute: typeof AuthSignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/sign-in': {
+      id: '/auth/sign-in'
+      path: '/auth/sign-in'
+      fullPath: '/auth/sign-in'
+      preLoaderRoute: typeof AuthSignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/_layout': {
+      id: '/auth/_layout'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/news/$slug/og': {
       id: '/news/$slug/og'
       path: '/og'
@@ -423,6 +483,9 @@ const rootRouteChildren: RootRouteChildren = {
   FavoritesRoute: FavoritesRoute,
   NewsRoute: NewsRouteWithChildren,
   TennisRoute: TennisRouteWithChildren,
+  AuthLayoutRoute: AuthLayoutRoute,
+  AuthSignInRoute: AuthSignInRoute,
+  AuthSignUpRoute: AuthSignUpRoute,
   AuthorsSlugRoute: AuthorsSlugRoute,
   IndexGameIdRoute: IndexGameIdRoute,
   IndexTournamentTournamentIdRoute: IndexTournamentTournamentIdRoute,
