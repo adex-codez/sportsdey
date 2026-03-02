@@ -21,7 +21,6 @@ import { useDateContext } from "./date-context";
 import { socials } from "./socials";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "./ui/button";
-import { UserMenu } from "./user-menu";
 
 export default function Header() {
 	const currentSport = useCurrentSport();
@@ -104,7 +103,6 @@ export default function Header() {
 					</Link>
 
 					<div className="flex items-center gap-2">
-						<UserMenu />
 						<ThemeToggle />
 					</div>
 				</div>
@@ -146,7 +144,6 @@ export default function Header() {
 						</nav>
 					</div>
 					<div className="flex items-center gap-2">
-						<UserMenu />
 						<ThemeToggle />
 					</div>
 				</div>
@@ -605,7 +602,7 @@ export default function Header() {
 							title="Calendar disabled for this release"
 						>
 							<CalendarDays className="text-secondary" width={24} height={24} />
-							
+
 						</button> */}
 					</div>
 				) : null}
