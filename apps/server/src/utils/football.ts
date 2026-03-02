@@ -8,6 +8,126 @@ import type {
 	TransformedResponse,
 } from "@/types/football";
 
+import { parseDateString } from ".";
+
+export function transformProxySchedule(data: any[]): TransformedResponse {
+	const competitionMap = new Map<string, CompetitionGroup>();
+
+	data.forEach((matchData) => {
+		const { tournament, homeTeam, awayTeam, status, times, date, id } =
+			matchData;
+		if (status.shortName === "PSP") return;
+		if (status.shortName === "CNC") return;
+
+		const competitionId = tournament.id;
+
+		if (!competitionMap.has(competitionId)) {
+			competitionMap.set(competitionId, {
+				competition: {
+					id: tournament.id,
+					name: tournament.name,
+				},
+				matches: [],
+			});
+		}
+
+		const match: TransformedMatch = {
+			id: id,
+			competitors: {
+				home: {
+					id: homeTeam.id,
+					name: homeTeam.name,
+					score: homeTeam.score?.current ?? 0,
+				},
+				away: {
+					id: awayTeam.id,
+					name: awayTeam.name,
+					score: awayTeam.score?.current ?? 0,
+				},
+			},
+			start_time: parseDateString(date),
+			match_status: status.shortName === "FT" ? "closed" : status.shortName,
+			...(times?.currentMinute
+				? {
+						clock: times.currentMinute,
+					}
+				: {}),
+		};
+		competitionMap.get(competitionId)!.matches.push(match);
+	});
+
+	const competitions = Array.from(competitionMap.values());
+
+	// Sort competitions to show major leagues first
+	const priorityLeagues = [
+		"Champions League",
+		"English Premier League",
+		"Spanish La Liga",
+		"Spanish La Liga 2",
+		"African Cup of Nations",
+		"Italian Serie A",
+		"French Ligue 1",
+		"UEFA Europa League",
+		"Carabao Cup",
+		"Copa del Rey",
+	];
+
+	competitions.sort((a, b) => {
+		const aName = a.competition.name;
+		const bName = b.competition.name;
+
+		const aIndex = priorityLeagues.findIndex((league) => aName === league);
+		const bIndex = priorityLeagues.findIndex((league) => bName === league);
+
+		if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+		if (aIndex !== -1) return -1;
+		if (bIndex !== -1) return 1;
+
+		return aName.localeCompare(bName);
+	});
+
+	const total_matches = data.length;
+
+	return { competitions, total_matches };
+}
+
+export function transformTournamentSchedule(
+	data: any[],
+): z.infer<typeof TournamentScheduleSchema> {
+	const matches = data.map((matchData) => {
+		const { homeTeam, awayTeam, status, times, date, id } = matchData;
+
+		return {
+			id: id,
+			competitors: {
+				home: {
+					id: homeTeam.id,
+					name: homeTeam.name,
+					score: homeTeam.score?.current ?? 0,
+				},
+				away: {
+					id: awayTeam.id,
+					name: awayTeam.name,
+					score: awayTeam.score?.current ?? 0,
+				},
+			},
+			start_time: parseDateString(date),
+			match_status: status.shortName === "FT" ? "closed" : status.shortName,
+			...(times?.currentMinute
+				? {
+						clock: times.currentMinute,
+					}
+				: {}),
+		};
+	});
+
+	const competition = {
+		name: data[0].tournament.name,
+		id: data[0].tournament.id,
+	};
+	return { matches, total_matches: matches.length, competition };
+}
+
 interface StatscoreEvent {
 	id: number;
 	name: string;
@@ -394,74 +514,74 @@ export function transformFullProxyStandings(
 	};
 }
 
-export function transformTournamentSchedule(
-	data: StatscoreApiResponse,
-	tournamentId: string,
-): z.infer<typeof TournamentScheduleSchema> {
-	const allMatches: TransformedMatch[] = [];
-	let competitionName = "Unknown Competition";
+// export function transformTournamentSchedule(
+// 	data: StatscoreApiResponse,
+// 	tournamentId: string,
+// ): z.infer<typeof TournamentScheduleSchema> {
+// 	const allMatches: TransformedMatch[] = [];
+// 	let competitionName = "Unknown Competition";
 
-	const competitions = data.api?.data?.competitions || [];
+// 	const competitions = data.api?.data?.competitions || [];
 
-	competitions.forEach((comp) => {
-		if (comp.id.toString() !== tournamentId) return;
+// 	competitions.forEach((comp) => {
+// 		if (comp.id.toString() !== tournamentId) return;
 
-		competitionName = comp.name;
+// 		competitionName = comp.name;
 
-		comp.seasons.forEach((season) => {
-			season.stages.forEach((stage) => {
-				stage.groups.forEach((group) => {
-					group.events.forEach((event) => {
-						if (event.status_name === "Postponed") return;
-						if (event.status_name === "Cancelled") return;
+// 		comp.seasons.forEach((season) => {
+// 			season.stages.forEach((stage) => {
+// 				stage.groups.forEach((group) => {
+// 					group.events.forEach((event) => {
+// 						if (event.status_name === "Postponed") return;
+// 						if (event.status_name === "Cancelled") return;
 
-						const homeParticipant = event.participants.find(
-							(p) => p.counter === 1,
-						);
-						const awayParticipant = event.participants.find(
-							(p) => p.counter === 2,
-						);
+// 						const homeParticipant = event.participants.find(
+// 							(p) => p.counter === 1,
+// 						);
+// 						const awayParticipant = event.participants.find(
+// 							(p) => p.counter === 2,
+// 						);
 
-						const match: TransformedMatch = {
-							id: event.id.toString(),
-							competitors: {
-								home: {
-									id: homeParticipant?.id.toString() || "",
-									name:
-										homeParticipant?.short_name || homeParticipant?.name || "",
-									score: homeParticipant
-										? getParticipantScore(homeParticipant)
-										: 0,
-								},
-								away: {
-									id: awayParticipant?.id.toString() || "",
-									name:
-										awayParticipant?.short_name || awayParticipant?.name || "",
-									score: awayParticipant
-										? getParticipantScore(awayParticipant)
-										: 0,
-								},
-							},
-							start_time: parseStatscoreDate(event.start_date),
-							match_status: mapStatscoreStatus(
-								event.status_id,
-								event.status_type,
-							),
-						};
+// 						const match: TransformedMatch = {
+// 							id: event.id.toString(),
+// 							competitors: {
+// 								home: {
+// 									id: homeParticipant?.id.toString() || "",
+// 									name:
+// 										homeParticipant?.short_name || homeParticipant?.name || "",
+// 									score: homeParticipant
+// 										? getParticipantScore(homeParticipant)
+// 										: 0,
+// 								},
+// 								away: {
+// 									id: awayParticipant?.id.toString() || "",
+// 									name:
+// 										awayParticipant?.short_name || awayParticipant?.name || "",
+// 									score: awayParticipant
+// 										? getParticipantScore(awayParticipant)
+// 										: 0,
+// 								},
+// 							},
+// 							start_time: parseStatscoreDate(event.start_date),
+// 							match_status: mapStatscoreStatus(
+// 								event.status_id,
+// 								event.status_type,
+// 							),
+// 						};
 
-						allMatches.push(match);
-					});
-				});
-			});
-		});
-	});
+// 						allMatches.push(match);
+// 					});
+// 				});
+// 			});
+// 		});
+// 	});
 
-	return {
-		matches: allMatches,
-		total_matches: allMatches.length,
-		competition: {
-			id: Number.parseInt(tournamentId, 10),
-			name: competitionName,
-		},
-	};
-}
+// 	return {
+// 		matches: allMatches,
+// 		total_matches: allMatches.length,
+// 		competition: {
+// 			id: Number.parseInt(tournamentId, 10),
+// 			name: competitionName,
+// 		},
+// 	};
+// }
