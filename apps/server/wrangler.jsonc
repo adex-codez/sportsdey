@@ -42,39 +42,29 @@
       "name": "sportsdey-prod",
       "routes": ["api.sportsdey.com"],
       "d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "sportsdey_db",
-			"database_id": "d091e50e-e19f-40dc-ad77-e7050c7bbbad",
-			"remote": false,
-			"migrations_dir": "./src/db/migrations"
-		}
-	],
-	"kv_namespaces": [
-		{
-			"binding": "sportsdey_ns",
-			"id": "7720322efb504b96a392d8acfe37ad4b",
-			"remote": false
-		}
-	]
-    }
-  },
-	"vars": {
-		"NODE_ENV": "production",
-		"CORS_ORIGIN": "https://sportsdey.adeaduratimilehin.workers.dev"
-		// Add public environment variables here
-		// Example: "CORS_ORIGIN": "https://your-domain.com"
-	},
-	// For sensitive data, use:
-	// wrangler secret put SECRET_NAME
-	// Don't add secrets to "vars" - they're visible in the dashboard!
-	// To set up D1 database:
-	// 1. Run: wrangler login
-	// 2. Run: wrangler d1 create your-database-name
-	// 3. Copy the output and paste below
-	// Then run migrations:
-	// bun db:generate
-	// To apply migrations locally, run:
-	// wrangler d1 migrations apply YOUR_DB_NAME --local
+    		{
+   			"binding": "DB",
+   			"database_name": "sportsdey_db",
+   			"database_id": "d091e50e-e19f-40dc-ad77-e7050c7bbbad",
+   			"remote": false,
+   			"migrations_dir": "./src/db/migrations"
+    		}
+   	  ],
+     	"kv_namespaces": [
+    		{
+   			"binding": "sportsdey_ns",
+   			"id": "7720322efb504b96a392d8acfe37ad4b",
+   			"remote": false
+    		}
+      ],
+      "vars": {
+    		"NODE_ENV": "production",
+    		"CORS_ORIGIN": "https://sportsdey.adeaduratimilehin.workers.dev"
+    		// Add public environment variables here
+    		// Example: "CORS_ORIGIN": "https://your-domain.com"
+     	},
+    },
+
+  }
 
 }
