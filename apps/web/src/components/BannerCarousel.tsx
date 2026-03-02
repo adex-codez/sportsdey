@@ -1,7 +1,6 @@
 import { clsx } from "clsx";
 import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import type { BannerData } from "@/lib/banners-server";
 
@@ -36,14 +35,6 @@ const BannerCarousel = ({ banners }: BannerCarouselProps) => {
 	const onSelect = useCallback(() => {
 		if (!emblaApi) return;
 		setSelectedIndex(emblaApi.selectedScrollSnap());
-	}, [emblaApi]);
-
-	const scrollPrev = useCallback(() => {
-		if (emblaApi) emblaApi.scrollPrev();
-	}, [emblaApi]);
-
-	const scrollNext = useCallback(() => {
-		if (emblaApi) emblaApi.scrollNext();
 	}, [emblaApi]);
 
 	useEffect(() => {
@@ -86,7 +77,7 @@ const BannerCarousel = ({ banners }: BannerCarouselProps) => {
 	}
 
 	return (
-		<div className="relative w-full group">
+		<div className="relative w-full">
 			<div className="overflow-hidden" ref={emblaRef}>
 				<div className="flex">
 					{banners.map((banner) => (
@@ -110,21 +101,6 @@ const BannerCarousel = ({ banners }: BannerCarouselProps) => {
 					))}
 				</div>
 			</div>
-
-			<button
-				className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/30 p-1.5 text-white/70 backdrop-blur-sm transition-all hover:bg-black/50 hover:text-white disabled:opacity-0 md:left-4 md:p-2 cursor-pointer"
-				onClick={scrollPrev}
-			>
-				<ChevronLeft className="h-4 w-4 md:h-6 md:w-6" />
-			</button>
-
-			<button
-				className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/30 p-1.5 text-white/70 backdrop-blur-sm transition-all hover:bg-black/50 hover:text-white disabled:opacity-0 md:right-4 md:p-2 cursor-pointer"
-				onClick={scrollNext}
-			>
-				<ChevronRight className="h-4 w-4 md:h-6 md:w-6" />
-			</button>
-
 			<div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2">
 				{scrollSnaps.map((_, index) => (
 					<button

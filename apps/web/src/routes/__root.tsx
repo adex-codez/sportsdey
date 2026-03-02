@@ -5,6 +5,8 @@ import {
 	HeadContent,
 	Outlet,
 	Scripts,
+	useLocation,
+	useMatchRoute,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Provider } from "react-redux";
@@ -12,9 +14,9 @@ import z from "zod";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Footer from "@/components/footer";
 import { Providers } from "@/components/providers";
+import RegulatoryFooter from "@/components/RegulatoryFooter";
 import Sidebar from "@/components/sidebar";
 import Socials from "@/components/socials";
-import RegulatoryFooter from "@/components/RegulatoryFooter";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -64,6 +66,9 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 });
 
 function RootDocument() {
+	const location = useLocation();
+	const isAuthRoute = location.pathname.startsWith("/auth");
+
 	return (
 		<Provider store={store}>
 			<ThemeProvider attribute="class" defaultTheme="light" enableSystem>
@@ -99,29 +104,36 @@ function RootDocument() {
 						<QueryClientProvider client={queryClient}>
 							<ErrorBoundary>
 								<Providers>
-									<div className="flex h-svh flex-col overflow-hidden">
-										<header className="shrink-0">
-											<Header />
-											<Socials />
-										</header>
+									{isAuthRoute ? (
+										<div className="flex h-svh flex-col overflow-hidden">
+											<main className="no-scrollbar flex-1 overflow-y-auto">
+												<Outlet />
+											</main>
+										</div>
+									) : (
+										<div className="flex h-svh flex-col overflow-hidden">
+											<header className="shrink-0">
+												<Header />
+												<Socials />
+											</header>
 
-										<main className="flex-1 overflow-y-auto no-scrollbar">
-											<div className="mx-4 md:gap-8 lg:mx-[104px] grid lg:grid-cols-[20%_80%] py-4">
-												<aside className="hidden lg:block h-full overflow-y-auto no-scrollbar pr-4">
-													<Sidebar />
-												</aside>
-												<section className="min-w-0">
-													<Outlet />
-												</section>
-											</div>
-											<RegulatoryFooter />
-										</main>
+											<main className="no-scrollbar flex-1 overflow-y-auto">
+												<div className="mx-4 grid py-4 md:gap-8 lg:mx-[104px] lg:grid-cols-[20%_80%]">
+													<aside className="no-scrollbar hidden h-full overflow-y-auto pr-4 lg:block">
+														<Sidebar />
+													</aside>
+													<section className="min-w-0">
+														<Outlet />
+													</section>
+												</div>
+												<RegulatoryFooter />
+											</main>
 
-										<footer className="shrink-0 lg:hidden">
-											<Footer />
-										</footer>
-
-									</div>
+											<footer className="shrink-0 lg:hidden">
+												<Footer />
+											</footer>
+										</div>
+									)}
 								</Providers>
 
 								<Toaster richColors position="top-right" />
