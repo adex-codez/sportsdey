@@ -12,10 +12,10 @@
 	},
   "env": {
     "staging": {
-      "name": "staging-web",
+      "name": "staging-web"
     },
     "production": {
-      "name": "prod-web",
+      "name": "prod-web"
     }
   }
 	// "kv_namespaces": [
