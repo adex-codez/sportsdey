@@ -1,10 +1,10 @@
-import type { Session, User } from "better-auth/types";
-import type { CloudflareBindings } from "../../worker-configuration";
+import type { CloudflareBindings } from "../worker-configuration";
 
 declare module "hono" {
 	interface ContextVariableMap {
-		session: Session | null;
-		user: User | null;
+		auth: ReturnType<typeof import("better-auth").betterAuth>;
+		session: import("better-auth/types").Session | null;
+		user: import("better-auth/types").User | null;
 	}
 }
 

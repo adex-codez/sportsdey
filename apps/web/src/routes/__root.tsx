@@ -6,7 +6,6 @@ import {
 	Outlet,
 	Scripts,
 	useLocation,
-	useMatchRoute,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Provider } from "react-redux";
@@ -80,10 +79,10 @@ function RootDocument() {
 							dangerouslySetInnerHTML={{
 								__html: `
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
- new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
- j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
- 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
- })(window,document,'script','dataLayer','GTM-5JZSLR3K');
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-5JZSLR3K');
       `,
 							}}
 						/>
@@ -106,6 +105,10 @@ function RootDocument() {
 								<Providers>
 									{isAuthRoute ? (
 										<div className="flex h-svh flex-col overflow-hidden">
+											<header className="shrink-0">
+												<Header />
+											</header>
+
 											<main className="no-scrollbar flex-1 overflow-y-auto">
 												<Outlet />
 											</main>

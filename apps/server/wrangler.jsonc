@@ -13,52 +13,6 @@
       "persist": true
     }
   },
-  "env": {
-    "staging": {
-      "name": "sportsdey-staging",
-      "d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "staging-db",
-			"database_id": "4be3127a-eadf-47db-918c-ae2fa1c4776e",
-			"remote": false,
-			"migrations_dir": "./src/db/migrations"
-		}
-	],
-      "kv_namespaces": [
-    		{
-     			"binding": "staging-kv",
-     			"id": "7720322efb504b96a392d8acfe37ad4b",
-     			"remote": false
-    		}
-     	],
-      "routes": ["staging-api.sportsdey.com"],
-      "vars": {
-        "NODE_ENV": "staging",
-        "CORS_ORIGIN": "https://staging.sportsdey.adeaduratimilehin.workers.dev"
-      }
-    },
-    "production": {
-      "name": "sportsdey-prod",
-      "routes": ["api.sportsdey.com"],
-      "d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "sportsdey_db",
-			"database_id": "d091e50e-e19f-40dc-ad77-e7050c7bbbad",
-			"remote": false,
-			"migrations_dir": "./src/db/migrations"
-		}
-	],
-	"kv_namespaces": [
-		{
-			"binding": "sportsdey_ns",
-			"id": "7720322efb504b96a392d8acfe37ad4b",
-			"remote": false
-		}
-	]
-    }
-  },
 	"vars": {
 		"NODE_ENV": "production",
 		"CORS_ORIGIN": "https://sportsdey.adeaduratimilehin.workers.dev"
@@ -76,5 +30,20 @@
 	// bun db:generate
 	// To apply migrations locally, run:
 	// wrangler d1 migrations apply YOUR_DB_NAME --local
-
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "sportsdey_db",
+			"database_id": "d091e50e-e19f-40dc-ad77-e7050c7bbbad",
+			"remote": false,
+			"migrations_dir": "./src/db/migrations"
+		}
+	],
+	"kv_namespaces": [
+		{
+			"binding": "sportsdey_ns",
+			"id": "7720322efb504b96a392d8acfe37ad4b",
+			"remote": false
+		}
+	]
 }

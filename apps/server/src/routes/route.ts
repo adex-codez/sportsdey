@@ -13,6 +13,6 @@ routes.route("/basketball", basketballRoute);
 routes.route("/tennis", tennisRoute);
 routes.route("/news", newsRoute);
 routes.route("/notifications", notificationsRoute);
-routes.route("/wallet", walletRoute);
+routes.route("/wallet", walletRoute)
 
 export default routes;

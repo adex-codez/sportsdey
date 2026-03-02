@@ -50,8 +50,6 @@ declare namespace NodeJS {
 				| "PROXY_URL"
 				| "PROXY_SECRET"
 				| "STATSCORE_TOKEN"
-				| "PAYSTACK_SECRET_KEY"
-				| "PAYSTACK_PUBLIC_KEY"
 			>
 		> {}
 }

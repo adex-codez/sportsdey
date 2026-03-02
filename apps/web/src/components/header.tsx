@@ -23,7 +23,13 @@ import { ThemeToggle } from "./theme-toggle";
 import { Button } from "./ui/button";
 import { UserMenu } from "./user-menu";
 
-export default function Header() {
+type HeaderProps = {
+	hideSportsNav?: boolean;
+};
+
+export default function Header({ hideSportsNav = false }: HeaderProps) {
+	const isAuthRoute = location.pathname.startsWith("/auth");
+	const shouldHideSportsNav = hideSportsNav || isAuthRoute;
 	const currentSport = useCurrentSport();
 	const { setTab, tab } = useActiveTab();
 	// const { totalFavoritesCount } = useFavorites();
@@ -103,10 +109,7 @@ export default function Header() {
 						</div>
 					</Link>
 
-					<div className="flex items-center gap-2">
-						<UserMenu />
-						<ThemeToggle />
-					</div>
+					<ThemeToggle />
 				</div>
 
 				<div className="hidden min-w-0 lg:flex lg:h-full lg:w-full lg:items-center lg:justify-between">
@@ -124,27 +127,30 @@ export default function Header() {
 						/>
 					</Link>
 
-					<div className="overflow-x-auto">
-						<nav className="cust-scrollbar flex w-max gap-4 py-4 font-medium">
-							{links.map(({ to, label, icon: Icon, sport }) => (
-								<Link
-									key={to}
-									to={to as string}
-									onClick={() => setTab("scores")}
-									search={{ sports: sport }}
-									className={cn(
-										"flex shrink-0 gap-2 pb-2",
-										currentSport === sport
-											? "border-accent border-b-2 text-accent"
-											: "text-secondary dark:text-white",
-									)}
-								>
-									<Icon />
-									<p>{label}</p>
-								</Link>
-							))}
-						</nav>
-					</div>
+					{!shouldHideSportsNav && (
+						<div className="overflow-x-auto">
+							<nav className="cust-scrollbar flex w-max gap-4 py-4 font-medium">
+								{links.map(({ to, label, icon: Icon, sport }) => (
+									<Link
+										key={to}
+										to={to as string}
+										onClick={() => setTab("scores")}
+										search={{ sports: sport }}
+										className={cn(
+											"flex shrink-0 gap-2 pb-2",
+											currentSport === sport
+												? "border-accent border-b-2 text-accent"
+												: "text-secondary dark:text-white",
+										)}
+									>
+										<Icon />
+										<p>{label}</p>
+									</Link>
+								))}
+							</nav>
+						</div>
+					)}
+
 					<div className="flex items-center gap-2">
 						<UserMenu />
 						<ThemeToggle />

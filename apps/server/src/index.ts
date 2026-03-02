@@ -18,6 +18,11 @@ app.use(
 	}),
 );
 
+app.on(["GET", "POST"], "/auth/*", async (c) => {
+	const auth = createAuth(c.env);
+	return auth.handler(c.req.raw);
+});
+
 app.use("*", async (c, next) => {
 	const auth = createAuth(c.env);
 	const session = await auth.api.getSession({
@@ -29,7 +34,7 @@ app.use("*", async (c, next) => {
 });
 
 app.on(["GET", "POST"], "/auth/*", async (c) => {
-	const auth = createAuth(c.env);
+	const auth = c.get("auth");
 	return auth.handler(c.req.raw);
 });
 

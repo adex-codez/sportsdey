@@ -1,4 +1,4 @@
-import { OpenAPIHono } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { z } from "zod";
@@ -9,10 +9,205 @@ import type { CloudflareBindings } from "../types";
 const walletRoute = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
 
 const FundWalletSchema = z.object({
-	amount: z.number().min(1),
+	amount: z.number().min(1).openapi({
+		description: "Amount to fund wallet in Naira",
+		example: 1000,
+	}),
 });
 
-walletRoute.post("/fund", async (c) => {
+const WalletResponseSchema = z.object({
+	id: z.string().openapi({ description: "Wallet ID" }),
+	userId: z.string().openapi({ description: "User ID" }),
+	balance: z.number().openapi({ description: "Wallet balance in Naira" }),
+	createdAt: z.string().openapi({ description: "Creation timestamp" }),
+	updatedAt: z.string().openapi({ description: "Last update timestamp" }),
+});
+
+const TransactionResponseSchema = z.object({
+	id: z.string().openapi({ description: "Transaction ID" }),
+	userId: z.string().openapi({ description: "User ID" }),
+	amount: z.number().openapi({ description: "Transaction amount in Naira" }),
+	type: z.string().openapi({ description: "Transaction type (credit/debit)" }),
+	reference: z.string().openapi({ description: "Transaction reference" }),
+	status: z.string().openapi({ description: "Transaction status" }),
+	createdAt: z.string().openapi({ description: "Creation timestamp" }),
+});
+
+const FundWalletErrorSchema = z.object({
+	success: z.literal(false),
+	error: z.string(),
+	details: z.null(),
+});
+
+const FundWalletResponseSchema = z.object({
+	success: z.literal(true),
+	data: z.object({
+		authorizationUrl: z.string().openapi({
+			description: "Paystack authorization URL for payment",
+		}),
+		reference: z.string().openapi({
+			description: "Transaction reference",
+		}),
+	}),
+});
+
+const GetWalletErrorSchema = z.object({
+	success: z.literal(false),
+	error: z.string(),
+	details: z.null(),
+});
+
+const GetWalletResponseSchema = z.object({
+	success: z.literal(true),
+	data: WalletResponseSchema,
+});
+
+const GetTransactionsErrorSchema = z.object({
+	success: z.literal(false),
+	error: z.string(),
+	details: z.null(),
+});
+
+const GetTransactionsResponseSchema = z.object({
+	success: z.literal(true),
+	data: z.array(TransactionResponseSchema),
+});
+
+const WebhookErrorSchema = z.object({
+	success: z.literal(false),
+	error: z.string(),
+	details: z.null(),
+});
+
+const WebhookResponseSchema = z.object({
+	received: z.literal(true),
+});
+
+const fundWalletRoute = createRoute({
+	method: "post",
+	path: "/fund",
+	tags: ["Wallet"],
+	summary: "Fund wallet",
+	description: "Initialize a wallet funding transaction via Paystack",
+	request: {
+		body: {
+			content: {
+				"application/json": {
+					schema: FundWalletSchema,
+				},
+			},
+		},
+	},
+	responses: {
+		200: {
+			description: "Payment initialized successfully",
+			content: {
+				"application/json": {
+					schema: FundWalletResponseSchema,
+				},
+			},
+		},
+		400: {
+			description: "Invalid request or payment failed",
+			content: {
+				"application/json": {
+					schema: FundWalletErrorSchema,
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized - user not authenticated",
+			content: {
+				"application/json": {
+					schema: FundWalletErrorSchema,
+				},
+			},
+		},
+	},
+});
+
+const getWalletRoute = createRoute({
+	method: "get",
+	path: "/",
+	tags: ["Wallet"],
+	summary: "Get wallet",
+	description: "Retrieve the authenticated user's wallet details",
+	security: [{ BearerAuth: [] }],
+	responses: {
+		200: {
+			description: "Wallet retrieved successfully",
+			content: {
+				"application/json": {
+					schema: GetWalletResponseSchema,
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized - user not authenticated",
+			content: {
+				"application/json": {
+					schema: GetWalletErrorSchema,
+				},
+			},
+		},
+	},
+});
+
+const getTransactionsRoute = createRoute({
+	method: "get",
+	path: "/transactions",
+	tags: ["Wallet"],
+	summary: "Get wallet transactions",
+	description: "Retrieve the authenticated user's wallet transaction history",
+	security: [{ BearerAuth: [] }],
+	responses: {
+		200: {
+			description: "Transactions retrieved successfully",
+			content: {
+				"application/json": {
+					schema: GetTransactionsResponseSchema,
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized - user not authenticated",
+			content: {
+				"application/json": {
+					schema: GetTransactionsErrorSchema,
+				},
+			},
+		},
+	},
+});
+
+const webhookRoute = createRoute({
+	method: "post",
+	path: "/webhook",
+	tags: ["Wallet"],
+	summary: "Paystack webhook",
+	description: "Handle Paystack webhook events for wallet funding",
+	security: [{ PaystackSignature: [] }],
+	responses: {
+		200: {
+			description: "Webhook processed",
+			content: {
+				"application/json": {
+					schema: WebhookResponseSchema,
+				},
+			},
+		},
+		400: {
+			description: "Invalid signature or malformed request",
+			content: {
+				"application/json": {
+					schema: WebhookErrorSchema,
+				},
+			},
+		},
+	},
+});
+
+walletRoute.openapi(fundWalletRoute, async (c) => {
 	const user = c.get("user");
 	if (!user) {
 		return c.json(
@@ -107,7 +302,7 @@ walletRoute.post("/fund", async (c) => {
 	}
 });
 
-walletRoute.get("/", async (c) => {
+walletRoute.openapi(getWalletRoute, async (c) => {
 	const user = c.get("user");
 	if (!user) {
 		return c.json(
@@ -156,7 +351,7 @@ walletRoute.get("/", async (c) => {
 	);
 });
 
-walletRoute.get("/transactions", async (c) => {
+walletRoute.openapi(getTransactionsRoute, async (c) => {
 	const user = c.get("user");
 	if (!user) {
 		return c.json(
@@ -200,7 +395,7 @@ const WebhookEventSchema = z.object({
 	}),
 });
 
-walletRoute.post("/webhook", async (c) => {
+walletRoute.openapi(webhookRoute, async (c) => {
 	const signature = c.req.header("x-paystack-signature");
 	if (!signature) {
 		return c.json(
