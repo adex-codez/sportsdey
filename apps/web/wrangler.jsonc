@@ -1,6 +1,6 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
-	"name": "sportsdey",
+	// "name": "sportsdey",
 	"main": "@tanstack/react-start/server-entry",
 	"compatibility_date": "2025-09-15",
 	"compatibility_flags": ["nodejs_compat"],

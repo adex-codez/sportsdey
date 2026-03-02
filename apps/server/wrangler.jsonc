@@ -13,6 +13,26 @@
       "persist": true
     }
   },
+  "d1_databases": [
+		{
+  		"binding": "DB",
+			"database_name": "staging-db",
+			"database_id": "4be3127a-eadf-47db-918c-ae2fa1c4776e",
+			"remote": false,
+			"migrations_dir": "./src/db/migrations"		}
+	],
+  "kv_namespaces": [
+		{
+		"binding": "staging-kv",
+       			"id": "7720322efb504b96a392d8acfe37ad4b",
+       			"remote": false
+			// "migrations_dir": "./src/db/migrations"
+		}
+	],
+  "vars": {
+    "NODE_ENV": "development",
+    "CORS_ORIGIN": "http://localhost:3001"
+  },
   "env": {
       "staging": {
         "name": "sportsdey-staging",

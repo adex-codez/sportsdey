@@ -1,7 +1,7 @@
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { openAPI } from "better-auth/plugins";
+import { bearer, openAPI } from "better-auth/plugins";
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "@/db/schema";
 import type { CloudflareBindings } from "../../worker-configuration";
@@ -13,7 +13,7 @@ export const createAuth = (env: CloudflareBindings) => {
 		basePath: "/auth",
 		database: drizzleAdapter(db, { provider: "sqlite" }),
 		emailAndPassword: { enabled: true },
-		plugins: [expo(), openAPI()],
+		plugins: [expo(), openAPI(), bearer()],
 		socialProviders: {
 			google: {
 				clientId: env.GOOGLE_CLIENT_ID,
@@ -28,11 +28,11 @@ export const createAuth = (env: CloudflareBindings) => {
 				clientSecret: env.FACEBOOK_CLIENT_SECRET,
 			},
 		},
-    user: {
-      deleteUser: {
-        enabled: true
-      }
-    },
+		user: {
+			deleteUser: {
+				enabled: true,
+			},
+		},
 		baseURL: env.BETTER_AUTH_URL,
 		secret: env.BETTER_AUTH_SECRET,
 		trustedOrigins:

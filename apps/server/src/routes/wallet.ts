@@ -89,6 +89,7 @@ const fundWalletRoute = createRoute({
 	tags: ["Wallet"],
 	summary: "Fund wallet",
 	description: "Initialize a wallet funding transaction via Paystack",
+	security: [{ BearerAuth: [] }],
 	request: {
 		body: {
 			content: {
@@ -186,7 +187,6 @@ const webhookRoute = createRoute({
 	tags: ["Wallet"],
 	summary: "Paystack webhook",
 	description: "Handle Paystack webhook events for wallet funding",
-	security: [{ PaystackSignature: [] }],
 	responses: {
 		200: {
 			description: "Webhook processed",

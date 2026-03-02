@@ -8,6 +8,13 @@ import type { CloudflareBindings } from "./types";
 
 const app = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
 
+app.openAPIRegistry.registerComponent("securitySchemes", "BearerAuth", {
+	type: "http",
+	scheme: "bearer",
+	description:
+		"Enter the session token from /auth/sign-in/email or /auth/sign-in/oauth",
+});
+
 app.use(logger());
 app.use(
 	"/*",
@@ -30,6 +37,9 @@ app.use("*", async (c, next) => {
 	});
 	c.set("session", session);
 	c.set("user", session?.user ?? null);
+
+	const user = c.get("user");
+	console.log(user);
 	await next();
 });
 
