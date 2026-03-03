@@ -1,18 +1,21 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
-	// "name": "sportsdey",
-	"main": "@tanstack/react-start/server-entry",
-	"compatibility_date": "2025-09-15",
+	"name": "sportsdey-web",
+	"main": "dist/server/index.js",
+	"compatibility_date": "2026-03-03",
 	"compatibility_flags": ["nodejs_compat"],
 	"assets": {
-		"directory": ".output/public"
+		"directory": "dist/client"
 	},
 	"observability": {
 		"enabled": true
 	},
-	"env": {
+"env": {
 		"staging": {
 			"name": "staging-web",
+			"vars": {
+				"ENV": "staging"
+			},
 			"routes": [
 				{
 					"pattern": "stagingweb.sportsdey.com",
@@ -22,6 +25,9 @@
 		},
 		"production": {
 			"name": "prod-web",
+			"vars": {
+				"ENV": "production"
+			},
 			"routes": [
 				{
 					"pattern": "sportsdey.com",
