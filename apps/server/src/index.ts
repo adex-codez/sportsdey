@@ -21,7 +21,7 @@ app.use(
 	cors({
 		origin: (origin) => origin,
 		allowMethods: ["GET", "POST", "OPTIONS"],
-		credentials: true,
+		allowHeaders: ["Authorization", "Content-Type"],
 	}),
 );
 
@@ -31,21 +31,26 @@ app.on(["GET", "POST"], "/auth/*", async (c) => {
 });
 
 app.use("*", async (c, next) => {
+	const path = c.req.path;
+	if (
+		path.startsWith("/auth/") ||
+		path.startsWith("/docs") ||
+		path.startsWith("/openapi")
+	) {
+		return next();
+	}
 	const auth = createAuth(c.env);
-	const session = await auth.api.getSession({
+	const sessionResult = await auth.api.getSession({
 		headers: c.req.raw.headers,
 	});
+	const session = sessionResult?.session ?? null;
+	const user = sessionResult?.user ?? null;
 	c.set("session", session);
-	c.set("user", session?.user ?? null);
+	c.set("user", user);
 
-	const user = c.get("user");
-	console.log(user);
+	const currentUser = c.get("user");
+	console.log("user", currentUser);
 	await next();
-});
-
-app.on(["GET", "POST"], "/auth/*", async (c) => {
-	const auth = c.get("auth");
-	return auth.handler(c.req.raw);
 });
 
 app.route("/", routes);

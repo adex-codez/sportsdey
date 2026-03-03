@@ -28,6 +28,7 @@ type HeaderProps = {
 };
 
 export default function Header({ hideSportsNav = false }: HeaderProps) {
+	const location = useLocation();
 	const isAuthRoute = location.pathname.startsWith("/auth");
 	const shouldHideSportsNav = hideSportsNav || isAuthRoute;
 	const currentSport = useCurrentSport();
@@ -53,7 +54,6 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 	const { date, setDate } = useDateContext();
 	const weekDates = useWeekDates(date);
 	const { currentFilter, changeCurrentFilter } = useCurrentFilter();
-	const location = useLocation();
 	const router = useRouter();
 
 	const params = useParams({ strict: false });

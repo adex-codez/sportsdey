@@ -3,7 +3,12 @@ import { desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { z } from "zod";
 import * as schema from "@/db/schema";
-import { initializeTransaction } from "@/utils/paystack";
+import {
+	createTransferRecipient,
+	initializeTransaction,
+	initiateTransfer,
+	verifyAccountNumber,
+} from "@/utils/paystack";
 import type { CloudflareBindings } from "../types";
 
 const walletRoute = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
@@ -81,6 +86,46 @@ const WebhookErrorSchema = z.object({
 
 const WebhookResponseSchema = z.object({
 	received: z.literal(true),
+});
+
+const WithdrawSchema = z.object({
+	amount: z.number().min(100).openapi({
+		description: "Amount to withdraw in Naira (minimum 100)",
+		example: 1000,
+	}),
+	bankCode: z.string().openapi({
+		description: "Bank code (e.g., 058 for GTBank)",
+		example: "058",
+	}),
+	accountNumber: z.string().openapi({
+		description: "Bank account number",
+		example: "0123456789",
+	}),
+	accountName: z.string().openapi({
+		description: "Account holder name",
+		example: "John Doe",
+	}),
+});
+
+const WithdrawErrorSchema = z.object({
+	success: z.literal(false),
+	error: z.string(),
+	details: z.null(),
+});
+
+const WithdrawResponseSchema = z.object({
+	success: z.literal(true),
+	data: z.object({
+		reference: z.string().openapi({
+			description: "Withdrawal reference",
+		}),
+		amount: z.number().openapi({
+			description: "Withdrawal amount",
+		}),
+		status: z.string().openapi({
+			description: "Withdrawal status",
+		}),
+	}),
 });
 
 const fundWalletRoute = createRoute({
@@ -201,6 +246,50 @@ const webhookRoute = createRoute({
 			content: {
 				"application/json": {
 					schema: WebhookErrorSchema,
+				},
+			},
+		},
+	},
+});
+
+const withdrawRoute = createRoute({
+	method: "post",
+	path: "/withdraw",
+	tags: ["Wallet"],
+	summary: "Withdraw from wallet",
+	description: "Withdraw funds from wallet to user's bank account via Paystack",
+	security: [{ BearerAuth: [] }],
+	request: {
+		body: {
+			content: {
+				"application/json": {
+					schema: WithdrawSchema,
+				},
+			},
+		},
+	},
+	responses: {
+		200: {
+			description: "Withdrawal initiated successfully",
+			content: {
+				"application/json": {
+					schema: WithdrawResponseSchema,
+				},
+			},
+		},
+		400: {
+			description: "Invalid request or insufficient balance",
+			content: {
+				"application/json": {
+					schema: WithdrawErrorSchema,
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized - user not authenticated",
+			content: {
+				"application/json": {
+					schema: WithdrawErrorSchema,
 				},
 			},
 		},
@@ -465,6 +554,129 @@ walletRoute.openapi(webhookRoute, async (c) => {
 	}
 
 	return c.json({ received: true }, 200);
+});
+
+walletRoute.openapi(withdrawRoute, async (c) => {
+	const user = c.get("user");
+	if (!user) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Unauthorized",
+				details: null,
+			},
+			401,
+		);
+	}
+
+	const result = WithdrawSchema.safeParse(await c.req.json());
+	if (!result.success) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Invalid request",
+				details: null,
+			},
+			400,
+		);
+	}
+
+	const { amount, bankCode, accountNumber, accountName } = result.data;
+	const db = drizzle(c.env.DB, { schema });
+
+	const [wallet] = await db
+		.select()
+		.from(schema.wallet)
+		.where(eq(schema.wallet.userId, user.id))
+		.limit(1);
+
+	if (!wallet || wallet.balance < amount) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Insufficient balance",
+				details: null,
+			},
+			400,
+		);
+	}
+
+	const reference = `wd_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+
+	try {
+		const accountVerification = await verifyAccountNumber(
+			c.env.PAYSTACK_SECRET_KEY,
+			accountNumber,
+			bankCode,
+		);
+
+		if (!accountVerification.isValid) {
+			return c.json(
+				{
+					success: false as const,
+					error: "Invalid account number or bank code",
+					details: null,
+				},
+				400,
+			);
+		}
+
+		const recipient = await createTransferRecipient(
+			c.env.PAYSTACK_SECRET_KEY,
+			"bank",
+			bankCode,
+			accountNumber,
+			accountVerification.accountName,
+		);
+
+		const transfer = await initiateTransfer(
+			c.env.PAYSTACK_SECRET_KEY,
+			amount,
+			recipient.id,
+			"balance",
+			"Withdrawal from wallet",
+		);
+
+		await db.insert(schema.walletTransaction).values({
+			id: `txn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
+			userId: user.id,
+			amount,
+			type: "debit",
+			reference,
+			status: transfer.status === "success" ? "success" : "pending",
+		});
+
+		await db
+			.update(schema.wallet)
+			.set({
+				balance: wallet.balance - amount,
+			})
+			.where(eq(schema.wallet.userId, user.id));
+
+		return c.json(
+			{
+				success: true as const,
+				data: {
+					reference: transfer.reference,
+					amount,
+					status: transfer.status,
+				},
+			},
+			200,
+		);
+	} catch (error) {
+		return c.json(
+			{
+				success: false as const,
+				error:
+					error instanceof Error
+						? error.message
+						: "Failed to process withdrawal",
+				details: null,
+			},
+			400,
+		);
+	}
 });
 
 export default walletRoute;
