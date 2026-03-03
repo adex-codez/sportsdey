@@ -6,8 +6,8 @@
 		"build": "vite build",
 		"serve": "vite preview",
 		"dev": "vite dev --port=3001",
-		"deploy:staging": "vite build --mode staging && wrangler deploy --env staging",
-		"deploy:production": "vite build --mode production && wrangler deploy --env production",
+		"deploy:staging": "vite build --mode staging && wrangler deploy --env staging --config wrangler.jsonc",
+		"deploy:production": "vite build --mode production && wrangler deploy --env production --config wrangler.jsonc",
 		"cf-typegen": "wrangler types --env-interface Env"
 	},
 	"dependencies": {
