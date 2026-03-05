@@ -1,0 +1,292 @@
+import { Navigate, createFileRoute } from "@tanstack/react-router";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Eye, EyeOff, X } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import { WalletInfo } from "@/components/wallet-info";
+import { WalletRecentTransactions } from "@/components/wallet-recent-transactions";
+import { WalletSidebar } from "@/components/wallet-sidebar";
+import { WithdrawModal } from "@/components/withdraw-modal";
+import { useSession } from "@/lib/auth/client";
+import { ApiError, apiRequest } from "@/lib/api";
+import { Input } from "@/components/ui/input";
+import WalletIcon from "@/logos/wallet.svg?react";
+
+export const Route = createFileRoute("/wallet")({
+	component: WalletPage,
+});
+
+type WalletResponse = {
+	id: string;
+	balance: number;
+	createdAt: string;
+	updatedAt: string;
+};
+
+type WalletTransaction = {
+	id: string;
+	userId: string;
+	amount: number;
+	type: string;
+	reference: string;
+	status: string;
+	createdAt: string;
+};
+
+type FundWalletResponse = {
+	authorizationUrl: string;
+	reference: string;
+};
+
+const MIN_DEPOSIT_AMOUNT = 100;
+const MAX_DEPOSIT_AMOUNT = 9_999_999;
+
+function WalletPage() {
+	const [showBalance, setShowBalance] = useState(true);
+	const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
+	const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+	const [depositAmount, setDepositAmount] = useState("");
+	const [depositError, setDepositError] = useState("");
+	const [shouldRedirectToSignIn, setShouldRedirectToSignIn] = useState(false);
+	const { data: session, isPending: isSessionLoading } = useSession();
+	const {
+		data: walletData,
+		isLoading: isWalletLoading,
+		error: walletError,
+	} = useQuery({
+		queryKey: ["wallet"],
+		queryFn: () =>
+			apiRequest<WalletResponse>("wallet", {
+				credentials: "include",
+			}),
+		enabled: !!session?.user,
+	});
+	const {
+		data: transactions = [],
+		isLoading: isTransactionsLoading,
+	} = useQuery({
+		queryKey: ["wallet-transactions"],
+		queryFn: () =>
+			apiRequest<WalletTransaction[]>("wallet/transactions", {
+				credentials: "include",
+			}),
+		enabled: !!session?.user,
+	});
+	const depositMutation = useMutation({
+		mutationFn: (amount: number) =>
+			apiRequest<FundWalletResponse>("wallet/fund", {
+				method: "POST",
+				credentials: "include",
+				body: JSON.stringify({ amount }),
+			}),
+		onSuccess: (data) => {
+			window.open(data.authorizationUrl, "_blank", "noopener,noreferrer");
+			setIsDepositModalOpen(false);
+			setDepositAmount("");
+			setDepositError("");
+		},
+		onError: (error) => {
+			if (error instanceof ApiError && error.status === 401) {
+				setShouldRedirectToSignIn(true);
+				return;
+			}
+			setDepositError(
+				error instanceof ApiError
+					? error.message
+					: "Failed to initialize deposit. Please try again.",
+			);
+		},
+	});
+
+	if (isSessionLoading) {
+		return null;
+	}
+
+	if (!session?.user || shouldRedirectToSignIn) {
+		return <Navigate to="/auth/sign-in" />;
+	}
+
+	if (walletError instanceof ApiError && walletError.status === 401) {
+		return <Navigate to="/auth/sign-in" />;
+	}
+
+	const walletBalance = (walletData?.balance ?? 0).toLocaleString("en-NG", {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2,
+	});
+	const validateDepositAmount = (amount: number) => {
+		if (!Number.isFinite(amount)) {
+			return "Enter a valid amount.";
+		}
+		if (amount < MIN_DEPOSIT_AMOUNT) {
+			return `Minimum deposit amount is ₦${MIN_DEPOSIT_AMOUNT.toLocaleString("en-NG")}.`;
+		}
+		if (amount > MAX_DEPOSIT_AMOUNT) {
+			return `Maximum deposit amount is ₦${MAX_DEPOSIT_AMOUNT.toLocaleString("en-NG", {
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2,
+			})}.`;
+		}
+		return "";
+	};
+
+	const handleDepositSubmit = (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		const amount = Number(depositAmount);
+		const error = validateDepositAmount(amount);
+		if (error) {
+			setDepositError(error);
+			return;
+		}
+
+		setDepositError("");
+		depositMutation.mutate(amount);
+	};
+
+	return (
+		<div className="my-5 grid gap-6 lg:grid-cols-[320px_1fr]">
+			<WalletSidebar />
+
+			<section>
+				<div className="grid grid-cols-2 grid-rows-[auto_1fr] gap-4">
+					<div className="col-start-1 row-start-1 h-fit self-start rounded-2xl bg-white p-[20px] shadow-sm dark:bg-[#202120]">
+						<div className="flex items-center justify-between">
+							<p className="font-semibold text-[30px] text-primary dark:text-white">
+								Wallet &amp; Credits
+							</p>
+							<div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F0F0F0]">
+								<WalletIcon width={18} height={18} className="block" />
+							</div>
+						</div>
+					</div>
+					<div className="col-start-1 row-start-2 h-full min-h-40 rounded-2xl bg-white p-6 shadow-sm dark:bg-[#202120]">
+						<p className="text-[14px] text-primary dark:text-white">
+							Wallet Balance
+						</p>
+						<div className="mt-3 flex items-start gap-2">
+							<p className="font-semibold leading-none text-primary dark:text-white">
+								{showBalance ? (
+									<span className="leading-none">
+										<span className="-top-2 relative align-super text-[24px]">₦</span>
+										<span className="text-[50px]">
+											{isWalletLoading ? "..." : walletBalance}
+										</span>
+									</span>
+								) : (
+									<span className="text-[50px]">••••••</span>
+								)}
+							</p>
+							<button
+								type="button"
+								onClick={() => setShowBalance((prev) => !prev)}
+								className="cursor-pointer text-primary dark:text-white"
+								aria-label={showBalance ? "Hide wallet balance" : "Show wallet balance"}
+							>
+								{showBalance ? (
+									<EyeOff className="h-4 w-4" />
+								) : (
+									<Eye className="h-4 w-4" />
+								)}
+							</button>
+						</div>
+						<div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+							<button
+								type="button"
+								onClick={() => {
+									setDepositError("");
+									setIsDepositModalOpen(true);
+								}}
+								className="w-full cursor-pointer rounded-lg bg-[#F0F0F0] px-4 py-2 font-medium text-primary text-sm"
+							>
+								Deposit
+							</button>
+							<button
+								type="button"
+								className="w-full cursor-pointer rounded-lg bg-[#F0F0F0] px-4 py-2 font-medium text-primary text-sm"
+							>
+								Tranfer fund
+							</button>
+							<button
+								type="button"
+								onClick={() => {
+									setIsWithdrawModalOpen(true);
+								}}
+								className="w-full cursor-pointer rounded-lg bg-[#F0F0F0] px-4 py-2 font-medium text-primary text-sm"
+							>
+								Withdraw
+							</button>
+						</div>
+					</div>
+					<div className="col-start-2 row-span-2 min-h-40 rounded-2xl bg-white p-6 shadow-sm dark:bg-[#202120]" />
+				</div>
+				<WalletRecentTransactions
+					transactions={transactions}
+					isLoading={isTransactionsLoading}
+				/>
+				<WalletInfo />
+			</section>
+			{isDepositModalOpen && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+					<div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg dark:bg-[#202120]">
+						<div className="flex items-center justify-between">
+							<h2 className="font-semibold text-primary text-xl dark:text-white">
+								Deposit Funds
+							</h2>
+							<button
+								type="button"
+								onClick={() => {
+									setIsDepositModalOpen(false);
+									setDepositError("");
+								}}
+								aria-label="Close deposit modal"
+								className="cursor-pointer rounded-md px-2 py-1 text-primary text-sm dark:text-white"
+							>
+								<X className="h-4 w-4" />
+							</button>
+						</div>
+
+						<form className="mt-4 space-y-4" onSubmit={handleDepositSubmit}>
+							<div>
+								<label
+									htmlFor="deposit-amount"
+									className="mb-2 block font-medium text-primary text-sm dark:text-white"
+								>
+									Amount (NGN)
+								</label>
+								<Input
+									id="deposit-amount"
+									type="number"
+									min={MIN_DEPOSIT_AMOUNT}
+									max={MAX_DEPOSIT_AMOUNT}
+									step="0.01"
+									value={depositAmount}
+									onChange={(event) => setDepositAmount(event.target.value)}
+									placeholder="Enter amount"
+								/>
+								<p className="mt-2 text-[#6E6E6E] text-xs">
+									Min: ₦100.00, Max: ₦9,999,999.00
+								</p>
+							</div>
+
+							{depositError && (
+								<p className="text-[#D13030] text-sm">{depositError}</p>
+							)}
+
+							<button
+								type="submit"
+								disabled={depositMutation.isPending}
+								className="w-full cursor-pointer rounded-lg bg-primary px-4 py-2 font-medium text-sm text-white disabled:cursor-not-allowed disabled:opacity-60"
+							>
+								{depositMutation.isPending ? "Processing..." : "Deposit"}
+							</button>
+						</form>
+					</div>
+				</div>
+			)}
+			<WithdrawModal
+				isOpen={isWithdrawModalOpen}
+				onClose={() => setIsWithdrawModalOpen(false)}
+				onUnauthorized={() => setShouldRedirectToSignIn(true)}
+			/>
+		</div>
+	);
+}

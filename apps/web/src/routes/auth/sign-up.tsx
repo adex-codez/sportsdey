@@ -7,6 +7,9 @@ export const Route = createFileRoute("/auth/sign-up")({
 });
 
 export default function SignUpPage() {
+	const callbackURL =
+		import.meta.env.VITE_PUBLIC_URL ||
+		(typeof window !== "undefined" ? window.location.origin : "http://localhost:3001");
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState("");
 
@@ -18,7 +21,7 @@ export default function SignUpPage() {
 		try {
 			await signIn.social({
 				provider,
-				callbackURL: "/",
+				callbackURL,
 			});
 		} catch (err) {
 			setError("Failed to sign up with " + provider);
@@ -112,3 +115,4 @@ export default function SignUpPage() {
 		</div>
 	);
 }
+

@@ -19,6 +19,7 @@ export async function initializeTransaction(
 	amount: number,
 	email: string,
 	metadata?: Record<string, unknown>,
+	callbackUrl?: string,
 ): Promise<InitializeTransactionResponse> {
 	const response = await fetch(
 		"https://api.paystack.co/transaction/initialize",
@@ -33,6 +34,7 @@ export async function initializeTransaction(
 				email,
 				currency: "NGN",
 				metadata,
+				callback_url: callbackUrl,
 			}),
 		},
 	);
@@ -180,6 +182,12 @@ export interface AccountVerification {
 	bankId: number;
 }
 
+export interface NigerianBank {
+	name: string;
+	code: string;
+	id: number;
+}
+
 export async function verifyAccountNumber(
 	secretKey: string,
 	accountNumber: string,
@@ -219,4 +227,33 @@ export async function verifyAccountNumber(
 		accountNumber: data.data.account_number,
 		bankId: data.data.bank_id,
 	};
+}
+
+export async function getNigerianBanks(
+	secretKey: string,
+): Promise<NigerianBank[]> {
+	const response = await fetch(
+		"https://api.paystack.co/bank?country=nigeria&use_cursor=false&perPage=500",
+		{
+			headers: {
+				Authorization: `Bearer ${secretKey}`,
+			},
+		},
+	);
+
+	const data = (await response.json()) as {
+		status: boolean;
+		message: string;
+		data: Array<{ name: string; code: string; id: number }>;
+	};
+
+	if (!response.ok || !data.status) {
+		throw new Error(data.message || "Failed to fetch banks");
+	}
+
+	return data.data.map((bank) => ({
+		name: bank.name,
+		code: bank.code,
+		id: bank.id,
+	}));
 }

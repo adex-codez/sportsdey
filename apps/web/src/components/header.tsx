@@ -4,7 +4,14 @@ import {
 	useParams,
 	useRouter,
 } from "@tanstack/react-router";
-import { CalendarDays, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
+import {
+	CalendarDays,
+	ChevronDown,
+	ChevronRight,
+	Menu,
+	Undo2,
+	X,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useCurrentFilter } from "@/hooks/use-current-filter";
 import { useCurrentSport } from "@/hooks/use-current-sport";
@@ -79,6 +86,14 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 		};
 	}, [open]);
 
+	const handleBackToSite = () => {
+		if (typeof window !== "undefined" && window.history.length > 1) {
+			window.history.back();
+			return;
+		}
+		router.navigate({ to: "/" });
+	};
+
 	return (
 		<div className="z-30 w-full pb-4 lg:pb-0">
 			<div className="h-[60px] w-full bg-primary px-4 py-1 text-foreground lg:flex lg:h-20 lg:flex-row lg:items-center lg:justify-between lg:px-[10%] lg:py-1">
@@ -109,7 +124,19 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 						</div>
 					</Link>
 
-					<ThemeToggle />
+					<div className="flex items-center gap-3">
+						<ThemeToggle />
+						{isAuthRoute && (
+							<button
+								type="button"
+								onClick={handleBackToSite}
+								className="flex items-center gap-1 text-secondary hover:text-white"
+							>
+								<Undo2 className="h-4 w-4" />
+								<span className="text-sm underline">Back to site</span>
+							</button>
+						)}
+					</div>
 				</div>
 
 				<div className="hidden min-w-0 lg:flex lg:h-full lg:w-full lg:items-center lg:justify-between">
@@ -152,8 +179,18 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 					)}
 
 					<div className="flex items-center gap-2">
-						<UserMenu />
+						{!isAuthRoute && <UserMenu />}
 						<ThemeToggle />
+						{isAuthRoute && (
+							<button
+								type="button"
+								onClick={handleBackToSite}
+								className="flex items-center gap-1 text-secondary hover:text-white"
+							>
+								<Undo2 className="h-4 w-4" />
+								<span className="text-sm underline">Back to site</span>
+							</button>
+						)}
 					</div>
 				</div>
 

@@ -39,7 +39,7 @@ export function UserMenu() {
 				<button
 					onClick={() => setIsOpen(!isOpen)}
 					className={cn(
-						"flex items-center gap-2 rounded-full p-2 transition-colors",
+						"flex items-center gap-2.5 rounded-full p-2.5 transition-colors",
 						"hover:bg-white/10",
 					)}
 					aria-label="User menu"
@@ -49,13 +49,23 @@ export function UserMenu() {
 						<img
 							src={user.image}
 							alt={displayName}
-							className="h-6 w-6 rounded-full"
+							className="h-8 w-8 rounded-full bg-[#F7C9B6] object-cover"
 						/>
 					) : (
-						<div className="flex h-6 w-6 items-center justify-center rounded-full bg-accent font-medium text-white text-xs">
+						<div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F7C9B6] font-medium text-[#5D2E1F] text-sm">
 							{initials}
 						</div>
 					)}
+					<svg
+						viewBox="0 0 20 20"
+						aria-hidden="true"
+						className={cn(
+							"h-5 w-5 fill-current text-secondary transition-transform",
+							isOpen ? "rotate-180" : "rotate-0",
+						)}
+					>
+						<polygon points="10,13.5 4.5,7.5 15.5,7.5" />
+					</svg>
 				</button>
 
 				{isOpen && (
@@ -64,7 +74,7 @@ export function UserMenu() {
 							className="fixed inset-0 z-40"
 							onClick={() => setIsOpen(false)}
 						/>
-						<div className="absolute top-full right-0 z-50 mt-2 w-56 rounded-lg border bg-primary p-3 shadow-lg dark:bg-black">
+						<div className="absolute top-full right-0 z-50 mt-2 w-56 rounded-lg bg-primary p-3 shadow-lg dark:bg-black">
 							<div className="border-border border-b pb-3">
 								<p className="truncate font-medium text-foreground">
 									{displayName}

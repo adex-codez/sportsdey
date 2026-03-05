@@ -43,7 +43,13 @@ export const createAuth = (env: CloudflareBindings) => {
 						"sportsdey-mobile://",
 						"exp://172.20.10.9:8081",
 					]
-				: ["sportsdey.com", "exp://172.20.10.9:8081", "sportsdey-mobile://"],
+				: [
+						"stagingweb.sportsdey.com",
+						"sportsdey.com",
+						"exp://172.20.10.9:8081",
+						"sportsdey-mobile://",
+						"stagingweb.sportsdey.com",
+					],
 		advanced: {
 			crossSubDomainCookies: {
 				enabled: env.NODE_ENV !== "development",

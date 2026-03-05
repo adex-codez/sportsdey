@@ -19,9 +19,19 @@ app.use(logger());
 app.use(
 	"/*",
 	cors({
-		origin: (origin) => origin,
+		origin: (origin, c) => {
+			console.log("CORS_ORIGIN", c.env.CORS_ORIGIN);
+			if (!origin) return "";
+			const allowedOrigins = new Set([
+				c.env.CORS_ORIGIN,
+				"http://localhost:3001",
+				"http://localhost:8787",
+			]);
+			return allowedOrigins.has(origin) ? origin : "";
+		},
 		allowMethods: ["GET", "POST", "OPTIONS"],
 		allowHeaders: ["Authorization", "Content-Type"],
+		credentials: true,
 	}),
 );
 
@@ -48,8 +58,6 @@ app.use("*", async (c, next) => {
 	c.set("session", session);
 	c.set("user", user);
 
-	const currentUser = c.get("user");
-	console.log("user", currentUser);
 	await next();
 });
 

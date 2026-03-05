@@ -5,8 +5,10 @@ import { z } from "zod";
 import * as schema from "@/db/schema";
 import {
 	createTransferRecipient,
+	getNigerianBanks,
 	initializeTransaction,
 	initiateTransfer,
+	verifyTransaction,
 	verifyAccountNumber,
 } from "@/utils/paystack";
 import type { CloudflareBindings } from "../types";
@@ -14,15 +16,15 @@ import type { CloudflareBindings } from "../types";
 const walletRoute = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
 
 const FundWalletSchema = z.object({
-	amount: z.number().min(1).openapi({
-		description: "Amount to fund wallet in Naira",
+	amount: z.number().min(100).max(9_999_999).openapi({
+		description:
+			"Amount to fund wallet in Naira (minimum 100, maximum 9,999,999.00)",
 		example: 1000,
 	}),
 });
 
 const WalletResponseSchema = z.object({
 	id: z.string().openapi({ description: "Wallet ID" }),
-	userId: z.string().openapi({ description: "User ID" }),
 	balance: z.number().openapi({ description: "Wallet balance in Naira" }),
 	createdAt: z.string().openapi({ description: "Creation timestamp" }),
 	updatedAt: z.string().openapi({ description: "Last update timestamp" }),
@@ -76,6 +78,29 @@ const GetTransactionsErrorSchema = z.object({
 const GetTransactionsResponseSchema = z.object({
 	success: z.literal(true),
 	data: z.array(TransactionResponseSchema),
+});
+
+const BankResponseSchema = z.object({
+	name: z.string().openapi({ description: "Bank name" }),
+	code: z.string().openapi({ description: "Bank code" }),
+});
+
+const GetBanksErrorSchema = z.object({
+	success: z.literal(false),
+	error: z.string(),
+	details: z.null(),
+});
+
+const GetBanksResponseSchema = z.object({
+	success: z.literal(true),
+	data: z.array(BankResponseSchema),
+});
+
+const CallbackQuerySchema = z.object({
+	reference: z.string().optional(),
+	trxref: z.string().optional(),
+	status: z.string().optional(),
+	type: z.enum(["deposit", "withdraw"]).optional(),
 });
 
 const WebhookErrorSchema = z.object({
@@ -226,6 +251,42 @@ const getTransactionsRoute = createRoute({
 	},
 });
 
+const getBanksRoute = createRoute({
+	method: "get",
+	path: "/banks",
+	tags: ["Wallet"],
+	summary: "Get Nigerian banks",
+	description:
+		"Retrieve supported Nigerian banks and bank codes for wallet withdrawals",
+	security: [{ BearerAuth: [] }],
+	responses: {
+		200: {
+			description: "Banks retrieved successfully",
+			content: {
+				"application/json": {
+					schema: GetBanksResponseSchema,
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized - user not authenticated",
+			content: {
+				"application/json": {
+					schema: GetBanksErrorSchema,
+				},
+			},
+		},
+		400: {
+			description: "Failed to fetch banks",
+			content: {
+				"application/json": {
+					schema: GetBanksErrorSchema,
+				},
+			},
+		},
+	},
+});
+
 const webhookRoute = createRoute({
 	method: "post",
 	path: "/webhook",
@@ -248,6 +309,23 @@ const webhookRoute = createRoute({
 					schema: WebhookErrorSchema,
 				},
 			},
+		},
+	},
+});
+
+const callbackRoute = createRoute({
+	method: "get",
+	path: "/callback",
+	tags: ["Wallet"],
+	summary: "Paystack callback redirect",
+	description:
+		"Handles Paystack callback query params and redirects to wallet transaction status page.",
+	request: {
+		query: CallbackQuerySchema,
+	},
+	responses: {
+		302: {
+			description: "Redirect to wallet status page",
 		},
 	},
 });
@@ -350,6 +428,7 @@ walletRoute.openapi(fundWalletRoute, async (c) => {
 	});
 
 	try {
+		const callbackUrl = `${new URL(c.req.url).origin}/wallet/callback?type=deposit`;
 		const paystackResult = await initializeTransaction(
 			c.env.PAYSTACK_SECRET_KEY,
 			amount,
@@ -359,6 +438,7 @@ walletRoute.openapi(fundWalletRoute, async (c) => {
 				reference,
 				type: "wallet_funding",
 			},
+			callbackUrl,
 		);
 
 		return c.json(
@@ -422,19 +502,33 @@ walletRoute.openapi(getWalletRoute, async (c) => {
 			})
 			.returning();
 
+		const walletResponse = {
+			id: newWallet.id,
+			balance: newWallet.balance,
+			createdAt: newWallet.createdAt,
+			updatedAt: newWallet.updatedAt,
+		};
+
 		return c.json(
 			{
 				success: true as const,
-				data: newWallet,
+				data: walletResponse,
 			},
 			200,
 		);
 	}
 
+	const walletResponse = {
+		id: wallet.id,
+		balance: wallet.balance,
+		createdAt: wallet.createdAt,
+		updatedAt: wallet.updatedAt,
+	};
+
 	return c.json(
 		{
 			success: true as const,
-			data: wallet,
+			data: walletResponse,
 		},
 		200,
 	);
@@ -469,6 +563,83 @@ walletRoute.openapi(getTransactionsRoute, async (c) => {
 		},
 		200,
 	);
+});
+
+walletRoute.openapi(getBanksRoute, async (c) => {
+	const user = c.get("user");
+	if (!user) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Unauthorized",
+				details: null,
+			},
+			401,
+		);
+	}
+
+	try {
+		const banks = await getNigerianBanks(c.env.PAYSTACK_SECRET_KEY);
+		const normalizedBanks = banks
+			.map((bank) => ({ name: bank.name, code: bank.code }))
+			.sort((a, b) => a.name.localeCompare(b.name));
+
+		return c.json(
+			{
+				success: true as const,
+				data: normalizedBanks,
+			},
+			200,
+		);
+	} catch (error) {
+		return c.json(
+			{
+				success: false as const,
+				error:
+					error instanceof Error
+						? error.message
+						: "Failed to fetch banks",
+				details: null,
+			},
+			400,
+		);
+	}
+});
+
+walletRoute.openapi(callbackRoute, async (c) => {
+	const query = c.req.valid("query");
+	const reference = query.reference || query.trxref || "";
+	const type = query.type || "deposit";
+	let status = (query.status || "").toLowerCase();
+
+	// Paystack may not include status in callback query, so verify by reference.
+	if (!status && reference) {
+		try {
+			const tx = await verifyTransaction(c.env.PAYSTACK_SECRET_KEY, reference);
+			const txStatus = tx.status.toLowerCase();
+			status =
+				txStatus === "success"
+					? "success"
+					: txStatus === "failed" || txStatus === "abandoned"
+						? "failed"
+						: "pending";
+		} catch {
+			status = "pending";
+		}
+	}
+
+	if (!["success", "failed", "pending"].includes(status)) {
+		status = "pending";
+	}
+
+	const redirectUrl = new URL("/wallet-transaction-status", c.env.CORS_ORIGIN);
+	redirectUrl.searchParams.set("status", status);
+	redirectUrl.searchParams.set("type", type);
+	if (reference) {
+		redirectUrl.searchParams.set("reference", reference);
+	}
+
+	return c.redirect(redirectUrl.toString(), 302);
 });
 
 const WebhookEventSchema = z.object({

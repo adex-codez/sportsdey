@@ -6,6 +6,7 @@ import {
 	Outlet,
 	Scripts,
 	useLocation,
+	useMatches,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Provider } from "react-redux";
@@ -20,6 +21,7 @@ import Socials from "@/components/socials";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SPORTS } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import { store } from "@/store";
 import Header from "../components/header";
 import appCss from "../index.css?url";
@@ -66,7 +68,27 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
 function RootDocument() {
 	const location = useLocation();
+	const matches = useMatches();
+	const activeRouteId = matches[matches.length - 1]?.routeId ?? "";
 	const isAuthRoute = location.pathname.startsWith("/auth");
+	const sidebarAllowedRouteIds = new Set([
+		"/",
+		"/index/$gameId",
+		"/index/tournament/$tournamentId",
+		"/basketball",
+		"/basketball/",
+		"/basketball/$Id",
+		"/basketball/tournament/$tournamentId",
+		"/tennis",
+		"/tennis/",
+		"/tennis/$Id",
+		"/news",
+		"/news/",
+		"/news/$slug",
+		"/news/$slug/og",
+		"/betting",
+	]);
+	const shouldShowSidebar = sidebarAllowedRouteIds.has(activeRouteId);
 
 	return (
 		<Provider store={store}>
@@ -121,10 +143,19 @@ function RootDocument() {
 											</header>
 
 											<main className="no-scrollbar flex-1 overflow-y-auto">
-												<div className="mx-4 grid py-4 md:gap-8 lg:mx-[104px] lg:grid-cols-[20%_80%]">
-													<aside className="no-scrollbar hidden h-full overflow-y-auto pr-4 lg:block">
-														<Sidebar />
-													</aside>
+												<div
+													className={cn(
+														"mx-4 grid py-4 md:gap-8 lg:mx-[104px]",
+														shouldShowSidebar
+															? "lg:grid-cols-[20%_80%]"
+															: "lg:grid-cols-1",
+													)}
+												>
+													{shouldShowSidebar && (
+														<aside className="no-scrollbar hidden h-full overflow-y-auto pr-4 lg:block">
+															<Sidebar />
+														</aside>
+													)}
 													<section className="min-w-0">
 														<Outlet />
 													</section>

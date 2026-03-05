@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WalletTransactionStatusRouteImport } from './routes/wallet-transaction-status'
+import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TennisRouteImport } from './routes/tennis'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as FavoritesRouteImport } from './routes/favorites'
@@ -30,6 +32,16 @@ import { Route as NewsSlugOgRouteImport } from './routes/news.$slug.og'
 import { Route as IndexTournamentTournamentIdRouteImport } from './routes/index.tournament.$tournamentId'
 import { Route as BasketballTournamentTournamentIdRouteImport } from './routes/basketball.tournament.$tournamentId'
 
+const WalletTransactionStatusRoute = WalletTransactionStatusRouteImport.update({
+  id: '/wallet-transaction-status',
+  path: '/wallet-transaction-status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WalletRoute = WalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TennisRoute = TennisRouteImport.update({
   id: '/tennis',
   path: '/tennis',
@@ -140,6 +152,8 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof FavoritesRoute
   '/news': typeof NewsRouteWithChildren
   '/tennis': typeof TennisRouteWithChildren
+  '/wallet': typeof WalletRoute
+  '/wallet-transaction-status': typeof WalletTransactionStatusRoute
   '/auth': typeof AuthLayoutRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -159,6 +173,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/betting': typeof BettingRoute
   '/favorites': typeof FavoritesRoute
+  '/wallet': typeof WalletRoute
+  '/wallet-transaction-status': typeof WalletTransactionStatusRoute
   '/auth': typeof AuthLayoutRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -182,6 +198,8 @@ export interface FileRoutesById {
   '/favorites': typeof FavoritesRoute
   '/news': typeof NewsRouteWithChildren
   '/tennis': typeof TennisRouteWithChildren
+  '/wallet': typeof WalletRoute
+  '/wallet-transaction-status': typeof WalletTransactionStatusRoute
   '/auth/_layout': typeof AuthLayoutRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
@@ -206,6 +224,8 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/news'
     | '/tennis'
+    | '/wallet'
+    | '/wallet-transaction-status'
     | '/auth'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -225,6 +245,8 @@ export interface FileRouteTypes {
     | '/'
     | '/betting'
     | '/favorites'
+    | '/wallet'
+    | '/wallet-transaction-status'
     | '/auth'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -247,6 +269,8 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/news'
     | '/tennis'
+    | '/wallet'
+    | '/wallet-transaction-status'
     | '/auth/_layout'
     | '/auth/sign-in'
     | '/auth/sign-up'
@@ -270,6 +294,8 @@ export interface RootRouteChildren {
   FavoritesRoute: typeof FavoritesRoute
   NewsRoute: typeof NewsRouteWithChildren
   TennisRoute: typeof TennisRouteWithChildren
+  WalletRoute: typeof WalletRoute
+  WalletTransactionStatusRoute: typeof WalletTransactionStatusRoute
   AuthLayoutRoute: typeof AuthLayoutRoute
   AuthSignInRoute: typeof AuthSignInRoute
   AuthSignUpRoute: typeof AuthSignUpRoute
@@ -280,6 +306,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wallet-transaction-status': {
+      id: '/wallet-transaction-status'
+      path: '/wallet-transaction-status'
+      fullPath: '/wallet-transaction-status'
+      preLoaderRoute: typeof WalletTransactionStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wallet': {
+      id: '/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof WalletRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tennis': {
       id: '/tennis'
       path: '/tennis'
@@ -483,6 +523,8 @@ const rootRouteChildren: RootRouteChildren = {
   FavoritesRoute: FavoritesRoute,
   NewsRoute: NewsRouteWithChildren,
   TennisRoute: TennisRouteWithChildren,
+  WalletRoute: WalletRoute,
+  WalletTransactionStatusRoute: WalletTransactionStatusRoute,
   AuthLayoutRoute: AuthLayoutRoute,
   AuthSignInRoute: AuthSignInRoute,
   AuthSignUpRoute: AuthSignUpRoute,

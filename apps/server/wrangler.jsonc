@@ -31,7 +31,6 @@
 	],
   "vars": {
     "NODE_ENV": "development",
-    "CORS_ORIGIN": "http://localhost:3001"
   },
   "env": {
       "staging": {
@@ -55,7 +54,6 @@
         "routes": ["staging-api.sportsdey.com"],
         "vars": {
           "NODE_ENV": "staging",
-          "CORS_ORIGIN": "https://staging.sportsdey.adeaduratimilehin.workers.dev"
         }
       },
       "production": {
@@ -79,7 +77,6 @@
         ],
         "vars": {
       		"NODE_ENV": "production",
-      		"CORS_ORIGIN": "https://sportsdey.adeaduratimilehin.workers.dev"
       		// Add public environment variables here
       		// Example: "CORS_ORIGIN": "https://your-domain.com"
        	},
