@@ -43,7 +43,6 @@ const SidebarItem = ({
 	return <div>{Content}</div>;
 };
 
-
 const Sidebar = () => {
 	const { tab, setTab } = useActiveTab();
 	const navigate = useNavigate();
@@ -79,7 +78,6 @@ const Sidebar = () => {
 								search: { league: undefined, sports: targetSport } as any,
 							});
 						}}
-
 					>
 						Scores
 					</li>
@@ -112,7 +110,6 @@ const Sidebar = () => {
 					>
 						News
 					</li>
-
 				</ul>
 			</SidebarItem>
 

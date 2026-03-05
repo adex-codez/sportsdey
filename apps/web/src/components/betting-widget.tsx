@@ -32,7 +32,7 @@ export default function BettingWidget() {
 
 			if (event.data?.type === "SET_LOBBY_SIDEBAR_WIDGET_HEIGHT") {
 				const iframe = document.getElementById(
-					"lobbySidebarWidget"
+					"lobbySidebarWidget",
 				) as HTMLIFrameElement | null;
 
 				if (iframe && event.data.height) {
@@ -51,7 +51,6 @@ export default function BettingWidget() {
 
 	return (
 		<div className="overflow-hidden rounded-2xl bg-white dark:bg-[#202120]">
-
 			<hr className="dark:border-[#5A5F63]" />
 			<div className="relative">
 				{isIframeLoading && (
@@ -81,12 +80,31 @@ export default function BettingWidget() {
 						href="https://hallalotto.com/"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="flex items-center gap-3 hover:text-accent transition-colors"
+						className="flex items-center gap-3 transition-colors hover:text-accent"
 					>
-						<img src="/betting-logo.png" className="h-5 w-5 object-contain" alt="Betting" />
-						<span className="font-medium text-sm">Play lottery</span>
+						<img
+							src="/betting-logo.png"
+							className="h-5 w-5 object-contain"
+							alt="Betting"
+						/>
+						<span className="font-medium text-sm">Tutorials</span>
 					</a>
 				</li>
+				{/*<li>
+					<a
+						href="https://hallalotto.com/"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="flex items-center gap-3 transition-colors hover:text-accent"
+					>
+						<img
+							src="/betting-logo.png"
+							className="h-5 w-5 object-contain"
+							alt="Betting"
+						/>
+						<span className="font-medium text-sm">Play lottery</span>
+					</a>
+				</li>*/}
 			</ul>
 		</div>
 	);
