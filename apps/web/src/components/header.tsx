@@ -125,6 +125,7 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 					</Link>
 
 					<div className="flex items-center gap-3">
+						{!isAuthRoute && <UserMenu />}
 						<ThemeToggle />
 						{isAuthRoute && (
 							<button
@@ -359,6 +360,7 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 									</li>
 								</ul>
 							</div>
+
 							<div className="dark:text-white">
 								<div className="w-full bg-[#202120] px-4 py-4 text-base">
 									Betting

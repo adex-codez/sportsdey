@@ -8,8 +8,8 @@ import {
 	getNigerianBanks,
 	initializeTransaction,
 	initiateTransfer,
-	verifyTransaction,
 	verifyAccountNumber,
+	verifyTransaction,
 } from "@/utils/paystack";
 import type { CloudflareBindings } from "../types";
 
@@ -428,7 +428,7 @@ walletRoute.openapi(fundWalletRoute, async (c) => {
 	});
 
 	try {
-		const callbackUrl = `${new URL(c.req.url).origin}/wallet/callback?type=deposit`;
+		const callbackUrl = `${c.env.SERVER_URL}/wallet/callback?type=deposit`;
 		const paystackResult = await initializeTransaction(
 			c.env.PAYSTACK_SECRET_KEY,
 			amount,
@@ -595,10 +595,7 @@ walletRoute.openapi(getBanksRoute, async (c) => {
 		return c.json(
 			{
 				success: false as const,
-				error:
-					error instanceof Error
-						? error.message
-						: "Failed to fetch banks",
+				error: error instanceof Error ? error.message : "Failed to fetch banks",
 				details: null,
 			},
 			400,
@@ -610,10 +607,10 @@ walletRoute.openapi(callbackRoute, async (c) => {
 	const query = c.req.valid("query");
 	const reference = query.reference || query.trxref || "";
 	const type = query.type || "deposit";
-	let status = (query.status || "").toLowerCase();
 
-	// Paystack may not include status in callback query, so verify by reference.
-	if (!status && reference) {
+	let status = "pending";
+
+	if (reference) {
 		try {
 			const tx = await verifyTransaction(c.env.PAYSTACK_SECRET_KEY, reference);
 			const txStatus = tx.status.toLowerCase();
@@ -623,23 +620,228 @@ walletRoute.openapi(callbackRoute, async (c) => {
 					: txStatus === "failed" || txStatus === "abandoned"
 						? "failed"
 						: "pending";
+
+			if (status === "success" && type === "deposit") {
+				const db = drizzle(c.env.DB, { schema });
+
+				const [transaction] = await db
+					.select()
+					.from(schema.walletTransaction)
+					.where(eq(schema.walletTransaction.reference, reference))
+					.limit(1);
+
+				if (transaction && transaction.status !== "success") {
+					await db
+						.update(schema.walletTransaction)
+						.set({ status: "success" })
+						.where(eq(schema.walletTransaction.reference, reference));
+
+					const [wallet] = await db
+						.select()
+						.from(schema.wallet)
+						.where(eq(schema.wallet.userId, transaction.userId))
+						.limit(1);
+
+					if (wallet) {
+						await db
+							.update(schema.wallet)
+							.set({
+								balance: wallet.balance + transaction.amount,
+							})
+							.where(eq(schema.wallet.userId, transaction.userId));
+					}
+				}
+			}
 		} catch {
 			status = "pending";
 		}
 	}
 
-	if (!["success", "failed", "pending"].includes(status)) {
-		status = "pending";
-	}
+	const isSuccess = status === "success";
+	const isFailed = status === "failed";
+	const title =
+		type === "withdraw"
+			? isSuccess
+				? "Withdrawal successful"
+				: isFailed
+					? "Withdrawal failed"
+					: "Withdrawal pending"
+			: isSuccess
+				? "Deposit successful"
+				: isFailed
+					? "Deposit failed"
+					: "Deposit pending";
 
-	const redirectUrl = new URL("/wallet-transaction-status", c.env.CORS_ORIGIN);
-	redirectUrl.searchParams.set("status", status);
-	redirectUrl.searchParams.set("type", type);
-	if (reference) {
-		redirectUrl.searchParams.set("reference", reference);
-	}
+	const description = isSuccess
+		? "Your transaction was completed successfully."
+		: isFailed
+			? "This transaction failed. Please try again."
+			: "Your transaction is still being processed.";
 
-	return c.redirect(redirectUrl.toString(), 302);
+	const textColor = isSuccess ? "#14804A" : isFailed ? "#D13030" : "#B26A00";
+	const bgCircle = isSuccess ? "#14804A" : isFailed ? "#D13030" : "#B26A00";
+	const bgPing = isSuccess ? "#CCF3DD" : isFailed ? "#FADBD8" : "#F2CF93";
+	const borderColor = isSuccess ? "#F2CF93" : isFailed ? "#FADBD8" : "#F2CF93";
+
+	const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>${title}</title>
+	<style>
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			background: #fafafa;
+			min-height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		.container {
+			background: white;
+			border-radius: 16px;
+			padding: 32px;
+			text-align: center;
+			box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+			max-width: 400px;
+			width: 90%;
+		}
+		@media (prefers-color-scheme: dark) {
+			body { background: #121212; }
+			.container { background: #202120; }
+		}
+		.icon-container {
+			display: flex;
+			justify-content: center;
+			margin-bottom: 24px;
+		}
+		${
+			isSuccess
+				? `
+			.icon-wrapper {
+				position: relative;
+				width: 96px;
+				height: 96px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			.ping {
+				position: absolute;
+				width: 96px;
+				height: 96px;
+				background: ${bgPing};
+				border-radius: 50%;
+				animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+			}
+			.circle {
+				position: relative;
+				width: 80px;
+				height: 80px;
+				background: ${bgCircle};
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: white;
+				font-size: 32px;
+			}
+			@keyframes ping {
+				75%, 100% { transform: scale(2); opacity: 0; }
+			}
+		`
+				: isFailed
+					? `
+			.circle {
+				width: 80px;
+				height: 80px;
+				background: ${bgCircle};
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: white;
+				font-size: 40px;
+				animation: pulse 1.5s ease-in-out infinite;
+			}
+			@keyframes pulse {
+				0%, 100% { opacity: 1; }
+				50% { opacity: 0.6; }
+			}
+		`
+					: `
+			.spinner {
+				width: 80px;
+				height: 80px;
+				border: 4px solid ${borderColor};
+				border-top-color: ${bgCircle};
+				border-radius: 50%;
+				animation: spin 1s linear infinite;
+			}
+			@keyframes spin {
+				to { transform: rotate(360deg); }
+			}
+		`
+		}
+		h1 {
+			font-size: 24px;
+			font-weight: 600;
+			color: ${textColor};
+			margin-bottom: 12px;
+		}
+		p {
+			color: #6E6E6E;
+			font-size: 14px;
+			line-height: 1.5;
+		}
+		.reference {
+			margin-top: 8px;
+			font-size: 12px;
+		}
+		.close-msg {
+			margin-top: 24px;
+			padding-top: 16px;
+			border-top: 1px solid #eee;
+			font-size: 13px;
+			color: #888;
+		}
+		@media (prefers-color-scheme: dark) {
+			p { color: #aaa; }
+			.close-msg { border-color: #333; }
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="icon-container">
+			${
+				isSuccess
+					? `
+				<div class="icon-wrapper">
+					<div class="ping"></div>
+					<div class="circle">✓</div>
+				</div>
+			`
+					: isFailed
+						? `
+				<div class="circle">×</div>
+			`
+						: `
+				<div class="spinner"></div>
+			`
+			}
+		</div>
+		<h1>${title}</h1>
+		<p>${description}</p>
+		${reference ? `<p class="reference">Reference: ${reference}</p>` : ""}
+		<p class="close-msg">You can close this window</p>
+	</div>
+</body>
+</html>`;
+
+	return c.html(html, 200);
 });
 
 const WebhookEventSchema = z.object({
@@ -711,17 +913,43 @@ walletRoute.openapi(webhookRoute, async (c) => {
 			return c.json({ received: true }, 200);
 		}
 
+		try {
+			const verifiedTx = await verifyTransaction(
+				c.env.PAYSTACK_SECRET_KEY,
+				reference,
+			);
+
+			if (verifiedTx.status.toLowerCase() !== "success") {
+				await db
+					.update(schema.walletTransaction)
+					.set({ status: "failed" })
+					.where(eq(schema.walletTransaction.reference, reference));
+
+				return c.json({ received: true }, 200);
+			}
+		} catch {
+			return c.json({ received: true }, 200);
+		}
+
 		await db
 			.update(schema.walletTransaction)
 			.set({ status: "success" })
 			.where(eq(schema.walletTransaction.reference, reference));
 
-		await db
-			.update(schema.wallet)
-			.set({
-				balance: transaction.amount,
-			})
-			.where(eq(schema.wallet.userId, transaction.userId));
+		const [wallet] = await db
+			.select()
+			.from(schema.wallet)
+			.where(eq(schema.wallet.userId, transaction.userId))
+			.limit(1);
+
+		if (wallet) {
+			await db
+				.update(schema.wallet)
+				.set({
+					balance: wallet.balance + transaction.amount,
+				})
+				.where(eq(schema.wallet.userId, transaction.userId));
+		}
 	}
 
 	return c.json({ received: true }, 200);

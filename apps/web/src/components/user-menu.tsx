@@ -1,20 +1,32 @@
-import { LogOut } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { signOut, useSession } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
+import { walletLogoutItem, walletMenuItems } from "./wallet-menu-items";
 
 export function UserMenu() {
 	const { data: session, isPending: isLoading } = useSession();
 	const [isOpen, setIsOpen] = useState(false);
+	const navigate = useNavigate();
 
 	const handleSignOut = async () => {
 		await signOut();
 		setIsOpen(false);
+		navigate({ to: "/auth/sign-in" });
+	};
+	const handleMenuNavigation = (path?: string) => {
+		setIsOpen(false);
+		if (!path) {
+			return;
+		}
+		const destination = session?.user ? path : "/auth/sign-in";
+		navigate({ to: destination });
 	};
 
 	if (isLoading) {
 		return (
 			<button
+				type="button"
 				className="flex items-center justify-center p-2"
 				aria-label="Loading"
 			>
@@ -25,6 +37,7 @@ export function UserMenu() {
 
 	if (session?.user) {
 		const user = session.user;
+		const WalletLogoutIcon = walletLogoutItem.icon;
 		const displayName = user.name || "User";
 		const initials = displayName
 			.split(" ")
@@ -32,11 +45,11 @@ export function UserMenu() {
 			.join("")
 			.toUpperCase()
 			.slice(0, 2);
-		const email = user.email || "";
 
 		return (
 			<div className="relative">
 				<button
+					type="button"
 					onClick={() => setIsOpen(!isOpen)}
 					className={cn(
 						"flex items-center gap-2.5 rounded-full p-2.5 transition-colors",
@@ -70,26 +83,49 @@ export function UserMenu() {
 
 				{isOpen && (
 					<>
-						<div
+						<button
+							type="button"
 							className="fixed inset-0 z-40"
 							onClick={() => setIsOpen(false)}
+							aria-label="Close user menu"
 						/>
-						<div className="absolute top-full right-0 z-50 mt-2 w-56 rounded-lg bg-primary p-3 shadow-lg dark:bg-black">
-							<div className="border-border border-b pb-3">
-								<p className="truncate font-medium text-foreground">
-									{displayName}
-								</p>
-								<p className="truncate text-muted-foreground text-sm">
-									{email}
-								</p>
-							</div>
-							<button
-								onClick={handleSignOut}
-								className="mt-3 flex w-full items-center gap-2 rounded-md px-2 py-2 text-destructive text-sm transition-colors hover:bg-destructive/10"
-							>
-								<LogOut className="h-4 w-4" />
-								Sign out
-							</button>
+						<div className="absolute top-full right-0 z-50 mt-2 w-64 rounded-2xl bg-white p-3 shadow-lg dark:bg-[#202120]">
+							<nav aria-label="User menu options">
+								<ul className="space-y-2">
+									{walletMenuItems.map(({ label, icon: Icon, path }) => (
+										<li key={label}>
+											<button
+												type="button"
+												onClick={() => handleMenuNavigation(path)}
+												className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-primary dark:text-white"
+											>
+												<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEF0ED]">
+													<Icon width={18} height={18} className="block" />
+												</span>
+												<span className="font-medium text-sm">{label}</span>
+											</button>
+										</li>
+									))}
+									<li>
+										<button
+											type="button"
+											onClick={handleSignOut}
+											className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[#FD4585]"
+										>
+											<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F8E9FE]">
+												<WalletLogoutIcon
+													width={18}
+													height={18}
+													className="block"
+												/>
+											</span>
+											<span className="font-medium text-sm">
+												{walletLogoutItem.label}
+											</span>
+										</button>
+									</li>
+								</ul>
+							</nav>
 						</div>
 					</>
 				)}

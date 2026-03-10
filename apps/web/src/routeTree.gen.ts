@@ -16,6 +16,7 @@ import { Route as NewsRouteImport } from './routes/news'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as BettingRouteImport } from './routes/betting'
 import { Route as BasketballRouteImport } from './routes/basketball'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TennisIndexRouteImport } from './routes/tennis.index'
 import { Route as NewsIndexRouteImport } from './routes/news.index'
@@ -65,6 +66,11 @@ const BettingRoute = BettingRouteImport.update({
 const BasketballRoute = BasketballRouteImport.update({
   id: '/basketball',
   path: '/basketball',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -147,6 +153,7 @@ const BasketballTournamentTournamentIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/basketball': typeof BasketballRouteWithChildren
   '/betting': typeof BettingRoute
   '/favorites': typeof FavoritesRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/betting': typeof BettingRoute
   '/favorites': typeof FavoritesRoute
   '/wallet': typeof WalletRoute
@@ -193,6 +201,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/basketball': typeof BasketballRouteWithChildren
   '/betting': typeof BettingRoute
   '/favorites': typeof FavoritesRoute
@@ -219,6 +228,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account'
     | '/basketball'
     | '/betting'
     | '/favorites'
@@ -243,6 +253,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account'
     | '/betting'
     | '/favorites'
     | '/wallet'
@@ -264,6 +275,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/account'
     | '/basketball'
     | '/betting'
     | '/favorites'
@@ -289,6 +301,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
   BasketballRoute: typeof BasketballRouteWithChildren
   BettingRoute: typeof BettingRoute
   FavoritesRoute: typeof FavoritesRoute
@@ -353,6 +366,13 @@ declare module '@tanstack/react-router' {
       path: '/basketball'
       fullPath: '/basketball'
       preLoaderRoute: typeof BasketballRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -518,6 +538,7 @@ const TennisRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
   BasketballRoute: BasketballRouteWithChildren,
   BettingRoute: BettingRoute,
   FavoritesRoute: FavoritesRoute,

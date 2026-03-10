@@ -15,6 +15,13 @@
       "when": 1772472812204,
       "tag": "0001_glamorous_aqueduct",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1772747739664,
+      "tag": "0002_conscious_madrox",
+      "breakpoints": true
     }
   ]
 }

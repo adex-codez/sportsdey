@@ -25,6 +25,8 @@ declare namespace Cloudflare {
 		FACEBOOK_CLIENT_SECRET: string;
 		PAYSTACK_SECRET_KEY: string;
 		PAYSTACK_PUBLIC_KEY: string;
+		SERVER_URL: string;
+		LUCKYWORLDGAMES_LAUNCH_URL: string;
 	}
 }
 export interface CloudflareBindings extends Cloudflare.Env {}

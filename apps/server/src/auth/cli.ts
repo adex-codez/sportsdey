@@ -18,6 +18,19 @@ const db = new Kysely<Database>({
 export const auth = betterAuth({
 	database: drizzleAdapter(db, { provider: "sqlite" }),
 	emailAndPassword: { enabled: true },
+	user: {
+		additionalFields: {
+			country: {
+				type: "string",
+				required: false,
+			},
+			mobileNumber: {
+				type: "string",
+				required: false,
+				fieldName: "mobile_number",
+			},
+		},
+	},
 	socialProviders: {
 		google: {
 			clientId: process.env.GOOGLE_CLIENT_ID || "",

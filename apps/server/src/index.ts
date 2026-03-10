@@ -37,6 +37,7 @@ app.use(
 
 app.on(["GET", "POST"], "/auth/*", async (c) => {
 	const auth = createAuth(c.env);
+	console.log("trustedOrigin");
 	return auth.handler(c.req.raw);
 });
 
@@ -45,7 +46,8 @@ app.use("*", async (c, next) => {
 	if (
 		path.startsWith("/auth/") ||
 		path.startsWith("/docs") ||
-		path.startsWith("/openapi")
+		path.startsWith("/openapi") ||
+		path.startsWith("/api/account/")
 	) {
 		return next();
 	}
