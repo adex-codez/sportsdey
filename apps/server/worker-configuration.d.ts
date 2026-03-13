@@ -21,6 +21,9 @@ declare namespace Cloudflare {
 		GOOGLE_CLIENT_SECRET: string;
 		APPLE_CLIENT_ID: string;
 		APPLE_CLIENT_SECRET: string;
+		APPLE_TEAM_ID: string;
+		APPLE_KEY_ID: string;
+		APPLE_PRIVATE_KEY: string;
 		FACEBOOK_CLIENT_ID: string;
 		FACEBOOK_CLIENT_SECRET: string;
 		PAYSTACK_SECRET_KEY: string;

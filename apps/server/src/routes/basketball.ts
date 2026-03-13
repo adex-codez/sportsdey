@@ -11,11 +11,10 @@ import {
 } from "@/schemas";
 
 import {
-	transformGameSummary,
+	transformApiSportsStandings,
+	transformGameSummaryApiSports,
 	transformGameTeamStats,
-	transformProxySchedule,
-	transformProxyStandings,
-	transformTournamentSchedule,
+	transformSchedule,
 } from "@/utils/basketball";
 import { fetchWithTimeout, isTimeoutError } from "@/utils/fetch-with-timeout";
 import { jsonZodErrorFormatter } from "@/utils/zod";
@@ -28,6 +27,10 @@ import {
 } from "@/validators";
 
 const basketballRoute = new OpenAPIHono<{ Bindings: Cloudflare.Env }>();
+
+function getKvNamespace(env: any): any {
+	return env.sportsdey_ns || env.staging_kv || null;
+}
 
 const basketballScheduleRoute = createRoute({
 	method: "get",
@@ -82,19 +85,18 @@ basketballRoute.openapi(
 		try {
 			const { date } = c.req.valid("query");
 
-			const proxyUrl = c.env.PROXY_URL;
-			const proxySecret = c.env.PROXY_SECRET;
+			const apiKey = c.env.API_SPORTS_KEY;
 
-			if (!proxyUrl || !proxySecret) {
+			if (!apiKey) {
 				return c.json(
 					{
 						success: false as const,
 						error: "Configuration error",
 						details: [
 							{
-								field: "server",
-								message: "Proxy configuration missing",
-								code: "config_error",
+								field: "API_SPORTS_KEY",
+								message: "API-Sports key is missing",
+								code: "missing_api_key",
 							},
 						],
 					},
@@ -105,7 +107,7 @@ basketballRoute.openapi(
 			const cacheKey = `basketball_schedule_${date}`;
 			let cachedData = null;
 			try {
-				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+				cachedData = (await getKvNamespace(c.env)?.get(cacheKey, "json")) as {
 					data: any;
 					expiresAt: number;
 				} | null;
@@ -123,7 +125,10 @@ basketballRoute.openapi(
 				);
 			}
 
-			const apiUrl = `${proxyUrl}basketball/match/list?date=${date}`;
+			const apiSportsBase = "https://v1.basketball.api-sports.io";
+			const [day, month, year] = date.split("/");
+			const apiSportsDate = `${year}-${month}-${day}`;
+			const apiUrl = `${apiSportsBase}/games?date=${apiSportsDate}`;
 
 			let response: Response;
 			try {
@@ -131,7 +136,9 @@ basketballRoute.openapi(
 					apiUrl,
 					{
 						headers: {
-							"X-Proxy-Auth": proxySecret,
+							"x-rapidapi-host": "v1.basketball.api-sports.io",
+							"x-rapidapi-key": apiKey!,
+							Accept: "application/json",
 						},
 					},
 					10000,
@@ -144,8 +151,8 @@ basketballRoute.openapi(
 							error: "Gateway timeout",
 							details: [
 								{
-									field: "proxy_api",
-									message: "Proxy API request timed out",
+									field: "api_sports",
+									message: "API-Sports request timed out",
 									code: "timeout_error",
 								},
 							],
@@ -153,7 +160,20 @@ basketballRoute.openapi(
 						502,
 					);
 				}
-				throw err;
+				return c.json(
+					{
+						success: false as const,
+						error: "Failed to fetch",
+						details: [
+							{
+								field: "api_sports",
+								message: `Fetch failed: ${err instanceof Error ? err.message : "Unknown error"}`,
+								code: "fetch_error",
+							},
+						],
+					},
+					502,
+				);
 			}
 
 			if (!response.ok) {
@@ -163,8 +183,8 @@ basketballRoute.openapi(
 						error: "External API error",
 						details: [
 							{
-								field: "proxy_api",
-								message: `Proxy API returned status ${response.status}`,
+								field: "api_sports",
+								message: `API-Sports returned status ${response.status}`,
 								code: "external_api_error",
 							},
 						],
@@ -173,17 +193,24 @@ basketballRoute.openapi(
 				);
 			}
 
-			const data = await response.json();
+			const data = (await response.json()) as any;
+			const games = data.response || [];
 
-			const transformedData = transformProxySchedule(data as any[]);
+			const transformedData = transformSchedule(games);
 
-			await c.env.sportsdey_ns.put(
-				cacheKey,
-				JSON.stringify({
-					data: transformedData,
-					expiresAt: Date.now() + 30 * 1000,
-				}),
-			);
+			if (getKvNamespace(c.env)) {
+				try {
+					await getKvNamespace(c.env)?.put(
+						cacheKey,
+						JSON.stringify({
+							data: transformedData,
+							expiresAt: Date.now() + 30 * 1000,
+						}),
+					);
+				} catch (cacheErr) {
+					console.warn("Cache write failed:", cacheErr);
+				}
+			}
 			return c.json(
 				{
 					success: true as const,
@@ -192,7 +219,7 @@ basketballRoute.openapi(
 				200,
 			);
 		} catch (error) {
-			console.error(error);
+			console.error("Basketball schedule error:", error);
 			return c.json(
 				{
 					success: false as const,
@@ -266,19 +293,18 @@ basketballRoute.openapi(
 			const { tournamentId } = c.req.valid("param");
 			const { date } = c.req.valid("query");
 
-			const proxyUrl = c.env.PROXY_URL;
-			const proxySecret = c.env.PROXY_SECRET;
+			const apiKey = c.env.API_SPORTS_KEY;
 
-			if (!proxyUrl || !proxySecret) {
+			if (!apiKey) {
 				return c.json(
 					{
 						success: false as const,
 						error: "Configuration error",
 						details: [
 							{
-								field: "server",
-								message: "Proxy configuration missing",
-								code: "config_error",
+								field: "API_SPORTS_KEY",
+								message: "API-Sports key is missing",
+								code: "missing_api_key",
 							},
 						],
 					},
@@ -289,7 +315,7 @@ basketballRoute.openapi(
 			const cacheKey = `basketball_tournament_${tournamentId}_matches_${date}`;
 			let cachedData = null;
 			try {
-				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+				cachedData = (await getKvNamespace(c.env)?.get(cacheKey, "json")) as {
 					data: any;
 					expiresAt: number;
 				} | null;
@@ -307,7 +333,10 @@ basketballRoute.openapi(
 				);
 			}
 
-			const apiUrl = `${proxyUrl}basketball/match/list?date=${date}`;
+			const apiSportsBase = "https://v1.basketball.api-sports.io";
+			const [day, month, year] = date.split("/");
+			const apiSportsDate = `${year}-${month}-${day}`;
+			const apiUrl = `${apiSportsBase}/games?date=${apiSportsDate}`;
 
 			let response: Response;
 			try {
@@ -315,7 +344,9 @@ basketballRoute.openapi(
 					apiUrl,
 					{
 						headers: {
-							"X-Proxy-Auth": proxySecret,
+							"x-rapidapi-host": "v1.basketball.api-sports.io",
+							"x-rapidapi-key": apiKey,
+							Accept: "application/json",
 						},
 					},
 					10000,
@@ -328,8 +359,8 @@ basketballRoute.openapi(
 							error: "Gateway timeout",
 							details: [
 								{
-									field: "proxy_api",
-									message: "Proxy API request timed out",
+									field: "api_sports",
+									message: "API-Sports request timed out",
 									code: "timeout_error",
 								},
 							],
@@ -347,8 +378,8 @@ basketballRoute.openapi(
 						error: "External API error",
 						details: [
 							{
-								field: "proxy_api",
-								message: `Proxy API returned status ${response.status}`,
+								field: "api_sports",
+								message: `API-Sports returned status ${response.status}`,
 								code: "external_api_error",
 							},
 						],
@@ -357,26 +388,45 @@ basketballRoute.openapi(
 				);
 			}
 
-			const data = await response.json();
-			const transformedData = transformTournamentSchedule(
-				data as any[],
-				tournamentId,
+			const data = (await response.json()) as any;
+			const allGames = data.response || [];
+
+			const filteredGames = allGames.filter(
+				(game: any) => game.league?.id?.toString() === tournamentId,
 			);
 
-			// console.log(transformedData);
+			const transformedData = transformSchedule(filteredGames);
 
-			await c.env.sportsdey_ns.put(
-				cacheKey,
-				JSON.stringify({
-					data: transformedData,
-					expiresAt: Date.now() + 30 * 1000,
-				}),
-			);
+			// transformSchedule returns { competitions: [{ id, name, games }...] }
+			// The tournament schedule response shape expects { games, total, competition }
+			const competition = transformedData.competitions[0];
+			const responseData = {
+				games: competition?.games ?? [],
+				total: competition?.games?.length ?? 0,
+				competition: {
+					name: competition?.name ?? "",
+					id: competition?.id ? Number(competition.id) : Number(tournamentId),
+				},
+			};
+
+			if (getKvNamespace(c.env)) {
+				try {
+					await getKvNamespace(c.env)?.put(
+						cacheKey,
+						JSON.stringify({
+							data: responseData,
+							expiresAt: Date.now() + 30 * 1000,
+						}),
+					);
+				} catch (cacheErr) {
+					console.warn("Cache write failed:", cacheErr);
+				}
+			}
 
 			return c.json(
 				{
 					success: true as const,
-					data: transformedData,
+					data: responseData,
 				},
 				200,
 			);
@@ -459,19 +509,18 @@ basketballRoute.openapi(
 	async (c) => {
 		try {
 			const { gameId } = c.req.valid("param");
-			const proxyUrl = c.env.PROXY_URL;
-			const proxySecret = c.env.PROXY_SECRET;
+			const apiKey = c.env.API_SPORTS_KEY;
 
-			if (!proxyUrl || !proxySecret) {
+			if (!apiKey) {
 				return c.json(
 					{
 						success: false as const,
 						error: "Configuration error",
 						details: [
 							{
-								field: "server",
-								message: "Proxy configuration missing",
-								code: "config_error",
+								field: "API_SPORTS_KEY",
+								message: "API-Sports key is missing",
+								code: "missing_api_key",
 							},
 						],
 					},
@@ -482,7 +531,7 @@ basketballRoute.openapi(
 			const cacheKey = `basketball_game_${gameId}`;
 			let cachedData = null;
 			try {
-				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+				cachedData = (await getKvNamespace(c.env)?.get(cacheKey, "json")) as {
 					data: any;
 					expiresAt: number;
 				} | null;
@@ -500,16 +549,40 @@ basketballRoute.openapi(
 				);
 			}
 
-			// Parallel fetch for summary and boxscore with timeout
-			const [summaryRes, boxscoreRes] = await Promise.all([
+			const apiSportsBase = "https://v1.basketball.api-sports.io";
+
+			const [summaryRes, teamStatsRes, playersRes] = await Promise.all([
 				fetchWithTimeout(
-					`${proxyUrl}basketball/match/summary?matchId=${gameId}`,
-					{ headers: { "X-Proxy-Auth": proxySecret } },
+					`${apiSportsBase}/games?id=${gameId}`,
+					{
+						headers: {
+							"x-rapidapi-host": "v1.basketball.api-sports.io",
+							"x-rapidapi-key": apiKey,
+							Accept: "application/json",
+						},
+					},
 					10000,
 				),
 				fetchWithTimeout(
-					`${proxyUrl}basketball/match/boxscore?matchId=${gameId}`,
-					{ headers: { "X-Proxy-Auth": proxySecret } },
+					`${apiSportsBase}/games/statistics/teams?id=${gameId}`,
+					{
+						headers: {
+							"x-rapidapi-host": "v1.basketball.api-sports.io",
+							"x-rapidapi-key": apiKey,
+							Accept: "application/json",
+						},
+					},
+					10000,
+				),
+				fetchWithTimeout(
+					`${apiSportsBase}/games/statistics/players?id=${gameId}`,
+					{
+						headers: {
+							"x-rapidapi-host": "v1.basketball.api-sports.io",
+							"x-rapidapi-key": apiKey,
+							Accept: "application/json",
+						},
+					},
 					10000,
 				),
 			]);
@@ -521,8 +594,8 @@ basketballRoute.openapi(
 						error: "External API error",
 						details: [
 							{
-								field: "proxy_api",
-								message: `Summary API returned status ${summaryRes.statusText}`,
+								field: "api_sports",
+								message: `Summary API returned status ${summaryRes.status}`,
 								code: "external_api_error",
 							},
 						],
@@ -531,15 +604,15 @@ basketballRoute.openapi(
 				);
 			}
 
-			if (!boxscoreRes.ok) {
+			if (!teamStatsRes.ok) {
 				return c.json(
 					{
 						success: false as const,
 						error: "External API error",
 						details: [
 							{
-								field: "proxy_api",
-								message: `Boxscore API returned status ${boxscoreRes.status}`,
+								field: "api_sports",
+								message: `Team Stats API returned status ${teamStatsRes.status}`,
 								code: "external_api_error",
 							},
 						],
@@ -549,28 +622,37 @@ basketballRoute.openapi(
 			}
 
 			const summaryData = await summaryRes.json();
-			const boxscoreData = await boxscoreRes.json();
+			const teamStatsData = await teamStatsRes.json();
+			const playersData = playersRes.ok
+				? await playersRes.json()
+				: { response: [] };
 
-			const transformedData = transformGameSummary(
+			const transformedData = transformGameSummaryApiSports(
 				summaryData as any,
-				boxscoreData as any,
+				teamStatsData as any,
+				playersData as any,
 			);
 
-			// Determine cache time based on status using the transformed status directly or checking summary
 			const isClosed =
 				transformedData.status === "Full Time" ||
 				transformedData.status === "Finished A.E.T." ||
 				transformedData.status === "closed";
 
-			await c.env.sportsdey_ns.put(
-				cacheKey,
-				JSON.stringify({
-					data: transformedData,
-					expiresAt: isClosed
-						? Date.now() + 2 * 60 * 1000
-						: Date.now() + 2 * 1000,
-				}),
-			);
+			if (getKvNamespace(c.env)) {
+				try {
+					await getKvNamespace(c.env)?.put(
+						cacheKey,
+						JSON.stringify({
+							data: transformedData,
+							expiresAt: isClosed
+								? Date.now() + 2 * 60 * 1000
+								: Date.now() + 2 * 1000,
+						}),
+					);
+				} catch (cacheErr) {
+					console.warn("Cache write failed:", cacheErr);
+				}
+			}
 
 			return c.json(
 				{
@@ -660,19 +742,18 @@ basketballRoute.openapi(
 	async (c) => {
 		try {
 			const { gameId } = c.req.valid("param");
-			const proxyUrl = c.env.PROXY_URL;
-			const proxySecret = c.env.PROXY_SECRET;
+			const apiKey = c.env.API_SPORTS_KEY;
 
-			if (!proxyUrl || !proxySecret) {
+			if (!apiKey) {
 				return c.json(
 					{
 						success: false as const,
 						error: "Configuration error",
 						details: [
 							{
-								field: "server",
-								message: "Proxy configuration missing",
-								code: "config_error",
+								field: "API_SPORTS_KEY",
+								message: "API-Sports key is missing",
+								code: "missing_api_key",
 							},
 						],
 					},
@@ -683,7 +764,7 @@ basketballRoute.openapi(
 			const cacheKey = `basketball_game_${gameId}_stats`;
 			let cachedData = null;
 			try {
-				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+				cachedData = (await getKvNamespace(c.env)?.get(cacheKey, "json")) as {
 					data: any;
 					expiresAt: number;
 				} | null;
@@ -701,37 +782,45 @@ basketballRoute.openapi(
 				);
 			}
 
-			let response: Response;
-			try {
-				response = await fetchWithTimeout(
-					`${proxyUrl}basketball/match/boxscore?matchId=${gameId}`,
+			const apiSportsBase = "https://v1.basketball.api-sports.io";
+			const [gameRes, teamStatsRes, playersRes] = await Promise.all([
+				fetchWithTimeout(
+					`${apiSportsBase}/games?id=${gameId}`,
 					{
-						headers: { "X-Proxy-Auth": proxySecret },
+						headers: {
+							"x-rapidapi-host": "v1.basketball.api-sports.io",
+							"x-rapidapi-key": apiKey,
+							Accept: "application/json",
+						},
 					},
 					10000,
-				);
-			} catch (err) {
-				if (isTimeoutError(err)) {
-					return c.json(
-						{
-							success: false as const,
-							error: "Gateway timeout",
-							details: [
-								{
-									field: "proxy_api",
-									message: "Proxy API request timed out",
-									code: "timeout_error",
-								},
-							],
+				),
+				fetchWithTimeout(
+					`${apiSportsBase}/games/statistics/teams?id=${gameId}`,
+					{
+						headers: {
+							"x-rapidapi-host": "v1.basketball.api-sports.io",
+							"x-rapidapi-key": apiKey,
+							Accept: "application/json",
 						},
-						502,
-					);
-				}
-				throw err;
-			}
+					},
+					10000,
+				),
+				fetchWithTimeout(
+					`${apiSportsBase}/games/statistics/players?id=${gameId}`,
+					{
+						headers: {
+							"x-rapidapi-host": "v1.basketball.api-sports.io",
+							"x-rapidapi-key": apiKey,
+							Accept: "application/json",
+						},
+					},
+					10000,
+				),
+			]);
 
-			if (!response.ok) {
-				if (response.status === 404) {
+			if (!gameRes.ok) {
+				if (gameRes.status === 404) {
 					return c.json(
 						{
 							success: false as const,
@@ -754,8 +843,8 @@ basketballRoute.openapi(
 						error: "External API error",
 						details: [
 							{
-								field: "proxy_api",
-								message: `Proxy API returned status ${response.status}`,
+								field: "api_sports",
+								message: `Game API returned status ${gameRes.status}`,
 								code: "external_api_error",
 							},
 						],
@@ -764,16 +853,64 @@ basketballRoute.openapi(
 				);
 			}
 
-			const boxscoreData = await response.json();
-			const transformedData = transformGameTeamStats(boxscoreData as any);
+			if (!teamStatsRes.ok) {
+				if (teamStatsRes.status === 404) {
+					return c.json(
+						{
+							success: false as const,
+							error: "Game not found",
+							details: [
+								{
+									field: "gameId",
+									message: `Game with ID ${gameId} was not found`,
+									code: "game_not_found",
+								},
+							],
+						},
+						404,
+					);
+				}
 
-			await c.env.sportsdey_ns.put(
-				cacheKey,
-				JSON.stringify({
-					data: transformedData,
-					expiresAt: Date.now() + 5 * 1000,
-				}),
+				return c.json(
+					{
+						success: false as const,
+						error: "External API error",
+						details: [
+							{
+								field: "api_sports",
+								message: `API-Sports returned status ${teamStatsRes.status}`,
+								code: "external_api_error",
+							},
+						],
+					},
+					502,
+				);
+			}
+
+			const gameData = await gameRes.json();
+			const teamStatsData = await teamStatsRes.json();
+			const playersData = playersRes.ok
+				? await playersRes.json()
+				: { response: [] };
+			const transformedData = transformGameTeamStats(
+				gameData as any,
+				teamStatsData as any,
+				playersData as any,
 			);
+
+			if (getKvNamespace(c.env)) {
+				try {
+					await getKvNamespace(c.env)?.put(
+						cacheKey,
+						JSON.stringify({
+							data: transformedData,
+							expiresAt: Date.now() + 5 * 1000,
+						}),
+					);
+				} catch (cacheErr) {
+					console.warn("Cache write failed:", cacheErr);
+				}
+			}
 
 			return c.json(
 				{
@@ -853,19 +990,18 @@ basketballRoute.openapi(
 	async (c) => {
 		try {
 			const { tournamentId } = c.req.valid("param");
-			const proxyUrl = c.env.PROXY_URL;
-			const proxySecret = c.env.PROXY_SECRET;
+			const apiKey = c.env.API_SPORTS_KEY;
 
-			if (!proxyUrl || !proxySecret) {
+			if (!apiKey) {
 				return c.json(
 					{
 						success: false as const,
 						error: "Configuration error",
 						details: [
 							{
-								field: "server",
-								message: "Proxy configuration missing",
-								code: "config_error",
+								field: "API_SPORTS_KEY",
+								message: "API-Sports key is missing",
+								code: "missing_api_key",
 							},
 						],
 					},
@@ -876,7 +1012,7 @@ basketballRoute.openapi(
 			const cacheKey = `basketball_standings_${tournamentId}`;
 			let cachedData = null;
 			try {
-				cachedData = (await c.env.sportsdey_ns.get(cacheKey, "json")) as {
+				cachedData = (await getKvNamespace(c.env)?.get(cacheKey, "json")) as {
 					data: any;
 					expiresAt: number;
 				} | null;
@@ -894,15 +1030,24 @@ basketballRoute.openapi(
 				);
 			}
 
-			const apiUrl = `${proxyUrl}basketball/tournament/standings?tournamentId=${tournamentId}`;
+			const apiSportsBase = "https://v1.basketball.api-sports.io";
+			const currentYear = new Date().getFullYear();
+			const currentMonth = new Date().getMonth();
+			const season =
+				currentMonth >= 9
+					? `${currentYear}-${currentYear + 1}`
+					: `${currentYear - 1}-${currentYear}`;
+			const url = `${apiSportsBase}/standings?league=${tournamentId}&season=${season}`;
 
 			let response: Response;
 			try {
 				response = await fetchWithTimeout(
-					apiUrl,
+					url,
 					{
 						headers: {
-							"X-Proxy-Auth": proxySecret,
+							"x-rapidapi-host": "v1.basketball.api-sports.io",
+							"x-rapidapi-key": apiKey,
+							Accept: "application/json",
 						},
 					},
 					10000,
@@ -915,8 +1060,8 @@ basketballRoute.openapi(
 							error: "Gateway timeout",
 							details: [
 								{
-									field: "proxy_api",
-									message: "Proxy API request timed out",
+									field: "api_sports",
+									message: "API-Sports request timed out",
 									code: "timeout_error",
 								},
 							],
@@ -927,6 +1072,8 @@ basketballRoute.openapi(
 				throw err;
 			}
 
+			console.log(url);
+
 			if (!response.ok) {
 				return c.json(
 					{
@@ -934,8 +1081,8 @@ basketballRoute.openapi(
 						error: "External API error",
 						details: [
 							{
-								field: "proxy_api",
-								message: `Proxy API returned status ${response.status}`,
+								field: "api_sports",
+								message: `API-Sports returned status ${response.status}`,
 								code: "external_api_error",
 							},
 						],
@@ -944,19 +1091,32 @@ basketballRoute.openapi(
 				);
 			}
 
-			const data = await response.json();
-			const transformedData = transformProxyStandings(data as any[]);
+			const data = (await response.json()) as any;
+			const transformedData = transformApiSportsStandings(data);
 
-			await c.env.sportsdey_ns.put(
-				cacheKey,
-				JSON.stringify({
+			if (getKvNamespace(c.env)) {
+				try {
+					await getKvNamespace(c.env)?.put(
+						cacheKey,
+						JSON.stringify({
+							data: transformedData,
+							expiresAt: Date.now() + 60 * 60 * 1000,
+						}),
+					);
+				} catch (cacheErr) {
+					console.warn("Cache write failed:", cacheErr);
+				}
+			}
+
+			return c.json(
+				{
+					success: true as const,
 					data: transformedData,
-					expiresAt: Date.now() + 60 * 60 * 1000, // Cache for 1 hour
-				}),
+				},
+				200,
 			);
-
-			return c.json({ success: true as const, data: transformedData }, 200);
 		} catch (error) {
+			console.error("Basketball standings error:", error);
 			return c.json(
 				{
 					success: false as const,

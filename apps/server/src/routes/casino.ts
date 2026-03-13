@@ -15,6 +15,7 @@ const GamePlayResponseSchema = z.object({
 	success: z.literal(true),
 	data: z.object({
 		launchUrl: z.string().openapi({ description: "URL to launch the game" }),
+		token: z.string().openapi({ description: "Token for game" }),
 	}),
 });
 
@@ -136,6 +137,7 @@ casinoRoute.openapi(playGameRoute, async (c) => {
 			success: true,
 			data: {
 				launchUrl,
+				token,
 			},
 		},
 		200,

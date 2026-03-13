@@ -1,12 +1,9 @@
 import type { z } from "@hono/zod-openapi";
-import {
-	type BasketballTournamentScheduleSchema,
-	type GameSummarySchema,
-	type ScheduleData,
-	type StandingsSchema,
-	TournamentScheduleSchema,
+import type {
+	GameSummarySchema,
+	ScheduleData,
+	StandingsSchema,
 } from "@/schemas";
-import { parseDateString } from ".";
 
 // Types mimicking the proxy response structure based on user input
 interface ProxyPlayerStats {
@@ -91,40 +88,134 @@ interface ProxyGameSummary {
 	};
 }
 
-export const transformProxySchedule = (
-	data: any[],
+export interface ApiSportsBasketballGame {
+	id: number;
+	date: string;
+	timestamp: number;
+	timezone: string;
+	status: {
+		long: string;
+		short: string;
+		elapsed: number | null;
+	};
+	periods: {
+		current: number | null;
+		total: number | null;
+		type: string;
+	};
+	league: {
+		id: number;
+		name: string;
+		type: string;
+		season: number;
+		seasonDisplay: string;
+		logo?: string;
+	};
+	teams: {
+		home: {
+			id: number;
+			name: string;
+			nickname: string;
+			code: string;
+			logo: string;
+		};
+		away: {
+			id: number;
+			name: string;
+			nickname: string;
+			code: string;
+			logo: string;
+		};
+	};
+	scores: {
+		home: number | null;
+		away: number | null;
+		winner: boolean | null;
+		periods: {
+			quarter1: number | null;
+			quarter2: number | null;
+			quarter3: number | null;
+			quarter4: number | null;
+		} | null;
+	};
+}
+
+function mapBasketballStatus(
+	statusShortName?: string,
+):
+	| "scheduled"
+	| "closed"
+	| "inprogress"
+	| "halftime"
+	| "postponed"
+	| "cancelled" {
+	switch (statusShortName) {
+		case "FT":
+		case "END":
+			return "closed";
+		case "SCH":
+		case "NS":
+			return "scheduled";
+		case "1Q":
+		case "2Q":
+		case "3Q":
+		case "4Q":
+		case "Q1":
+		case "Q2":
+		case "Q3":
+		case "Q4":
+			return "inprogress";
+		case "HT":
+			return "halftime";
+		case "PPD":
+			return "postponed";
+		case "C":
+			return "cancelled";
+		default:
+			return "scheduled";
+	}
+}
+
+export const transformSchedule = (
+	data: ApiSportsBasketballGame[],
 ): z.infer<typeof ScheduleData> => {
-	// Group games by tournament/competition
+	if (!data || data.length === 0) {
+		return { competitions: [] };
+	}
+
 	const groupedGames = data.reduce(
 		(acc, game) => {
-			const tournamentName = game.tournament?.name || "Unknown Tournament";
-			const tournamentId = game.tournament?.id || "unknown";
+			if (!game) return acc;
+
+			const tournamentName = game.league?.name || "Unknown Tournament";
+			const tournamentId = game.league?.id ?? "unknown";
 
 			if (!acc[tournamentId]) {
 				acc[tournamentId] = {
 					id: String(tournamentId),
 					name: tournamentName,
+					imageUrl: game.league?.logo ?? null,
 					games: [],
 				};
 			}
 
 			acc[tournamentId].games.push({
-				id: String(game.id),
-				status: mapGameStatus(game.status?.shortName),
-				scheduledTime: parseDateString(game.date),
+				id: String(game.id || ""),
+				status: mapBasketballStatus(game.status?.short),
+				scheduledTime: game.date || "",
 				home: {
-					name: game.homeTeam?.name || "Unknown",
-					alias: game.homeTeam?.shortName || "",
-					points: game.homeTeam?.score?.current ?? null,
+					name: game.teams?.home?.name || "Unknown",
+					alias: game.teams?.home?.code || "",
+					points: game.scores?.home ?? null,
+					imageUrl: game.teams?.home?.logo ?? null,
 				},
 				away: {
-					name: game.awayTeam?.name || "Unknown",
-					alias: game.awayTeam?.shortName || "",
-					points: game.awayTeam?.score?.current ?? null,
+					name: game.teams?.away?.name || "Unknown",
+					alias: game.teams?.away?.code || "",
+					points: game.scores?.away ?? null,
+					imageUrl: game.teams?.away?.logo ?? null,
 				},
-				...(game.gameClock
-					? { clock: `${game.gameClock.minute}:${game.gameClock.second}` }
-					: {}),
+				...(game.status?.elapsed ? { clock: `${game.status.elapsed}:00` } : {}),
 			});
 
 			return acc;
@@ -132,7 +223,6 @@ export const transformProxySchedule = (
 		{} as Record<string, any>,
 	);
 
-	// Sort competitions to show NBA first
 	const competitions = Object.values(groupedGames) as Array<{
 		id: string;
 		name: string;
@@ -151,37 +241,154 @@ export const transformProxySchedule = (
 	};
 };
 
-// Helper status mapper
-const mapGameStatus = (
-	statusShortName?: string,
-):
-	| "scheduled"
-	| "closed"
-	| "inprogress"
-	| "halftime"
-	| "postponed"
-	| "cancelled" => {
-	switch (statusShortName) {
-		case "FT":
-		case "AET":
-		case "AOT":
+export const transformGameSummaryApiSports = (
+	summary: any,
+	teamStats: any,
+	players: any,
+): z.infer<typeof GameSummarySchema> => {
+	const game = summary?.response?.[0];
+	const homeTeamId = game?.teams?.home?.id;
+	const awayTeamId = game?.teams?.away?.id;
+	const homeTeamName = game?.teams?.home?.name;
+	const awayTeamName = game?.teams?.away?.name;
+	const homeTeamLogo = game?.teams?.home?.logo;
+	const awayTeamLogo = game?.teams?.away?.logo;
+	const tournamentLogo = game?.league?.logo;
+
+	const homeTeamStats = teamStats?.response?.find(
+		(t: any) => t.team?.id === homeTeamId,
+	);
+	const awayTeamStats = teamStats?.response?.find(
+		(t: any) => t.team?.id === awayTeamId,
+	);
+
+	const summaryScores = {
+		home: summary?.response?.[0]?.scores?.home ?? {},
+		away: summary?.response?.[0]?.scores?.away ?? {},
+	};
+
+	const allPlayers = players?.response || [];
+
+	const homePlayers = allPlayers.filter((p: any) => p.team?.id === homeTeamId);
+	const awayPlayers = allPlayers.filter((p: any) => p.team?.id === awayTeamId);
+
+	const parseMinutes = (timeStr?: string): number => {
+		if (!timeStr) return 0;
+		const parts = timeStr.split(":").map(Number);
+		if (parts.length < 2) return 0;
+		const [min, sec] = parts;
+		if (min === undefined || sec === undefined) return 0;
+		return min + sec / 60;
+	};
+
+	const transformPlayer = (p: any) => ({
+		full_name: p.player?.name || "Unknown",
+		pls_min: parseMinutes(p.minutes),
+		imageUrl: p.player?.photo ?? null,
+		statistics: {
+			minutes: p.minutes || "00:00",
+			field_goals_made: p.field_goals?.total || 0,
+			field_goals_att: p.field_goals?.attempts || 0,
+			field_goals_pct: p.field_goals?.percentage ?? 0,
+			three_points_made: p.threepoint_goals?.total || 0,
+			three_points_att: p.threepoint_goals?.attempts || 0,
+			three_points_pct: p.threepoint_goals?.percentage ?? 0,
+			free_throws_made: p.freethrows_goals?.total || 0,
+			free_throws_att: p.freethrows_goals?.attempts || 0,
+			free_throws_pct: p.freethrows_goals?.percentage ?? 0,
+			rebounds: p.rebounds?.total || 0,
+			offensive_rebounds: 0,
+			defensive_rebounds: 0,
+			assists: p.assists || 0,
+			steals: 0,
+			blocks: 0,
+			turnovers: 0,
+			personal_fouls: 0,
+		},
+	});
+
+	const transformTeam = (
+		isHome: boolean,
+		teamStatsData: any,
+		teamPlayers: any[],
+	) => {
+		const starters = teamPlayers
+			.filter((p) => p.type === "starters")
+			.map(transformPlayer);
+
+		const bench = teamPlayers
+			.filter((p) => p.type === "bench")
+			.map(transformPlayer);
+
+		const teamName = isHome ? homeTeamName : awayTeamName;
+		const scoreFromSummary = isHome ? summaryScores.home : summaryScores.away;
+		const getQuarter = (key: string) =>
+			scoreFromSummary?.[key] ??
+			scoreFromSummary?.[key.replace("_", "")] ??
+			scoreFromSummary?.[key.toLowerCase()];
+
+		const teamPoints =
+			teamStatsData?.points ??
+			scoreFromSummary?.total ??
+			scoreFromSummary?.points ??
+			0;
+
+		return {
+			name: teamName || "Unknown",
+			points: teamPoints,
+			imageUrl: isHome ? homeTeamLogo ?? null : awayTeamLogo ?? null,
+			score: {
+				quarter1: teamStatsData?.scores?.q1 ?? getQuarter("quarter_1") ?? 0,
+				quarter2: teamStatsData?.scores?.q2 ?? getQuarter("quarter_2") ?? 0,
+				quarter3: teamStatsData?.scores?.q3 ?? getQuarter("quarter_3") ?? 0,
+				quarter4: teamStatsData?.scores?.q4 ?? getQuarter("quarter_4") ?? 0,
+				...(scoreFromSummary?.over_time != null && {
+					over_time: scoreFromSummary.over_time,
+				}),
+				...(scoreFromSummary?.total != null && {
+					total: scoreFromSummary.total,
+				}),
+			},
+			starters,
+			bench,
+		};
+	};
+
+	const mapStatus = (short: string): string => {
+		if (short === "FT" || short === "END" || short === "AET" || short === "AOT")
 			return "closed";
-		case "SCH":
-			return "scheduled";
-		case "1Q":
-		case "2Q":
-		case "3Q":
-		case "4Q":
+		if (short === "NS" || short === "SCH") return "scheduled";
+		if (
+			short === "Q1" ||
+			short === "Q2" ||
+			short === "Q3" ||
+			short === "Q4" ||
+			short === "1Q" ||
+			short === "2Q" ||
+			short === "3Q" ||
+			short === "4Q"
+		)
 			return "inprogress";
-		case "HT":
-			return "halftime";
-		case "Postponed":
-			return "postponed";
-		case "Canceled":
-			return "cancelled";
-		default:
-			return "scheduled"; // Default fallback
-	}
+		if (short === "HT") return "halftime";
+		if (short === "PPD") return "postponed";
+		if (short === "C") return "cancelled";
+		return "scheduled";
+	};
+
+	return {
+		id: String(game?.id || ""),
+		status: mapStatus(game?.status?.short || ""),
+		tournament: {
+			id: game?.league?.id || 0,
+			name: game?.league?.name || "Unknown",
+			imageUrl: tournamentLogo ?? null,
+		},
+		date: game?.date || "",
+		venue: game?.venue || "Unknown Venue",
+		clock: game?.status?.elapsed ? `${game.status.elapsed}:00` : "",
+		home: transformTeam(true, homeTeamStats, homePlayers),
+		away: transformTeam(false, awayTeamStats, awayPlayers),
+	};
 };
 
 export const transformGameSummary = (
@@ -212,12 +419,15 @@ export const transformGameSummary = (
 
 		return {
 			name: teamSummary.name,
-			points: teamSummary.score ? teamSummary.score.current : 0,
+			points: teamSummary.score ? teamSummary.score.total : 0,
 			score: {
-				quarter1: teamSummary.score ? teamSummary.score.quarter1 : 0,
-				quarter2: teamSummary.score ? teamSummary.score.quarter2 : 0,
-				quarter3: teamSummary.score ? teamSummary.score.quarter3 : 0,
-				quarter4: teamSummary.score ? teamSummary.score.quarter4 : 0,
+				quarter1: teamSummary.score ? teamSummary.score.quarter_1 : 0,
+				quarter2: teamSummary.score ? teamSummary.score.quarter_2 : 0,
+				quarter3: teamSummary.score ? teamSummary.score.quarter_3 : 0,
+				quarter4: teamSummary.score ? teamSummary.score.quarter_4 : 0,
+				...(teamSummary.score?.over_time && {
+					over_time: teamSummary.score.over_time,
+				}),
 			},
 			starters,
 			bench,
@@ -288,40 +498,98 @@ export const transformTeamData = (
 	return {};
 };
 
-export const transformProxyStandings = (
-	data: any[],
+export const transformApiSportsStandings = (
+	data: any,
 ): z.infer<typeof StandingsSchema> => {
-	const leagueStandings =
-		data.find((item) => item.name === "League Standings") || data[0];
+	const standingsData = data?.response || [];
+	const allTeams: any[] = [];
 
-	if (!leagueStandings || !leagueStandings.standings?.overall) {
-		return { data: [] };
-	}
+	standingsData.forEach((conference: any) => {
+		if (Array.isArray(conference)) {
+			conference.forEach((team: any) => {
+			allTeams.push({
+				id: String(team.team?.id),
+				name: team.team?.name || "Unknown",
+				imageUrl: team.team?.logo ?? null,
+				wins: team.games?.win?.total || 0,
+				losses: team.games?.lose?.total || 0,
+				played: team.games?.played || 0,
+				streak: 0,
+					gb: 0,
+					diff: (team.points?.for || 0) - (team.points?.against || 0),
+					win_pct: Number.parseFloat(team.games?.win?.percentage || "0") * 100,
+				});
+			});
+		}
+	});
 
-	const transformedParams = leagueStandings.standings.overall.map(
-		(teamData: any) => ({
-			id: String(teamData.team.id),
-			name: teamData.team.name,
-			points: teamData.points,
-			wins: teamData.won,
-			losses: teamData.lost,
-			played: teamData.played,
-			// streak: 0, // Not provided in the new API response
-			gb: teamData.gb,
-			diff: teamData.pd, // Point differential
-			win_pct: teamData.wpg,
-		}),
-	);
+	allTeams.sort((a, b) => b.win_pct - a.win_pct);
 
 	return {
-		data: transformedParams,
+		data: allTeams,
 	};
 };
 
-export const transformGameTeamStats = (boxscore: {
-	homeTeam: ProxyTeamBoxscore;
-	awayTeam: ProxyTeamBoxscore;
-}) => {
+export const transformGameTeamStats = (
+	gameData: {
+		response?: Array<{
+			id: number;
+			teams: {
+				home: { id: number; name: string };
+				away: { id: number; name: string };
+			};
+		}>;
+	},
+	teamData: {
+		response?: Array<{
+			game: { id: number };
+			team: { id: number; name?: string };
+			field_goals: { total: number; attempts: number; percentage: number };
+			threepoint_goals: { total: number; attempts: number; percentage: number };
+			freethrows_goals: { total: number; attempts: number; percentage: number };
+			rebounds: { total: number; offence: number; defense: number };
+			assists: number;
+			steals: number;
+			blocks: number;
+			turnovers: number;
+			personal_fouls: number;
+		}>;
+	},
+	playersData: {
+		response?: Array<{
+			game: { id: number };
+			team: { id: number; name?: string };
+			player: { id: number; name: string };
+			type: "starters" | "bench";
+			minutes: string;
+			field_goals: {
+				total: number;
+				attempts: number;
+				percentage: number | null;
+			};
+			threepoint_goals: {
+				total: number;
+				attempts: number;
+				percentage: number | null;
+			};
+			freethrows_goals: {
+				total: number;
+				attempts: number;
+				percentage: number | null;
+			};
+			rebounds: { total: number };
+			assists: number;
+			points: number;
+		}>;
+	},
+) => {
+	const game = gameData.response?.[0];
+	const homeTeamName = game?.teams?.home?.name;
+	const awayTeamName = game?.teams?.away?.name;
+
+	const teams = teamData.response || [];
+	const players = playersData.response || [];
+
 	const parseMinutes = (timeStr?: string): number => {
 		if (!timeStr) return 0;
 		const parts = timeStr.split(":").map(Number);
@@ -331,99 +599,105 @@ export const transformGameTeamStats = (boxscore: {
 		return min + sec / 60;
 	};
 
-	const transformPlayer = (p: ProxyPlayer) => ({
-		full_name: p.player.knownName,
-		pls_min: parseMinutes(p.statistics.playingTime),
+	const transformPlayer = (p: (typeof players)[0]) => ({
+		full_name: p.player?.name || "Unknown",
+		pls_min: parseMinutes(p.minutes),
 		statistics: {
-			field_goals_made: p.statistics.successfulFieldGoals || 0,
-			field_goals_att: p.statistics.fieldGoalAttempts || 0,
-			field_goals_pct: (p.statistics.fieldGoalSuccessRate || 0) * 100,
-			three_points_made: p.statistics.successfulThreePointShots || 0,
-			three_points_att: p.statistics.threePointShotAttempts || 0,
-			three_points_pct: (p.statistics.threePointSuccessRate || 0) * 100,
-			free_throws_made: p.statistics.successfulFreeThrows || 0,
-			free_throws_att: p.statistics.freeThrowAttempts || 0,
-			free_throws_pct: (p.statistics.freeThrowSuccessRate || 0) * 100,
-			rebounds: p.statistics.totalRebounds || 0,
-			offensive_rebounds: p.statistics.offensiveRebounds || 0,
-			defensive_rebounds: p.statistics.defensiveRebounds || 0,
-			assists: p.statistics.assists || 0,
-			steals: p.statistics.steals || 0,
-			blocks: p.statistics.blocks || 0,
-			turnovers: p.statistics.turnovers || 0,
-			personal_fouls: p.statistics.personalFouls || 0,
+			minutes: p.minutes || "00:00",
+			field_goals_made: p.field_goals?.total || 0,
+			field_goals_att: p.field_goals?.attempts || 0,
+			field_goals_pct: p.field_goals?.percentage ?? 0,
+			three_points_made: p.threepoint_goals?.total || 0,
+			three_points_att: p.threepoint_goals?.attempts || 0,
+			three_points_pct: p.threepoint_goals?.percentage ?? 0,
+			free_throws_made: p.freethrows_goals?.total || 0,
+			free_throws_att: p.freethrows_goals?.attempts || 0,
+			free_throws_pct: p.freethrows_goals?.percentage ?? 0,
+			rebounds: p.rebounds?.total || 0,
+			offensive_rebounds: 0,
+			defensive_rebounds: 0,
+			assists: p.assists || 0,
+			steals: 0,
+			blocks: 0,
+			turnovers: 0,
+			personal_fouls: 0,
 		},
 	});
 
-	const transformTeamStats = (teamBoxscore: ProxyTeamBoxscore) => {
-		const starters = teamBoxscore?.boxscore
-			? teamBoxscore.boxscore
-					.filter((p) => !p.statistics.onBench)
-					.map(transformPlayer)
-			: [];
+	const transformTeamStats = (
+		isHome: boolean,
+		teamStats: (typeof teams)[0] | undefined,
+		teamPlayers: typeof players,
+	) => {
+		const starters = teamPlayers
+			.filter((p) => p.type === "starters")
+			.map(transformPlayer);
 
-		const bench = teamBoxscore?.boxscore
-			? teamBoxscore.boxscore
-					.filter(
-						(p) =>
-							p.statistics.onBench &&
-							!p.statistics.dnp &&
-							p.statistics.playingTime &&
-							p.statistics.playingTime !== "00:00",
-					)
-					.map(transformPlayer)
-			: [];
+		const bench = teamPlayers
+			.filter((p) => p.type === "bench")
+			.map(transformPlayer);
+
+		const teamName = isHome ? homeTeamName : awayTeamName;
+
+		if (!teamStats) {
+			return {
+				name: teamName || "Unknown",
+				field_goals_made: 0,
+				field_goals_att: 0,
+				field_goals_pct: 0,
+				three_points_made: 0,
+				three_points_att: 0,
+				three_points_pct: 0,
+				free_throws_made: 0,
+				free_throws_att: 0,
+				free_throws_pct: 0,
+				rebounds: 0,
+				offensive_rebounds: 0,
+				defensive_rebounds: 0,
+				assists: 0,
+				steals: 0,
+				blocks: 0,
+				turnovers: 0,
+				personal_fouls: 0,
+				starters,
+				bench,
+			};
+		}
 
 		return {
-			name: teamBoxscore.name,
+			name: teamName || teamStats.team?.name || "Unknown",
+			field_goals_made: teamStats.field_goals?.total || 0,
+			field_goals_att: teamStats.field_goals?.attempts || 0,
+			field_goals_pct: teamStats.field_goals?.percentage || 0,
+			three_points_made: teamStats.threepoint_goals?.total || 0,
+			three_points_att: teamStats.threepoint_goals?.attempts || 0,
+			three_points_pct: teamStats.threepoint_goals?.percentage || 0,
+			free_throws_made: teamStats.freethrows_goals?.total || 0,
+			free_throws_att: teamStats.freethrows_goals?.attempts || 0,
+			free_throws_pct: teamStats.freethrows_goals?.percentage || 0,
+			rebounds: teamStats.rebounds?.total || 0,
+			offensive_rebounds: teamStats.rebounds?.offence || 0,
+			defensive_rebounds: teamStats.rebounds?.defense || 0,
+			assists: teamStats.assists || 0,
+			steals: teamStats.steals || 0,
+			blocks: teamStats.blocks || 0,
+			turnovers: teamStats.turnovers || 0,
+			personal_fouls: teamStats.personal_fouls || 0,
 			starters,
 			bench,
 		};
 	};
 
-	return {
-		home: transformTeamStats(boxscore.homeTeam),
-		away: transformTeamStats(boxscore.awayTeam),
-	};
-};
+	const homeTeam = teams[0];
+	const awayTeam = teams[1];
+	const homeIdFromTeamStats = homeTeam?.team?.id;
+	const awayIdFromTeamStats = awayTeam?.team?.id;
 
-export const transformTournamentSchedule = (
-	data: any[],
-	tournamentId: string,
-): z.infer<typeof BasketballTournamentScheduleSchema> => {
-	const filteredGames = data.filter(
-		(game) => String(game.tournament?.id) === tournamentId,
-	);
-
-	const tournament = filteredGames[0].tournament;
-
-	const games = filteredGames.map((game) => ({
-		id: String(game.id),
-		status: mapGameStatus(game.status?.shortName),
-		scheduledTime: game.startTimestamp
-			? new Date(game.startTimestamp * 1000).toISOString()
-			: parseDateString(game.date),
-		home: {
-			name: game.homeTeam?.name || "Unknown",
-			alias: game.homeTeam?.shortName || "",
-			points: game.homeTeam?.score?.current ?? null,
-		},
-		away: {
-			name: game.awayTeam?.name || "Unknown",
-			alias: game.awayTeam?.shortName || "",
-			points: game.awayTeam?.score?.current ?? null,
-		},
-		...(game.gameClock
-			? { clock: `${game.gameClock.minute}:${game.gameClock.second}` }
-			: {}),
-	}));
+	const homePlayers = players.filter((p) => p.team?.id === homeIdFromTeamStats);
+	const awayPlayers = players.filter((p) => p.team?.id === awayIdFromTeamStats);
 
 	return {
-		games: games,
-		total: games.length,
-		competition: {
-			name: tournament.name,
-			id: tournament.id,
-		},
+		home: transformTeamStats(true, homeTeam, homePlayers),
+		away: transformTeamStats(false, awayTeam, awayPlayers),
 	};
 };

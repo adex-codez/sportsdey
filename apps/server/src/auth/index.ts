@@ -35,6 +35,23 @@ export const createAuth = (env: CloudflareBindings) => {
 		basePath: "/auth",
 		database: drizzleAdapter(db, { provider: "sqlite" }),
 		emailAndPassword: { enabled: true },
+		socialProviders: {
+			google: {
+				clientId: env.GOOGLE_CLIENT_ID || "",
+				clientSecret: env.GOOGLE_CLIENT_SECRET || "",
+			},
+			facebook: {
+				clientId: env.FACEBOOK_CLIENT_ID || "",
+				clientSecret: env.FACEBOOK_CLIENT_SECRET || "",
+			},
+			apple: {
+				clientId: env.APPLE_CLIENT_ID || "",
+				clientSecret: env.APPLE_CLIENT_SECRET || "",
+				teamId: env.APPLE_TEAM_ID || "",
+				keyId: env.APPLE_KEY_ID || "",
+				privateKey: env.APPLE_PRIVATE_KEY || "",
+			},
+		},
 		plugins: [expo(), openAPI(), bearer()],
 		user: {
 			changeEmail: {

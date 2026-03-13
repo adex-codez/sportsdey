@@ -76,6 +76,44 @@ const BasketballComponentHeader: React.FC<BasketballComponentHeaderProps> = ({
 	);
 };
 
+const normalizeScore = (score: unknown): number | undefined => {
+	if (typeof score === "number" && Number.isFinite(score)) return score;
+	if (typeof score === "string") {
+		const n = Number(score);
+		return Number.isFinite(n) ? n : undefined;
+	}
+	if (!score || typeof score !== "object") return undefined;
+
+	const record = score as Record<string, unknown>;
+	const total = record.total ?? record.points;
+	if (typeof total === "number" && Number.isFinite(total)) return total;
+
+	const quarterKeys = [
+		"quarter_1",
+		"quarter_2",
+		"quarter_3",
+		"quarter_4",
+		"quarter1",
+		"quarter2",
+		"quarter3",
+		"quarter4",
+		"over_time",
+		"overtime",
+		"ot",
+	];
+
+	let sum = 0;
+	let found = false;
+	for (const key of quarterKeys) {
+		const value = record[key];
+		if (typeof value === "number" && Number.isFinite(value)) {
+			sum += value;
+			found = true;
+		}
+	}
+	return found ? sum : undefined;
+};
+
 const MatchCard: React.FC<MatchCardProps> = ({
 	team1,
 	team2,
@@ -92,6 +130,9 @@ const MatchCard: React.FC<MatchCardProps> = ({
 	country,
 	hideFinishedStatus = false,
 }) => {
+	const normalizedScore1 = normalizeScore(score1);
+	const normalizedScore2 = normalizeScore(score2);
+
 	const { state } = useRouter();
 	// console.log("time", time);
 	const pathname = state.location.pathname;
@@ -223,26 +264,30 @@ const MatchCard: React.FC<MatchCardProps> = ({
 				<div className="flex flex-col gap-1.5 text-sm">
 					<div className="flex items-center justify-between">
 						<span
-							className={`text-primary dark:text-white ${shouldShowScores && (score1 != null && score2 != null && score1 > score2) ? "font-semibold" : ""}`}
+							className={`text-primary dark:text-white ${shouldShowScores && (normalizedScore1 != null && normalizedScore2 != null && normalizedScore1 > normalizedScore2) ? "font-semibold" : ""}`}
 						>
 							{team1}
 						</span>
 						<span
-							className={`min-w-10 text-right text-primary dark:text-white ${shouldShowScores && (score1 != null && score2 != null && score1 > score2) ? "font-semibold" : ""}`}
+							className={`min-w-10 text-right text-primary dark:text-white ${shouldShowScores && (normalizedScore1 != null && normalizedScore2 != null && normalizedScore1 > normalizedScore2) ? "font-semibold" : ""}`}
 						>
-							{shouldShowScores && score1 != null ? score1 : ""}
+							{shouldShowScores && normalizedScore1 != null
+								? normalizedScore1
+								: ""}
 						</span>
 					</div>
 					<div className="flex items-center justify-between">
 						<span
-							className={`text-primary dark:text-white ${shouldShowScores && (score1 != null && score2 != null && score2 > score1) ? "font-semibold" : ""}`}
+							className={`text-primary dark:text-white ${shouldShowScores && (normalizedScore1 != null && normalizedScore2 != null && normalizedScore2 > normalizedScore1) ? "font-semibold" : ""}`}
 						>
 							{team2}
 						</span>
 						<span
-							className={`min-w-10 text-right text-primary dark:text-white ${shouldShowScores && (score1 != null && score2 != null && score2 > score1) ? "font-semibold" : ""}`}
+							className={`min-w-10 text-right text-primary dark:text-white ${shouldShowScores && (normalizedScore1 != null && normalizedScore2 != null && normalizedScore2 > normalizedScore1) ? "font-semibold" : ""}`}
 						>
-							{shouldShowScores && score2 != null ? score2 : ""}
+							{shouldShowScores && normalizedScore2 != null
+								? normalizedScore2
+								: ""}
 						</span>
 					</div>
 				</div>

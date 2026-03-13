@@ -47,11 +47,13 @@ export type TransformedMatch = {
 			id: string;
 			name: string;
 			score: number;
+			imageUrl?: string | null;
 		};
 		away: {
 			id: string;
 			name: string;
 			score: number;
+			imageUrl?: string | null;
 		};
 	};
 	start_time: string;
@@ -63,6 +65,7 @@ export type CompetitionGroup = {
 	competition: {
 		id: string;
 		name: string;
+		imageUrl?: string | null;
 	};
 	matches: TransformedMatch[];
 };
@@ -77,6 +80,7 @@ export type TeamStanding = {
 	name: string;
 	position: number;
 	points: number;
+	imageUrl?: string | null;
 	played: number;
 	won: number;
 	drawn: number;
@@ -89,10 +93,12 @@ export type TeamStanding = {
 export type TopScorer = {
 	id: string;
 	name: string;
+	imageUrl?: string | null;
 	team: {
 		id: string;
 		name: string;
 		abbreviation: string;
+		imageUrl?: string | null;
 	};
 	gs: number; // goals scored
 };
@@ -115,6 +121,7 @@ export type TransformedMatchInfo = {
 	competition: {
 		id: string;
 		name: string;
+		imageUrl?: string | null;
 		// gender: string;
 	};
 	competitors: {
@@ -123,12 +130,14 @@ export type TransformedMatchInfo = {
 			name: string;
 			shortName: string;
 			score?: number;
+			imageUrl?: string | null;
 		};
 		away: {
 			id: string;
 			name: string;
 			shortName: string;
 			score?: number;
+			imageUrl?: string | null;
 		};
 	};
 	match_info: {
@@ -149,6 +158,7 @@ export type TransformedMatchInfo = {
 
 export type FullTeamStanding = {
 	name: string;
+	imageUrl?: string | null;
 	position: number;
 	statistics: {
 		P: number;
@@ -352,11 +362,13 @@ export type TransformedMatchStats = {
 		statistics: ProxyMatchStats["homeTeam"]["statistics"];
 		name: string;
 		id: number;
+		imageUrl?: string | null;
 	};
 	away: {
 		statistics: ProxyMatchStats["awayTeam"]["statistics"];
 		name: string;
 		id: number;
+		imageUrl?: string | null;
 	};
 	date: string;
 	id: number;

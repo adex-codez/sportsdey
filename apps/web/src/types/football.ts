@@ -4,6 +4,7 @@ export type FootballSchedule = {
 			id: string;
 			name: string;
 			gender: string;
+			imageUrl?: string | null;
 		};
 		category: {
 			id: string;
@@ -16,11 +17,13 @@ export type FootballSchedule = {
 					id: string;
 					name: string;
 					score: number;
+					imageUrl?: string | null;
 				};
 				away: {
 					id: string;
 					name: string;
 					score: number;
+					imageUrl?: string | null;
 				};
 			};
 			start_time: string;
@@ -35,6 +38,7 @@ export type TournamentFootballSchedule = {
 	competition: {
 		id: string;
 		name: string;
+		imageUrl?: string | null;
 	};
 	matches: {
 		id: string;
@@ -43,11 +47,13 @@ export type TournamentFootballSchedule = {
 				id: string;
 				name: string;
 				score: number;
+				imageUrl?: string | null;
 			};
 			away: {
 				id: string;
 				name: string;
 				score: number;
+				imageUrl?: string | null;
 			};
 		};
 		date: string;
@@ -62,6 +68,7 @@ export type FootballMatchInfoType = {
 	competition: {
 		id: string;
 		name: string;
+		imageUrl?: string | null;
 		gender: string;
 	};
 	season: {
@@ -73,12 +80,14 @@ export type FootballMatchInfoType = {
 			name: string;
 			score: number;
 			shortName: string;
+			imageUrl?: string | null;
 		};
 		away: {
 			id: string;
 			name: string;
 			score: number;
 			shortName: string;
+			imageUrl?: string | null;
 		};
 	};
 	match_info: {
@@ -104,10 +113,12 @@ export type FootballMatchInfoType = {
 	top_scorers?: {
 		id: string;
 		name: string;
+		imageUrl?: string | null;
 		team: {
 			id: string;
 			name: string;
 			abbreviation: string;
+			imageUrl?: string | null;
 		};
 		gs: number;
 	}[];
@@ -135,6 +146,7 @@ export type FootballStandingsResponse = {
 
 export type FootballStanding = {
 	name: string;
+	imageUrl?: string | null;
 	position: number;
 	statistics: {
 		P: number;
@@ -158,6 +170,7 @@ export type FootballStatsResponse = {
 		};
 		name: string;
 		id: number;
+		imageUrl?: string | null;
 	};
 	away: {
 		statistics: {
@@ -167,6 +180,7 @@ export type FootballStatsResponse = {
 		};
 		name: string;
 		id: number;
+		imageUrl?: string | null;
 	};
 	date: string;
 	id: number;

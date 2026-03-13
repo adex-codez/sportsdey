@@ -3,6 +3,25 @@ import BasketBallScoreCard from "./BasketBallScoreCard";
 import { TeamStats, type TeamStatsData } from "./TeamStats";
 import VenueGuide from "./VenueGuide";
 
+const getQuarterScore = (
+	score: Record<string, unknown> | undefined,
+	key: string,
+): number => {
+	if (!score) return 0;
+	const value = score[key] ?? score[`quarter_${key.replace("quarter", "")}`];
+	return typeof value === "number" ? value : 0;
+};
+
+const getScoreTotal = (
+	score: Record<string, unknown> | undefined,
+	points: number | undefined,
+): number => {
+	if (points !== undefined) return points;
+	if (!score) return 0;
+	const total = score.total;
+	return typeof total === "number" ? total : 0;
+};
+
 const InfoTab = ({
 	gameDetails,
 	teamStats,
@@ -12,33 +31,40 @@ const InfoTab = ({
 }) => {
 	if (!gameDetails) return null;
 
+	const homeScore = gameDetails.home.score as
+		| Record<string, unknown>
+		| undefined;
+	const awayScore = gameDetails.away.score as
+		| Record<string, unknown>
+		| undefined;
+
 	return (
 		<div className="w-full space-y-4">
 			<div className="w-full">
 				<BasketBallScoreCard
 					team1={{
 						name: gameDetails.home.name,
-						quarterScores: gameDetails.home.score
+						quarterScores: homeScore
 							? [
-									gameDetails.home.score["quarter1"] || 0,
-									gameDetails.home.score["quarter2"] || 0,
-									gameDetails.home.score["quarter3"] || 0,
-									gameDetails.home.score["quarter4"] || 0,
+									getQuarterScore(homeScore, "quarter1"),
+									getQuarterScore(homeScore, "quarter2"),
+									getQuarterScore(homeScore, "quarter3"),
+									getQuarterScore(homeScore, "quarter4"),
 								]
 							: [0, 0, 0, 0],
-						total: gameDetails.home.points ?? 0,
+						total: getScoreTotal(homeScore, gameDetails.home.points),
 					}}
 					team2={{
 						name: gameDetails.away.name,
-						quarterScores: gameDetails.away.score
+						quarterScores: awayScore
 							? [
-									gameDetails.away.score["quarter1"] || 0,
-									gameDetails.away.score["quarter2"] || 0,
-									gameDetails.away.score["quarter3"] || 0,
-									gameDetails.away.score["quarter4"] || 0,
+									getQuarterScore(awayScore, "quarter1"),
+									getQuarterScore(awayScore, "quarter2"),
+									getQuarterScore(awayScore, "quarter3"),
+									getQuarterScore(awayScore, "quarter4"),
 								]
 							: [0, 0, 0, 0],
-						total: gameDetails.away.points ?? 0,
+						total: getScoreTotal(awayScore, gameDetails.away.points),
 					}}
 					quarters={[
 						{ id: "q1", label: "Q1" },

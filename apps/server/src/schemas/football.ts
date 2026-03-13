@@ -4,6 +4,7 @@ export const TransformedMatchInfoSchema = z.object({
 	competition: z.object({
 		id: z.string(),
 		name: z.string(),
+		imageUrl: z.string().url().nullable().optional(),
 	}),
 	competitors: z.object({
 		home: z.object({
@@ -11,12 +12,14 @@ export const TransformedMatchInfoSchema = z.object({
 			name: z.string(),
 			shortName: z.string(),
 			score: z.number(),
+			imageUrl: z.string().url().nullable().optional(),
 		}),
 		away: z.object({
 			id: z.string(),
 			name: z.string(),
 			shortName: z.string(),
 			score: z.number(),
+			imageUrl: z.string().url().nullable().optional(),
 		}),
 	}),
 	match_info: z.object({
@@ -36,6 +39,7 @@ export const TransformedMatchInfoSchema = z.object({
 				name: z.string(),
 				position: z.number(),
 				points: z.number(),
+				imageUrl: z.string().url().nullable().optional(),
 				played: z.number(),
 				won: z.number(),
 				drawn: z.number(),
@@ -51,10 +55,12 @@ export const TransformedMatchInfoSchema = z.object({
 			z.object({
 				id: z.string(),
 				name: z.string(),
+				imageUrl: z.string().url().nullable().optional(),
 				team: z.object({
 					id: z.string(),
 					name: z.string(),
 					abbreviation: z.string(),
+					imageUrl: z.string().url().nullable().optional(),
 				}),
 				gs: z.number(),
 				// assists: z.number(),
@@ -109,6 +115,7 @@ export const TransformedResponseSchema = z.object({
 			competition: z.object({
 				id: z.string(),
 				name: z.string(),
+				imageUrl: z.string().url().nullable().optional(),
 			}),
 			matches: z.array(
 				z.object({
@@ -118,11 +125,13 @@ export const TransformedResponseSchema = z.object({
 							id: z.string(),
 							name: z.string(),
 							score: z.number(),
+							imageUrl: z.string().url().nullable().optional(),
 						}),
 						away: z.object({
 							id: z.string(),
 							name: z.string(),
 							score: z.number(),
+							imageUrl: z.string().url().nullable().optional(),
 						}),
 					}),
 					date: z.string(),
@@ -153,11 +162,13 @@ export const MatchStatsSchema = z.object({
 		statistics: TeamStatsSchema,
 		name: z.string().openapi({ example: "Melbourne City" }),
 		id: z.number().openapi({ example: 15272 }),
+		imageUrl: z.string().url().nullable().optional(),
 	}),
 	away: z.object({
 		statistics: TeamStatsSchema,
 		name: z.string().openapi({ example: "Brisbane Roar" }),
 		id: z.number().openapi({ example: 8722 }),
+		imageUrl: z.string().url().nullable().optional(),
 	}),
 	date: z.string().openapi({ example: "06/01/2026 08:00:00" }),
 	id: z.number().openapi({ example: 1985541 }),
@@ -180,6 +191,7 @@ export const FullStandingsSchema = z.object({
 				GD: z.number().openapi({ example: 26 }),
 				PTS: z.number().openapi({ example: 48 }),
 			}),
+			imageUrl: z.string().url().nullable().optional(),
 		}),
 	),
 });
@@ -189,6 +201,7 @@ export const TournamentScheduleSchema = z.object({
 	competition: z.object({
 		name: z.string(),
 		id: z.number(),
+		imageUrl: z.string().url().nullable().optional(),
 	}),
 	matches: z.array(
 		z.object({
@@ -198,11 +211,13 @@ export const TournamentScheduleSchema = z.object({
 					id: z.string(),
 					name: z.string(),
 					score: z.number(),
+					imageUrl: z.string().url().nullable().optional(),
 				}),
 				away: z.object({
 					id: z.string(),
 					name: z.string(),
 					score: z.number(),
+					imageUrl: z.string().url().nullable().optional(),
 				}),
 			}),
 			start_time: z.string(),

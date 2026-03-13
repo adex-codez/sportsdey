@@ -11,14 +11,21 @@ export function formatTime(date: Date): string {
 	return `${hours}:${minutes}`;
 }
 
-export function formatDateTimeWithoutSeconds(dateTimeString: string): string {
-	// Split into date and time parts
-	const [date, timeWithSeconds] = dateTimeString.split(" ");
+export function formatDateTimeWithoutSeconds(
+	dateTimeString: string | undefined | null,
+): string {
+	if (!dateTimeString) return "";
 
-	// Remove the last 3 characters (:SS) from the time
+	const normalized = dateTimeString
+		.replace("T", " ")
+		.replace(/[+-]\d{2}:\d{2}$/, "");
+	const parts = normalized.split(" ");
+	if (parts.length < 2) return dateTimeString;
+
+	const [date, timeWithSeconds] = parts;
+
 	const timeWithoutSeconds = timeWithSeconds.slice(0, -3);
 
-	// Return combined: "06/01/2026 20:00"
 	return `${date} ${timeWithoutSeconds}`;
 }
 
