@@ -3,11 +3,14 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
+		"clean": "node -e \"const fs=require('node:fs');for (const d of ['dist','.tanstack']) fs.rmSync(d,{recursive:true,force:true});\"",
 		"build": "vite build",
+		"build:staging": "pnpm run clean && vite build --mode staging",
+		"build:production": "pnpm run clean && vite build --mode production",
 		"serve": "vite preview",
 		"dev": "vite dev --port=3001",
-		"deploy:staging": "vite build --mode staging && wrangler deploy --env staging --config wrangler.jsonc",
-		"deploy:production": "vite build --mode production && wrangler deploy --env production --config wrangler.jsonc",
+		"deploy:staging": "pnpm run build:staging && wrangler deploy dist/server/index.js --assets dist/client --env staging --config wrangler.jsonc",
+		"deploy:production": "pnpm run build:production && wrangler deploy dist/server/index.js --assets dist/client --env production --config wrangler.jsonc",
 		"cf-typegen": "wrangler types --env-interface Env"
 	},
 	"dependencies": {

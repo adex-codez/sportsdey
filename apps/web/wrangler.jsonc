@@ -1,7 +1,7 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "sportsdey-web",
-	"main": "dist/server/index.js",
+	"main": "@tanstack/react-start/server-entry",
 	"compatibility_date": "2026-03-03",
 	"compatibility_flags": ["nodejs_compat"],
 	"assets": {
