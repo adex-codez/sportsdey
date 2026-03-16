@@ -3,7 +3,7 @@ import type {
 	GameSummarySchema,
 	ScheduleData,
 	StandingsSchema,
-} from "@/schemas";
+} from "@/schemas/basketball";
 
 // Types mimicking the proxy response structure based on user input
 interface ProxyPlayerStats {
@@ -111,6 +111,10 @@ export interface ApiSportsBasketballGame {
 		seasonDisplay: string;
 		logo?: string;
 	};
+	country: {
+		name: string;
+		flag: string;
+	};
 	teams: {
 		home: {
 			id: number;
@@ -195,6 +199,10 @@ export const transformSchedule = (
 					id: String(tournamentId),
 					name: tournamentName,
 					imageUrl: game.league?.logo ?? null,
+					country: {
+						name: game.country.name ?? "",
+						flag: game.country.flag ?? null,
+					},
 					games: [],
 				};
 			}
@@ -336,7 +344,7 @@ export const transformGameSummaryApiSports = (
 		return {
 			name: teamName || "Unknown",
 			points: teamPoints,
-			imageUrl: isHome ? homeTeamLogo ?? null : awayTeamLogo ?? null,
+			imageUrl: isHome ? (homeTeamLogo ?? null) : (awayTeamLogo ?? null),
 			score: {
 				quarter1: teamStatsData?.scores?.q1 ?? getQuarter("quarter_1") ?? 0,
 				quarter2: teamStatsData?.scores?.q2 ?? getQuarter("quarter_2") ?? 0,
@@ -391,113 +399,6 @@ export const transformGameSummaryApiSports = (
 	};
 };
 
-export const transformGameSummary = (
-	summary: ProxyGameSummary,
-	boxscore: { homeTeam: ProxyTeamBoxscore; awayTeam: ProxyTeamBoxscore },
-): z.infer<typeof GameSummarySchema> => {
-	const transformTeam = (
-		teamSummary: ProxyGameSummary["homeTeam"],
-		teamBoxscore: ProxyTeamBoxscore,
-	) => {
-		const starters = teamBoxscore?.boxscore
-			? teamBoxscore.boxscore
-					.filter((p) => !p.statistics.onBench)
-					.map(transformPlayer)
-			: [];
-
-		const bench = teamBoxscore?.boxscore
-			? teamBoxscore.boxscore
-					.filter(
-						(p) =>
-							p.statistics.onBench &&
-							!p.statistics.dnp &&
-							p.statistics.playingTime &&
-							p.statistics.playingTime !== "00:00",
-					)
-					.map(transformPlayer)
-			: [];
-
-		return {
-			name: teamSummary.name,
-			points: teamSummary.score ? teamSummary.score.total : 0,
-			score: {
-				quarter1: teamSummary.score ? teamSummary.score.quarter_1 : 0,
-				quarter2: teamSummary.score ? teamSummary.score.quarter_2 : 0,
-				quarter3: teamSummary.score ? teamSummary.score.quarter_3 : 0,
-				quarter4: teamSummary.score ? teamSummary.score.quarter_4 : 0,
-				...(teamSummary.score?.over_time && {
-					over_time: teamSummary.score.over_time,
-				}),
-			},
-			starters,
-			bench,
-		};
-	};
-
-	const transformPlayer = (p: ProxyPlayer) => ({
-		full_name: p.player.knownName,
-		pls_min: parseMinutes(p.statistics.playingTime),
-		statistics: {
-			minutes: p.statistics.playingTime || "00:00",
-			field_goals_made: p.statistics.successfulFieldGoals || 0,
-			field_goals_att: p.statistics.fieldGoalAttempts || 0,
-			field_goals_pct: (p.statistics.fieldGoalSuccessRate || 0) * 100,
-			three_points_made: p.statistics.successfulThreePointShots || 0,
-			three_points_att: p.statistics.threePointShotAttempts || 0,
-			three_points_pct: (p.statistics.threePointSuccessRate || 0) * 100,
-			free_throws_made: p.statistics.successfulFreeThrows || 0,
-			free_throws_att: p.statistics.freeThrowAttempts || 0,
-			free_throws_pct: (p.statistics.freeThrowSuccessRate || 0) * 100,
-			rebounds: p.statistics.totalRebounds || 0,
-			offensive_rebounds: p.statistics.offensiveRebounds || 0,
-			defensive_rebounds: p.statistics.defensiveRebounds || 0,
-			assists: p.statistics.assists || 0,
-			steals: p.statistics.steals || 0,
-			blocks: p.statistics.blocks || 0,
-			turnovers: p.statistics.turnovers || 0,
-			personal_fouls: p.statistics.personalFouls || 0,
-		},
-	});
-
-	// Helper to parse "MM:SS" into total minutes (as number)
-	const parseMinutes = (timeStr?: string): number => {
-		if (!timeStr) return 0;
-		const parts = timeStr.split(":").map(Number);
-		if (parts.length < 2) return 0;
-		const [min, sec] = parts;
-		if (min === undefined || sec === undefined) return 0;
-		return min + sec / 60;
-	};
-
-	// Construct clock string
-	let clock = "";
-	if (summary.gameClock) {
-		const min = summary.gameClock.minute.toString().padStart(2, "0");
-		const sec = summary.gameClock.second.toString().padStart(2, "0");
-		clock = `${min}:${sec}`;
-	}
-
-	return {
-		id: String(summary.id),
-		status: summary.status.name,
-		tournament: summary.tournament,
-		date: summary.date,
-		venue: summary.info?.stadium?.name || "Unknown Venue",
-		clock: clock,
-		home: transformTeam(summary.homeTeam, boxscore?.homeTeam),
-		away: transformTeam(summary.awayTeam, boxscore?.awayTeam),
-	};
-};
-
-// Kept for backward compatibility
-export const transformTeamData = (
-	_teamData: any,
-	_isHome: boolean,
-	_isScheduled: boolean,
-) => {
-	return {};
-};
-
 export const transformApiSportsStandings = (
 	data: any,
 ): z.infer<typeof StandingsSchema> => {
@@ -507,14 +408,14 @@ export const transformApiSportsStandings = (
 	standingsData.forEach((conference: any) => {
 		if (Array.isArray(conference)) {
 			conference.forEach((team: any) => {
-			allTeams.push({
-				id: String(team.team?.id),
-				name: team.team?.name || "Unknown",
-				imageUrl: team.team?.logo ?? null,
-				wins: team.games?.win?.total || 0,
-				losses: team.games?.lose?.total || 0,
-				played: team.games?.played || 0,
-				streak: 0,
+				allTeams.push({
+					id: String(team.team?.id),
+					name: team.team?.name || "Unknown",
+					imageUrl: team.team?.logo ?? null,
+					wins: team.games?.win?.total || 0,
+					losses: team.games?.lose?.total || 0,
+					played: team.games?.played || 0,
+					streak: 0,
 					gb: 0,
 					diff: (team.points?.for || 0) - (team.points?.against || 0),
 					win_pct: Number.parseFloat(team.games?.win?.percentage || "0") * 100,

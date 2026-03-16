@@ -26,6 +26,8 @@ app.use(
 				c.env.CORS_ORIGIN,
 				"http://localhost:3001",
 				"http://localhost:8787",
+				"sportsdey-mobile://",
+				"exp://172.20.10.9:8081",
 			]);
 			return allowedOrigins.has(origin) ? origin : "";
 		},

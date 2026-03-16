@@ -3,40 +3,15 @@ import { desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { z } from "zod";
 import * as schema from "@/db/schema";
+import {
+	GamePlayErrorSchema,
+	GamePlayRequestSchema,
+	GamePlayResponseSchema,
+	TransactionsResponseSchema,
+} from "@/schemas/casino";
 import type { CloudflareBindings } from "../types";
 
 const casinoRoute = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
-
-const GamePlayRequestSchema = z.object({
-	gameCode: z.string().openapi({ description: "Game code to play" }),
-});
-
-const GamePlayResponseSchema = z.object({
-	success: z.literal(true),
-	data: z.object({
-		launchUrl: z.string().openapi({ description: "URL to launch the game" }),
-		token: z.string().openapi({ description: "Token for game" }),
-	}),
-});
-
-const GamePlayErrorSchema = z.object({
-	success: z.literal(false),
-	error: z.string(),
-});
-
-const CasinoTransactionSchema = z.object({
-	id: z.string(),
-	providerTxId: z.string(),
-	type: z.string(),
-	amount: z.number(),
-	game: z.string(),
-	createdAt: z.string(),
-});
-
-const TransactionsResponseSchema = z.object({
-	success: z.literal(true),
-	data: z.array(CasinoTransactionSchema),
-});
 
 const playGameRoute = createRoute({
 	method: "post",

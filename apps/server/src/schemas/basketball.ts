@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+
 export const ScheduledGameSchema = z.object({
 	id: z.string(),
 	status: z.enum([
@@ -30,12 +31,19 @@ export const ScheduledGameSchema = z.object({
 	}),
 	clock: z.string().optional(),
 });
+
 export const ScheduleData = z.object({
 	competitions: z.array(
 		z.object({
 			id: z.string().or(z.number()).transform(String),
 			name: z.string(),
 			imageUrl: z.string().url().nullable().optional(),
+			country: z
+				.object({
+					name: z.string(),
+					flag: z.string().url().nullable().optional(),
+				})
+				.optional(),
 			games: z.array(ScheduledGameSchema),
 		}),
 	),
@@ -87,28 +95,6 @@ export const TeamSchema = z.object({
 			over_time: z.number().optional(),
 			total: z.number().optional(),
 		}),
-	// statistics: z
-	// 	.object({
-	// 		minutes: z.string(),
-	// 		field_goals_made: z.number(),
-	// 		field_goals_att: z.number(),
-	// 		field_goals_pct: z.number(),
-	// 		three_points_made: z.number(),
-	// 		three_points_att: z.number(),
-	// 		three_points_pct: z.number(),
-	// 		free_throws_made: z.number(),
-	// 		free_throws_att: z.number(),
-	// 		free_throws_pct: z.number(),
-	// 		rebounds: z.number(),
-	// 		offensive_rebounds: z.number(),
-	// 		defensive_rebounds: z.number(),
-	// 		assists: z.number(),
-	// 		steals: z.number(),
-	// 		blocks: z.number(),
-	// 		turnovers: z.number(),
-	// 		personal_fouls: z.number(),
-	// 	})
-	// 	.optional(),
 });
 
 export const GameSummarySchema = z.object({
@@ -125,6 +111,7 @@ export const GameSummarySchema = z.object({
 	home: TeamSchema,
 	away: TeamSchema,
 });
+
 export const StandingsSchema = z.object({
 	data: z.array(
 		z.object({
@@ -169,6 +156,7 @@ export const GameTeamStatsSchema = z.object({
 	home: TeamStatsSchema,
 	away: TeamStatsSchema,
 });
+
 export const BasketballTournamentScheduleSchema = z.object({
 	games: z.array(ScheduledGameSchema),
 	total: z.number(),
@@ -176,5 +164,11 @@ export const BasketballTournamentScheduleSchema = z.object({
 		name: z.string(),
 		id: z.number(),
 		imageUrl: z.string().url().nullable().optional(),
+		country: z
+			.object({
+				name: z.string(),
+				flag: z.string().url().nullable().optional(),
+			})
+			.optional(),
 	}),
 });

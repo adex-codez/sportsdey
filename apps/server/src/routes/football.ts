@@ -2,14 +2,26 @@ import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { z } from "zod";
 import {
 	ErrorResponseSchema,
+	successResponseSchema,
+	VideoResponseSchema,
+} from "@/schemas";
+import {
 	FullStandingsSchema,
 	MatchStatsSchema,
-	successResponseSchema,
 	TournamentScheduleSchema,
 	TransformedMatchInfoSchema,
 	TransformedResponseSchema,
-	VideoResponseSchema,
-} from "@/schemas";
+} from "@/schemas/football";
+import type {
+	CompetitionGroup,
+	FullStandingsResponse,
+	H2HMatch,
+	TeamStanding,
+	TopScorer,
+	TransformedMatch,
+	TransformedMatchInfo,
+	TransformedResponse,
+} from "@/types/football";
 import { fetchWithTimeout, isTimeoutError } from "@/utils/fetch-with-timeout";
 import {
 	type ApiSportsH2HResponse,
@@ -22,7 +34,6 @@ import {
 	transformStandings,
 	transformTopScorers,
 } from "@/utils/football";
-
 import { jsonZodErrorFormatter } from "@/utils/zod";
 import { footballVideosQuery } from "@/validators";
 
@@ -213,8 +224,7 @@ footballRoute.openapi(
 			}
 
 			const data = response.response || [];
-
-
+			console.log(response);
 
 			const transformedData = transformSchedule(data);
 
@@ -425,6 +435,10 @@ footballRoute.openapi(
 							competition: {
 								id: Number(tournamentId),
 								name: "Unknown Competition",
+								country: {
+									name: "",
+									flag: null,
+								},
 							},
 						},
 					},
@@ -437,6 +451,11 @@ footballRoute.openapi(
 			const competition = {
 				id: Number(tournamentId),
 				name: filteredData[0]?.league?.name || "Unknown Competition",
+				imageUrl: filteredData[0]?.league?.logo ?? null,
+				country: {
+					name: filteredData[0]?.league.country || "",
+					flag: filteredData[0]?.league?.flag ?? null,
+				},
 			};
 
 			const result = {

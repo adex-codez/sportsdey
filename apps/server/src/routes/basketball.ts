@@ -1,15 +1,16 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
-	BasketballTournamentScheduleSchema,
 	ErrorResponseSchema,
+	successResponseSchema,
+	VideoResponseSchema,
+} from "@/schemas";
+import {
+	BasketballTournamentScheduleSchema,
 	GameSummarySchema,
 	GameTeamStatsSchema,
 	ScheduleData,
 	StandingsSchema,
-	successResponseSchema,
-	VideoResponseSchema,
-} from "@/schemas";
-
+} from "@/schemas/basketball";
 import {
 	transformApiSportsStandings,
 	transformGameSummaryApiSports,
@@ -406,6 +407,8 @@ basketballRoute.openapi(
 				competition: {
 					name: competition?.name ?? "",
 					id: competition?.id ? Number(competition.id) : Number(tournamentId),
+					imageUrl: competition?.imageUrl ?? null,
+					country: competition?.country ?? undefined,
 				},
 			};
 

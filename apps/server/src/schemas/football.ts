@@ -5,6 +5,12 @@ export const TransformedMatchInfoSchema = z.object({
 		id: z.string(),
 		name: z.string(),
 		imageUrl: z.string().url().nullable().optional(),
+		country: z
+			.object({
+				name: z.string(),
+				flag: z.string().url().nullable().optional(),
+			})
+			.optional(),
 	}),
 	competitors: z.object({
 		home: z.object({
@@ -25,7 +31,6 @@ export const TransformedMatchInfoSchema = z.object({
 	match_info: z.object({
 		date_time: z.string(),
 		stadium: z.string(),
-		// capacity: z.number(),
 	}),
 	clock: z.number().optional(),
 	status: z.object({
@@ -63,7 +68,6 @@ export const TransformedMatchInfoSchema = z.object({
 					imageUrl: z.string().url().nullable().optional(),
 				}),
 				gs: z.number(),
-				// assists: z.number(),
 			}),
 		)
 		.optional(),
@@ -85,28 +89,6 @@ export const TransformedMatchInfoSchema = z.object({
 			}),
 		)
 		.optional(),
-	// last5_home_results: z
-	// 	.array(
-	// 		z.object({
-	// 			match_id: z.string(),
-	// 			date: z.string(),
-	// 			opponent: z.string(),
-	// 			result: z.enum(["win", "draw", "loss"]),
-	// 			score: z.string(),
-	// 		}),
-	// 	)
-	// 	.optional(),
-	// last5_away_results: z
-	// 	.array(
-	// 		z.object({
-	// 			match_id: z.string(),
-	// 			date: z.string(),
-	// 			opponent: z.string(),
-	// 			result: z.enum(["win", "draw", "loss"]),
-	// 			score: z.string(),
-	// 		}),
-	// 	)
-	// 	.optional(),
 });
 
 export const TransformedResponseSchema = z.object({
@@ -116,6 +98,12 @@ export const TransformedResponseSchema = z.object({
 				id: z.string(),
 				name: z.string(),
 				imageUrl: z.string().url().nullable().optional(),
+				country: z
+					.object({
+						name: z.string(),
+						flag: z.string().url().nullable().optional(),
+					})
+					.optional(),
 			}),
 			matches: z.array(
 				z.object({
@@ -202,6 +190,12 @@ export const TournamentScheduleSchema = z.object({
 		name: z.string(),
 		id: z.number(),
 		imageUrl: z.string().url().nullable().optional(),
+		country: z
+			.object({
+				name: z.string(),
+				flag: z.string().url().nullable().optional(),
+			})
+			.optional(),
 	}),
 	matches: z.array(
 		z.object({

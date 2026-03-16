@@ -1,9 +1,5 @@
 import { z } from "@hono/zod-openapi";
 
-/**
- * Ticket Status Notification Request Schema
- * Received from Betstack for ticket status updates
- */
 export const TicketStatusNotificationSchema = z.object({
 	type: z.literal("ticket_status").openapi({
 		description: "Notification type indicator",
@@ -37,9 +33,6 @@ export const TicketStatusNotificationSchema = z.object({
 		}),
 });
 
-/**
- * Notification Acknowledgement Response Schema
- */
 export const NotificationAcknowledgementSchema = z.object({
 	message: z.string().openapi({
 		description: "Acknowledgement message",

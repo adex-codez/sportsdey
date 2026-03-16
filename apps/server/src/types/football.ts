@@ -1,37 +1,3 @@
-export type ScheduleRes = {
-	schedules: {
-		sport_event: {
-			id: string;
-			start_time: string;
-			sport_event_context: {
-				category: {
-					id: string;
-					name: string;
-				};
-				competition: {
-					id: string;
-					name: string;
-					gender: string;
-				};
-			};
-			competitors: {
-				id: string;
-				name: string;
-				abbreviation: string;
-				qualifier: string;
-			}[];
-		};
-		sport_event_status: {
-			match_status: string;
-			home_score: number;
-			away_score: number;
-		};
-		clock?: {
-			played: string;
-		};
-	}[];
-};
-
 export type TransformedCompetitor = {
 	id: string;
 	name: string;
@@ -66,6 +32,10 @@ export type CompetitionGroup = {
 		id: string;
 		name: string;
 		imageUrl?: string | null;
+		country?: {
+			name: string;
+			flag?: string | null;
+		};
 	};
 	matches: TransformedMatch[];
 };
@@ -100,7 +70,7 @@ export type TopScorer = {
 		abbreviation: string;
 		imageUrl?: string | null;
 	};
-	gs: number; // goals scored
+	gs: number;
 };
 
 export type MatchResultSummary = {
@@ -122,7 +92,10 @@ export type TransformedMatchInfo = {
 		id: string;
 		name: string;
 		imageUrl?: string | null;
-		// gender: string;
+		country?: {
+			name: string;
+			flag?: string | null;
+		};
 	};
 	competitors: {
 		home: {
@@ -143,7 +116,6 @@ export type TransformedMatchInfo = {
 	match_info: {
 		date_time: string;
 		stadium: string;
-		// capacity: number;
 	};
 	clock?: number;
 	status: {
@@ -178,219 +150,41 @@ export type FullStandingsResponse = {
 	standings: FullTeamStanding[];
 };
 
-export type ProxyMatchSummary = {
-	homeTeam: {
-		score?: {
-			regular?: number;
-			halfTime?: number;
-			current?: number;
-		};
-		name: string;
-		shortName: string;
-		mediumName: string;
-		id: number;
-	};
-	awayTeam: {
-		score?: {
-			regular?: number;
-			halfTime?: number;
-			current?: number;
-		};
-		name: string;
-		shortName: string;
-		mediumName: string;
-		id: number;
-	};
-	status: {
-		name: string;
-		shortName: string;
-		id: number;
-	};
-	info: {
-		stadium?: {
-			name: string;
-			id: number;
-		};
-		weather?: {
-			status: {
-				name: string;
-				id: number;
-			};
-			temperatureC: number;
-			temperatureF: number;
-		};
-	};
-	times?: {
-		currentMinute: number;
-	};
-	date: string;
-	id: number;
-	tournament: {
-		name: string;
-		shortName: string;
-		id: number;
-	};
-	stage?: {
-		name: string;
-		shortName: string;
-		id: number;
-	};
-	round?: {
-		name: string;
-		shortName: string;
-		id: number;
-	};
-};
-
-export type ProxyStanding = {
-	tournament: {
-		name: string;
-		shortName: string;
-		id: number;
-	};
-	standings: {
-		overall: {
-			team: {
-				name: string;
-				shortName: string;
-				mediumName: string;
-				id: number;
-			};
-			positionStatus?: {
-				name: string;
-				id: number;
-			};
-			scored: number;
-			against: number;
-			average: number;
-			position: number;
-			delta: number;
-			played: number;
-			won: number;
-			draw: number;
-			lost: number;
-			points: number;
-		}[];
-	};
-};
-
-export type ProxyGoalLeaderboard = {
-	player: {
-		country: {
-			name: string;
-			shortName: string;
-			id: number;
-		};
-		position: {
-			name: string;
-			shortName: string;
-			id: number;
-		};
-		knownName: string;
-		knownNameMedium: string;
-		knownNameShort: string;
-		id: number;
-	};
-	team: {
-		name: string;
-		shortName: string;
-		mediumName: string;
-		id: number;
-	};
-	matchesStarted: number;
-	minutesPlayed: number;
-	position: number;
-	matchesPlayed: number;
-	totalGoals: number;
-	goalsPerMatch: number;
-	penaltyGoals: number;
-	penaltyGoalsPerMatch: number;
-};
-
-// export type MatchSummaryRes = {
-// 	sport_event: {
-// 		sport_event_context: {
-// 			season: { id: string };
-// 		};
-// 		competitors: { id: string }[];
-// 	};
-// };
-
-export type ProxyMatchStats = {
-	homeTeam: {
-		statistics: {
-			ballPossession: number;
-			shotsOnTarget: number;
-			shotsOffTarget: number;
-			fouls: number;
-			corners: number;
-			offsides: number;
-			saves: number;
-			yellowCards: number;
-			secondYellowCards: number;
-			redCards: number;
-		};
-		name: string;
-		shortName: string;
-		mediumName: string;
-		id: number;
-	};
-	awayTeam: {
-		statistics: {
-			ballPossession: number;
-			shotsOnTarget: number;
-			shotsOffTarget: number;
-			fouls: number;
-			corners: number;
-			offsides: number;
-			saves: number;
-			yellowCards: number;
-			secondYellowCards: number;
-			redCards: number;
-		};
-		name: string;
-		shortName: string;
-		mediumName: string;
-		id: number;
-	};
-	date: string;
-	id: number;
-};
-
 export type TransformedMatchStats = {
 	home: {
-		statistics: ProxyMatchStats["homeTeam"]["statistics"];
+		statistics: {
+			ballPossession: number;
+			shotsOnTarget: number;
+			shotsOffTarget: number;
+			fouls: number;
+			corners: number;
+			offsides: number;
+			saves: number;
+			yellowCards: number;
+			secondYellowCards: number;
+			redCards: number;
+		};
 		name: string;
 		id: number;
 		imageUrl?: string | null;
 	};
 	away: {
-		statistics: ProxyMatchStats["awayTeam"]["statistics"];
+		statistics: {
+			ballPossession: number;
+			shotsOnTarget: number;
+			shotsOffTarget: number;
+			fouls: number;
+			corners: number;
+			offsides: number;
+			saves: number;
+			yellowCards: number;
+			secondYellowCards: number;
+			redCards: number;
+		};
 		name: string;
 		id: number;
 		imageUrl?: string | null;
 	};
 	date: string;
 	id: number;
-};
-
-export type StandingsRes = {
-	standings: {
-		type: string;
-		groups: {
-			id: string;
-			standings: {
-				competitor: { id: string; name: string };
-				position: number;
-				points: number;
-				played: number;
-				won: number;
-				drawn: number;
-				lost: number;
-				goals_for: number;
-				goals_against: number;
-				goal_diff: number;
-			}[];
-		}[];
-	}[];
 };
