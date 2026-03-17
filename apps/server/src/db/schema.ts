@@ -97,6 +97,7 @@ export const userRelations = relations(user, ({ many }) => ({
 	gameLaunchTokens: many(gameLaunchTokens),
 	gameSessions: many(gameSessions),
 	gameTransactions: many(gameTransactions),
+	utilityTransactions: many(utilityTransaction),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -163,6 +164,36 @@ export const walletTransactionRelations = relations(
 	({ one }) => ({
 		user: one(user, {
 			fields: [walletTransaction.userId],
+			references: [user.id],
+		}),
+	}),
+);
+
+export const utilityTransaction = sqliteTable("utility_transaction", {
+	id: text("id").primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	amount: integer("amount").notNull(),
+	serviceType: text("service_type").notNull(),
+	billerId: text("biller_id").notNull(),
+	billerName: text("biller_name").notNull(),
+	rechargeAccount: text("recharge_account").notNull(),
+	itemId: text("item_id").notNull(),
+	itemName: text("item_name").notNull(),
+	palmPayOrderNo: text("palm_pay_order_no"),
+	outOrderNo: text("out_order_no").notNull().unique(),
+	status: text("status").notNull(),
+	createdAt: integer("created_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.notNull(),
+});
+
+export const utilityTransactionRelations = relations(
+	utilityTransaction,
+	({ one }) => ({
+		user: one(user, {
+			fields: [utilityTransaction.userId],
 			references: [user.id],
 		}),
 	}),

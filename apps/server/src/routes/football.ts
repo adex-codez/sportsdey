@@ -12,16 +12,6 @@ import {
 	TransformedMatchInfoSchema,
 	TransformedResponseSchema,
 } from "@/schemas/football";
-import type {
-	CompetitionGroup,
-	FullStandingsResponse,
-	H2HMatch,
-	TeamStanding,
-	TopScorer,
-	TransformedMatch,
-	TransformedMatchInfo,
-	TransformedResponse,
-} from "@/types/football";
 import { fetchWithTimeout, isTimeoutError } from "@/utils/fetch-with-timeout";
 import {
 	type ApiSportsH2HResponse,
@@ -1076,7 +1066,9 @@ footballRoute.openapi(
 
 		const apiSportsBase = "https://v3.football.api-sports.io";
 		const currentYear = new Date().getFullYear();
-		const url = `${apiSportsBase}/standings?league=${tournamentId}&season=${currentYear}`;
+		const currentMonth = new Date().getMonth();
+		const season = currentMonth >= 8 ? currentYear : currentYear - 1;
+		const url = `${apiSportsBase}/standings?league=${tournamentId}&season=${season}`;
 
 		const cacheKey = `tournament_standings_${tournamentId}`;
 		let cachedData = null;

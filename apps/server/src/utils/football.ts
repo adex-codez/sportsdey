@@ -66,13 +66,13 @@ export function transformSchedule(
 	const competitions = Array.from(competitionMap.values());
 
 	const priorityLeagues: Record<string, number> = {
-		"Premier League": 0,
-		LaLiga: 1,
-		"La Liga": 1,
-		"Serie A": 2,
-		Bundesliga: 3,
-		"Ligue 1": 4,
-		"UEFA Champions League": 5,
+		"UEFA Champions League": 0,
+		"Premier League": 1,
+		LaLiga: 2,
+		"La Liga": 2,
+		"Serie A": 3,
+		Bundesliga: 4,
+		"Ligue 1": 5,
 		"UEFA Europa League": 6,
 		"UEFA Nations League": 7,
 		"FA Cup": 8,
@@ -82,17 +82,32 @@ export function transformSchedule(
 		"African Cup of Nations": 12,
 	};
 
-	competitions.sort((a, b) => {
-		const aName = a.competition.name;
-		const bName = b.competition.name;
+	const resolvePriority = (comp?: CompetitionGroup["competition"]): number => {
+		if (!comp) return 999;
 
-		const aPriority = priorityLeagues[aName] ?? 999;
-		const bPriority = priorityLeagues[bName] ?? 999;
+		const name = comp.name;
+		const country = comp.country?.name ?? "";
+
+		// Only the English Premier League should receive the "Premier League" priority.
+		if (name === "Premier League") {
+			return country === "England"
+				? priorityLeagues["Premier League"]
+				: 999;
+		}
+
+		return priorityLeagues[name] ?? 999;
+	};
+
+	competitions.sort((a, b) => {
+		const aPriority: number = resolvePriority(a?.competition);
+		const bPriority: number = resolvePriority(b?.competition);
 
 		if (aPriority !== 999 && bPriority !== 999) return aPriority - bPriority;
 		if (aPriority !== 999) return -1;
 		if (bPriority !== 999) return 1;
 
+		const aName = a.competition?.name ?? "";
+		const bName = b.competition?.name ?? "";
 		return aName.localeCompare(bName);
 	});
 
@@ -214,19 +229,23 @@ export interface ApiSportsStandingsResponse {
 			logo: string;
 			flag: string;
 			season: number;
+			standings: Array<
+				Array<{
+					rank: number;
+					team: { id: number; name: string; logo: string };
+					points: number;
+					goalsDiff: number;
+					group: string;
+					all: {
+						played: number;
+						win: number;
+						draw: number;
+						lose: number;
+						goals: { for: number; against: number };
+					};
+				}>
+			>;
 		};
-		leagueStandings: {
-			rank: number;
-			team: { id: number; name: string; logo: string };
-			points: number;
-			played: number;
-			won: number;
-			draw: number;
-			lost: number;
-			goalsfor: number;
-			goalsagainst: number;
-			goalsdiff: number;
-		}[];
 	}[];
 }
 
@@ -237,9 +256,10 @@ export function transformStandings(
 	if (!data?.response || data.response.length === 0) return [];
 
 	const leagueData = data.response[0];
-	if (!leagueData?.leagueStandings) return [];
+	const standings = leagueData?.league?.standings?.[0];
+	if (!standings) return [];
 
-	return leagueData.leagueStandings
+	return standings
 		.filter((team) => teamIds.includes(team.team.id.toString()))
 		.map((team) => ({
 			id: team.team.id.toString(),
@@ -247,13 +267,13 @@ export function transformStandings(
 			position: team.rank,
 			points: team.points,
 			imageUrl: team.team.logo ?? null,
-			played: team.played,
-			won: team.won,
-			drawn: team.draw,
-			lost: team.lost,
-			goals_for: team.goalsfor,
-			goals_against: team.goalsagainst,
-			goal_diff: team.goalsdiff,
+			played: team.all.played,
+			won: team.all.win,
+			drawn: team.all.draw,
+			lost: team.all.lose,
+			goals_for: team.all.goals.for,
+			goals_against: team.all.goals.against,
+			goal_diff: team.goalsDiff,
 		}))
 		.sort((a, b) => a.position - b.position);
 }
@@ -300,8 +320,6 @@ export function transformTopScorers(
 export function transformFullStandings(
 	data: ApiSportsStandingsResponse,
 ): import("@/types/football").FullStandingsResponse {
-	console.log("transformFullStandings input:", JSON.stringify(data));
-
 	if (!data?.response || data.response.length === 0) {
 		return {
 			tournament: { id: 0, name: "Unknown" },
@@ -317,17 +335,18 @@ export function transformFullStandings(
 		};
 	}
 	const league = leagueData.league;
+	const standingsData = league?.standings?.[0] || [];
 
-	const standings = (leagueData.leagueStandings || []).map((team) => ({
+	const standings = standingsData.map((team) => ({
 		name: team.team.name,
 		position: team.rank,
 		imageUrl: team.team.logo ?? null,
 		statistics: {
-			P: team.played,
-			W: team.won,
-			D: team.draw,
-			L: team.lost,
-			GD: team.goalsdiff,
+			P: team.all.played,
+			W: team.all.win,
+			D: team.all.draw,
+			L: team.all.lose,
+			GD: team.goalsDiff,
 			PTS: team.points,
 		},
 	}));

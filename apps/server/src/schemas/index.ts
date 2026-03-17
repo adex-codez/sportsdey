@@ -5,7 +5,9 @@ export * from "./casino";
 export * from "./casino-provider";
 export * from "./football";
 export * from "./notifications";
+export * from "./palmpay";
 export * from "./tennis";
+export * from "./wallet";
 
 export const successResponseSchema = <T extends z.ZodType>(data: T) =>
 	z.object({

@@ -4,6 +4,26 @@ import { drizzle } from "drizzle-orm/d1";
 import { z } from "zod";
 import * as schema from "@/db/schema";
 import {
+	CallbackQuerySchema,
+	FundWalletErrorSchema,
+	FundWalletResponseSchema,
+	FundWalletSchema,
+	GetBanksErrorSchema,
+	GetBanksResponseSchema,
+	GetTransactionsErrorSchema,
+	GetTransactionsResponseSchema,
+	GetWalletErrorSchema,
+	GetWalletResponseSchema,
+	TransactionResponseSchema,
+	WalletResponseSchema,
+	WithdrawResponseSchema as WalletWithdrawResponseSchema,
+	WebhookErrorSchema,
+	WebhookEventSchema,
+	WebhookResponseSchema,
+	WithdrawErrorSchema,
+	WithdrawSchema,
+} from "@/schemas/wallet";
+import {
 	createTransferRecipient,
 	getNigerianBanks,
 	initializeTransaction,
@@ -14,144 +34,6 @@ import {
 import type { CloudflareBindings } from "../types";
 
 const walletRoute = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
-
-const FundWalletSchema = z.object({
-	amount: z.number().min(100).max(9_999_999).openapi({
-		description:
-			"Amount to fund wallet in Naira (minimum 100, maximum 9,999,999.00)",
-		example: 1000,
-	}),
-});
-
-const WalletResponseSchema = z.object({
-	id: z.string().openapi({ description: "Wallet ID" }),
-	balance: z.number().openapi({ description: "Wallet balance in Naira" }),
-	createdAt: z.string().openapi({ description: "Creation timestamp" }),
-	updatedAt: z.string().openapi({ description: "Last update timestamp" }),
-});
-
-const TransactionResponseSchema = z.object({
-	id: z.string().openapi({ description: "Transaction ID" }),
-	userId: z.string().openapi({ description: "User ID" }),
-	amount: z.number().openapi({ description: "Transaction amount in Naira" }),
-	type: z.string().openapi({ description: "Transaction type (credit/debit)" }),
-	reference: z.string().openapi({ description: "Transaction reference" }),
-	status: z.string().openapi({ description: "Transaction status" }),
-	createdAt: z.string().openapi({ description: "Creation timestamp" }),
-});
-
-const FundWalletErrorSchema = z.object({
-	success: z.literal(false),
-	error: z.string(),
-	details: z.null(),
-});
-
-const FundWalletResponseSchema = z.object({
-	success: z.literal(true),
-	data: z.object({
-		authorizationUrl: z.string().openapi({
-			description: "Paystack authorization URL for payment",
-		}),
-		reference: z.string().openapi({
-			description: "Transaction reference",
-		}),
-	}),
-});
-
-const GetWalletErrorSchema = z.object({
-	success: z.literal(false),
-	error: z.string(),
-	details: z.null(),
-});
-
-const GetWalletResponseSchema = z.object({
-	success: z.literal(true),
-	data: WalletResponseSchema,
-});
-
-const GetTransactionsErrorSchema = z.object({
-	success: z.literal(false),
-	error: z.string(),
-	details: z.null(),
-});
-
-const GetTransactionsResponseSchema = z.object({
-	success: z.literal(true),
-	data: z.array(TransactionResponseSchema),
-});
-
-const BankResponseSchema = z.object({
-	name: z.string().openapi({ description: "Bank name" }),
-	code: z.string().openapi({ description: "Bank code" }),
-});
-
-const GetBanksErrorSchema = z.object({
-	success: z.literal(false),
-	error: z.string(),
-	details: z.null(),
-});
-
-const GetBanksResponseSchema = z.object({
-	success: z.literal(true),
-	data: z.array(BankResponseSchema),
-});
-
-const CallbackQuerySchema = z.object({
-	reference: z.string().optional(),
-	trxref: z.string().optional(),
-	status: z.string().optional(),
-	type: z.enum(["deposit", "withdraw"]).optional(),
-});
-
-const WebhookErrorSchema = z.object({
-	success: z.literal(false),
-	error: z.string(),
-	details: z.null(),
-});
-
-const WebhookResponseSchema = z.object({
-	received: z.literal(true),
-});
-
-const WithdrawSchema = z.object({
-	amount: z.number().min(100).openapi({
-		description: "Amount to withdraw in Naira (minimum 100)",
-		example: 1000,
-	}),
-	bankCode: z.string().openapi({
-		description: "Bank code (e.g., 058 for GTBank)",
-		example: "058",
-	}),
-	accountNumber: z.string().openapi({
-		description: "Bank account number",
-		example: "0123456789",
-	}),
-	accountName: z.string().openapi({
-		description: "Account holder name",
-		example: "John Doe",
-	}),
-});
-
-const WithdrawErrorSchema = z.object({
-	success: z.literal(false),
-	error: z.string(),
-	details: z.null(),
-});
-
-const WithdrawResponseSchema = z.object({
-	success: z.literal(true),
-	data: z.object({
-		reference: z.string().openapi({
-			description: "Withdrawal reference",
-		}),
-		amount: z.number().openapi({
-			description: "Withdrawal amount",
-		}),
-		status: z.string().openapi({
-			description: "Withdrawal status",
-		}),
-	}),
-});
 
 const fundWalletRoute = createRoute({
 	method: "post",
@@ -351,7 +233,7 @@ const withdrawRoute = createRoute({
 			description: "Withdrawal initiated successfully",
 			content: {
 				"application/json": {
-					schema: WithdrawResponseSchema,
+					schema: WalletWithdrawResponseSchema,
 				},
 			},
 		},
@@ -614,6 +496,7 @@ walletRoute.openapi(callbackRoute, async (c) => {
 		try {
 			const tx = await verifyTransaction(c.env.PAYSTACK_SECRET_KEY, reference);
 			const txStatus = tx.status.toLowerCase();
+			console.log("transaction status", txStatus);
 			status =
 				txStatus === "success"
 					? "success"
@@ -635,6 +518,15 @@ walletRoute.openapi(callbackRoute, async (c) => {
 						.update(schema.walletTransaction)
 						.set({ status: "success" })
 						.where(eq(schema.walletTransaction.reference, reference));
+
+					console.log(
+						"Transaction updated:",
+						await db
+							.select()
+							.from(schema.walletTransaction)
+							.where(eq(schema.walletTransaction.reference, reference))
+							.limit(1),
+					);
 
 					const [wallet] = await db
 						.select()
@@ -842,19 +734,6 @@ walletRoute.openapi(callbackRoute, async (c) => {
 </html>`;
 
 	return c.html(html, 200);
-});
-
-const WebhookEventSchema = z.object({
-	event: z.string(),
-	data: z.object({
-		reference: z.string(),
-		amount: z.number(),
-		status: z.string(),
-		customer: z.object({
-			email: z.string(),
-		}),
-		metadata: z.record(z.string(), z.unknown()).optional(),
-	}),
 });
 
 walletRoute.openapi(webhookRoute, async (c) => {

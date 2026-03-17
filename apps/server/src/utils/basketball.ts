@@ -403,27 +403,32 @@ export const transformApiSportsStandings = (
 	data: any,
 ): z.infer<typeof StandingsSchema> => {
 	const standingsData = data?.response || [];
-	const allTeams: any[] = [];
+	const teamMap = new Map<string, any>();
 
 	standingsData.forEach((conference: any) => {
 		if (Array.isArray(conference)) {
 			conference.forEach((team: any) => {
-				allTeams.push({
-					id: String(team.team?.id),
-					name: team.team?.name || "Unknown",
-					imageUrl: team.team?.logo ?? null,
-					wins: team.games?.win?.total || 0,
-					losses: team.games?.lose?.total || 0,
-					played: team.games?.played || 0,
-					streak: 0,
-					gb: 0,
-					diff: (team.points?.for || 0) - (team.points?.against || 0),
-					win_pct: Number.parseFloat(team.games?.win?.percentage || "0") * 100,
-				});
+				const teamId = String(team.team?.id);
+				if (!teamMap.has(teamId)) {
+					teamMap.set(teamId, {
+						id: teamId,
+						name: team.team?.name || "Unknown",
+						imageUrl: team.team?.logo ?? null,
+						wins: team.games?.win?.total || 0,
+						losses: team.games?.lose?.total || 0,
+						played: team.games?.played || 0,
+						streak: 0,
+						gb: 0,
+						diff: (team.points?.for || 0) - (team.points?.against || 0),
+						win_pct:
+							Number.parseFloat(team.games?.win?.percentage || "0") * 100,
+					});
+				}
 			});
 		}
 	});
 
+	const allTeams = Array.from(teamMap.values());
 	allTeams.sort((a, b) => b.win_pct - a.win_pct);
 
 	return {
