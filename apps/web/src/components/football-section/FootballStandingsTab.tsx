@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { FootballStanding } from "@/types/football";
-import { getTeamInitials, getTeamLogo } from "@/utils/getTeamLogo";
+import { getTeamInitials } from "@/utils/getTeamLogo";
 
 interface FootballStandingsTabProps {
 	teams: FootballStanding[];
@@ -35,7 +36,8 @@ function StandingsView({ teams }: { teams: FootballStanding[] }) {
 					<tbody>
 						{teams.map((team, index) => {
 							const [logoError, setLogoError] = useState(false);
-							const logoUrl = getTeamLogo(team.name);
+							const [logoLoading, setLogoLoading] = useState(true);
+							const logoUrl = team.imageUrl || "/Profile.png";
 
 							return (
 								<tr
@@ -71,12 +73,18 @@ function StandingsView({ teams }: { teams: FootballStanding[] }) {
 										)}
 									>
 										<div className="flex items-center gap-2">
-											{!logoError && logoUrl !== "/Profile.png" ? (
+											{logoLoading && !logoError ? (
+												<Skeleton className="size-6 rounded-full" />
+											) : !logoError && logoUrl !== "/Profile.png" ? (
 												<img
 													src={logoUrl}
 													alt={team.name}
 													className="size-6 object-contain"
-													onError={() => setLogoError(true)}
+													onLoad={() => setLogoLoading(false)}
+													onError={() => {
+														setLogoError(true);
+														setLogoLoading(false);
+													}}
 												/>
 											) : (
 												<div className="flex size-6 items-center justify-center rounded-full border border-gray-200 bg-gray-100 font-bold text-[9px] text-gray-400 dark:border-[#5A5F63] dark:bg-card dark:text-white">

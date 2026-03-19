@@ -872,7 +872,7 @@ footballRoute.openapi(
 		}
 
 		const apiSportsBase = "https://v3.football.api-sports.io";
-		const url = `${apiSportsBase}/fixtures/statistics?id=${id}`;
+		const url = `${apiSportsBase}/fixtures/statistics?fixture=${id}`;
 
 		const cacheKey = `match_stats_${id}`;
 		let cachedData = null;
@@ -947,6 +947,7 @@ footballRoute.openapi(
 			}
 
 			const data = (await response.json()) as any;
+			console.log("statsData", data);
 
 			if (!data.response || data.response.length === 0) {
 				return c.json(

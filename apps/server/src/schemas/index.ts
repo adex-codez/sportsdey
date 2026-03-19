@@ -4,8 +4,8 @@ export * from "./basketball";
 export * from "./casino";
 export * from "./casino-provider";
 export * from "./football";
+export * from "./monnify";
 export * from "./notifications";
-export * from "./palmpay";
 export * from "./tennis";
 export * from "./wallet";
 

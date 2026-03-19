@@ -1,0 +1,703 @@
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { and, desc, eq } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/d1";
+import { z } from "zod";
+import * as schema from "@/db/schema";
+import {
+	MonnifyBillerSchema,
+	MonnifyCategorySchema,
+	MonnifyProductSchema,
+	MonnifyRequerySchema,
+	MonnifyVendResponseSchema,
+} from "@/schemas";
+import {
+	getBillers,
+	getCategories,
+	getProducts,
+	requeryTransaction,
+	validateCustomer,
+	vendBill,
+} from "@/utils/monnify";
+import {
+	getBillersQuery,
+	getProductsQuery,
+	historyQuery,
+	requeryTransactionQuery,
+	vendBillBody,
+} from "@/validators/monnify";
+import type { CloudflareBindings } from "../types";
+
+const monnifyRoute = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
+
+const categoriesRoute = createRoute({
+	method: "get",
+	path: "/categories",
+	tags: ["Bills"],
+	summary: "Get bill categories",
+	description: "Get all available bill categories",
+	security: [],
+	responses: {
+		200: {
+			description: "Categories retrieved successfully",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(true),
+						data: z.array(MonnifyCategorySchema),
+					}),
+				},
+			},
+		},
+		500: {
+			description: "Server error",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(false),
+						error: z.string(),
+						details: z.null(),
+					}),
+				},
+			},
+		},
+	},
+});
+
+monnifyRoute.openapi(categoriesRoute, async (c) => {
+	const env = {
+		MONNIFY_API_KEY: c.env.MONNIFY_API_KEY,
+		MONNIFY_CLIENT_SECRET: c.env.MONNIFY_CLIENT_SECRET,
+		MONNIFY_CONTRACT_CODE: c.env.MONNIFY_CONTRACT_CODE,
+	};
+
+	if (!env.MONNIFY_API_KEY || !env.MONNIFY_CLIENT_SECRET) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Configuration error",
+				details: null,
+			},
+			500,
+		);
+	}
+
+	const result = await getCategories(env);
+
+	if (!result.ok || !result.data) {
+		return c.json(
+			{
+				success: false as const,
+				error: result.error || "Failed to fetch categories",
+				details: null,
+			},
+			500,
+		);
+	}
+
+	return c.json({ success: true as const, data: result.data }, 200);
+});
+
+const billersRoute = createRoute({
+	method: "get",
+	path: "/billers",
+	tags: ["Bills"],
+	summary: "Get billers",
+	description: "Get billers by category",
+	security: [],
+	request: {
+		query: getBillersQuery,
+	},
+	responses: {
+		200: {
+			description: "Billers retrieved successfully",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(true),
+						data: z.array(MonnifyBillerSchema),
+					}),
+				},
+			},
+		},
+		500: {
+			description: "Server error",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(false),
+						error: z.string(),
+						details: z.null(),
+					}),
+				},
+			},
+		},
+	},
+});
+
+monnifyRoute.openapi(billersRoute, async (c) => {
+	const { categoryCode } = c.req.valid("query");
+	const env = {
+		MONNIFY_API_KEY: c.env.MONNIFY_API_KEY,
+		MONNIFY_CLIENT_SECRET: c.env.MONNIFY_CLIENT_SECRET,
+		MONNIFY_CONTRACT_CODE: c.env.MONNIFY_CONTRACT_CODE,
+	};
+
+	if (!env.MONNIFY_API_KEY || !env.MONNIFY_CLIENT_SECRET) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Configuration error",
+				details: null,
+			},
+			500,
+		);
+	}
+
+	const result = await getBillers(env, categoryCode);
+
+	if (!result.ok || !result.data) {
+		return c.json(
+			{
+				success: false as const,
+				error: result.error || "Failed to fetch billers",
+				details: null,
+			},
+			500,
+		);
+	}
+
+	return c.json({ success: true as const, data: result.data }, 200);
+});
+
+const productsRoute = createRoute({
+	method: "get",
+	path: "/products",
+	tags: ["Bills"],
+	summary: "Get products",
+	description: "Get products for a biller",
+	security: [],
+	request: {
+		query: getProductsQuery,
+	},
+	responses: {
+		200: {
+			description: "Products retrieved successfully",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(true),
+						data: z.array(MonnifyProductSchema),
+					}),
+				},
+			},
+		},
+		500: {
+			description: "Server error",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(false),
+						error: z.string(),
+						details: z.null(),
+					}),
+				},
+			},
+		},
+	},
+});
+
+monnifyRoute.openapi(productsRoute, async (c) => {
+	const { billerCode } = c.req.valid("query");
+	const env = {
+		MONNIFY_API_KEY: c.env.MONNIFY_API_KEY,
+		MONNIFY_CLIENT_SECRET: c.env.MONNIFY_CLIENT_SECRET,
+		MONNIFY_CONTRACT_CODE: c.env.MONNIFY_CONTRACT_CODE,
+	};
+
+	if (!env.MONNIFY_API_KEY || !env.MONNIFY_CLIENT_SECRET) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Configuration error",
+				details: null,
+			},
+			500,
+		);
+	}
+
+	const result = await getProducts(env, billerCode);
+
+	if (!result.ok || !result.data) {
+		return c.json(
+			{
+				success: false as const,
+				error: result.error || "Failed to fetch products",
+				details: null,
+			},
+			500,
+		);
+	}
+
+	return c.json({ success: true as const, data: result.data }, 200);
+});
+
+const vendRoute = createRoute({
+	method: "post",
+	path: "/vend",
+	tags: ["Bills"],
+	summary: "Vend a bill",
+	description: "Validate customer and process bill payment",
+	security: [{ BearerAuth: [] }],
+	request: {
+		body: {
+			content: {
+				"application/json": {
+					schema: vendBillBody,
+				},
+			},
+		},
+	},
+	responses: {
+		200: {
+			description: "Vend initiated",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(true),
+						data: MonnifyVendResponseSchema,
+					}),
+				},
+			},
+		},
+		400: {
+			description: "Vend failed",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(false),
+						error: z.string(),
+						details: z.null(),
+					}),
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(false),
+						error: z.string(),
+						details: z.null(),
+					}),
+				},
+			},
+		},
+		500: {
+			description: "Server error",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(false),
+						error: z.string(),
+						details: z.null(),
+					}),
+				},
+			},
+		},
+	},
+});
+
+monnifyRoute.openapi(vendRoute, async (c) => {
+	const user = c.get("user");
+	if (!user) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Unauthorized",
+				details: null,
+			},
+			401,
+		);
+	}
+	const userId: string = user.id as string;
+	const {
+		productCode,
+		customerId,
+		amount,
+		customerName,
+	}: {
+		productCode: string;
+		customerId: string;
+		amount: number;
+		customerName?: string;
+	} = c.req.valid("json");
+	const env = {
+		MONNIFY_API_KEY: c.env.MONNIFY_API_KEY,
+		MONNIFY_CLIENT_SECRET: c.env.MONNIFY_CLIENT_SECRET,
+		MONNIFY_CONTRACT_CODE: c.env.MONNIFY_CONTRACT_CODE,
+	};
+
+	if (!env.MONNIFY_API_KEY || !env.MONNIFY_CLIENT_SECRET) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Configuration error",
+				details: null,
+			},
+			500,
+		);
+	}
+
+	const validationResult = await validateCustomer(env, productCode, customerId);
+	if (!validationResult.ok || !validationResult.data) {
+		return c.json(
+			{
+				success: false as const,
+				error: validationResult.error || "Customer validation failed",
+				details: null,
+			},
+			400,
+		);
+	}
+	const validationReference = validationResult.data.validationReference;
+	const validatedCustomerName =
+		validationResult.data.customerName || customerName;
+	const vendReference = `VND_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+
+	const finalValidationReference = validationReference;
+	const db = drizzle(c.env.DB, { schema });
+
+	const transactionId = `txn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+
+	const upperProductCode = productCode.toUpperCase();
+	const serviceCategory = upperProductCode.includes("AIRTIME")
+		? "airtime"
+		: upperProductCode.includes("DATA")
+			? "data"
+			: upperProductCode.includes("ELECTRICITY")
+				? "electricity"
+				: upperProductCode.includes("TV")
+					? "cable_tv"
+					: "data";
+
+	const txValues: typeof schema.utilityTransaction.$inferInsert = {
+		id: transactionId,
+		userId,
+		amount,
+		serviceCategory,
+		billerCode: productCode.split("_")[0]!,
+		billerName: "",
+		customerId,
+		customerName: validatedCustomerName ?? null,
+		productCode,
+		productName: "",
+		vendReference,
+		validationReference: validationReference ?? null,
+		status: "pending",
+	};
+
+	await db.insert(schema.utilityTransaction).values(txValues);
+
+	const result = await vendBill(env, {
+		productCode,
+		customerId,
+		vendAmount: amount,
+		vendReference,
+		validationReference,
+		customerName: validatedCustomerName,
+	});
+
+	if (!result.ok || !result.data) {
+		await db
+			.update(schema.utilityTransaction)
+			.set({ status: "failed" })
+			.where(eq(schema.utilityTransaction.id, transactionId));
+
+		return c.json(
+			{
+				success: false as const,
+				error: result.error || "Vend failed",
+				details: null,
+			},
+			400,
+		);
+	}
+
+	const status =
+		result.data.vendStatus === "SUCCESS"
+			? "success"
+			: result.data.vendStatus === "FAILED"
+				? "failed"
+				: "in_progress";
+
+	await db
+		.update(schema.utilityTransaction)
+		.set({
+			monnifyTransactionReference: result.data.transactionReference,
+			billerName: result.data.billerName,
+			productName: result.data.productName,
+			customerName: result.data.customerName || validatedCustomerName || null,
+			status,
+		})
+		.where(eq(schema.utilityTransaction.id, transactionId));
+
+	return c.json(
+		{
+			success: true as const,
+			data: result.data,
+		},
+		200,
+	);
+});
+
+const requeryRoute = createRoute({
+	method: "get",
+	path: "/requery",
+	tags: ["Bills"],
+	summary: "Requery transaction",
+	description: "Check the status of a bill payment",
+	security: [{ BearerAuth: [] }],
+	request: {
+		query: requeryTransactionQuery,
+	},
+	responses: {
+		200: {
+			description: "Transaction status retrieved",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(true),
+						data: MonnifyRequerySchema,
+					}),
+				},
+			},
+		},
+		400: {
+			description: "Requery failed",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(false),
+						error: z.string(),
+						details: z.null(),
+					}),
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(false),
+						error: z.string(),
+						details: z.null(),
+					}),
+				},
+			},
+		},
+		404: {
+			description: "Transaction not found",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(false),
+						error: z.string(),
+						details: z.null(),
+					}),
+				},
+			},
+		},
+		500: {
+			description: "Server error",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(false),
+						error: z.string(),
+						details: z.null(),
+					}),
+				},
+			},
+		},
+	},
+});
+
+monnifyRoute.openapi(requeryRoute, async (c) => {
+	const user = c.get("user");
+	if (!user) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Unauthorized",
+				details: null,
+			},
+			401,
+		);
+	}
+
+	const { transactionReference } = c.req.valid("query");
+	const env = {
+		MONNIFY_API_KEY: c.env.MONNIFY_API_KEY,
+		MONNIFY_CLIENT_SECRET: c.env.MONNIFY_CLIENT_SECRET,
+		MONNIFY_CONTRACT_CODE: c.env.MONNIFY_CONTRACT_CODE,
+	};
+
+	if (!env.MONNIFY_API_KEY || !env.MONNIFY_CLIENT_SECRET) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Configuration error",
+				details: null,
+			},
+			500,
+		);
+	}
+
+	const db = drizzle(c.env.DB, { schema });
+
+	const [existing] = await db
+		.select()
+		.from(schema.utilityTransaction)
+		.where(
+			eq(
+				schema.utilityTransaction.monnifyTransactionReference,
+				transactionReference,
+			),
+		)
+		.limit(1);
+
+	if (!existing || existing.userId !== user.id) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Transaction not found",
+				details: null,
+			},
+			404,
+		);
+	}
+
+	const result = await requeryTransaction(env, transactionReference);
+
+	if (!result.ok || !result.data) {
+		return c.json(
+			{
+				success: false as const,
+				error: result.error || "Requery failed",
+				details: null,
+			},
+			400,
+		);
+	}
+
+	const status =
+		result.data.vendStatus === "SUCCESS"
+			? "success"
+			: result.data.vendStatus === "FAILED"
+				? "failed"
+				: "in_progress";
+
+	await db
+		.update(schema.utilityTransaction)
+		.set({
+			status,
+			billerName: result.data.billerName,
+			productName: result.data.productName,
+		})
+		.where(eq(schema.utilityTransaction.id, existing.id));
+
+	return c.json({ success: true as const, data: result.data }, 200);
+});
+
+const historyRoute = createRoute({
+	method: "get",
+	path: "/history",
+	tags: ["Bills"],
+	summary: "Get transaction history",
+	description: "Get user's utility transaction history",
+	security: [{ BearerAuth: [] }],
+	request: {
+		query: historyQuery,
+	},
+	responses: {
+		200: {
+			description: "History retrieved",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(true),
+						data: z.array(
+							z.object({
+								id: z.string(),
+								userId: z.string(),
+								amount: z.number(),
+								serviceCategory: z.string(),
+								billerCode: z.string(),
+								billerName: z.string(),
+								customerId: z.string(),
+								customerName: z.string().nullable(),
+								productCode: z.string(),
+								productName: z.string(),
+								monnifyTransactionReference: z.string().nullable(),
+								vendReference: z.string(),
+								validationReference: z.string().nullable(),
+								status: z.string(),
+								createdAt: z.string(),
+							}),
+						),
+					}),
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(false),
+						error: z.string(),
+						details: z.null(),
+					}),
+				},
+			},
+		},
+	},
+});
+
+monnifyRoute.openapi(historyRoute, async (c) => {
+	const user = c.get("user");
+	if (!user) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Unauthorized",
+				details: null,
+			},
+			401,
+		);
+	}
+
+	const { limit, serviceCategory } = c.req.valid("query");
+	const db = drizzle(c.env.DB, { schema });
+
+	const conditions = [eq(schema.utilityTransaction.userId, user.id)];
+
+	if (serviceCategory) {
+		conditions.push(
+			eq(schema.utilityTransaction.serviceCategory, serviceCategory),
+		);
+	}
+
+	const transactions = await db
+		.select()
+		.from(schema.utilityTransaction)
+		.where(and(...conditions))
+		.orderBy(desc(schema.utilityTransaction.createdAt))
+		.limit(limit || 20);
+
+	return c.json({ success: true as const, data: transactions }, 200);
+});
+
+export default monnifyRoute;

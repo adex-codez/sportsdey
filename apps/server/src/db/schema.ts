@@ -175,14 +175,16 @@ export const utilityTransaction = sqliteTable("utility_transaction", {
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
 	amount: integer("amount").notNull(),
-	serviceType: text("service_type").notNull(),
-	billerId: text("biller_id").notNull(),
+	serviceCategory: text("service_category").notNull(),
+	billerCode: text("biller_code").notNull(),
 	billerName: text("biller_name").notNull(),
-	rechargeAccount: text("recharge_account").notNull(),
-	itemId: text("item_id").notNull(),
-	itemName: text("item_name").notNull(),
-	palmPayOrderNo: text("palm_pay_order_no"),
-	outOrderNo: text("out_order_no").notNull().unique(),
+	customerId: text("customer_id").notNull(),
+	customerName: text("customer_name"),
+	productCode: text("product_code").notNull(),
+	productName: text("product_name").notNull(),
+	monnifyTransactionReference: text("monnify_transaction_reference").unique(),
+	vendReference: text("vend_reference").notNull().unique(),
+	validationReference: text("validation_reference"),
 	status: text("status").notNull(),
 	createdAt: integer("created_at", { mode: "timestamp_ms" })
 		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)

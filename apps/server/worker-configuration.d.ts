@@ -30,6 +30,9 @@ declare namespace Cloudflare {
 		PAYSTACK_PUBLIC_KEY: string;
 		SERVER_URL: string;
 		LUCKYWORLDGAMES_LAUNCH_URL: string;
+		MONNIFY_API_KEY: string;
+		MONNIFY_CLIENT_SECRET: string;
+		MONNIFY_CONTRACT_CODE: string;
 	}
 }
 export interface CloudflareBindings extends Cloudflare.Env {}

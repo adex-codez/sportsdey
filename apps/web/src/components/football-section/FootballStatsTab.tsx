@@ -97,19 +97,84 @@ function FootballStatsTab({ stats, isLoading }: FootballStatsTabProps) {
 
 			<div className="px-6 pb-4">
 				<StatBar
+					label="Ball Possession"
+					homeValue={homeStats.ballPossession}
+					awayValue={awayStats.ballPossession}
+				/>
+				<StatBar
+					label="Shots on Target"
+					homeValue={homeStats.shotsOnTarget}
+					awayValue={awayStats.shotsOnTarget}
+				/>
+				<StatBar
+					label="Shots off Target"
+					homeValue={homeStats.shotsOffTarget}
+					awayValue={awayStats.shotsOffTarget}
+				/>
+				<StatBar
+					label="Total Shots"
+					homeValue={homeStats.totalShots}
+					awayValue={awayStats.totalShots}
+				/>
+				<StatBar
+					label="Blocked Shots"
+					homeValue={homeStats.blockedShots}
+					awayValue={awayStats.blockedShots}
+				/>
+				<StatBar
+					label="Shots Inside Box"
+					homeValue={homeStats.shotsInsideBox}
+					awayValue={awayStats.shotsInsideBox}
+				/>
+				<StatBar
+					label="Shots Outside Box"
+					homeValue={homeStats.shotsOutsideBox}
+					awayValue={awayStats.shotsOutsideBox}
+				/>
+				<StatBar
+					label="Fouls"
+					homeValue={homeStats.fouls}
+					awayValue={awayStats.fouls}
+				/>
+				<StatBar
+					label="Corner Kicks"
+					homeValue={homeStats.corners}
+					awayValue={awayStats.corners}
+				/>
+				<StatBar
+					label="Offsides"
+					homeValue={homeStats.offsides}
+					awayValue={awayStats.offsides}
+				/>
+				<StatBar
+					label="Goalkeeper Saves"
+					homeValue={homeStats.saves}
+					awayValue={awayStats.saves}
+				/>
+				<StatBar
 					label="Yellow Cards"
 					homeValue={homeStats.yellowCards}
 					awayValue={awayStats.yellowCards}
 				/>
 				<StatBar
-					label="Second Yellow Cards"
-					homeValue={homeStats.secondYellowCards}
-					awayValue={awayStats.secondYellowCards}
-				/>
-				<StatBar
 					label="Red Cards"
 					homeValue={homeStats.redCards}
 					awayValue={awayStats.redCards}
+				/>
+				<StatBar
+					label="Total Passes"
+					homeValue={homeStats.totalPasses}
+					awayValue={awayStats.totalPasses}
+				/>
+				<StatBar
+					label="Accurate Passes"
+					homeValue={homeStats.accuratePasses}
+					awayValue={awayStats.accuratePasses}
+				/>
+				<StatBar
+					label="Pass Accuracy"
+					homeValue={homeStats.passAccuracy}
+					awayValue={awayStats.passAccuracy}
 				/>
 			</div>
 		</div>

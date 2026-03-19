@@ -284,7 +284,7 @@ walletRoute.openapi(fundWalletRoute, async (c) => {
 	const { amount } = result.data;
 	const db = drizzle(c.env.DB, { schema });
 
-	const reference = `wf_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+	const transactionId = `txn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
 	const [existingWallet] = await db
 		.select()
@@ -300,28 +300,27 @@ walletRoute.openapi(fundWalletRoute, async (c) => {
 		});
 	}
 
-	await db.insert(schema.walletTransaction).values({
-		id: `txn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
-		userId: user.id,
-		amount,
-		type: "credit",
-		reference,
-		status: "pending",
-	});
-
 	try {
-		const callbackUrl = `${c.env.SERVER_URL}/wallet/callback?type=deposit`;
+		const callbackUrl = `${c.env.SERVER_URL}/wallet/callback`;
 		const paystackResult = await initializeTransaction(
 			c.env.PAYSTACK_SECRET_KEY,
 			amount,
 			user.email,
 			{
 				userId: user.id,
-				reference,
 				type: "wallet_funding",
 			},
 			callbackUrl,
 		);
+
+		await db.insert(schema.walletTransaction).values({
+			id: transactionId,
+			userId: user.id,
+			amount,
+			type: "credit",
+			reference: paystackResult.reference,
+			status: "pending",
+		});
 
 		return c.json(
 			{
@@ -334,11 +333,6 @@ walletRoute.openapi(fundWalletRoute, async (c) => {
 			200,
 		);
 	} catch (error) {
-		await db
-			.update(schema.walletTransaction)
-			.set({ status: "failed" })
-			.where(eq(schema.walletTransaction.reference, reference));
-
 		return c.json(
 			{
 				success: false as const,
@@ -488,15 +482,25 @@ walletRoute.openapi(getBanksRoute, async (c) => {
 walletRoute.openapi(callbackRoute, async (c) => {
 	const query = c.req.valid("query");
 	const reference = query.reference || query.trxref || "";
-	const type = query.type || "deposit";
+	const db = drizzle(c.env.DB, { schema });
 
 	let status = "pending";
+	let txType = query.type || "deposit";
 
 	if (reference) {
+		const [transaction] = await db
+			.select()
+			.from(schema.walletTransaction)
+			.where(eq(schema.walletTransaction.reference, reference))
+			.limit(1);
+
+		if (transaction) {
+			txType = transaction.type === "credit" ? "deposit" : "withdraw";
+		}
+
 		try {
 			const tx = await verifyTransaction(c.env.PAYSTACK_SECRET_KEY, reference);
 			const txStatus = tx.status.toLowerCase();
-			console.log("transaction status", txStatus);
 			status =
 				txStatus === "success"
 					? "success"
@@ -504,29 +508,12 @@ walletRoute.openapi(callbackRoute, async (c) => {
 						? "failed"
 						: "pending";
 
-			if (status === "success" && type === "deposit") {
-				const db = drizzle(c.env.DB, { schema });
-
-				const [transaction] = await db
-					.select()
-					.from(schema.walletTransaction)
-					.where(eq(schema.walletTransaction.reference, reference))
-					.limit(1);
-
+			if (status === "success") {
 				if (transaction && transaction.status !== "success") {
 					await db
 						.update(schema.walletTransaction)
 						.set({ status: "success" })
 						.where(eq(schema.walletTransaction.reference, reference));
-
-					console.log(
-						"Transaction updated:",
-						await db
-							.select()
-							.from(schema.walletTransaction)
-							.where(eq(schema.walletTransaction.reference, reference))
-							.limit(1),
-					);
 
 					const [wallet] = await db
 						.select()
@@ -535,10 +522,15 @@ walletRoute.openapi(callbackRoute, async (c) => {
 						.limit(1);
 
 					if (wallet) {
+						const newBalance =
+							transaction.type === "credit"
+								? wallet.balance + transaction.amount
+								: wallet.balance - transaction.amount;
+
 						await db
 							.update(schema.wallet)
 							.set({
-								balance: wallet.balance + transaction.amount,
+								balance: newBalance,
 							})
 							.where(eq(schema.wallet.userId, transaction.userId));
 					}
@@ -552,7 +544,7 @@ walletRoute.openapi(callbackRoute, async (c) => {
 	const isSuccess = status === "success";
 	const isFailed = status === "failed";
 	const title =
-		type === "withdraw"
+		txType === "withdraw"
 			? isSuccess
 				? "Withdrawal successful"
 				: isFailed
@@ -887,6 +879,7 @@ walletRoute.openapi(withdrawRoute, async (c) => {
 			accountNumber,
 			bankCode,
 		);
+		console.log(accountVerification)
 
 		if (!accountVerification.isValid) {
 			return c.json(

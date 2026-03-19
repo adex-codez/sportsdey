@@ -77,6 +77,8 @@ export const TransformedMatchInfoSchema = z.object({
 				id: z.string(),
 				date: z.string(),
 				result: z.enum(["W", "D", "L"]),
+				homeScore: z.number(),
+				awayScore: z.number(),
 			}),
 		)
 		.optional(),
@@ -86,6 +88,8 @@ export const TransformedMatchInfoSchema = z.object({
 				id: z.string(),
 				date: z.string(),
 				result: z.enum(["W", "D", "L"]),
+				homeScore: z.number(),
+				awayScore: z.number(),
 			}),
 		)
 		.optional(),

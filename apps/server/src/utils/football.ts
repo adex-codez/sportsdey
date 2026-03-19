@@ -90,9 +90,7 @@ export function transformSchedule(
 
 		// Only the English Premier League should receive the "Premier League" priority.
 		if (name === "Premier League") {
-			return country === "England"
-				? priorityLeagues["Premier League"]
-				: 999;
+			return country === "England" ? priorityLeagues["Premier League"] : 999;
 		}
 
 		return priorityLeagues[name] ?? 999;
@@ -302,7 +300,7 @@ export function transformTopScorers(
 ): import("@/types/football").TopScorer[] {
 	if (!data?.response) return [];
 
-	return data.response.slice(0, 3).map((player) => ({
+	return data.response.map((player) => ({
 		id: player.player.id.toString(),
 		name: player.player.name,
 		imageUrl: player.player.photo ?? null,
@@ -362,89 +360,110 @@ export function transformFullStandings(
 
 export interface ApiSportsMatchStatsResponse {
 	response: {
-		fixture: {
+		fixture?: {
 			id: number;
 			date: string;
 			timestamp: number;
 			status: { short: string };
 		};
-		league: { id: number; name: string };
-		teams: {
-			home: { id: number; name: string; logo: string; winner: boolean | null };
-			away: { id: number; name: string; logo: string; winner: boolean | null };
+		league?: { id: number; name: string };
+		team: {
+			id: number;
+			name: string;
+			logo: string;
 		};
 		statistics: {
-			ballPossession: { percentage: number | null };
-			shots: { total: number | null; onGoal: number | null };
-			fouls: { total: number | null };
-			corners: { total: number | null };
-			offsides: { total: number | null };
-			saves: { total: number | null };
-			yellowCards: { total: number | null };
-			redCards: { total: number | null };
+			type: string;
+			value: number | string | null;
 		}[];
 	}[];
 }
 
 export function transformMatchStats(data: ApiSportsMatchStatsResponse): any {
-	const match = data.response?.[0];
+	const homeTeamData = data.response?.[0];
+	const awayTeamData = data.response?.[1];
 
-	if (!match) {
+	if (!homeTeamData && !awayTeamData) {
 		return null;
 	}
 
-	const homeStats = match.statistics?.[0];
-	const awayStats = match.statistics?.[1];
-
-	const getStat = (stats: any, type: string): number => {
-		if (!stats) return 0;
-		const stat = stats[type];
-		if (!stat) return 0;
-		if (type === "shots") {
-			return stat.onGoal ?? 0;
-		}
-		return stat.total ?? 0;
+	const getStatValue = (
+		statistics: { type: string; value: number | string | null }[] | undefined,
+		type: string,
+	): number => {
+		if (!statistics) return 0;
+		const stat = statistics.find((s) => s.type === type);
+		if (!stat || stat.value === null) return 0;
+		return typeof stat.value === "number"
+			? stat.value
+			: Number.parseInt(stat.value as string, 10) || 0;
 	};
+
+	const getStatPercentage = (
+		statistics: { type: string; value: number | string | null }[] | undefined,
+		type: string,
+	): number => {
+		if (!statistics) return 0;
+		const stat = statistics.find((s) => s.type === type);
+		if (!stat || stat.value === null) return 0;
+		if (typeof stat.value === "string" && stat.value.includes("%")) {
+			return Number.parseInt(stat.value.replace("%", ""), 10) || 0;
+		}
+		return typeof stat.value === "number" ? stat.value : 0;
+	};
+
+	const homeStats = homeTeamData?.statistics;
+	const awayStats = awayTeamData?.statistics;
 
 	return {
 		home: {
 			statistics: {
-				ballPossession: homeStats?.ballPossession?.percentage ?? 0,
-				shotsOnTarget: getStat(homeStats, "shots"),
-				shotsOffTarget:
-					(homeStats?.shots?.total ?? 0) - getStat(homeStats, "shots"),
-				fouls: getStat(homeStats, "fouls"),
-				corners: getStat(homeStats, "corners"),
-				offsides: getStat(homeStats, "offsides"),
-				saves: getStat(homeStats, "saves"),
-				yellowCards: getStat(homeStats, "yellowCards"),
-				secondYellowCards: 0,
-				redCards: getStat(homeStats, "redCards"),
+				ballPossession: getStatPercentage(homeStats, "Ball Possession"),
+				shotsOnTarget: getStatValue(homeStats, "Shots on Goal"),
+				shotsOffTarget: getStatValue(homeStats, "Shots off Goal"),
+				totalShots: getStatValue(homeStats, "Total Shots"),
+				blockedShots: getStatValue(homeStats, "Blocked Shots"),
+				shotsInsideBox: getStatValue(homeStats, "Shots insidebox"),
+				shotsOutsideBox: getStatValue(homeStats, "Shots outsidebox"),
+				fouls: getStatValue(homeStats, "Fouls"),
+				corners: getStatValue(homeStats, "Corner Kicks"),
+				offsides: getStatValue(homeStats, "Offsides"),
+				saves: getStatValue(homeStats, "Goalkeeper Saves"),
+				yellowCards: getStatValue(homeStats, "Yellow Cards"),
+				redCards: getStatValue(homeStats, "Red Cards"),
+				totalPasses: getStatValue(homeStats, "Total passes"),
+				accuratePasses: getStatValue(homeStats, "Passes accurate"),
+				passAccuracy: getStatPercentage(homeStats, "Passes %"),
 			},
-			name: match.teams.home.name,
-			id: match.teams.home.id,
-			imageUrl: match.teams.home.logo ?? null,
+			name: homeTeamData?.team?.name,
+			id: homeTeamData?.team?.id,
+			imageUrl: homeTeamData?.team?.logo ?? null,
 		},
 		away: {
 			statistics: {
-				ballPossession: awayStats?.ballPossession?.percentage ?? 0,
-				shotsOnTarget: getStat(awayStats, "shots"),
-				shotsOffTarget:
-					(awayStats?.shots?.total ?? 0) - getStat(awayStats, "shots"),
-				fouls: getStat(awayStats, "fouls"),
-				corners: getStat(awayStats, "corners"),
-				offsides: getStat(awayStats, "offsides"),
-				saves: getStat(awayStats, "saves"),
-				yellowCards: getStat(awayStats, "yellowCards"),
-				secondYellowCards: 0,
-				redCards: getStat(awayStats, "redCards"),
+				ballPossession: getStatPercentage(awayStats, "Ball Possession"),
+				shotsOnTarget: getStatValue(awayStats, "Shots on Goal"),
+				shotsOffTarget: getStatValue(awayStats, "Shots off Goal"),
+				totalShots: getStatValue(awayStats, "Total Shots"),
+				blockedShots: getStatValue(awayStats, "Blocked Shots"),
+				shotsInsideBox: getStatValue(awayStats, "Shots insidebox"),
+				shotsOutsideBox: getStatValue(awayStats, "Shots outsidebox"),
+				fouls: getStatValue(awayStats, "Fouls"),
+				corners: getStatValue(awayStats, "Corner Kicks"),
+				offsides: getStatValue(awayStats, "Offsides"),
+				saves: getStatValue(awayStats, "Goalkeeper Saves"),
+				yellowCards: getStatValue(awayStats, "Yellow Cards"),
+				redCards: getStatValue(awayStats, "Red Cards"),
+				totalPasses: getStatValue(awayStats, "Total passes"),
+				accuratePasses: getStatValue(awayStats, "Passes accurate"),
+				passAccuracy: getStatPercentage(awayStats, "Passes %"),
 			},
-			name: match.teams.away.name,
-			id: match.teams.away.id,
-			imageUrl: match.teams.away.logo ?? null,
+			name: awayTeamData?.team?.name,
+			id: awayTeamData?.team?.id,
+			imageUrl: awayTeamData?.team?.logo ?? null,
 		},
-		date: match.fixture.date,
-		id: match.fixture.id,
+		date: homeTeamData?.fixture?.date || awayTeamData?.fixture?.date,
+		id: homeTeamData?.fixture?.id || awayTeamData?.fixture?.id,
 	};
 }
 
@@ -507,12 +526,16 @@ export function transformH2H(
 		id: match.fixture.id.toString(),
 		date: match.fixture.date,
 		result: getResult(homeTeamId, match),
+		homeScore: match.goals.home ?? 0,
+		awayScore: match.goals.away ?? 0,
 	}));
 
 	const awayH2H: H2HMatch[] = matches.map((match) => ({
 		id: match.fixture.id.toString(),
 		date: match.fixture.date,
 		result: getResult(awayTeamId, match),
+		homeScore: match.goals.home ?? 0,
+		awayScore: match.goals.away ?? 0,
 	}));
 
 	return { homeH2H, awayH2H };

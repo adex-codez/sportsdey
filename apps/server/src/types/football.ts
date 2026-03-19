@@ -85,6 +85,8 @@ export type H2HMatch = {
 	id: string;
 	date: string;
 	result: "W" | "D" | "L";
+	homeScore: number;
+	awayScore: number;
 };
 
 export type TransformedMatchInfo = {

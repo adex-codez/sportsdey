@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { TabNavigation } from "@/components/ui/tab-navigation";
 import { formatClock } from "@/lib/utils";
 import type { DetailsImageProps } from "@/types/basketball";
@@ -53,6 +55,17 @@ const DetailsImageCard = ({
 	scheduledDate,
 	scheduledTime,
 }: DetailsImageCardProps) => {
+	const [hostLogoLoading, setHostLogoLoading] = useState(true);
+	const [awayLogoLoading, setAwayLogoLoading] = useState(true);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setHostLogoLoading(false);
+			setAwayLogoLoading(false);
+		}, 100);
+		return () => clearTimeout(timer);
+	}, []);
+
 	return (
 		<div className="relative h-64 w-full rounded-t-2xl rounded-b-0 bg-primary dark:bg-card">
 			<div className="h-full w-full">
@@ -86,11 +99,16 @@ const DetailsImageCard = ({
 							★
 						</button>
 						<div className="mx-4 flex flex-col items-center">
-							<img
-								src={hostTeamLogo}
-								alt={hostTeamName}
-								className="mx-auto h-16 w-16 object-contain"
-							/>
+							{hostLogoLoading ? (
+								<Skeleton className="h-16 w-16 rounded-full" />
+							) : (
+								<img
+									src={hostTeamLogo}
+									alt={hostTeamName}
+									className="mx-auto h-16 w-16 object-contain"
+									onLoad={() => setHostLogoLoading(false)}
+								/>
+							)}
 							<span className="mt-2 block flex h-8 items-start justify-center text-center font-normal text-[10px] text-white md:h-auto md:text-sm">
 								{hostTeamName}
 							</span>
@@ -165,11 +183,16 @@ const DetailsImageCard = ({
 							★
 						</button>
 						<div className="mx-4 flex flex-col items-center">
-							<img
-								src={guestTeamLogo}
-								alt={guestTeamName}
-								className="mx-auto h-16 w-16 object-contain"
-							/>
+							{awayLogoLoading ? (
+								<Skeleton className="h-16 w-16 rounded-full" />
+							) : (
+								<img
+									src={guestTeamLogo}
+									alt={guestTeamName}
+									className="mx-auto h-16 w-16 object-contain"
+									onLoad={() => setAwayLogoLoading(false)}
+								/>
+							)}
 							<span className="mt-2 block flex h-8 items-start justify-center text-center font-normal text-[10px] text-white md:h-auto md:text-sm">
 								{guestTeamName}
 							</span>

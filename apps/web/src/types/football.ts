@@ -127,12 +127,16 @@ export type FootballMatchInfoType = {
 		date: string;
 		name: string;
 		result: "win" | "draw" | "loss";
+		homeScore: number;
+		awayScore: number;
 	}[];
 	awayH2H?: {
 		id: string;
 		date: string;
 		name: string;
 		result: "win" | "draw" | "loss";
+		homeScore: number;
+		awayScore: number;
 	}[];
 };
 
@@ -164,9 +168,22 @@ export type FootballStatsResponse = {
 
 	home: {
 		statistics: {
+			ballPossession: number;
+			shotsOnTarget: number;
+			shotsOffTarget: number;
+			totalShots: number;
+			blockedShots: number;
+			shotsInsideBox: number;
+			shotsOutsideBox: number;
+			fouls: number;
+			corners: number;
+			offsides: number;
+			saves: number;
 			yellowCards: number;
-			secondYellowCards: number;
 			redCards: number;
+			totalPasses: number;
+			accuratePasses: number;
+			passAccuracy: number;
 		};
 		name: string;
 		id: number;
@@ -174,9 +191,22 @@ export type FootballStatsResponse = {
 	};
 	away: {
 		statistics: {
+			ballPossession: number;
+			shotsOnTarget: number;
+			shotsOffTarget: number;
+			totalShots: number;
+			blockedShots: number;
+			shotsInsideBox: number;
+			shotsOutsideBox: number;
+			fouls: number;
+			corners: number;
+			offsides: number;
+			saves: number;
 			yellowCards: number;
-			secondYellowCards: number;
 			redCards: number;
+			totalPasses: number;
+			accuratePasses: number;
+			passAccuracy: number;
 		};
 		name: string;
 		id: number;

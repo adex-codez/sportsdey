@@ -160,15 +160,15 @@ function mapBasketballStatus(
 		case "SCH":
 		case "NS":
 			return "scheduled";
-		case "1Q":
-		case "2Q":
-		case "3Q":
-		case "4Q":
-		case "Q1":
-		case "Q2":
-		case "Q3":
-		case "Q4":
-			return "inprogress";
+		// case "1Q":
+		// case "2Q":
+		// case "3Q":
+		// case "4Q":
+		// case "Q1":
+		// case "Q2":
+		// case "Q3":
+		// case "Q4":
+		// 	return "live";
 		case "HT":
 			return "halftime";
 		case "PPD":
