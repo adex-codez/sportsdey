@@ -98,6 +98,7 @@ export const userRelations = relations(user, ({ many }) => ({
 	gameSessions: many(gameSessions),
 	gameTransactions: many(gameTransactions),
 	utilityTransactions: many(utilityTransaction),
+	withdrawalAccounts: many(withdrawalAccount),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -201,13 +202,39 @@ export const utilityTransactionRelations = relations(
 	}),
 );
 
+export const withdrawalAccount = sqliteTable("withdrawal_account", {
+	id: text("id").primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	bankCode: text("bank_code").notNull(),
+	bankName: text("bank_name").notNull(),
+	accountNumber: text("account_number").notNull(),
+	accountName: text("account_name").notNull(),
+	createdAt: integer("created_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.notNull(),
+	updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+		.$onUpdate(() => /* @__PURE__ */ new Date())
+		.notNull(),
+});
+
+export const withdrawalAccountRelations = relations(
+	withdrawalAccount,
+	({ one }) => ({
+		user: one(user, {
+			fields: [withdrawalAccount.userId],
+			references: [user.id],
+		}),
+	}),
+);
+
 export const gameLaunchTokens = sqliteTable("game_launch_tokens", {
 	token: text("token").primaryKey(),
 	userId: text("user_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
 	game: text("game").notNull(),
-	expiresAt: integer("expires_at", { mode: "timestamp_ms" }),
 	used: integer("used", { mode: "boolean" }).default(false).notNull(),
 	createdAt: integer("created_at", { mode: "timestamp_ms" })
 		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
@@ -245,6 +272,22 @@ export const gameTransactions = sqliteTable("game_transactions", {
 		.notNull(),
 });
 
+export const thundrSessions = sqliteTable("thundr_sessions", {
+	sessionId: text("session_id").primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	gameId: text("game_id").notNull(),
+	status: text("status").default("active").notNull(),
+	createdAt: integer("created_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.notNull(),
+	updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.$onUpdate(() => /* @__PURE__ */ new Date())
+		.notNull(),
+});
+
 export const gameLaunchTokensRelations = relations(
 	gameLaunchTokens,
 	({ one }) => ({
@@ -267,6 +310,40 @@ export const gameTransactionsRelations = relations(
 	({ one }) => ({
 		user: one(user, {
 			fields: [gameTransactions.userId],
+			references: [user.id],
+		}),
+	}),
+);
+
+export const thundrSessionsRelations = relations(thundrSessions, ({ one }) => ({
+	user: one(user, {
+		fields: [thundrSessions.userId],
+		references: [user.id],
+	}),
+}));
+
+export const thundrTransactions = sqliteTable("thundr_transactions", {
+	id: text("id").primaryKey(),
+	transactionId: text("transaction_id").notNull().unique(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	type: text("type").notNull(),
+	amount: integer("amount").notNull(),
+	roundId: text("round_id").notNull(),
+	gameId: text("game_id").notNull(),
+	sessionId: text("session_id").notNull(),
+	originalTransactionId: text("original_transaction_id"),
+	createdAt: integer("created_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.notNull(),
+});
+
+export const thundrTransactionsRelations = relations(
+	thundrTransactions,
+	({ one }) => ({
+		user: one(user, {
+			fields: [thundrTransactions.userId],
 			references: [user.id],
 		}),
 	}),

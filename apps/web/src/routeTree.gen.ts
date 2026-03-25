@@ -13,6 +13,7 @@ import { Route as WalletTransactionStatusRouteImport } from './routes/wallet-tra
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TennisRouteImport } from './routes/tennis'
 import { Route as NewsRouteImport } from './routes/news'
+import { Route as GamesRouteImport } from './routes/games'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as BettingRouteImport } from './routes/betting'
 import { Route as BasketballRouteImport } from './routes/basketball'
@@ -51,6 +52,11 @@ const TennisRoute = TennisRouteImport.update({
 const NewsRoute = NewsRouteImport.update({
   id: '/news',
   path: '/news',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesRoute = GamesRouteImport.update({
+  id: '/games',
+  path: '/games',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FavoritesRoute = FavoritesRouteImport.update({
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/basketball': typeof BasketballRouteWithChildren
   '/betting': typeof BettingRoute
   '/favorites': typeof FavoritesRoute
+  '/games': typeof GamesRoute
   '/news': typeof NewsRouteWithChildren
   '/tennis': typeof TennisRouteWithChildren
   '/wallet': typeof WalletRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/betting': typeof BettingRoute
   '/favorites': typeof FavoritesRoute
+  '/games': typeof GamesRoute
   '/wallet': typeof WalletRoute
   '/wallet-transaction-status': typeof WalletTransactionStatusRoute
   '/auth': typeof AuthLayoutRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/basketball': typeof BasketballRouteWithChildren
   '/betting': typeof BettingRoute
   '/favorites': typeof FavoritesRoute
+  '/games': typeof GamesRoute
   '/news': typeof NewsRouteWithChildren
   '/tennis': typeof TennisRouteWithChildren
   '/wallet': typeof WalletRoute
@@ -232,6 +241,7 @@ export interface FileRouteTypes {
     | '/basketball'
     | '/betting'
     | '/favorites'
+    | '/games'
     | '/news'
     | '/tennis'
     | '/wallet'
@@ -256,6 +266,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/betting'
     | '/favorites'
+    | '/games'
     | '/wallet'
     | '/wallet-transaction-status'
     | '/auth'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/basketball'
     | '/betting'
     | '/favorites'
+    | '/games'
     | '/news'
     | '/tennis'
     | '/wallet'
@@ -305,6 +317,7 @@ export interface RootRouteChildren {
   BasketballRoute: typeof BasketballRouteWithChildren
   BettingRoute: typeof BettingRoute
   FavoritesRoute: typeof FavoritesRoute
+  GamesRoute: typeof GamesRoute
   NewsRoute: typeof NewsRouteWithChildren
   TennisRoute: typeof TennisRouteWithChildren
   WalletRoute: typeof WalletRoute
@@ -345,6 +358,13 @@ declare module '@tanstack/react-router' {
       path: '/news'
       fullPath: '/news'
       preLoaderRoute: typeof NewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games': {
+      id: '/games'
+      path: '/games'
+      fullPath: '/games'
+      preLoaderRoute: typeof GamesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/favorites': {
@@ -542,6 +562,7 @@ const rootRouteChildren: RootRouteChildren = {
   BasketballRoute: BasketballRouteWithChildren,
   BettingRoute: BettingRoute,
   FavoritesRoute: FavoritesRoute,
+  GamesRoute: GamesRoute,
   NewsRoute: NewsRouteWithChildren,
   TennisRoute: TennisRouteWithChildren,
   WalletRoute: WalletRoute,

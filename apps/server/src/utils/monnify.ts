@@ -27,17 +27,30 @@ export interface MonnifyBiller {
 }
 
 export interface MonnifyProduct {
-	productCode: string;
-	billerCode: string;
-	billerName: string;
+	code: string;
 	name: string;
-	productType: string;
-	amount: number | null;
-	unit: string | null;
-	isAmountFixed: number;
+	category: { code: string; name: string };
+	billers: { code: string; name: string }[];
 	minAmount: number | null;
 	maxAmount: number | null;
-	fixedAmount: number | null;
+	price: number | null;
+	priceType: "OPEN" | "FIXED";
+	metadata: {
+		volume: number;
+		duration: number;
+		productType: { code: string; name: string };
+		durationUnit: string | null;
+		productCategory: string | null;
+	};
+}
+
+export interface MonnifyProductsResponse {
+	content: MonnifyProduct[];
+	totalElements: number;
+	size: number;
+	number: number;
+	empty: boolean;
+	nextPage: number | null;
 }
 
 export interface MonnifyValidationResponse {
@@ -122,9 +135,14 @@ async function monnifyRequest<T>(
 			...(body ? { body: JSON.stringify(body) } : {}),
 		});
 
-		const data = (await res.json()) as
+		const ras = await res.json();
+		console.log("validation result", ras);
+
+		const data = ras as
 			| { responseCode: string; responseMessage: string; responseBody: T }
 			| MonnifyErrorResponse;
+
+		console.log("validation result", data);
 
 		if ("requestSuccessful" in data && data.requestSuccessful === true) {
 			const body = data as {
@@ -255,12 +273,36 @@ export async function getProducts(
 		MONNIFY_CONTRACT_CODE: string;
 	},
 	billerCode: string,
-): Promise<{ ok: boolean; data?: MonnifyProduct[]; error?: string }> {
-	return monnifyRequest<MonnifyProduct[]>(
+	categoryCode?: string,
+): Promise<{ ok: boolean; data?: MonnifyProductsResponse; error?: string }> {
+	const result = await monnifyRequest<MonnifyProductsResponse>(
 		"GET",
 		`/vas/bills-payment/biller-products?biller_code=${billerCode}`,
 		env,
 	);
+
+	if (!result.ok || !result.data) {
+		return {
+			ok: result.ok,
+			error: result.error,
+		};
+	}
+
+	if (categoryCode) {
+		const filteredContent = result.data.content.filter(
+			(p) => p.category?.code === categoryCode,
+		);
+		return {
+			ok: true,
+			data: {
+				...result.data,
+				content: filteredContent,
+				totalElements: filteredContent.length,
+			},
+		};
+	}
+
+	return result;
 }
 
 export async function validateCustomer(

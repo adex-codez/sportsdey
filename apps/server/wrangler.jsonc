@@ -31,7 +31,7 @@
 	],
   "vars": {
     "NODE_ENV": "development",
-    "LUCKYWORLDGAMES_LAUNCH_URL": "https://play.luckyworldgames.com/launch"
+    // "LUCKYWORLDGAMES_LAUNCH_URL": "https://play.luckyworldgames.com/launch"
   },
   "env": {
       "staging": {
@@ -55,7 +55,7 @@
         "routes": ["staging-api.sportsdey.com"],
         "vars": {
           "NODE_ENV": "staging",
-          "LUCKYWORLDGAMES_LAUNCH_URL": "https://play.luckyworldgames.com/launch"
+          // "LUCKYWORLDGAMES_LAUNCH_URL": "https://play.luckyworldgames.com/launch"
         }
       },
       "production": {
@@ -79,7 +79,7 @@
         ],
         "vars": {
       		"NODE_ENV": "production",
-      		"LUCKYWORLDGAMES_LAUNCH_URL": "https://play.luckyworldgames.com/launch",
+      		// "LUCKYWORLDGAMES_LAUNCH_URL": "https://play.luckyworldgames.com/launch",
       		// Add public environment variables here
       		// Example: "CORS_ORIGIN": "https://your-domain.com"
       	},

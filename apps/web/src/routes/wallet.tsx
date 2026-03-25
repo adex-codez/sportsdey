@@ -1,14 +1,19 @@
-import { Navigate, createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Loader2, X } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { type FormEvent, useState } from "react";
+import { BillPaymentModal } from "@/components/bill-payment-modal";
+import { Input } from "@/components/ui/input";
 import { WalletInfo } from "@/components/wallet-info";
 import { WalletRecentTransactions } from "@/components/wallet-recent-transactions";
 import { WalletSidebar } from "@/components/wallet-sidebar";
 import { WithdrawModal } from "@/components/withdraw-modal";
-import { useSession } from "@/lib/auth/client";
 import { ApiError, apiRequest } from "@/lib/api";
-import { Input } from "@/components/ui/input";
+import { useSession } from "@/lib/auth/client";
+import AirtimeIcon from "@/logos/airtime.svg?react";
+import CableTvIcon from "@/logos/cable-tv.svg?react";
+import ElectricityIcon from "@/logos/electricity.svg?react";
+import InternetIcon from "@/logos/internet.svg?react";
 import WalletIcon from "@/logos/wallet.svg?react";
 
 export const Route = createFileRoute("/wallet")({
@@ -47,6 +52,11 @@ function WalletPage() {
 	const [depositAmount, setDepositAmount] = useState("");
 	const [depositError, setDepositError] = useState("");
 	const [shouldRedirectToSignIn, setShouldRedirectToSignIn] = useState(false);
+	const [isBillPaymentOpen, setIsBillPaymentOpen] = useState(false);
+	const [billPaymentCategory, setBillPaymentCategory] = useState<{
+		code: string;
+		name: string;
+	} | null>(null);
 	const { data: session, isPending: isSessionLoading } = useSession();
 	const {
 		data: walletData,
@@ -60,17 +70,15 @@ function WalletPage() {
 			}),
 		enabled: !!session?.user,
 	});
-	const {
-		data: transactions = [],
-		isLoading: isTransactionsLoading,
-	} = useQuery({
-		queryKey: ["wallet-transactions"],
-		queryFn: () =>
-			apiRequest<WalletTransaction[]>("wallet/transactions", {
-				credentials: "include",
-			}),
-		enabled: !!session?.user,
-	});
+	const { data: transactions = [], isLoading: isTransactionsLoading } =
+		useQuery({
+			queryKey: ["wallet-transactions"],
+			queryFn: () =>
+				apiRequest<WalletTransaction[]>("wallet/transactions", {
+					credentials: "include",
+				}),
+			enabled: !!session?.user,
+		});
 	const depositMutation = useMutation({
 		mutationFn: (amount: number) =>
 			apiRequest<FundWalletResponse>("wallet/fund", {
@@ -119,10 +127,13 @@ function WalletPage() {
 			return `Minimum deposit amount is ₦${MIN_DEPOSIT_AMOUNT.toLocaleString("en-NG")}.`;
 		}
 		if (amount > MAX_DEPOSIT_AMOUNT) {
-			return `Maximum deposit amount is ₦${MAX_DEPOSIT_AMOUNT.toLocaleString("en-NG", {
-				minimumFractionDigits: 2,
-				maximumFractionDigits: 2,
-			})}.`;
+			return `Maximum deposit amount is ₦${MAX_DEPOSIT_AMOUNT.toLocaleString(
+				"en-NG",
+				{
+					minimumFractionDigits: 2,
+					maximumFractionDigits: 2,
+				},
+			)}.`;
 		}
 		return "";
 	};
@@ -173,10 +184,12 @@ function WalletPage() {
 											Wallet Balance
 										</p>
 										<div className="mt-3 flex items-start gap-2">
-											<p className="font-semibold leading-none text-primary dark:text-white">
+											<p className="font-semibold text-primary leading-none dark:text-white">
 												{showBalance ? (
 													<span className="leading-none">
-														<span className="-top-2 relative align-super text-[24px]">₦</span>
+														<span className="relative -top-2 align-super text-[24px]">
+															₦
+														</span>
 														<span className="text-[50px]">{walletBalance}</span>
 													</span>
 												) : (
@@ -187,7 +200,11 @@ function WalletPage() {
 												type="button"
 												onClick={() => setShowBalance((prev) => !prev)}
 												className="cursor-pointer text-primary dark:text-white"
-												aria-label={showBalance ? "Hide wallet balance" : "Show wallet balance"}
+												aria-label={
+													showBalance
+														? "Hide wallet balance"
+														: "Show wallet balance"
+												}
 											>
 												{showBalance ? (
 													<EyeOff className="h-4 w-4" />
@@ -226,7 +243,93 @@ function WalletPage() {
 									</>
 								)}
 							</div>
-							<div className="col-start-2 row-span-2 min-h-40 rounded-2xl bg-white p-6 shadow-sm dark:bg-[#202120]" />
+							<div className="col-start-2 row-span-2 min-h-40 rounded-2xl bg-white p-6 shadow-sm dark:bg-[#202120]">
+								<p className="border-[#E0E0E0] border-b pb-3 font-semibold text-base text-primary dark:text-white">
+									Quick Access
+								</p>
+								<ul className="mt-4 space-y-3">
+									<li>
+										<button
+											type="button"
+											onClick={() => {
+												setBillPaymentCategory({
+													code: "AIRTIME",
+													name: "Airtime",
+												});
+												setIsBillPaymentOpen(true);
+											}}
+											className="flex w-full cursor-pointer items-center gap-3 rounded-lg bg-[#F0F0F0] p-3"
+										>
+											<div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F0F0F0]">
+												<AirtimeIcon className="h-5 w-5 text-primary dark:text-white" />
+											</div>
+											<span className="text-primary text-sm dark:text-white">
+												Airtime
+											</span>
+										</button>
+									</li>
+									<li>
+										<button
+											type="button"
+											onClick={() => {
+												setBillPaymentCategory({
+													code: "DATA_BUNDLE",
+													name: "Internet",
+												});
+												setIsBillPaymentOpen(true);
+											}}
+											className="flex w-full cursor-pointer items-center gap-3 rounded-lg bg-[#F0F0F0] p-3"
+										>
+											<div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F0F0F0]">
+												<InternetIcon className="h-5 w-5 text-primary dark:text-white" />
+											</div>
+											<span className="text-primary text-sm dark:text-white">
+												Internet
+											</span>
+										</button>
+									</li>
+									<li>
+										<button
+											type="button"
+											onClick={() => {
+												setBillPaymentCategory({
+													code: "CABLE_TV",
+													name: "Cable TV",
+												});
+												setIsBillPaymentOpen(true);
+											}}
+											className="flex w-full cursor-pointer items-center gap-3 rounded-lg bg-[#F0F0F0] p-3"
+										>
+											<div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F0F0F0]">
+												<CableTvIcon className="h-5 w-5 text-primary dark:text-white" />
+											</div>
+											<span className="text-primary text-sm dark:text-white">
+												Cable TV
+											</span>
+										</button>
+									</li>
+									<li>
+										<button
+											type="button"
+											onClick={() => {
+												setBillPaymentCategory({
+													code: "ELECTRICITY",
+													name: "Electricity",
+												});
+												setIsBillPaymentOpen(true);
+											}}
+											className="flex w-full cursor-pointer items-center gap-3 rounded-lg bg-[#F0F0F0] p-3"
+										>
+											<div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F0F0F0]">
+												<ElectricityIcon className="h-5 w-5 text-primary dark:text-white" />
+											</div>
+											<span className="text-primary text-sm dark:text-white">
+												Electricity
+											</span>
+										</button>
+									</li>
+								</ul>
+							</div>
 						</div>
 						<WalletRecentTransactions
 							transactions={transactions}
@@ -299,6 +402,17 @@ function WalletPage() {
 				onClose={() => setIsWithdrawModalOpen(false)}
 				onUnauthorized={() => setShouldRedirectToSignIn(true)}
 			/>
+			{billPaymentCategory && (
+				<BillPaymentModal
+					isOpen={isBillPaymentOpen}
+					onClose={() => {
+						setIsBillPaymentOpen(false);
+						setBillPaymentCategory(null);
+					}}
+					categoryCode={billPaymentCategory.code}
+					categoryName={billPaymentCategory.name}
+				/>
+			)}
 		</div>
 	);
 }

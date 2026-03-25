@@ -22,17 +22,36 @@ export const MonnifyBillerSchema = z.object({
 });
 
 export const MonnifyProductSchema = z.object({
-	productCode: z.string().openapi({ description: "Product code" }),
-	billerCode: z.string().openapi({ description: "Biller code" }),
-	billerName: z.string().openapi({ description: "Biller name" }),
+	code: z.string().openapi({ description: "Product code" }),
 	name: z.string().openapi({ description: "Product name" }),
-	productType: z.string().openapi({ description: "Product type" }),
-	amount: z.number().nullable().openapi({ description: "Amount" }),
-	unit: z.string().nullable().openapi({ description: "Unit" }),
-	isAmountFixed: z.number().openapi({ description: "Is amount fixed" }),
+	category: z.object({ code: z.string(), name: z.string() }).openapi({
+		description: "Category",
+	}),
+	billers: z
+		.array(z.object({ code: z.string(), name: z.string() }))
+		.openapi({ description: "Billers" }),
 	minAmount: z.number().nullable().openapi({ description: "Minimum amount" }),
 	maxAmount: z.number().nullable().openapi({ description: "Maximum amount" }),
-	fixedAmount: z.number().nullable().openapi({ description: "Fixed amount" }),
+	price: z.number().nullable().openapi({ description: "Price" }),
+	priceType: z.enum(["OPEN", "FIXED"]).openapi({ description: "Price type" }),
+	metadata: z
+		.object({
+			volume: z.number(),
+			duration: z.number(),
+			productType: z.object({ code: z.string(), name: z.string() }),
+			durationUnit: z.string().nullable(),
+			productCategory: z.string().nullable(),
+		})
+		.openapi({ description: "Metadata" }),
+});
+
+export const MonnifyProductsResponseSchema = z.object({
+	content: z.array(MonnifyProductSchema),
+	totalElements: z.number(),
+	size: z.number(),
+	number: z.number(),
+	empty: z.boolean(),
+	nextPage: z.number().nullable(),
 });
 
 export const MonnifyValidationSchema = z.object({
@@ -101,6 +120,9 @@ export const MonnifyRequerySchema = z.object({
 export type MonnifyCategory = z.infer<typeof MonnifyCategorySchema>;
 export type MonnifyBiller = z.infer<typeof MonnifyBillerSchema>;
 export type MonnifyProduct = z.infer<typeof MonnifyProductSchema>;
+export type MonnifyProductsResponse = z.infer<
+	typeof MonnifyProductsResponseSchema
+>;
 export type MonnifyValidation = z.infer<typeof MonnifyValidationSchema>;
 export type MonnifyVendResponse = z.infer<typeof MonnifyVendResponseSchema>;
 export type MonnifyRequery = z.infer<typeof MonnifyRequerySchema>;

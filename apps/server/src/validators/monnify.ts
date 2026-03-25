@@ -15,6 +15,10 @@ export const getProductsQuery = z
 			description: "Biller code",
 			example: "MTN_DATA",
 		}),
+		categoryCode: z.string().optional().openapi({
+			description: "Category code to filter products",
+			example: "DATA",
+		}),
 	})
 	.openapi({ description: "Get products request" });
 

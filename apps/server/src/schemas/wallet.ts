@@ -155,3 +155,61 @@ export type FundWallet = z.infer<typeof FundWalletSchema>;
 export type WalletResponse = z.infer<typeof WalletResponseSchema>;
 export type TransactionResponse = z.infer<typeof TransactionResponseSchema>;
 export type Withdraw = z.infer<typeof WithdrawSchema>;
+
+export const CreateWithdrawalAccountSchema = z.object({
+	bankCode: z.string().openapi({
+		description: "Bank code (e.g., 058 for GTBank)",
+		example: "058",
+	}),
+	bankName: z.string().optional().openapi({
+		description: "Bank name (optional - validated via Paystack)",
+		example: "Guaranty Trust Bank",
+	}),
+	accountNumber: z.string().openapi({
+		description: "Bank account number",
+		example: "0123456789",
+	}),
+	accountName: z.string().openapi({
+		description: "Account holder name (must match Paystack verification)",
+		example: "John Doe",
+	}),
+});
+
+export const WithdrawalAccountResponseSchema = z.object({
+	id: z.string().openapi({ description: "Withdrawal account ID" }),
+	bankCode: z.string().openapi({ description: "Bank code" }),
+	bankName: z.string().openapi({ description: "Bank name" }),
+	accountNumber: z.string().openapi({ description: "Account number" }),
+	accountName: z.string().openapi({ description: "Account holder name" }),
+	createdAt: z.string().openapi({ description: "Creation timestamp" }),
+	updatedAt: z.string().openapi({ description: "Last update timestamp" }),
+});
+
+export const CreateWithdrawalAccountErrorSchema = z.object({
+	success: z.literal(false),
+	error: z.string(),
+	details: z.null(),
+});
+
+export const CreateWithdrawalAccountResponseSchema = z.object({
+	success: z.literal(true),
+	data: WithdrawalAccountResponseSchema,
+});
+
+export const GetWithdrawalAccountsErrorSchema = z.object({
+	success: z.literal(false),
+	error: z.string(),
+	details: z.null(),
+});
+
+export const GetWithdrawalAccountsResponseSchema = z.object({
+	success: z.literal(true),
+	data: z.array(WithdrawalAccountResponseSchema),
+});
+
+export type CreateWithdrawalAccount = z.infer<
+	typeof CreateWithdrawalAccountSchema
+>;
+export type WithdrawalAccountResponse = z.infer<
+	typeof WithdrawalAccountResponseSchema
+>;

@@ -101,40 +101,46 @@ export interface TransferRecipient {
 
 export async function createTransferRecipient(
 	secretKey: string,
-	type: "bank" | "mobile_money",
 	bankCode: string,
 	accountNumber: string,
 	name: string,
 	currency = "NGN",
 ): Promise<TransferRecipient> {
+	const body = {
+		type: "nuban",
+		bank_code: bankCode,
+		account_number: accountNumber,
+		name,
+		currency,
+	};
+	console.log("Paystack create recipient:", body);
+
 	const response = await fetch("https://api.paystack.co/transferrecipient", {
 		method: "POST",
 		headers: {
 			Authorization: `Bearer ${secretKey}`,
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify({
-			type,
-			bank_code: bankCode,
-			account_number: accountNumber,
-			name,
-			currency,
-		}),
+		body: JSON.stringify(body),
 	});
 
-	const data = (await response.json()) as {
+	const data = await response.json();
+	console.log("Paystack create recipient response:", data);
+
+	const responseData = data as {
 		status: boolean;
-		message: string;
-		data: { id: string; reference: string };
+		message?: string;
+		data?: { id: string; reference: string };
 	};
 
-	if (!response.ok) {
-		throw new Error(data.message || "Failed to create transfer recipient");
+	if (!response.ok || !responseData.status) {
+		console.log("response message", responseData.message);
+		throw new Error(responseData.message);
 	}
 
 	return {
-		id: data.data.id,
-		reference: data.data.reference,
+		id: responseData.data!.id,
+		reference: responseData.data!.reference,
 	};
 }
 
@@ -145,18 +151,21 @@ export async function initiateTransfer(
 	source = "balance",
 	reason = "Withdrawal",
 ): Promise<{ reference: string; status: string }> {
+	const body = {
+		amount: amount * 100,
+		recipient: recipientCode,
+		source,
+		reason,
+	};
+	console.log("Paystack initiate transfer:", body);
+
 	const response = await fetch("https://api.paystack.co/transfer", {
 		method: "POST",
 		headers: {
 			Authorization: `Bearer ${secretKey}`,
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify({
-			amount: amount * 100,
-			recipient: recipientCode,
-			source,
-			reason,
-		}),
+		body: JSON.stringify(body),
 	});
 
 	const data = (await response.json()) as {
@@ -164,6 +173,8 @@ export async function initiateTransfer(
 		message: string;
 		data: { reference: string; status: string };
 	};
+
+	console.log("Paystack initiate transfer response:", data);
 
 	if (!response.ok) {
 		throw new Error(data.message || "Failed to initiate transfer");
@@ -193,14 +204,14 @@ export async function verifyAccountNumber(
 	accountNumber: string,
 	bankCode: string,
 ): Promise<AccountVerification> {
-	const response = await fetch(
-		`https://api.paystack.co/bank/resolve?account_number=${accountNumber}&bank_code=${bankCode}`,
-		{
-			headers: {
-				Authorization: `Bearer ${secretKey}`,
-			},
+	const url = `https://api.paystack.co/bank/resolve?account_number=${accountNumber}&bank_code=${bankCode}`;
+	console.log("Paystack verify account:", { url, accountNumber, bankCode });
+
+	const response = await fetch(url, {
+		headers: {
+			Authorization: `Bearer ${secretKey}`,
 		},
-	);
+	});
 
 	const data = (await response.json()) as {
 		status: boolean;
@@ -211,6 +222,8 @@ export async function verifyAccountNumber(
 			bank_id: number;
 		};
 	};
+
+	console.log("Paystack verify response:", data);
 
 	if (!response.ok || !data.status) {
 		return {

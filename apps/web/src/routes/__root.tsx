@@ -87,6 +87,7 @@ function RootDocument() {
 		"/news/$slug",
 		"/news/$slug/og",
 		"/betting",
+		"/games",
 	]);
 	const shouldShowSidebar = sidebarAllowedRouteIds.has(activeRouteId);
 

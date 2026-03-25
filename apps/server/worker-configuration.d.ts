@@ -33,6 +33,9 @@ declare namespace Cloudflare {
 		MONNIFY_API_KEY: string;
 		MONNIFY_CLIENT_SECRET: string;
 		MONNIFY_CONTRACT_CODE: string;
+		THNDR_BASE_URL: string;
+		THNDR_OPERATOR_ID: string;
+		THNDR_SERVER_SECRET: string;
 	}
 }
 export interface CloudflareBindings extends Cloudflare.Env {}

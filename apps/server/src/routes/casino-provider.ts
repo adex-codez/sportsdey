@@ -1,5 +1,5 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
-import { and, eq, gt } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "@/db/schema";
 import {
@@ -13,7 +13,7 @@ import {
 	RollbackRequestSchema,
 	RollbackResponseSchema,
 	WithdrawRequestSchema,
-	WithdrawResponseSchema,
+	CasinoWithdrawResponseSchema as WithdrawResponseSchema,
 } from "@/schemas/casino-provider";
 import type { CloudflareBindings } from "../types";
 
@@ -51,6 +51,22 @@ const authRoute = createRoute({
 				},
 			},
 		},
+		401: {
+			description: "Invalid token",
+			content: {
+				"application/json": {
+					schema: CasinoProviderErrorSchema,
+				},
+			},
+		},
+		403: {
+			description: "Token expired",
+			content: {
+				"application/json": {
+					schema: CasinoProviderErrorSchema,
+				},
+			},
+		},
 	},
 });
 
@@ -79,7 +95,31 @@ const withdrawRoute = createRoute({
 			},
 		},
 		400: {
-			description: "Invalid request or insufficient balance",
+			description: "Invalid request",
+			content: {
+				"application/json": {
+					schema: CasinoProviderErrorSchema,
+				},
+			},
+		},
+		401: {
+			description: "Invalid session",
+			content: {
+				"application/json": {
+					schema: CasinoProviderErrorSchema,
+				},
+			},
+		},
+		402: {
+			description: "Insufficient funds",
+			content: {
+				"application/json": {
+					schema: CasinoProviderErrorSchema,
+				},
+			},
+		},
+		409: {
+			description: "Duplicate transaction",
 			content: {
 				"application/json": {
 					schema: CasinoProviderErrorSchema,
@@ -121,6 +161,22 @@ const depositRoute = createRoute({
 				},
 			},
 		},
+		401: {
+			description: "Invalid session",
+			content: {
+				"application/json": {
+					schema: CasinoProviderErrorSchema,
+				},
+			},
+		},
+		409: {
+			description: "Duplicate transaction",
+			content: {
+				"application/json": {
+					schema: CasinoProviderErrorSchema,
+				},
+			},
+		},
 	},
 });
 
@@ -150,6 +206,22 @@ const rollbackRoute = createRoute({
 		},
 		400: {
 			description: "Invalid request",
+			content: {
+				"application/json": {
+					schema: CasinoProviderErrorSchema,
+				},
+			},
+		},
+		401: {
+			description: "Invalid session",
+			content: {
+				"application/json": {
+					schema: CasinoProviderErrorSchema,
+				},
+			},
+		},
+		404: {
+			description: "Transaction not found",
 			content: {
 				"application/json": {
 					schema: CasinoProviderErrorSchema,
@@ -191,6 +263,14 @@ const playerInfoRoute = createRoute({
 				},
 			},
 		},
+		401: {
+			description: "Invalid session",
+			content: {
+				"application/json": {
+					schema: CasinoProviderErrorSchema,
+				},
+			},
+		},
 	},
 });
 
@@ -225,10 +305,10 @@ casinoProviderRoute.openapi(authRoute, async (c) => {
 	if (!launchToken) {
 		return c.json(
 			{
-				code: 400,
-				error: "Invalid or expired token",
+				code: 403,
+				error: "Token expired",
 			},
-			400,
+			403,
 		);
 	}
 
@@ -241,10 +321,10 @@ casinoProviderRoute.openapi(authRoute, async (c) => {
 	if (!user) {
 		return c.json(
 			{
-				code: 400,
-				error: "User not found",
+				code: 401,
+				error: "Invalid token",
 			},
-			400,
+			401,
 		);
 	}
 
@@ -297,7 +377,16 @@ casinoProviderRoute.openapi(withdrawRoute, async (c) => {
 		);
 	}
 
-	const { user_id, amount, provider_tx_id, session_token, game } = result.data;
+	const {
+		user_id,
+		amount,
+		provider_tx_id,
+		session_token,
+		game,
+		action,
+		currency,
+		provider,
+	} = result.data;
 
 	const [existingTx] = await db
 		.select()
@@ -306,20 +395,12 @@ casinoProviderRoute.openapi(withdrawRoute, async (c) => {
 		.limit(1);
 
 	if (existingTx) {
-		const [wallet] = await db
-			.select()
-			.from(schema.wallet)
-			.where(eq(schema.wallet.userId, user_id))
-			.limit(1);
-
 		return c.json(
 			{
-				code: 200,
-				data: {
-					balance: wallet?.balance ?? 0,
-				},
+				code: 409,
+				error: "Duplicate transaction",
 			},
-			200,
+			409,
 		);
 	}
 
@@ -338,10 +419,26 @@ casinoProviderRoute.openapi(withdrawRoute, async (c) => {
 	if (!session) {
 		return c.json(
 			{
-				code: 400,
+				code: 401,
 				error: "Invalid session",
 			},
-			400,
+			401,
+		);
+	}
+
+	const [user] = await db
+		.select()
+		.from(schema.user)
+		.where(eq(schema.user.id, user_id))
+		.limit(1);
+
+	if (!user) {
+		return c.json(
+			{
+				code: 401,
+				error: "Invalid user",
+			},
+			401,
 		);
 	}
 
@@ -354,28 +451,28 @@ casinoProviderRoute.openapi(withdrawRoute, async (c) => {
 	if (!wallet || wallet.balance < amount) {
 		return c.json(
 			{
-				code: 400,
-				error: "Insufficient balance",
+				code: 402,
+				error: "Insufficient funds",
 			},
-			400,
+			402,
 		);
 	}
 
-	await db.transaction(async (tx) => {
-		await tx
-			.update(schema.wallet)
-			.set({ balance: wallet.balance - amount })
-			.where(eq(schema.wallet.userId, user_id));
+	const operatorTxId = `gtxn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
-		await tx.insert(schema.gameTransactions).values({
-			id: `gtxn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
-			userId: user_id,
-			providerTxId: provider_tx_id,
-			type: "BET",
-			amount,
-			sessionToken: session_token,
-			game,
-		});
+	await db
+		.update(schema.wallet)
+		.set({ balance: wallet.balance - amount })
+		.where(eq(schema.wallet.userId, user_id));
+
+	await db.insert(schema.gameTransactions).values({
+		id: operatorTxId,
+		userId: user_id,
+		providerTxId: provider_tx_id,
+		type: "BET",
+		amount,
+		sessionToken: session_token,
+		game,
 	});
 
 	const [updatedWallet] = await db
@@ -388,7 +485,13 @@ casinoProviderRoute.openapi(withdrawRoute, async (c) => {
 		{
 			code: 200,
 			data: {
-				balance: updatedWallet?.balance ?? 0,
+				user_id,
+				provider,
+				provider_tx_id,
+				old_balance: wallet.balance,
+				new_balance: updatedWallet?.balance ?? 0,
+				operator_tx_id: operatorTxId,
+				currency,
 			},
 		},
 		200,
@@ -410,7 +513,15 @@ casinoProviderRoute.openapi(depositRoute, async (c) => {
 		);
 	}
 
-	const { user_id, amount, provider_tx_id } = result.data;
+	const {
+		user_id,
+		amount,
+		provider_tx_id,
+		session_token,
+		provider,
+		game,
+		currency,
+	} = result.data;
 
 	const [existingTx] = await db
 		.select()
@@ -419,20 +530,50 @@ casinoProviderRoute.openapi(depositRoute, async (c) => {
 		.limit(1);
 
 	if (existingTx) {
-		const [wallet] = await db
-			.select()
-			.from(schema.wallet)
-			.where(eq(schema.wallet.userId, user_id))
-			.limit(1);
-
 		return c.json(
 			{
-				code: 200,
-				data: {
-					balance: wallet?.balance ?? 0,
-				},
+				code: 409,
+				error: "Duplicate transaction",
 			},
-			200,
+			409,
+		);
+	}
+
+	const [session] = await db
+		.select()
+		.from(schema.gameSessions)
+		.where(
+			and(
+				eq(schema.gameSessions.sessionToken, session_token),
+				eq(schema.gameSessions.userId, user_id),
+				eq(schema.gameSessions.status, "active"),
+			),
+		)
+		.limit(1);
+
+	if (!session) {
+		return c.json(
+			{
+				code: 401,
+				error: "Invalid session",
+			},
+			401,
+		);
+	}
+
+	const [user] = await db
+		.select()
+		.from(schema.user)
+		.where(eq(schema.user.id, user_id))
+		.limit(1);
+
+	if (!user) {
+		return c.json(
+			{
+				code: 401,
+				error: "Invalid user",
+			},
+			401,
 		);
 	}
 
@@ -443,22 +584,21 @@ casinoProviderRoute.openapi(depositRoute, async (c) => {
 		.limit(1);
 
 	const currentBalance = wallet?.balance ?? 0;
+	const operatorTxId = `gtxn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
-	await db.transaction(async (tx) => {
-		await tx
-			.update(schema.wallet)
-			.set({ balance: currentBalance + amount })
-			.where(eq(schema.wallet.userId, user_id));
+	await db
+		.update(schema.wallet)
+		.set({ balance: currentBalance + amount })
+		.where(eq(schema.wallet.userId, user_id));
 
-		await tx.insert(schema.gameTransactions).values({
-			id: `gtxn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
-			userId: user_id,
-			providerTxId: provider_tx_id,
-			type: "WIN",
-			amount,
-			sessionToken: "",
-			game: "",
-		});
+	await db.insert(schema.gameTransactions).values({
+		id: operatorTxId,
+		userId: user_id,
+		providerTxId: provider_tx_id,
+		type: "WIN",
+		amount,
+		sessionToken: session_token,
+		game,
 	});
 
 	const [updatedWallet] = await db
@@ -471,7 +611,14 @@ casinoProviderRoute.openapi(depositRoute, async (c) => {
 		{
 			code: 200,
 			data: {
-				balance: updatedWallet?.balance ?? 0,
+				user_id,
+				provider_tx_id,
+				operator_tx_id: operatorTxId,
+				amount,
+				provider,
+				currency,
+				old_balance: currentBalance,
+				new_balance: updatedWallet?.balance ?? 0,
 			},
 		},
 		200,
@@ -493,7 +640,14 @@ casinoProviderRoute.openapi(rollbackRoute, async (c) => {
 		);
 	}
 
-	const { user_id, rollback_provider_tx_id, amount } = result.data;
+	const {
+		user_id,
+		amount,
+		rollback_provider_tx_id,
+		session_token,
+		provider,
+		game,
+	} = result.data;
 
 	const [existingTx] = await db
 		.select()
@@ -504,10 +658,48 @@ casinoProviderRoute.openapi(rollbackRoute, async (c) => {
 	if (!existingTx) {
 		return c.json(
 			{
-				code: 400,
+				code: 404,
 				error: "Transaction not found",
 			},
-			400,
+			404,
+		);
+	}
+
+	const [session] = await db
+		.select()
+		.from(schema.gameSessions)
+		.where(
+			and(
+				eq(schema.gameSessions.sessionToken, session_token),
+				eq(schema.gameSessions.userId, user_id),
+				eq(schema.gameSessions.status, "active"),
+			),
+		)
+		.limit(1);
+
+	if (!session) {
+		return c.json(
+			{
+				code: 401,
+				error: "Invalid session",
+			},
+			401,
+		);
+	}
+
+	const [user] = await db
+		.select()
+		.from(schema.user)
+		.where(eq(schema.user.id, user_id))
+		.limit(1);
+
+	if (!user) {
+		return c.json(
+			{
+				code: 401,
+				error: "Invalid user",
+			},
+			401,
 		);
 	}
 
@@ -519,22 +711,21 @@ casinoProviderRoute.openapi(rollbackRoute, async (c) => {
 
 	const currentBalance = wallet?.balance ?? 0;
 	const adjustment = existingTx.type === "BET" ? amount : -amount;
+	const operatorTxId = `gtxn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
-	await db.transaction(async (tx) => {
-		await tx
-			.update(schema.wallet)
-			.set({ balance: currentBalance + adjustment })
-			.where(eq(schema.wallet.userId, user_id));
+	await db
+		.update(schema.wallet)
+		.set({ balance: currentBalance + adjustment })
+		.where(eq(schema.wallet.userId, user_id));
 
-		await tx.insert(schema.gameTransactions).values({
-			id: `gtxn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
-			userId: user_id,
-			providerTxId: `rollback_${rollback_provider_tx_id}`,
-			type: "ROLLBACK",
-			amount,
-			sessionToken: existingTx.sessionToken,
-			game: existingTx.game,
-		});
+	await db.insert(schema.gameTransactions).values({
+		id: operatorTxId,
+		userId: user_id,
+		providerTxId: `rollback_${rollback_provider_tx_id}`,
+		type: "ROLLBACK",
+		amount,
+		sessionToken: session_token,
+		game,
 	});
 
 	const [updatedWallet] = await db
@@ -547,7 +738,13 @@ casinoProviderRoute.openapi(rollbackRoute, async (c) => {
 		{
 			code: 200,
 			data: {
-				balance: updatedWallet?.balance ?? 0,
+				user_id,
+				provider,
+				provider_tx_id: rollback_provider_tx_id,
+				old_balance: currentBalance,
+				new_balance: updatedWallet?.balance ?? 0,
+				operator_tx_id: operatorTxId,
+				currency: "NGN",
 			},
 		},
 		200,
@@ -586,10 +783,26 @@ casinoProviderRoute.openapi(playerInfoRoute, async (c) => {
 	if (!session) {
 		return c.json(
 			{
-				code: 400,
+				code: 401,
 				error: "Invalid session",
 			},
-			400,
+			401,
+		);
+	}
+
+	const [user] = await db
+		.select()
+		.from(schema.user)
+		.where(eq(schema.user.id, user_id))
+		.limit(1);
+
+	if (!user) {
+		return c.json(
+			{
+				code: 401,
+				error: "Invalid user",
+			},
+			401,
 		);
 	}
 

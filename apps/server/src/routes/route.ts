@@ -7,6 +7,7 @@ import monnifyRoute from "./monnify";
 import newsRoute from "./news";
 import notificationsRoute from "./notifications";
 import tennisRoute from "./tennis";
+import thundrRoute from "./thundr";
 import userRoute from "./user";
 import walletRoute from "./wallet";
 
@@ -20,6 +21,7 @@ routes.route("/notifications", notificationsRoute);
 routes.route("/wallet", walletRoute);
 routes.route("/user", userRoute);
 routes.route("/casino", casinoRoute);
+routes.route("/thndr", thundrRoute);
 routes.route("/account", casinoProviderRoute);
 routes.route("/bills", monnifyRoute);
 

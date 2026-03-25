@@ -7,6 +7,7 @@ import {
 	MonnifyBillerSchema,
 	MonnifyCategorySchema,
 	MonnifyProductSchema,
+	MonnifyProductsResponseSchema,
 	MonnifyRequerySchema,
 	MonnifyVendResponseSchema,
 } from "@/schemas";
@@ -186,7 +187,7 @@ const productsRoute = createRoute({
 				"application/json": {
 					schema: z.object({
 						success: z.literal(true),
-						data: z.array(MonnifyProductSchema),
+						data: MonnifyProductsResponseSchema,
 					}),
 				},
 			},
@@ -207,7 +208,7 @@ const productsRoute = createRoute({
 });
 
 monnifyRoute.openapi(productsRoute, async (c) => {
-	const { billerCode } = c.req.valid("query");
+	const { billerCode, categoryCode } = c.req.valid("query");
 	const env = {
 		MONNIFY_API_KEY: c.env.MONNIFY_API_KEY,
 		MONNIFY_CLIENT_SECRET: c.env.MONNIFY_CLIENT_SECRET,
@@ -225,7 +226,7 @@ monnifyRoute.openapi(productsRoute, async (c) => {
 		);
 	}
 
-	const result = await getProducts(env, billerCode);
+	const result = await getProducts(env, billerCode, categoryCode);
 
 	if (!result.ok || !result.data) {
 		return c.json(

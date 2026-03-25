@@ -5,6 +5,9 @@ import { z } from "zod";
 import * as schema from "@/db/schema";
 import {
 	CallbackQuerySchema,
+	CreateWithdrawalAccountErrorSchema,
+	CreateWithdrawalAccountResponseSchema,
+	CreateWithdrawalAccountSchema,
 	FundWalletErrorSchema,
 	FundWalletResponseSchema,
 	FundWalletSchema,
@@ -14,12 +17,15 @@ import {
 	GetTransactionsResponseSchema,
 	GetWalletErrorSchema,
 	GetWalletResponseSchema,
+	GetWithdrawalAccountsErrorSchema,
+	GetWithdrawalAccountsResponseSchema,
 	TransactionResponseSchema,
 	WalletResponseSchema,
 	WithdrawResponseSchema as WalletWithdrawResponseSchema,
 	WebhookErrorSchema,
 	WebhookEventSchema,
 	WebhookResponseSchema,
+	WithdrawalAccountResponseSchema,
 	WithdrawErrorSchema,
 	WithdrawSchema,
 } from "@/schemas/wallet";
@@ -169,31 +175,31 @@ const getBanksRoute = createRoute({
 	},
 });
 
-const webhookRoute = createRoute({
-	method: "post",
-	path: "/webhook",
-	tags: ["Wallet"],
-	summary: "Paystack webhook",
-	description: "Handle Paystack webhook events for wallet funding",
-	responses: {
-		200: {
-			description: "Webhook processed",
-			content: {
-				"application/json": {
-					schema: WebhookResponseSchema,
-				},
-			},
-		},
-		400: {
-			description: "Invalid signature or malformed request",
-			content: {
-				"application/json": {
-					schema: WebhookErrorSchema,
-				},
-			},
-		},
-	},
-});
+// const webhookRoute = createRoute({
+// 	method: "post",
+// 	path: "/webhook",
+// 	tags: ["Wallet"],
+// 	summary: "Paystack webhook",
+// 	description: "Handle Paystack webhook events for wallet funding",
+// 	responses: {
+// 		200: {
+// 			description: "Webhook processed",
+// 			content: {
+// 				"application/json": {
+// 					schema: WebhookResponseSchema,
+// 				},
+// 			},
+// 		},
+// 		400: {
+// 			description: "Invalid signature or malformed request",
+// 			content: {
+// 				"application/json": {
+// 					schema: WebhookErrorSchema,
+// 				},
+// 			},
+// 		},
+// 	},
+// });
 
 const callbackRoute = createRoute({
 	method: "get",
@@ -250,6 +256,160 @@ const withdrawRoute = createRoute({
 			content: {
 				"application/json": {
 					schema: WithdrawErrorSchema,
+				},
+			},
+		},
+	},
+});
+
+const createWithdrawalAccountRoute = createRoute({
+	method: "post",
+	path: "/accounts",
+	tags: ["Wallet"],
+	summary: "Create withdrawal account",
+	description: "Save a bank account for future withdrawals",
+	security: [{ BearerAuth: [] }],
+	request: {
+		body: {
+			content: {
+				"application/json": {
+					schema: CreateWithdrawalAccountSchema,
+				},
+			},
+		},
+	},
+	responses: {
+		201: {
+			description: "Withdrawal account created successfully",
+			content: {
+				"application/json": {
+					schema: CreateWithdrawalAccountResponseSchema,
+				},
+			},
+		},
+		400: {
+			description: "Invalid request",
+			content: {
+				"application/json": {
+					schema: CreateWithdrawalAccountErrorSchema,
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized",
+			content: {
+				"application/json": {
+					schema: CreateWithdrawalAccountErrorSchema,
+				},
+			},
+		},
+	},
+});
+
+const getWithdrawalAccountsRoute = createRoute({
+	method: "get",
+	path: "/accounts",
+	tags: ["Wallet"],
+	summary: "Get withdrawal accounts",
+	description: "List all saved withdrawal accounts for the authenticated user",
+	security: [{ BearerAuth: [] }],
+	responses: {
+		200: {
+			description: "Withdrawal accounts retrieved successfully",
+			content: {
+				"application/json": {
+					schema: GetWithdrawalAccountsResponseSchema,
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized",
+			content: {
+				"application/json": {
+					schema: GetWithdrawalAccountsErrorSchema,
+				},
+			},
+		},
+	},
+});
+
+const getWithdrawalAccountRoute = createRoute({
+	method: "get",
+	path: "/accounts/{id}",
+	tags: ["Wallet"],
+	summary: "Get withdrawal account",
+	description: "Get a single saved withdrawal account by ID",
+	security: [{ BearerAuth: [] }],
+	request: {
+		params: z.object({
+			id: z.string().openapi({ description: "Withdrawal account ID" }),
+		}),
+	},
+	responses: {
+		200: {
+			description: "Withdrawal account retrieved successfully",
+			content: {
+				"application/json": {
+					schema: CreateWithdrawalAccountResponseSchema,
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized",
+			content: {
+				"application/json": {
+					schema: CreateWithdrawalAccountErrorSchema,
+				},
+			},
+		},
+		404: {
+			description: "Account not found",
+			content: {
+				"application/json": {
+					schema: CreateWithdrawalAccountErrorSchema,
+				},
+			},
+		},
+	},
+});
+
+const deleteWithdrawalAccountRoute = createRoute({
+	method: "delete",
+	path: "/accounts/{id}",
+	tags: ["Wallet"],
+	summary: "Delete withdrawal account",
+	description: "Remove a saved withdrawal account",
+	security: [{ BearerAuth: [] }],
+	request: {
+		params: z.object({
+			id: z.string().openapi({ description: "Withdrawal account ID" }),
+		}),
+	},
+	responses: {
+		200: {
+			description: "Withdrawal account deleted successfully",
+			content: {
+				"application/json": {
+					schema: z.object({
+						success: z.literal(true),
+						data: z.object({ deleted: z.literal(true) }),
+					}),
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized",
+			content: {
+				"application/json": {
+					schema: CreateWithdrawalAccountErrorSchema,
+				},
+			},
+		},
+		404: {
+			description: "Account not found",
+			content: {
+				"application/json": {
+					schema: CreateWithdrawalAccountErrorSchema,
 				},
 			},
 		},
@@ -728,102 +888,336 @@ walletRoute.openapi(callbackRoute, async (c) => {
 	return c.html(html, 200);
 });
 
-walletRoute.openapi(webhookRoute, async (c) => {
-	const signature = c.req.header("x-paystack-signature");
-	if (!signature) {
+// walletRoute.openapi(webhookRoute, async (c) => {
+// 	const signature = c.req.header("x-paystack-signature");
+// 	if (!signature) {
+// 		return c.json(
+// 			{
+// 				success: false as const,
+// 				error: "Missing signature",
+// 				details: null,
+// 			},
+// 			400,
+// 		);
+// 	}
+
+// 	const rawBody = await c.req.text();
+// 	const crypto = await import("crypto");
+// 	const hash = crypto
+// 		.createHmac("sha512", c.env.PAYSTACK_SECRET_KEY)
+// 		.update(rawBody)
+// 		.digest("hex");
+
+// 	if (hash !== signature) {
+// 		return c.json(
+// 			{
+// 				success: false as const,
+// 				error: "Invalid signature",
+// 				details: null,
+// 			},
+// 			400,
+// 		);
+// 	}
+
+// 	const parseResult = WebhookEventSchema.safeParse(JSON.parse(rawBody));
+// 	if (!parseResult.success) {
+// 		return c.json({ received: true }, 200);
+// 	}
+
+// 	const { event, data } = parseResult.data;
+
+// 	if (event === "charge.success") {
+// 		const reference = data.reference;
+// 		const db = drizzle(c.env.DB, { schema });
+
+// 		const [transaction] = await db
+// 			.select()
+// 			.from(schema.walletTransaction)
+// 			.where(eq(schema.walletTransaction.reference, reference))
+// 			.limit(1);
+
+// 		if (!transaction) {
+// 			return c.json({ received: true }, 200);
+// 		}
+
+// 		if (transaction.status !== "pending") {
+// 			return c.json({ received: true }, 200);
+// 		}
+
+// 		try {
+// 			const verifiedTx = await verifyTransaction(
+// 				c.env.PAYSTACK_SECRET_KEY,
+// 				reference,
+// 			);
+
+// 			if (verifiedTx.status.toLowerCase() !== "success") {
+// 				await db
+// 					.update(schema.walletTransaction)
+// 					.set({ status: "failed" })
+// 					.where(eq(schema.walletTransaction.reference, reference));
+
+// 				return c.json({ received: true }, 200);
+// 			}
+// 		} catch {
+// 			return c.json({ received: true }, 200);
+// 		}
+
+// 		await db
+// 			.update(schema.walletTransaction)
+// 			.set({ status: "success" })
+// 			.where(eq(schema.walletTransaction.reference, reference));
+
+// 		const [wallet] = await db
+// 			.select()
+// 			.from(schema.wallet)
+// 			.where(eq(schema.wallet.userId, transaction.userId))
+// 			.limit(1);
+
+// 		if (wallet) {
+// 			await db
+// 				.update(schema.wallet)
+// 				.set({
+// 					balance: wallet.balance + transaction.amount,
+// 				})
+// 				.where(eq(schema.wallet.userId, transaction.userId));
+// 		}
+// 	}
+
+// 	return c.json({ received: true }, 200);
+// });
+
+walletRoute.openapi(createWithdrawalAccountRoute, async (c) => {
+	const user = c.get("user");
+	if (!user) {
 		return c.json(
 			{
 				success: false as const,
-				error: "Missing signature",
+				error: "Unauthorized",
+				details: null,
+			},
+			401,
+		);
+	}
+
+	const result = CreateWithdrawalAccountSchema.safeParse(await c.req.json());
+	if (!result.success) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Invalid request",
 				details: null,
 			},
 			400,
 		);
 	}
 
-	const rawBody = await c.req.text();
-	const crypto = await import("crypto");
-	const hash = crypto
-		.createHmac("sha512", c.env.PAYSTACK_SECRET_KEY)
-		.update(rawBody)
-		.digest("hex");
+	const db = drizzle(c.env.DB, { schema });
+	const { bankCode, accountNumber, accountName } = result.data;
 
-	if (hash !== signature) {
-		return c.json(
-			{
-				success: false as const,
-				error: "Invalid signature",
-				details: null,
-			},
-			400,
+	try {
+		const verification = await verifyAccountNumber(
+			c.env.PAYSTACK_SECRET_KEY,
+			accountNumber,
+			bankCode,
 		);
-	}
 
-	const parseResult = WebhookEventSchema.safeParse(JSON.parse(rawBody));
-	if (!parseResult.success) {
-		return c.json({ received: true }, 200);
-	}
-
-	const { event, data } = parseResult.data;
-
-	if (event === "charge.success") {
-		const reference = data.reference;
-		const db = drizzle(c.env.DB, { schema });
-
-		const [transaction] = await db
-			.select()
-			.from(schema.walletTransaction)
-			.where(eq(schema.walletTransaction.reference, reference))
-			.limit(1);
-
-		if (!transaction) {
-			return c.json({ received: true }, 200);
-		}
-
-		if (transaction.status !== "pending") {
-			return c.json({ received: true }, 200);
-		}
-
-		try {
-			const verifiedTx = await verifyTransaction(
-				c.env.PAYSTACK_SECRET_KEY,
-				reference,
+		if (!verification.isValid) {
+			return c.json(
+				{
+					success: false as const,
+					error: "Invalid account number or bank code",
+					details: null,
+				},
+				400,
 			);
-
-			if (verifiedTx.status.toLowerCase() !== "success") {
-				await db
-					.update(schema.walletTransaction)
-					.set({ status: "failed" })
-					.where(eq(schema.walletTransaction.reference, reference));
-
-				return c.json({ received: true }, 200);
-			}
-		} catch {
-			return c.json({ received: true }, 200);
 		}
 
-		await db
-			.update(schema.walletTransaction)
-			.set({ status: "success" })
-			.where(eq(schema.walletTransaction.reference, reference));
+		const normalizedInput = accountName.toLowerCase().trim();
+		const normalizedPaystack = verification.accountName.toLowerCase().trim();
 
-		const [wallet] = await db
-			.select()
-			.from(schema.wallet)
-			.where(eq(schema.wallet.userId, transaction.userId))
-			.limit(1);
-
-		if (wallet) {
-			await db
-				.update(schema.wallet)
-				.set({
-					balance: wallet.balance + transaction.amount,
-				})
-				.where(eq(schema.wallet.userId, transaction.userId));
+		if (normalizedInput !== normalizedPaystack) {
+			return c.json(
+				{
+					success: false as const,
+					error: "Account holder name does not match bank records",
+					details: null,
+				},
+				400,
+			);
 		}
+
+		const [account] = await db
+			.insert(schema.withdrawalAccount)
+			.values({
+				id: `wda_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
+				userId: user.id,
+				bankCode,
+				bankName: result.data.bankName || "",
+				accountNumber,
+				accountName: verification.accountName,
+			})
+			.returning();
+
+		return c.json(
+			{
+				success: true as const,
+				data: {
+					id: account.id,
+					bankCode: account.bankCode,
+					bankName: account.bankName,
+					accountNumber: account.accountNumber,
+					accountName: account.accountName,
+					createdAt: account.createdAt,
+					updatedAt: account.updatedAt,
+				},
+			},
+			201,
+		);
+	} catch (error) {
+		return c.json(
+			{
+				success: false as const,
+				error:
+					error instanceof Error ? error.message : "Failed to verify account",
+				details: null,
+			},
+			400,
+		);
+	}
+});
+
+walletRoute.openapi(getWithdrawalAccountsRoute, async (c) => {
+	const user = c.get("user");
+	if (!user) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Unauthorized",
+				details: null,
+			},
+			401,
+		);
 	}
 
-	return c.json({ received: true }, 200);
+	const db = drizzle(c.env.DB, { schema });
+
+	const accounts = await db
+		.select()
+		.from(schema.withdrawalAccount)
+		.where(eq(schema.withdrawalAccount.userId, user.id))
+		.orderBy(desc(schema.withdrawalAccount.createdAt));
+
+	return c.json(
+		{
+			success: true as const,
+			data: accounts.map((account) => ({
+				id: account.id,
+				bankCode: account.bankCode,
+				bankName: account.bankName,
+				accountNumber: account.accountNumber,
+				accountName: account.accountName,
+				createdAt: account.createdAt,
+				updatedAt: account.updatedAt,
+			})),
+		},
+		200,
+	);
+});
+
+walletRoute.openapi(getWithdrawalAccountRoute, async (c) => {
+	const user = c.get("user");
+	if (!user) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Unauthorized",
+				details: null,
+			},
+			401,
+		);
+	}
+
+	const { id } = c.req.valid("param");
+	const db = drizzle(c.env.DB, { schema });
+
+	const [account] = await db
+		.select()
+		.from(schema.withdrawalAccount)
+		.where(eq(schema.withdrawalAccount.id, id))
+		.limit(1);
+
+	if (!account || account.userId !== user.id) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Account not found",
+				details: null,
+			},
+			404,
+		);
+	}
+
+	return c.json(
+		{
+			success: true as const,
+			data: {
+				id: account.id,
+				bankCode: account.bankCode,
+				bankName: account.bankName,
+				accountNumber: account.accountNumber,
+				accountName: account.accountName,
+				createdAt: account.createdAt,
+				updatedAt: account.updatedAt,
+			},
+		},
+		200,
+	);
+});
+
+walletRoute.openapi(deleteWithdrawalAccountRoute, async (c) => {
+	const user = c.get("user");
+	if (!user) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Unauthorized",
+				details: null,
+			},
+			401,
+		);
+	}
+
+	const { id } = c.req.valid("param");
+	const db = drizzle(c.env.DB, { schema });
+
+	const [account] = await db
+		.select()
+		.from(schema.withdrawalAccount)
+		.where(eq(schema.withdrawalAccount.id, id))
+		.limit(1);
+
+	if (!account || account.userId !== user.id) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Account not found",
+				details: null,
+			},
+			404,
+		);
+	}
+
+	await db
+		.delete(schema.withdrawalAccount)
+		.where(eq(schema.withdrawalAccount.id, id));
+
+	return c.json(
+		{
+			success: true as const,
+			data: { deleted: true as const },
+		},
+		200,
+	);
 });
 
 walletRoute.openapi(withdrawRoute, async (c) => {
@@ -879,7 +1273,6 @@ walletRoute.openapi(withdrawRoute, async (c) => {
 			accountNumber,
 			bankCode,
 		);
-		console.log(accountVerification)
 
 		if (!accountVerification.isValid) {
 			return c.json(
@@ -892,12 +1285,13 @@ walletRoute.openapi(withdrawRoute, async (c) => {
 			);
 		}
 
+		console.log("Account number", accountNumber);
+
 		const recipient = await createTransferRecipient(
 			c.env.PAYSTACK_SECRET_KEY,
-			"bank",
 			bankCode,
 			accountNumber,
-			accountVerification.accountName,
+			accountVerification.accountName || accountName,
 		);
 
 		const transfer = await initiateTransfer(
