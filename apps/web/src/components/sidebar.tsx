@@ -110,6 +110,18 @@ const Sidebar = () => {
 					>
 						News
 					</li>
+					<li
+						className={cn(
+							"cursor-pointer",
+							tab === "games" ? "font-semibold text-accent" : null,
+						)}
+						onClick={() => {
+							setTab("games");
+							navigate({ to: "/games" });
+						}}
+					>
+						Play Games
+					</li>
 				</ul>
 			</SidebarItem>
 
@@ -181,6 +193,7 @@ const Sidebar = () => {
 					</Button>
 				</div>
 			</SidebarItem> */}
+			<SidebarItem link="/account" heading="Profile" icon={<ChevronRight />} />
 			<SidebarItem
 				link="/favorites"
 				heading="My League"

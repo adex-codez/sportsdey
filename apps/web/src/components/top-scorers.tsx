@@ -4,15 +4,21 @@ import type { FootballMatchInfoType } from "@/types/football";
 
 interface TopScorersProps {
 	scorers: FootballMatchInfoType["top_scorers"];
+	showAll?: boolean;
 }
 
-export const TopScorers: React.FC<TopScorersProps> = ({ scorers }) => {
+export const TopScorers: React.FC<TopScorersProps> = ({
+	scorers,
+	showAll = false,
+}) => {
 	if (!scorers || scorers.length === 0)
 		return (
 			<div className="rounded-2xl border border-gray-100 bg-white p-8 text-center text-gray-400 italic dark:bg-gray dark:text-white">
 				Top scorers data not available for this match.
 			</div>
 		);
+	const displayScorers = showAll ? scorers : scorers.slice(0, 3);
+
 	return (
 		<div className="mb-10 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm dark:border-0 dark:bg-card">
 			<div className="flex items-center justify-between border-gray-100 border-b bg-gray-50/50 px-4 py-3 dark:border-[#5A5F63] dark:bg-card">
@@ -28,7 +34,7 @@ export const TopScorers: React.FC<TopScorersProps> = ({ scorers }) => {
 			</div>
 
 			<div className="divide-y divide-gray-100 dark:divide-[#5A5F63]">
-				{scorers.map((scorer, index) => (
+				{displayScorers.map((scorer, index) => (
 					<div
 						key={scorer.id}
 						className="flex items-center justify-between px-4 py-3.5 transition-colors hover:bg-gray-50/50"

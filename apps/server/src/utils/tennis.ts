@@ -1,7 +1,7 @@
 import type {
 	SportRadarTennisGameResponse,
 	SportRadarTennisResponse,
-} from "@/types";
+} from "@/types/tennis";
 
 export function transformTennisData(
 	apiResponse: SportRadarTennisResponse,

@@ -21,10 +21,21 @@ declare namespace Cloudflare {
 		GOOGLE_CLIENT_SECRET: string;
 		APPLE_CLIENT_ID: string;
 		APPLE_CLIENT_SECRET: string;
+		APPLE_TEAM_ID: string;
+		APPLE_KEY_ID: string;
+		APPLE_PRIVATE_KEY: string;
 		FACEBOOK_CLIENT_ID: string;
 		FACEBOOK_CLIENT_SECRET: string;
 		PAYSTACK_SECRET_KEY: string;
 		PAYSTACK_PUBLIC_KEY: string;
+		SERVER_URL: string;
+		LUCKYWORLDGAMES_LAUNCH_URL: string;
+		MONNIFY_API_KEY: string;
+		MONNIFY_CLIENT_SECRET: string;
+		MONNIFY_CONTRACT_CODE: string;
+		THNDR_BASE_URL: string;
+		THNDR_OPERATOR_ID: string;
+		THNDR_SERVER_SECRET: string;
 	}
 }
 export interface CloudflareBindings extends Cloudflare.Env {}

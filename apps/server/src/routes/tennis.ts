@@ -2,14 +2,13 @@ import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
 	ErrorResponseSchema,
 	successResponseSchema,
-	TennisMatchInfoData,
-	TennisScheduleData,
 	VideoResponseSchema,
 } from "@/schemas";
+import { TennisMatchInfoData, TennisScheduleData } from "@/schemas/tennis";
 import type {
 	SportRadarTennisGameResponse,
 	SportRadarTennisResponse,
-} from "@/types";
+} from "@/types/tennis";
 import { fetchWithTimeout, isTimeoutError } from "@/utils/fetch-with-timeout";
 import { transformTennisData, transformTennisMatchData } from "@/utils/tennis";
 import { jsonZodErrorFormatter } from "@/utils/zod";

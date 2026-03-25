@@ -6,7 +6,6 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { apiRequest } from "@/lib/api";
 import DetailsImageCard from "@/shared/DetailsImageCard";
 import type { BasketballGameDetails } from "@/types/api";
-import { getBasketballTeamLogo } from "@/utils/getBasketballTeamLogo";
 import { getTimeUntilStart, safeParseDate } from "@/utils/timeUtils";
 
 import { GameDetailsSkeleton } from "./GameDetailsSkeleton";
@@ -170,7 +169,7 @@ const BasketBallDetailsPage = () => {
 		const teamData = apiStats?.[side];
 		const teamFromDetails = gameDetails?.[side];
 		const teamName = teamFromDetails?.name || "";
-		const teamLogo = "/Profile.png";
+		const teamLogo = teamFromDetails?.imageUrl || "/Profile.png";
 
 		// If we have API stats (lazy loaded), use them.
 		// Otherwise, check if gameDetails has the info (starters/bench)
@@ -393,12 +392,12 @@ const BasketBallDetailsPage = () => {
 					}
 					competitionName={gameDetails.tournament?.name || ""}
 					hostTeamName={gameDetails.home.name}
-					hostTeamLogo={getBasketballTeamLogo(gameDetails.home.name)}
+					hostTeamLogo={gameDetails.home.imageUrl || "/Profile.png"}
 					matchStatus={gameDetails.status}
 					clock={gameDetails.clock}
 					hostTeamScore={gameDetails.home.points}
 					guestTeamScore={gameDetails.away.points}
-					guestTeamLogo={getBasketballTeamLogo(gameDetails.away.name)}
+					guestTeamLogo={gameDetails.away.imageUrl || "/Profile.png"}
 					guestTeamName={gameDetails.away.name}
 					isUpcoming={gameDetails.status.toLowerCase() === "scheduled"}
 					countdownText={countdown}
@@ -415,10 +414,18 @@ const BasketBallDetailsPage = () => {
 					isHomeFavorite={isHomeFavorite}
 					isAwayFavorite={isAwayFavorite}
 					onToggleHomeFavorite={() =>
-						gameDetails && handleToggleFavorite(gameDetails.home.name)
+						gameDetails &&
+						handleToggleFavorite(
+							gameDetails.home.name,
+							gameDetails.home.imageUrl,
+						)
 					}
 					onToggleAwayFavorite={() =>
-						gameDetails && handleToggleFavorite(gameDetails.away.name)
+						gameDetails &&
+						handleToggleFavorite(
+							gameDetails.away.name,
+							gameDetails.away.imageUrl,
+						)
 					}
 					isFavorite={isFavoriteLeague(gameDetails.tournament?.name || "")}
 					onFavoriteToggle={handleToggleFavoriteLeague}

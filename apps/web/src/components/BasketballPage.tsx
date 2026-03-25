@@ -384,6 +384,8 @@ const BasketballPage = ({ banners }: BasketballPageProps) => {
 						id: game.id,
 						team1: game.home.name,
 						team2: game.away.name,
+						team1Logo: game.home.imageUrl,
+						team2Logo: game.away.imageUrl,
 						score1: game.home.points ?? undefined,
 						score2: game.away.points ?? undefined,
 						status:
@@ -415,7 +417,7 @@ const BasketballPage = ({ banners }: BasketballPageProps) => {
 					id: comp.id,
 					country,
 					leagueName: comp.name,
-					flag: flag,
+					flag: comp.imageUrl || flag,
 					matches: filteredMatches,
 				};
 			})

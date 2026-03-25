@@ -4,7 +4,14 @@ import {
 	useParams,
 	useRouter,
 } from "@tanstack/react-router";
-import { CalendarDays, ChevronDown, ChevronRight, Menu, X } from "lucide-react";
+import {
+	CalendarDays,
+	ChevronDown,
+	ChevronRight,
+	Menu,
+	Undo2,
+	X,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useCurrentFilter } from "@/hooks/use-current-filter";
 import { useCurrentSport } from "@/hooks/use-current-sport";
@@ -21,8 +28,16 @@ import { useDateContext } from "./date-context";
 import { socials } from "./socials";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "./ui/button";
+import { UserMenu } from "./user-menu";
 
-export default function Header() {
+type HeaderProps = {
+	hideSportsNav?: boolean;
+};
+
+export default function Header({ hideSportsNav = false }: HeaderProps) {
+	const location = useLocation();
+	const isAuthRoute = location.pathname.startsWith("/auth");
+	const shouldHideSportsNav = hideSportsNav || isAuthRoute;
 	const currentSport = useCurrentSport();
 	const { setTab, tab } = useActiveTab();
 	// const { totalFavoritesCount } = useFavorites();
@@ -46,7 +61,6 @@ export default function Header() {
 	const { date, setDate } = useDateContext();
 	const weekDates = useWeekDates(date);
 	const { currentFilter, changeCurrentFilter } = useCurrentFilter();
-	const location = useLocation();
 	const router = useRouter();
 
 	const params = useParams({ strict: false });
@@ -71,6 +85,14 @@ export default function Header() {
 			document.documentElement.classList.remove("overflow-hidden");
 		};
 	}, [open]);
+
+	const handleBackToSite = () => {
+		if (typeof window !== "undefined" && window.history.length > 1) {
+			window.history.back();
+			return;
+		}
+		router.navigate({ to: "/" });
+	};
 
 	return (
 		<div className="z-30 w-full pb-4 lg:pb-0">
@@ -102,8 +124,19 @@ export default function Header() {
 						</div>
 					</Link>
 
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-3">
+						{!isAuthRoute && <UserMenu />}
 						<ThemeToggle />
+						{isAuthRoute && (
+							<button
+								type="button"
+								onClick={handleBackToSite}
+								className="flex items-center gap-1 text-secondary hover:text-white"
+							>
+								<Undo2 className="h-4 w-4" />
+								<span className="text-sm underline">Back to site</span>
+							</button>
+						)}
 					</div>
 				</div>
 
@@ -122,29 +155,43 @@ export default function Header() {
 						/>
 					</Link>
 
-					<div className="overflow-x-auto">
-						<nav className="cust-scrollbar flex w-max gap-4 py-4 font-medium">
-							{links.map(({ to, label, icon: Icon, sport }) => (
-								<Link
-									key={to}
-									to={to as string}
-									onClick={() => setTab("scores")}
-									search={{ sports: sport }}
-									className={cn(
-										"flex shrink-0 gap-2 pb-2",
-										currentSport === sport
-											? "border-accent border-b-2 text-accent"
-											: "text-secondary dark:text-white",
-									)}
-								>
-									<Icon />
-									<p>{label}</p>
-								</Link>
-							))}
-						</nav>
-					</div>
+					{!shouldHideSportsNav && (
+						<div className="overflow-x-auto">
+							<nav className="cust-scrollbar flex w-max gap-4 py-4 font-medium">
+								{links.map(({ to, label, icon: Icon, sport }) => (
+									<Link
+										key={to}
+										to={to as string}
+										onClick={() => setTab("scores")}
+										search={{ sports: sport }}
+										className={cn(
+											"flex shrink-0 gap-2 pb-2",
+											currentSport === sport
+												? "border-accent border-b-2 text-accent"
+												: "text-secondary dark:text-white",
+										)}
+									>
+										<Icon />
+										<p>{label}</p>
+									</Link>
+								))}
+							</nav>
+						</div>
+					)}
+
 					<div className="flex items-center gap-2">
+						{!isAuthRoute && <UserMenu />}
 						<ThemeToggle />
+						{isAuthRoute && (
+							<button
+								type="button"
+								onClick={handleBackToSite}
+								className="flex items-center gap-1 text-secondary hover:text-white"
+							>
+								<Undo2 className="h-4 w-4" />
+								<span className="text-sm underline">Back to site</span>
+							</button>
+						)}
 					</div>
 				</div>
 
@@ -313,6 +360,7 @@ export default function Header() {
 									</li>
 								</ul>
 							</div>
+
 							<div className="dark:text-white">
 								<div className="w-full bg-[#202120] px-4 py-4 text-base">
 									Betting

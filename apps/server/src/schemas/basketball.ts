@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+
 export const ScheduledGameSchema = z.object({
 	id: z.string(),
 	status: z.enum([
@@ -20,25 +21,36 @@ export const ScheduledGameSchema = z.object({
 		name: z.string(),
 		alias: z.string(),
 		points: z.number().nullable(),
+		imageUrl: z.string().url().nullable().optional(),
 	}),
 	away: z.object({
 		name: z.string(),
 		alias: z.string(),
 		points: z.number().nullable(),
+		imageUrl: z.string().url().nullable().optional(),
 	}),
 	clock: z.string().optional(),
 });
+
 export const ScheduleData = z.object({
 	competitions: z.array(
 		z.object({
 			id: z.string().or(z.number()).transform(String),
 			name: z.string(),
+			imageUrl: z.string().url().nullable().optional(),
+			country: z
+				.object({
+					name: z.string(),
+					flag: z.string().url().nullable().optional(),
+				})
+				.optional(),
 			games: z.array(ScheduledGameSchema),
 		}),
 	),
 });
 
 export const PlayerStatisticsSchema = z.object({
+	minutes: z.string(),
 	field_goals_made: z.number(),
 	field_goals_att: z.number(),
 	field_goals_pct: z.number(),
@@ -61,42 +73,28 @@ export const PlayerStatisticsSchema = z.object({
 export const PlayerSchema = z.object({
 	full_name: z.string(),
 	pls_min: z.number(),
+	imageUrl: z.string().url().nullable().optional(),
 	statistics: PlayerStatisticsSchema,
 });
 
 export const TeamSchema = z.object({
 	name: z.string(),
 	points: z.number(),
+	imageUrl: z.string().url().nullable().optional(),
 	starters: z.array(PlayerSchema).optional(),
 	bench: z.array(PlayerSchema).optional(),
-	score: z.object({
-		quarter1: z.number(),
-		quarter2: z.number(),
-		quarter3: z.number(),
-		quarter4: z.number(),
-	}),
-	// statistics: z
-	// 	.object({
-	// 		minutes: z.string(),
-	// 		field_goals_made: z.number(),
-	// 		field_goals_att: z.number(),
-	// 		field_goals_pct: z.number(),
-	// 		three_points_made: z.number(),
-	// 		three_points_att: z.number(),
-	// 		three_points_pct: z.number(),
-	// 		free_throws_made: z.number(),
-	// 		free_throws_att: z.number(),
-	// 		free_throws_pct: z.number(),
-	// 		rebounds: z.number(),
-	// 		offensive_rebounds: z.number(),
-	// 		defensive_rebounds: z.number(),
-	// 		assists: z.number(),
-	// 		steals: z.number(),
-	// 		blocks: z.number(),
-	// 		turnovers: z.number(),
-	// 		personal_fouls: z.number(),
-	// 	})
-	// 	.optional(),
+	score: z
+		.object({
+			quarter1: z.number(),
+			quarter2: z.number(),
+			quarter3: z.number(),
+			quarter4: z.number(),
+		})
+		.partial()
+		.extend({
+			over_time: z.number().optional(),
+			total: z.number().optional(),
+		}),
 });
 
 export const GameSummarySchema = z.object({
@@ -108,15 +106,18 @@ export const GameSummarySchema = z.object({
 	tournament: z.object({
 		name: z.string(),
 		id: z.number(),
+		imageUrl: z.string().url().nullable().optional(),
 	}),
 	home: TeamSchema,
 	away: TeamSchema,
 });
+
 export const StandingsSchema = z.object({
 	data: z.array(
 		z.object({
 			id: z.string(),
 			name: z.string(),
+			imageUrl: z.string().url().nullable().optional(),
 			wins: z.number(),
 			losses: z.number(),
 			played: z.number(),
@@ -130,6 +131,23 @@ export const StandingsSchema = z.object({
 
 export const TeamStatsSchema = z.object({
 	name: z.string(),
+	field_goals_made: z.number(),
+	field_goals_att: z.number(),
+	field_goals_pct: z.number(),
+	three_points_made: z.number(),
+	three_points_att: z.number(),
+	three_points_pct: z.number(),
+	free_throws_made: z.number(),
+	free_throws_att: z.number(),
+	free_throws_pct: z.number(),
+	rebounds: z.number(),
+	offensive_rebounds: z.number(),
+	defensive_rebounds: z.number(),
+	assists: z.number(),
+	steals: z.number(),
+	blocks: z.number(),
+	turnovers: z.number(),
+	personal_fouls: z.number(),
 	starters: z.array(PlayerSchema),
 	bench: z.array(PlayerSchema),
 });
@@ -138,11 +156,19 @@ export const GameTeamStatsSchema = z.object({
 	home: TeamStatsSchema,
 	away: TeamStatsSchema,
 });
+
 export const BasketballTournamentScheduleSchema = z.object({
 	games: z.array(ScheduledGameSchema),
 	total: z.number(),
 	competition: z.object({
 		name: z.string(),
 		id: z.number(),
+		imageUrl: z.string().url().nullable().optional(),
+		country: z
+			.object({
+				name: z.string(),
+				flag: z.string().url().nullable().optional(),
+			})
+			.optional(),
 	}),
 });

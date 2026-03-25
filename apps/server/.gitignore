@@ -21,6 +21,8 @@ dist/
 .vercel
 prisma/generated/
 
+data.json
+
 prompt-playground.json
 
 match.json

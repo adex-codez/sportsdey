@@ -1,0 +1,144 @@
+import { useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { signOut, useSession } from "@/lib/auth/client";
+import { cn } from "@/lib/utils";
+import { walletLogoutItem, walletMenuItems } from "./wallet-menu-items";
+
+export function UserMenu() {
+	const { data: session, isPending: isLoading } = useSession();
+	const [isOpen, setIsOpen] = useState(false);
+	const navigate = useNavigate();
+
+	const handleSignOut = async () => {
+		await signOut();
+		setIsOpen(false);
+		navigate({ to: "/auth/sign-in" });
+	};
+	const handleMenuNavigation = (path?: string) => {
+		setIsOpen(false);
+		if (!path) {
+			return;
+		}
+		const destination = session?.user ? path : "/auth/sign-in";
+		navigate({ to: destination });
+	};
+
+	if (isLoading) {
+		return (
+			<button
+				type="button"
+				className="flex items-center justify-center p-2"
+				aria-label="Loading"
+			>
+				<div className="h-6 w-6 animate-pulse rounded-full bg-white/20" />
+			</button>
+		);
+	}
+
+	if (session?.user) {
+		const user = session.user;
+		const WalletLogoutIcon = walletLogoutItem.icon;
+		const displayName = user.name || "User";
+		const initials = displayName
+			.split(" ")
+			.map((n: string) => n[0])
+			.join("")
+			.toUpperCase()
+			.slice(0, 2);
+
+		return (
+			<div className="relative">
+				<button
+					type="button"
+					onClick={() => setIsOpen(!isOpen)}
+					className={cn(
+						"flex items-center gap-2.5 rounded-full p-2.5 transition-colors",
+						"hover:bg-white/10",
+					)}
+					aria-label="User menu"
+					aria-expanded={isOpen}
+				>
+					{user.image ? (
+						<img
+							src={user.image}
+							alt={displayName}
+							className="h-8 w-8 rounded-full bg-[#F7C9B6] object-cover"
+						/>
+					) : (
+						<div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F7C9B6] font-medium text-[#5D2E1F] text-sm">
+							{initials}
+						</div>
+					)}
+					<svg
+						viewBox="0 0 20 20"
+						aria-hidden="true"
+						className={cn(
+							"h-5 w-5 fill-current text-secondary transition-transform",
+							isOpen ? "rotate-180" : "rotate-0",
+						)}
+					>
+						<polygon points="10,13.5 4.5,7.5 15.5,7.5" />
+					</svg>
+				</button>
+
+				{isOpen && (
+					<>
+						<button
+							type="button"
+							className="fixed inset-0 z-40"
+							onClick={() => setIsOpen(false)}
+							aria-label="Close user menu"
+						/>
+						<div className="absolute top-full right-0 z-50 mt-2 w-64 rounded-2xl bg-white p-3 shadow-lg dark:bg-[#202120]">
+							<nav aria-label="User menu options">
+								<ul className="space-y-2">
+									{walletMenuItems.map(({ label, icon: Icon, path }) => (
+										<li key={label}>
+											<button
+												type="button"
+												onClick={() => handleMenuNavigation(path)}
+												className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-primary dark:text-white"
+											>
+												<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEF0ED]">
+													<Icon width={18} height={18} className="block" />
+												</span>
+												<span className="font-medium text-sm">{label}</span>
+											</button>
+										</li>
+									))}
+									<li>
+										<button
+											type="button"
+											onClick={handleSignOut}
+											className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[#FD4585]"
+										>
+											<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F8E9FE]">
+												<WalletLogoutIcon
+													width={18}
+													height={18}
+													className="block"
+												/>
+											</span>
+											<span className="font-medium text-sm">
+												{walletLogoutItem.label}
+											</span>
+										</button>
+									</li>
+								</ul>
+							</nav>
+						</div>
+					</>
+				)}
+			</div>
+		);
+	}
+
+	return (
+		<a
+			href="/auth/sign-in"
+			className="flex items-center justify-center rounded-full bg-[#F4F4F4] px-4 py-2 font-medium text-black text-sm transition-colors hover:bg-[#E5E5E5]"
+		>
+			<span className="flex items-center gap-2">Sign In</span>
+		</a>
+	);
+}
