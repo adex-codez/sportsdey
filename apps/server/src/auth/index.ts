@@ -35,6 +35,7 @@ export const createAuth = (env: CloudflareBindings) => {
 		basePath: "/auth",
 		database: drizzleAdapter(db, { provider: "sqlite" }),
 		emailAndPassword: { enabled: true },
+		plugins: [expo()],
 		socialProviders: {
 			google: {
 				clientId: env.GOOGLE_CLIENT_ID || "",
@@ -70,6 +71,10 @@ export const createAuth = (env: CloudflareBindings) => {
 			},
 			deleteUser: {
 				enabled: true,
+			},
+			facebook: {
+				clientId: env.FACEBOOK_CLIENT_ID,
+				clientSecret: env.FACEBOOK_CLIENT_SECRET,
 			},
 		},
 		baseURL: env.BETTER_AUTH_URL,

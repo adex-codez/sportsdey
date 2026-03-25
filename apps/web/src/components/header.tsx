@@ -650,7 +650,7 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 							title="Calendar disabled for this release"
 						>
 							<CalendarDays className="text-secondary" width={24} height={24} />
-							
+
 						</button> */}
 					</div>
 				) : null}

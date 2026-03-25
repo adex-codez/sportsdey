@@ -39,7 +39,6 @@ app.use(
 
 app.on(["GET", "POST"], "/auth/*", async (c) => {
 	const auth = createAuth(c.env);
-	console.log("trustedOrigin");
 	return auth.handler(c.req.raw);
 });
 
