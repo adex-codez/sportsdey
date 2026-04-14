@@ -193,7 +193,7 @@ const Sidebar = () => {
 					</Button>
 				</div>
 			</SidebarItem> */}
-			<SidebarItem link="/account" heading="Profile" icon={<ChevronRight />} />
+			{/*<SidebarItem link="/account" heading="Profile" icon={<ChevronRight />} />*/}
 			<SidebarItem
 				link="/favorites"
 				heading="My League"

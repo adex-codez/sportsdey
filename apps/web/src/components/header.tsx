@@ -124,7 +124,7 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 						</div>
 					</Link>
 
-					<div className="flex items-center gap-3">
+					{/*<div className="flex items-center gap-3">
 						{!isAuthRoute && <UserMenu />}
 						<ThemeToggle />
 						{isAuthRoute && (
@@ -137,7 +137,7 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 								<span className="text-sm underline">Back to site</span>
 							</button>
 						)}
-					</div>
+					</div>*/}
 				</div>
 
 				<div className="hidden min-w-0 lg:flex lg:h-full lg:w-full lg:items-center lg:justify-between">
@@ -179,7 +179,7 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 						</div>
 					)}
 
-					<div className="flex items-center gap-2">
+					{/*<div className="flex items-center gap-2">
 						{!isAuthRoute && <UserMenu />}
 						<ThemeToggle />
 						{isAuthRoute && (
@@ -192,7 +192,7 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 								<span className="text-sm underline">Back to site</span>
 							</button>
 						)}
-					</div>
+					</div>*/}
 				</div>
 
 				<div className="min-w-0">
