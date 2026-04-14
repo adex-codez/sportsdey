@@ -113,9 +113,9 @@ const Sidebar = () => {
 				</ul>
 			</SidebarItem>
 
-			<div className="relative">
+			{/*<div className="relative">
 				<BettingWidget />
-			</div>
+			</div>*/}
 			<SidebarItem link="/favorites" heading="My Teams" icon={<ChevronRight />}>
 				<div>
 					{favoriteTeams.length === 0 ? (
