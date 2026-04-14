@@ -68,7 +68,8 @@ BETTER_AUTH_URL={your-production-server-domain}
 
 
 ## Deployment (Cloudflare Wrangler)
-- Web deploy: cd apps/web && pnpm run deploy
+- Web deploy (staging): `cd apps/web && pnpm run deploy:staging` (builds with `.env.staging`)
+- Web deploy (production): `cd apps/web && pnpm run deploy:production` (builds with `.env.production`)
 - Server dev: cd apps/server && pnpm run dev
 - Server deploy: cd apps/server && pnpm run deploy
 

@@ -84,46 +84,58 @@ const FootballSchedule = ({ banners }: FootballScheduleProps) => {
 	const filteredSchedules = useMemo(() => {
 		if (!schedules) return null;
 
-		if (currentFilter === "all") {
-			return schedules;
-		}
+		const nameCount = new Map<string, number>();
+		schedules.competitions.forEach((comp) => {
+			const name = comp.competition.name;
+			nameCount.set(name, (nameCount.get(name) || 0) + 1);
+		});
 
-		const filteredCompetitions = [];
+		const processedCompetitions = schedules.competitions.map((comp) => {
+			const name = comp.competition.name;
+			const shouldPrefix =
+				nameCount.get(name)! > 1 && comp.competition.country?.name;
+			return {
+				...comp,
+				displayName: shouldPrefix
+					? `${comp.competition.country.name}: ${name}`
+					: name,
+			};
+		});
 
-		for (const competition of schedules.competitions) {
-			const matchingMatches = competition.matches.filter((match) => {
-				// if (currentFilter === "all" || filter === "all") return true;
-				if (currentFilter === "finished")
-					return match.match_status === "closed";
-				if (currentFilter === "upcoming")
-					return match.match_status === "SCH" || match.match_status === "AET";
-				if (currentFilter === "live")
-					return (
-						match.match_status !== "closed" &&
-						match.match_status !== "SCH" &&
-						match.match_status !== "AET" &&
-						match.match_status !== "FTO"
-					);
-				return false;
-			});
+		const filterByStatus = (comp: (typeof processedCompetitions)[0]) => {
+			if (currentFilter === "all") return true;
+			const hasFinished = comp.matches.some((m) => m.match_status === "closed");
+			const hasUpcoming = comp.matches.some(
+				(m) => m.match_status === "SCH" || m.match_status === "AET",
+			);
+			const hasLive = comp.matches.some(
+				(m) =>
+					m.match_status !== "closed" &&
+					m.match_status !== "SCH" &&
+					m.match_status !== "AET" &&
+					m.match_status !== "FTO",
+			);
+			if (currentFilter === "finished") return hasFinished;
+			if (currentFilter === "upcoming") return hasUpcoming;
+			if (currentFilter === "live") return hasLive;
+			return false;
+		};
 
-			if (matchingMatches.length > 0) {
-				filteredCompetitions.push({
-					...competition,
-					matches: matchingMatches,
-				});
-			}
-		}
+		const filteredCompetitions = processedCompetitions.filter(filterByStatus);
 
 		const finalCompetitions = activeLeague
-			? filteredCompetitions.filter(
-					(comp) => comp.competition.name === activeLeague,
-				)
+			? filteredCompetitions.filter((comp) => comp.displayName === activeLeague)
 			: filteredCompetitions;
 
 		return {
 			...schedules,
-			competitions: finalCompetitions,
+			competitions: finalCompetitions.map((comp) => ({
+				...comp,
+				competition: {
+					...comp.competition,
+					name: comp.displayName,
+				},
+			})),
 		};
 	}, [schedules, currentFilter, activeLeague]);
 

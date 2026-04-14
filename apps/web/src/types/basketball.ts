@@ -14,6 +14,8 @@ export interface SetScore {
 export interface Match {
 	team1: string;
 	team2: string;
+	team1Logo?: string;
+	team2Logo?: string;
 	score1?: number;
 	score2?: number;
 	player1Sets?: SetScore[];

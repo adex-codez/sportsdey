@@ -4,6 +4,7 @@ export interface BasketballTeam {
 	name: string;
 	alias: string;
 	points: number | null;
+	imageUrl?: string;
 }
 
 export interface BasketballGame {
@@ -20,6 +21,7 @@ export interface BasketballGame {
 export interface BasketballCompetition {
 	id: string;
 	name: string;
+	imageUrl?: string;
 	games: BasketballGame[];
 }
 
@@ -43,6 +45,7 @@ export interface BasketballScheduleResponse {
 export interface BasketballStanding {
 	id: string;
 	name: string;
+	imageUrl?: string;
 	wins: number;
 	losses: number;
 	played: number;
@@ -111,6 +114,7 @@ export interface BasketballTeamStatsResponse {
 export interface BasketballTeamDetails {
 	name: string;
 	points: number;
+	imageUrl?: string;
 	score: {
 		quarter1: number;
 		quarter2: number;

@@ -1,0 +1,1 @@
+ALTER TABLE `game_launch_tokens` DROP COLUMN `expires_at`;

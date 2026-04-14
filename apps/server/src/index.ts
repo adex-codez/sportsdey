@@ -8,29 +8,60 @@ import type { CloudflareBindings } from "./types";
 
 const app = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
 
+app.openAPIRegistry.registerComponent("securitySchemes", "BearerAuth", {
+	type: "http",
+	scheme: "bearer",
+	description:
+		"Enter the session token from /auth/sign-in/email or /auth/sign-in/oauth",
+});
+
 app.use(logger());
 app.use(
 	"/*",
 	cors({
-		origin: (origin) => origin,
+		origin: (origin, c) => {
+			console.log("CORS_ORIGIN", c.env.CORS_ORIGIN);
+			if (!origin) return "";
+			const allowedOrigins = new Set([
+				c.env.CORS_ORIGIN,
+				"http://localhost:3001",
+				"http://localhost:8787",
+				"sportsdey-mobile://",
+				"exp://172.20.10.9:8081",
+			]);
+			return allowedOrigins.has(origin) ? origin : "";
+		},
 		allowMethods: ["GET", "POST", "OPTIONS"],
+		allowHeaders: ["Authorization", "Content-Type"],
 		credentials: true,
 	}),
 );
 
-app.use("*", async (c, next) => {
-	const auth = createAuth(c.env);
-	const session = await auth.api.getSession({
-		headers: c.req.raw.headers,
-	});
-	c.set("session", session);
-	c.set("user", session?.user ?? null);
-	await next();
-});
-
 app.on(["GET", "POST"], "/auth/*", async (c) => {
 	const auth = createAuth(c.env);
 	return auth.handler(c.req.raw);
+});
+
+app.use("*", async (c, next) => {
+	const path = c.req.path;
+	if (
+		path.startsWith("/auth/") ||
+		path.startsWith("/docs") ||
+		path.startsWith("/openapi") ||
+		path.startsWith("/api/account/")
+	) {
+		return next();
+	}
+	const auth = createAuth(c.env);
+	const sessionResult = await auth.api.getSession({
+		headers: c.req.raw.headers,
+	});
+	const session = sessionResult?.session ?? null;
+	const user = sessionResult?.user ?? null;
+	c.set("session", session);
+	c.set("user", user);
+
+	await next();
 });
 
 app.route("/", routes);

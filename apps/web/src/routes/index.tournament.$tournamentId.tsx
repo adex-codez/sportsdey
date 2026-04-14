@@ -178,12 +178,11 @@ function RouteComponent() {
 										/>
 									) : (
 										filteredSchedules?.matches.map((match, index) => (
-											<div key={`${index}+1`} className="w-full rounded-2xl bg-white dark:bg-card">
-												<Link
-													to="/index/$gameId"
-													params={{ gameId: match.id }}
-													
-												>
+											<div
+												key={`${index}+1`}
+												className="w-full rounded-2xl bg-white dark:bg-card"
+											>
+												<Link to="/index/$gameId" params={{ gameId: match.id }}>
 													<MatchCard
 														team1={match.competitors.home.name}
 														team2={match.competitors.away.name}

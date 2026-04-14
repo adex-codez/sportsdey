@@ -17,7 +17,6 @@ import type {
 	FootballStandingsResponse,
 	FootballStatsResponse,
 } from "@/types/football";
-import { getTeamLogo } from "@/utils/getTeamLogo";
 import { getTimeUntilStart, safeParseDate } from "@/utils/timeUtils";
 
 export const Route = createFileRoute("/index/$gameId")({
@@ -84,14 +83,18 @@ function RouteComponent() {
 		return (
 			<div className="flex h-[40%] flex-col items-center justify-center space-y-2">
 				<Loader2 className="animate-spin" width={48} height={48} />
-				<p className="text-gray-500 text-sm dark:text-white">Loading matches info...</p>
+				<p className="text-gray-500 text-sm dark:text-white">
+					Loading matches info...
+				</p>
 			</div>
 		);
 	}
 	if (!gameInfo) {
 		return (
 			<div className="flex flex-col items-center justify-center space-y-2">
-				<p className="text-gray-500 text-sm dark:text-white">Match info unavailable...</p>
+				<p className="text-gray-500 text-sm dark:text-white">
+					Match info unavailable...
+				</p>
 			</div>
 		);
 	}
@@ -132,7 +135,7 @@ function RouteComponent() {
 			case "info":
 				return <FootballMatchInfo setTab={setTab} info={gameInfo} />;
 			case "top_scorers":
-				return <TopScorers scorers={gameInfo.top_scorers} />;
+				return <TopScorers scorers={gameInfo.top_scorers} showAll />;
 			case "stats":
 				return (
 					<FootballStatsTab stats={statsData} isLoading={isStatsLoading} />
@@ -162,8 +165,8 @@ function RouteComponent() {
 		<div className="space-y-6">
 			<DetailsImageCard
 				competitionName={gameInfo.competition.name}
-				hostTeamLogo={getTeamLogo(gameInfo.competitors.home.name)}
-				guestTeamLogo={getTeamLogo(gameInfo.competitors.away.name)}
+				hostTeamLogo={gameInfo.competitors.home.imageUrl || "/Profile.png"}
+				guestTeamLogo={gameInfo.competitors.away.imageUrl || "/Profile.png"}
 				hostTeamName={gameInfo.competitors.home.name}
 				hostTeamScore={gameInfo.competitors.home.score}
 				guestTeamName={gameInfo.competitors.away.name}

@@ -1,9 +1,9 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { ErrorResponseSchema } from "@/schemas";
 import {
-	ErrorResponseSchema,
 	NotificationAcknowledgementSchema,
 	TicketStatusNotificationSchema,
-} from "@/schemas";
+} from "@/schemas/notifications";
 import { sendSms } from "@/utils/sms";
 import { jsonZodErrorFormatter } from "@/utils/zod";
 

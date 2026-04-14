@@ -82,29 +82,10 @@ export default function BettingWidget() {
 						rel="noopener noreferrer"
 						className="flex items-center gap-3 transition-colors hover:text-accent"
 					>
-						<img
-							src="/betting-logo.png"
-							className="h-5 w-5 object-contain"
-							alt="Betting"
-						/>
-						<span className="font-medium text-sm">Tutorials</span>
-					</a>
-				</li>
-				{/*<li>
-					<a
-						href="https://hallalotto.com/"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="flex items-center gap-3 transition-colors hover:text-accent"
-					>
-						<img
-							src="/betting-logo.png"
-							className="h-5 w-5 object-contain"
-							alt="Betting"
-						/>
+						<img src="/betting-logo.png" className="h-5 w-5 object-contain" alt="Betting" />
 						<span className="font-medium text-sm">Play lottery</span>
 					</a>
-				</li>*/}
+				</li>
 			</ul>
 		</div>
 	);

@@ -15,6 +15,16 @@ import {
 	MatchCard,
 } from "@/shared/BasketballAccordionComponentCard";
 
+const getScore = (
+	points: number | null | undefined,
+	score: { total?: number } | undefined,
+): number | undefined => {
+	if (points !== null && points !== undefined) return points;
+	if (score && typeof score === "object" && "total" in score)
+		return score.total;
+	return undefined;
+};
+
 export const Route = createFileRoute("/favorites")({
 	loader: () => getBanners(),
 	component: FavoritesPage,
@@ -35,8 +45,8 @@ const FavoriteMatchCardRow = ({
 
 	const team1 = gameData?.home?.name || match.team1;
 	const team2 = gameData?.away?.name || match.team2;
-	const score1 = gameData?.home?.points;
-	const score2 = gameData?.away?.points;
+	const score1 = getScore(gameData?.home?.points, gameData?.home?.score);
+	const score2 = getScore(gameData?.away?.points, gameData?.away?.score);
 	const status = gameData
 		? gameData?.status === "closed" ||
 			gameData?.status === "ended" ||
