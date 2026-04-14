@@ -16,7 +16,7 @@ type NavItem = {
 	id: string;
 	label: string;
 	icon: string;
-	onClick: () => void;
+	onClick?: () => void;
 	isActive: boolean;
 };
 
@@ -64,11 +64,11 @@ const Sidebar = () => {
 	};
 
 	const goToWallet = () => navigate({ to: "/wallet" });
-	const goToBetting = (betType: string) =>
-		navigate({
-			to: "/betting",
-			search: { type: betType },
-		});
+	// const goToBetting = (betType: string) =>
+	// navigate({
+	// 	to: "/betting",
+	// 	search: { type: betType },
+	// });
 
 	const menuItems: NavItem[] = [
 		{
@@ -112,7 +112,7 @@ const Sidebar = () => {
 			id: "jackpots",
 			label: "Jackpots",
 			icon: jackpotIcon,
-			onClick: () => goToBetting("jackpots"),
+			// onClick: () => goToBetting("jackpots"),
 			isActive:
 				location.pathname.startsWith("/betting") &&
 				(betType === "jackpots" || !params.has("type")),
@@ -121,21 +121,21 @@ const Sidebar = () => {
 			id: "super-bets",
 			label: "Super Bets",
 			icon: superbetsIcon,
-			onClick: () => goToBetting("super"),
+			// onClick: () => goToBetting("super"),
 			isActive: location.pathname.startsWith("/betting") && betType === "super",
 		},
 		{
 			id: "smart-bets",
 			label: "Smart Bets",
 			icon: smartbetsIcon,
-			onClick: () => goToBetting("smart"),
+			// onClick: () => goToBetting("smart"),
 			isActive: location.pathname.startsWith("/betting") && betType === "smart",
 		},
 		{
 			id: "quick-bets",
 			label: "Quick Bets",
 			icon: quickbetsIcon,
-			onClick: () => goToBetting("quick"),
+			// onClick: () => goToBetting("quick"),
 			isActive: location.pathname.startsWith("/betting") && betType === "quick",
 		},
 	];
