@@ -16,12 +16,14 @@ export const TennisMatchSchema = z.object({
 	id: z.string(),
 	start_time: z.string(),
 	status: z.string(),
-	home_team: z.object({
-		competitor: TennisCompetitorSchema,
+	home: z.object({
+		id: z.string(),
+		name: z.string(),
 		set_scores: z.array(TennisSetScoreSchema),
 	}),
-	away_team: z.object({
-		competitor: TennisCompetitorSchema,
+	away: z.object({
+		id: z.string(),
+		name: z.string(),
 		set_scores: z.array(TennisSetScoreSchema),
 	}),
 	winner_id: z.string().optional(),
@@ -44,6 +46,23 @@ export const TennisScheduleData = z.object({
 });
 
 export const TennisMatchInfoData = z.object({
-	TennisMatchSchema,
-	venue: z.string(),
+	id: z.string(),
+	start_time: z.string(),
+	status: z.string(),
+	home: z.object({
+		id: z.string(),
+		name: z.string(),
+		set_scores: z.array(TennisSetScoreSchema),
+	}),
+	away: z.object({
+		id: z.string(),
+		name: z.string(),
+		set_scores: z.array(TennisSetScoreSchema),
+	}),
+	winner_id: z.string().optional(),
+	competition: z.object({
+		id: z.string(),
+		name: z.string(),
+		type: z.string().optional(),
+	}),
 });

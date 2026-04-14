@@ -97,6 +97,7 @@ export async function verifyWebhookSignature(
 export interface TransferRecipient {
 	id: string;
 	reference: string;
+	recipient_code: string;
 }
 
 export async function createTransferRecipient(
@@ -130,7 +131,7 @@ export async function createTransferRecipient(
 	const responseData = data as {
 		status: boolean;
 		message?: string;
-		data?: { id: string; reference: string };
+		data?: { id: string; reference: string; recipient_code: string };
 	};
 
 	if (!response.ok || !responseData.status) {
@@ -141,6 +142,7 @@ export async function createTransferRecipient(
 	return {
 		id: responseData.data!.id,
 		reference: responseData.data!.reference,
+		recipient_code: responseData.data!.recipient_code,
 	};
 }
 

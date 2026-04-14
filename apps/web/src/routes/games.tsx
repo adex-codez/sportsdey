@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
@@ -28,15 +28,29 @@ const GAMES = [
 		image: "/luckyrise-thumbnail-16x9.png",
 		gradient: "linear-gradient(to bottom, #0E0E2B, #1f3a5f, #d4a017)",
 	},
+	{
+		code: "LAGOSRUSH",
+		name: "Lagos Rush",
+		subtitle: "fulfilling games",
+		image: "/lagos-rush.png",
+		gradient: "linear-gradient(to bottom, #ff6b35, #f7931e, #ffcc00)",
+	},
 ];
 
 function GamesPage() {
+	const navigate = useNavigate();
 	const [loadingGame, setLoadingGame] = useState<string | null>(null);
 
-	const handleGameClick = async (gameCode: string) => {
-		setLoadingGame(gameCode);
+	const handleGameClick = async (game: (typeof GAMES)[number]) => {
+		setLoadingGame(game.code);
 		try {
-			const url = `${import.meta.env.VITE_SERVER_URL}casino/play/${gameCode}`;
+			let launchUrl: string;
+
+			const isLagosRush = game.code === "LAGOSRUSH";
+			const url = isLagosRush
+				? `${import.meta.env.VITE_SERVER_URL}lagos-rush/launcher`
+				: `${import.meta.env.VITE_SERVER_URL}casino/play/${game.code}`;
+
 			const response = await fetch(url, {
 				method: "POST",
 				credentials: "include",
@@ -45,32 +59,42 @@ function GamesPage() {
 			const data: {
 				success?: boolean;
 				error?: string;
-				launch_token?: string;
-				data?: { launch_token?: string };
+				data?: { gameUrl?: string; launchUrl?: string };
 			} = await response.json();
 
 			if (!response.ok || data.success === false) {
 				if (data.error === "Unauthorized" || response.status === 401) {
-					window.location.href = "/auth/sign-in";
+					navigate({ to: "/auth/sign-in" });
 					return;
 				}
-				throw new Error(data.error || "Failed to load game");
+				throw new Error(data.error || "Failed to launch game");
 			}
 
-			const launchToken = data.data?.launch_token || data.launch_token;
-			if (launchToken) {
-				window.location.href = launchToken;
+			launchUrl = data.data?.gameUrl ?? data.data?.launchUrl;
+
+			if (!launchUrl) {
+				throw new Error("Missing launch URL in response");
 			}
+
+			navigate({
+				to: "/game/$gameId",
+				params: { gameId: game.code },
+				state: { gameUrl: launchUrl },
+			});
 		} catch (error) {
 			console.error("Failed to launch game:", error);
+		} finally {
 			setLoadingGame(null);
 		}
 	};
 
-	const handleKeyDown = (e: React.KeyboardEvent, gameCode: string) => {
+	const handleKeyDown = (
+		e: React.KeyboardEvent,
+		game: (typeof GAMES)[number],
+	) => {
 		if (e.key === "Enter" || e.key === " ") {
 			e.preventDefault();
-			handleGameClick(gameCode);
+			handleGameClick(game);
 		}
 	};
 
@@ -80,40 +104,41 @@ function GamesPage() {
 				<h1 className="mb-6 font-bold text-2xl text-gray-900 dark:text-white">
 					All Games
 				</h1>
-				<div className="flex flex-wrap gap-6">
+				<div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-[repeat(auto-fill,minmax(180px,1fr))]">
 					{GAMES.map((game) => (
 						<div
 							key={game.code}
-							className="flex h-[280px] w-[220px] cursor-pointer flex-col items-center justify-end overflow-hidden rounded-lg border border-gray-200 p-4"
+							className="relative flex h-[280px] w-[180px] w-full cursor-pointer flex-col items-center justify-end overflow-hidden rounded-lg border border-gray-200 p-4"
 							style={{ background: game.gradient }}
-							onClick={() => handleGameClick(game.code)}
-							onKeyDown={(e) => handleKeyDown(e, game.code)}
+							onClick={() => handleGameClick(game)}
+							onKeyDown={(e) => handleKeyDown(e, game)}
 							role="button"
 							tabIndex={0}
 						>
-							{loadingGame === game.code ? (
-								<Loader2 className="h-8 w-8 animate-spin text-white" />
-							) : (
-								<>
-									<img
-										src={game.image}
-										alt={game.name}
-										className="h-40 w-full rounded-lg object-contain"
-									/>
-									<p
-										className="text-center font-normal text-[27px] text-white"
-										style={{ fontFamily: "Luckiest Guy" }}
-									>
-										{game.name}
-									</p>
-									<p
-										className="text-center text-gray-300 text-sm"
-										style={{ fontFamily: "Quicksand" }}
-									>
-										{game.subtitle}
-									</p>
-								</>
+							{loadingGame === game.code && (
+								<div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+									<Loader2 className="h-10 w-10 animate-spin text-white" />
+								</div>
 							)}
+
+							<img
+								src={game.image}
+								alt={game.name}
+								className="absolute inset-0 h-full w-full object-contain p-2 transition-opacity"
+								style={{ opacity: loadingGame === game.code ? 0.35 : 1 }}
+							/>
+							<p
+								className="text-center font-normal text-[27px] text-white"
+								style={{ fontFamily: "Luckiest Guy" }}
+							>
+								{game.name}
+							</p>
+							<p
+								className="text-center text-gray-100 text-sm"
+								style={{ fontFamily: "Quicksand" }}
+							>
+								{game.subtitle}
+							</p>
 						</div>
 					))}
 				</div>

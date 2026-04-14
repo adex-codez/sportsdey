@@ -135,6 +135,7 @@ export const ThundrBalanceRequestSchema = z.object({
 export const ThundrBalanceQuerySchema = z.object({
 	sessionId: z.string(),
 	currency: z.string(),
+	gameId: z.string(),
 });
 
 export const ThundrBalanceResponseSchema = z.object({

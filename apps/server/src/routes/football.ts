@@ -599,7 +599,7 @@ footballRoute.openapi(
 			const data = response.response || [];
 			console.log(response);
 
-			const transformedData = transformProxySchedule(data);
+			const transformedData = transformSchedule(data);
 
 			if (getKvNamespace(c.env)) {
 				try {

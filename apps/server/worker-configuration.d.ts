@@ -4,7 +4,9 @@ declare namespace Cloudflare {
 	}
 	interface Env {
 		sportsdey_ns: KVNamespace;
-		NODE_ENV: "development" | "production";
+		STAGING_BUCKET: R2Bucket;
+		PRODUCTION_BUCKET: R2Bucket;
+		NODE_ENV: "development" | "production" | "staging";
 		CLOUDFLARE_ACCOUNT_ID: string;
 		CLOUDFLARE_DATABASE_ID: string;
 		CLOUDFLARE_D1_TOKEN: string;
@@ -36,6 +38,10 @@ declare namespace Cloudflare {
 		THNDR_BASE_URL: string;
 		THNDR_OPERATOR_ID: string;
 		THNDR_SERVER_SECRET: string;
+		LAGOS_RUSH_API_KEY: string;
+		LAGOS_RUSH_BASE_URL: string;
+		POCKETS_SECRET_KEY: string;
+		API_SPORTS_KEY: string;
 	}
 }
 export interface CloudflareBindings extends Cloudflare.Env {}

@@ -13,19 +13,21 @@ import {
 	FundWalletSchema,
 	GetBanksErrorSchema,
 	GetBanksResponseSchema,
+	GetGameWalletErrorSchema,
+	GetGameWalletResponseSchema,
 	GetTransactionsErrorSchema,
 	GetTransactionsResponseSchema,
 	GetWalletErrorSchema,
 	GetWalletResponseSchema,
 	GetWithdrawalAccountsErrorSchema,
 	GetWithdrawalAccountsResponseSchema,
-	TransactionResponseSchema,
-	WalletResponseSchema,
+	TransferErrorSchema,
+	TransferResponseSchema,
+	TransferSchema,
+	TransferToGameWalletErrorSchema,
+	TransferToGameWalletResponseSchema,
+	TransferToGameWalletSchema,
 	WithdrawResponseSchema as WalletWithdrawResponseSchema,
-	WebhookErrorSchema,
-	WebhookEventSchema,
-	WebhookResponseSchema,
-	WithdrawalAccountResponseSchema,
 	WithdrawErrorSchema,
 	WithdrawSchema,
 } from "@/schemas/wallet";
@@ -37,6 +39,7 @@ import {
 	verifyAccountNumber,
 	verifyTransaction,
 } from "@/utils/paystack";
+import { generateUUIDv7 } from "@/utils/uuid";
 import type { CloudflareBindings } from "../types";
 
 const walletRoute = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
@@ -222,8 +225,8 @@ const withdrawRoute = createRoute({
 	method: "post",
 	path: "/withdraw",
 	tags: ["Wallet"],
-	summary: "Withdraw from wallet",
-	description: "Withdraw funds from wallet to user's bank account via Paystack",
+	summary: "Withdraw funds",
+	description: "Withdraw funds from wallet to a bank account",
 	security: [{ BearerAuth: [] }],
 	request: {
 		body: {
@@ -236,7 +239,7 @@ const withdrawRoute = createRoute({
 	},
 	responses: {
 		200: {
-			description: "Withdrawal initiated successfully",
+			description: "Withdrawal successful",
 			content: {
 				"application/json": {
 					schema: WalletWithdrawResponseSchema,
@@ -252,10 +255,55 @@ const withdrawRoute = createRoute({
 			},
 		},
 		401: {
-			description: "Unauthorized - user not authenticated",
+			description: "Unauthorized",
 			content: {
 				"application/json": {
 					schema: WithdrawErrorSchema,
+				},
+			},
+		},
+	},
+});
+
+const transferRoute = createRoute({
+	method: "post",
+	path: "/transfer",
+	tags: ["Wallet"],
+	summary: "Transfer funds",
+	description:
+		"Transfer funds from authenticated user's wallet to another wallet",
+	security: [{ BearerAuth: [] }],
+	request: {
+		body: {
+			content: {
+				"application/json": {
+					schema: TransferSchema,
+				},
+			},
+		},
+	},
+	responses: {
+		200: {
+			description: "Transfer successful",
+			content: {
+				"application/json": {
+					schema: TransferResponseSchema,
+				},
+			},
+		},
+		400: {
+			description: "Invalid request or insufficient balance",
+			content: {
+				"application/json": {
+					schema: TransferErrorSchema,
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized",
+			content: {
+				"application/json": {
+					schema: TransferErrorSchema,
 				},
 			},
 		},
@@ -416,6 +464,79 @@ const deleteWithdrawalAccountRoute = createRoute({
 	},
 });
 
+const getGameWalletRoute = createRoute({
+	method: "get",
+	path: "/game-wallet",
+	tags: ["Wallet"],
+	summary: "Get game wallet",
+	description:
+		"Retrieve the authenticated user's game wallet details. Auto-creates if not exists.",
+	security: [{ BearerAuth: [] }],
+	responses: {
+		200: {
+			description: "Game wallet retrieved successfully",
+			content: {
+				"application/json": {
+					schema: GetGameWalletResponseSchema,
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized - user not authenticated",
+			content: {
+				"application/json": {
+					schema: GetGameWalletErrorSchema,
+				},
+			},
+		},
+	},
+});
+
+const transferToGameWalletRoute = createRoute({
+	method: "post",
+	path: "/transfer-to-game",
+	tags: ["Wallet"],
+	summary: "Transfer to game wallet",
+	description:
+		"Transfer funds from normal wallet to game wallet for gaming purposes",
+	security: [{ BearerAuth: [] }],
+	request: {
+		body: {
+			content: {
+				"application/json": {
+					schema: TransferToGameWalletSchema,
+				},
+			},
+		},
+	},
+	responses: {
+		200: {
+			description: "Transfer successful",
+			content: {
+				"application/json": {
+					schema: TransferToGameWalletResponseSchema,
+				},
+			},
+		},
+		400: {
+			description: "Invalid request or insufficient balance",
+			content: {
+				"application/json": {
+					schema: TransferToGameWalletErrorSchema,
+				},
+			},
+		},
+		401: {
+			description: "Unauthorized",
+			content: {
+				"application/json": {
+					schema: TransferToGameWalletErrorSchema,
+				},
+			},
+		},
+	},
+});
+
 walletRoute.openapi(fundWalletRoute, async (c) => {
 	const user = c.get("user");
 	if (!user) {
@@ -454,7 +575,7 @@ walletRoute.openapi(fundWalletRoute, async (c) => {
 
 	if (!existingWallet) {
 		await db.insert(schema.wallet).values({
-			id: `wallet_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
+			id: generateUUIDv7(),
 			userId: user.id,
 			balance: 0,
 		});
@@ -476,7 +597,7 @@ walletRoute.openapi(fundWalletRoute, async (c) => {
 		await db.insert(schema.walletTransaction).values({
 			id: transactionId,
 			userId: user.id,
-			amount,
+			amount: amount * 100,
 			type: "credit",
 			reference: paystackResult.reference,
 			status: "pending",
@@ -532,7 +653,7 @@ walletRoute.openapi(getWalletRoute, async (c) => {
 		const [newWallet] = await db
 			.insert(schema.wallet)
 			.values({
-				id: `wallet_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
+				id: generateUUIDv7(),
 				userId: user.id,
 				balance: 0,
 			})
@@ -556,7 +677,7 @@ walletRoute.openapi(getWalletRoute, async (c) => {
 
 	const walletResponse = {
 		id: wallet.id,
-		balance: wallet.balance,
+		balance: wallet.balance / 100,
 		createdAt: wallet.createdAt,
 		updatedAt: wallet.updatedAt,
 	};
@@ -592,10 +713,15 @@ walletRoute.openapi(getTransactionsRoute, async (c) => {
 		.orderBy(desc(schema.walletTransaction.createdAt))
 		.limit(50);
 
+	const transactionsInNaira = transactions.map((tx) => ({
+		...tx,
+		amount: tx.amount / 100,
+	}));
+
 	return c.json(
 		{
 			success: true as const,
-			data: transactions,
+			data: transactionsInNaira,
 		},
 		200,
 	);
@@ -1268,36 +1394,34 @@ walletRoute.openapi(withdrawRoute, async (c) => {
 	const reference = `wd_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
 	try {
-		const accountVerification = await verifyAccountNumber(
-			c.env.PAYSTACK_SECRET_KEY,
-			accountNumber,
-			bankCode,
-		);
+		// const accountVerification = await verifyAccountNumber(
+		// 	c.env.PAYSTACK_SECRET_KEY,
+		// 	accountNumber,
+		// 	bankCode,
+		// );
 
-		if (!accountVerification.isValid) {
-			return c.json(
-				{
-					success: false as const,
-					error: "Invalid account number or bank code",
-					details: null,
-				},
-				400,
-			);
-		}
-
-		console.log("Account number", accountNumber);
+		// if (!accountVerification.isValid) {
+		// 	return c.json(
+		// 		{
+		// 			success: false as const,
+		// 			error: "Invalid account number or bank code",
+		// 			details: null,
+		// 		},
+		// 		400,
+		// 	);
+		// }
 
 		const recipient = await createTransferRecipient(
 			c.env.PAYSTACK_SECRET_KEY,
 			bankCode,
 			accountNumber,
-			accountVerification.accountName || accountName,
+			accountName,
 		);
 
 		const transfer = await initiateTransfer(
 			c.env.PAYSTACK_SECRET_KEY,
 			amount,
-			recipient.id,
+			recipient.recipient_code,
 			"balance",
 			"Withdrawal from wallet",
 		);
@@ -1305,7 +1429,7 @@ walletRoute.openapi(withdrawRoute, async (c) => {
 		await db.insert(schema.walletTransaction).values({
 			id: `txn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
 			userId: user.id,
-			amount,
+			amount: amount * 100,
 			type: "debit",
 			reference,
 			status: transfer.status === "success" ? "success" : "pending",
@@ -1314,7 +1438,7 @@ walletRoute.openapi(withdrawRoute, async (c) => {
 		await db
 			.update(schema.wallet)
 			.set({
-				balance: wallet.balance - amount,
+				balance: wallet.balance - amount * 100,
 			})
 			.where(eq(schema.wallet.userId, user.id));
 
@@ -1323,7 +1447,7 @@ walletRoute.openapi(withdrawRoute, async (c) => {
 				success: true as const,
 				data: {
 					reference: transfer.reference,
-					amount,
+					amount: amount,
 					status: transfer.status,
 				},
 			},
@@ -1337,6 +1461,369 @@ walletRoute.openapi(withdrawRoute, async (c) => {
 					error instanceof Error
 						? error.message
 						: "Failed to process withdrawal",
+				details: null,
+			},
+			400,
+		);
+	}
+});
+
+walletRoute.openapi(transferRoute, async (c) => {
+	const user = c.get("user");
+	const result = TransferSchema.safeParse(await c.req.json());
+
+	if (!result.success) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Invalid request body",
+				details: null,
+			},
+			400,
+		);
+	}
+
+	const { recipientWalletId, amount } = result.data;
+
+	if (amount < 100) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Minimum transfer amount is 100 Naira",
+				details: null,
+			},
+			400,
+		);
+	}
+
+	const db = drizzle(c.env.DB, { schema });
+
+	const [senderWallet] = await db
+		.select()
+		.from(schema.wallet)
+		.where(eq(schema.wallet.userId, user.id))
+		.limit(1);
+
+	if (!senderWallet) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Sender wallet not found",
+				details: null,
+			},
+			400,
+		);
+	}
+
+	if (senderWallet.balance < amount * 100) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Insufficient balance",
+				details: null,
+			},
+			400,
+		);
+	}
+
+	const [recipientWallet] = await db
+		.select()
+		.from(schema.wallet)
+		.where(eq(schema.wallet.id, recipientWalletId))
+		.limit(1);
+
+	if (!recipientWallet) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Recipient wallet not found",
+				details: null,
+			},
+			400,
+		);
+	}
+
+	if (recipientWallet.userId === user.id) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Cannot transfer to your own wallet",
+				details: null,
+			},
+			400,
+		);
+	}
+
+	const reference = `trf_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+
+	try {
+		await db
+			.update(schema.wallet)
+			.set({
+				balance: senderWallet.balance - amount * 100,
+				updatedAt: new Date(),
+			})
+			.where(eq(schema.wallet.id, senderWallet.id));
+
+		await db
+			.update(schema.wallet)
+			.set({
+				balance: recipientWallet.balance + amount * 100,
+				updatedAt: new Date(),
+			})
+			.where(eq(schema.wallet.id, recipientWallet.id));
+
+		await db.insert(schema.walletTransaction).values({
+			id: generateUUIDv7(),
+			userId: user.id,
+			amount: -amount * 100,
+			type: "debit",
+			reference: `${reference}_sender`,
+			status: "completed",
+		});
+
+		await db.insert(schema.walletTransaction).values({
+			id: generateUUIDv7(),
+			userId: recipientWallet.userId,
+			amount: amount * 100,
+			type: "credit",
+			reference: `${reference}_recipient`,
+			status: "completed",
+		});
+
+		return c.json(
+			{
+				success: true as const,
+				data: {
+					transactionId: reference,
+					amount,
+					recipientWalletId,
+				},
+			},
+			200,
+		);
+	} catch (error) {
+		return c.json(
+			{
+				success: false as const,
+				error:
+					error instanceof Error ? error.message : "Failed to process transfer",
+				details: null,
+			},
+			400,
+		);
+	}
+});
+
+walletRoute.openapi(getGameWalletRoute, async (c) => {
+	const user = c.get("user");
+	if (!user) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Unauthorized",
+				details: null,
+			},
+			401,
+		);
+	}
+
+	const db = drizzle(c.env.DB, { schema });
+
+	const [gameWallet] = await db
+		.select()
+		.from(schema.gameWallet)
+		.where(eq(schema.gameWallet.userId, user.id))
+		.limit(1);
+
+	if (!gameWallet) {
+		const [newGameWallet] = await db
+			.insert(schema.gameWallet)
+			.values({
+				id: generateUUIDv7(),
+				userId: user.id,
+				balance: 0,
+			})
+			.returning();
+
+		const walletResponse = {
+			id: newGameWallet.id,
+			balance: newGameWallet.balance,
+			createdAt: newGameWallet.createdAt,
+			updatedAt: newGameWallet.updatedAt,
+		};
+
+		return c.json(
+			{
+				success: true as const,
+				data: walletResponse,
+			},
+			200,
+		);
+	}
+
+	const walletResponse = {
+		id: gameWallet.id,
+		balance: gameWallet.balance / 100,
+		createdAt: gameWallet.createdAt,
+		updatedAt: gameWallet.updatedAt,
+	};
+
+	return c.json(
+		{
+			success: true as const,
+			data: walletResponse,
+		},
+		200,
+	);
+});
+
+walletRoute.openapi(transferToGameWalletRoute, async (c) => {
+	const user = c.get("user");
+	const result = TransferToGameWalletSchema.safeParse(await c.req.json());
+
+	if (!result.success) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Invalid request body",
+				details: null,
+			},
+			400,
+		);
+	}
+
+	const { amount } = result.data;
+
+	if (amount < 100) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Minimum transfer amount is 100 Naira",
+				details: null,
+			},
+			400,
+		);
+	}
+
+	const db = drizzle(c.env.DB, { schema });
+
+	const [normalWallet] = await db
+		.select()
+		.from(schema.wallet)
+		.where(eq(schema.wallet.userId, user.id))
+		.limit(1);
+
+	if (!normalWallet) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Normal wallet not found",
+				details: null,
+			},
+			400,
+		);
+	}
+
+	if (normalWallet.balance < amount * 100) {
+		return c.json(
+			{
+				success: false as const,
+				error: "Insufficient balance in normal wallet",
+				details: null,
+			},
+			400,
+		);
+	}
+
+	let [gameWallet] = await db
+		.select()
+		.from(schema.gameWallet)
+		.where(eq(schema.gameWallet.userId, user.id))
+		.limit(1);
+
+	if (!gameWallet) {
+		const [newGameWallet] = await db
+			.insert(schema.gameWallet)
+			.values({
+				id: generateUUIDv7(),
+				userId: user.id,
+				balance: 0,
+			})
+			.returning();
+		gameWallet = newGameWallet;
+	}
+
+	const reference = `tg_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+
+	try {
+		await db
+			.update(schema.wallet)
+			.set({
+				balance: normalWallet.balance - amount * 100,
+				updatedAt: new Date(),
+			})
+			.where(eq(schema.wallet.id, normalWallet.id));
+
+		await db
+			.update(schema.gameWallet)
+			.set({
+				balance: gameWallet.balance + amount * 100,
+				updatedAt: new Date(),
+			})
+			.where(eq(schema.gameWallet.id, gameWallet.id));
+
+		await db.insert(schema.walletTransaction).values({
+			id: generateUUIDv7(),
+			userId: user.id,
+			amount: -amount * 100,
+			type: "debit",
+			reference: `${reference}_normal`,
+			status: "completed",
+		});
+
+		await db.insert(schema.gameWalletTransaction).values({
+			id: generateUUIDv7(),
+			userId: user.id,
+			amount: amount * 100,
+			type: "credit",
+			reference: `${reference}_game`,
+			status: "completed",
+		});
+
+		const [updatedNormalWallet] = await db
+			.select()
+			.from(schema.wallet)
+			.where(eq(schema.wallet.id, normalWallet.id))
+			.limit(1);
+
+		const [updatedGameWallet] = await db
+			.select()
+			.from(schema.gameWallet)
+			.where(eq(schema.gameWallet.id, gameWallet.id))
+			.limit(1);
+
+		return c.json(
+			{
+				success: true as const,
+				data: {
+					transactionId: reference,
+					amount,
+					gameWalletId: gameWallet.id,
+					normalWalletBalance: (updatedNormalWallet?.balance ?? 0) / 100,
+					gameWalletBalance: (updatedGameWallet?.balance ?? amount * 100) / 100,
+				},
+			},
+			200,
+		);
+	} catch (error) {
+		return c.json(
+			{
+				success: false as const,
+				error:
+					error instanceof Error
+						? error.message
+						: "Failed to transfer to game wallet",
 				details: null,
 			},
 			400,

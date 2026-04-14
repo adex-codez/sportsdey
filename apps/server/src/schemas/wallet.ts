@@ -1,16 +1,18 @@
 import { z } from "@hono/zod-openapi";
 
 export const FundWalletSchema = z.object({
-	amount: z.number().min(100).max(9_999_999).openapi({
+	amount: z.number().int().min(100).max(9_999_999).openapi({
 		description:
-			"Amount to fund wallet in Naira (minimum 100, maximum 9,999,999.00)",
+			"Amount to fund wallet in Naira (minimum 100, maximum 9,999,999.00) - must be a whole number",
 		example: 1000,
 	}),
 });
 
 export const WalletResponseSchema = z.object({
 	id: z.string().openapi({ description: "Wallet ID" }),
-	balance: z.number().openapi({ description: "Wallet balance in Naira" }),
+	balance: z.number().openapi({
+		description: "Wallet balance in Naira (stored as kobo internally)",
+	}),
 	createdAt: z.string().openapi({ description: "Creation timestamp" }),
 	updatedAt: z.string().openapi({ description: "Last update timestamp" }),
 });
@@ -18,7 +20,9 @@ export const WalletResponseSchema = z.object({
 export const TransactionResponseSchema = z.object({
 	id: z.string().openapi({ description: "Transaction ID" }),
 	userId: z.string().openapi({ description: "User ID" }),
-	amount: z.number().openapi({ description: "Transaction amount in Naira" }),
+	amount: z.number().openapi({
+		description: "Transaction amount in Naira (stored as kobo internally)",
+	}),
 	type: z.string().openapi({ description: "Transaction type (credit/debit)" }),
 	reference: z.string().openapi({ description: "Transaction reference" }),
 	status: z.string().openapi({ description: "Transaction status" }),
@@ -99,8 +103,9 @@ export const WebhookResponseSchema = z.object({
 });
 
 export const WithdrawSchema = z.object({
-	amount: z.number().min(100).openapi({
-		description: "Amount to withdraw in Naira (minimum 100)",
+	amount: z.number().int().min(100).openapi({
+		description:
+			"Amount to withdraw in Naira (minimum 100) - must be a whole number",
 		example: 1000,
 	}),
 	bankCode: z.string().openapi({
@@ -213,3 +218,78 @@ export type CreateWithdrawalAccount = z.infer<
 export type WithdrawalAccountResponse = z.infer<
 	typeof WithdrawalAccountResponseSchema
 >;
+
+export const TransferSchema = z.object({
+	recipientWalletId: z.string().openapi({
+		description: "Wallet ID of the recipient",
+		example: "0197a1b2c3d4e5f6",
+	}),
+	amount: z.number().int().min(100).openapi({
+		description: "Amount to transfer in Naira (minimum 100)",
+		example: 500,
+	}),
+});
+
+export const TransferErrorSchema = z.object({
+	success: z.literal(false),
+	error: z.string(),
+	details: z.null(),
+});
+
+export const TransferResponseSchema = z.object({
+	success: z.literal(true),
+	data: z.object({
+		transactionId: z.string().openapi({ description: "Transaction ID" }),
+		amount: z.number().openapi({ description: "Amount transferred" }),
+		recipientWalletId: z
+			.string()
+			.openapi({ description: "Recipient wallet ID" }),
+	}),
+});
+
+export const GameWalletResponseSchema = z.object({
+	id: z.string().openapi({ description: "Game wallet ID" }),
+	balance: z.number().openapi({ description: "Game wallet balance in Naira" }),
+	createdAt: z.string().openapi({ description: "Creation timestamp" }),
+	updatedAt: z.string().openapi({ description: "Last update timestamp" }),
+});
+
+export const GetGameWalletErrorSchema = z.object({
+	success: z.literal(false),
+	error: z.string(),
+	details: z.null(),
+});
+
+export const GetGameWalletResponseSchema = z.object({
+	success: z.literal(true),
+	data: GameWalletResponseSchema,
+});
+
+export const TransferToGameWalletSchema = z.object({
+	amount: z.number().int().min(100).openapi({
+		description:
+			"Amount to transfer in Naira (minimum 100) - must be a whole number",
+		example: 500,
+	}),
+});
+
+export const TransferToGameWalletErrorSchema = z.object({
+	success: z.literal(false),
+	error: z.string(),
+	details: z.null(),
+});
+
+export const TransferToGameWalletResponseSchema = z.object({
+	success: z.literal(true),
+	data: z.object({
+		transactionId: z.string().openapi({ description: "Transaction ID" }),
+		amount: z.number().openapi({ description: "Amount transferred" }),
+		gameWalletId: z.string().openapi({ description: "Game wallet ID" }),
+		normalWalletBalance: z.number().openapi({
+			description: "Remaining normal wallet balance",
+		}),
+		gameWalletBalance: z.number().openapi({
+			description: "New game wallet balance",
+		}),
+	}),
+});

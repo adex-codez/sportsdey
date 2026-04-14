@@ -3,6 +3,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { createAuth } from "./auth";
+import adminRoute from "./routes/admin";
 import routes from "./routes/route";
 import type { CloudflareBindings } from "./types";
 
@@ -15,19 +16,58 @@ app.openAPIRegistry.registerComponent("securitySchemes", "BearerAuth", {
 		"Enter the session token from /auth/sign-in/email or /auth/sign-in/oauth",
 });
 
+// app.use("*", async (c, next) => {
+// 	if (c.req.method === "OPTIONS") {
+// 		return c.text("", 204);
+// 	}
+// 	await next();
+// });
+
+app.use("*", async (c, next) => {
+	if (c.req.method === "OPTIONS") {
+		const origin = c.req.header("origin") || "";
+		const corsOrigin = c.env.CORS_ORIGIN || "https://sportsdey.com";
+		const allowedOrigins = new Set([
+			corsOrigin,
+			"http://localhost:3001",
+			"http://localhost:3002",
+			"http://localhost:8787",
+			"sportsdey-mobile://",
+			"exp://172.20.10.9:8081",
+			"https://admin.sportsdey.com",
+			"https://staging-admin.sportsdey.com",
+		]);
+
+		if (allowedOrigins.has(origin)) {
+			return c.text(null, 204, {
+				"Access-Control-Allow-Origin": origin,
+				"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+				"Access-Control-Allow-Headers": "Authorization, Content-Type",
+				"Access-Control-Allow-Credentials": "true",
+			});
+		}
+		return c.text(null, 204);
+	}
+	await next();
+});
+
 app.use(logger());
 app.use(
 	"/*",
 	cors({
 		origin: (origin, c) => {
-			console.log("CORS_ORIGIN", c.env.CORS_ORIGIN);
+			const corsOrigin = c.env.CORS_ORIGIN || "https://sportsdey.com";
+			console.log("CORS_ORIGIN", corsOrigin);
 			if (!origin) return "";
 			const allowedOrigins = new Set([
-				c.env.CORS_ORIGIN,
+				corsOrigin,
 				"http://localhost:3001",
+				"http://localhost:3002",
 				"http://localhost:8787",
 				"sportsdey-mobile://",
 				"exp://172.20.10.9:8081",
+				"https://admin.sportsdey.com",
+				"https://staging-admin.sportsdey.com",
 			]);
 			return allowedOrigins.has(origin) ? origin : "";
 		},
@@ -38,17 +78,29 @@ app.use(
 );
 
 app.on(["GET", "POST"], "/auth/*", async (c) => {
+	const path = c.req.path;
+	console.log(
+		Object.fromEntries(
+			[...c.req.raw.headers.entries()].filter(([k]) =>
+				["authorization", "content-type", "origin", "accept"].includes(
+					k.toLowerCase(),
+				),
+			),
+		),
+	);
 	const auth = createAuth(c.env);
 	return auth.handler(c.req.raw);
 });
 
 app.use("*", async (c, next) => {
+	console.log("Request to:", c.req.path);
 	const path = c.req.path;
 	if (
 		path.startsWith("/auth/") ||
 		path.startsWith("/docs") ||
 		path.startsWith("/openapi") ||
-		path.startsWith("/api/account/")
+		path.startsWith("/api/account/") ||
+		path.startsWith("/admin")
 	) {
 		return next();
 	}
@@ -60,11 +112,11 @@ app.use("*", async (c, next) => {
 	const user = sessionResult?.user ?? null;
 	c.set("session", session);
 	c.set("user", user);
-
 	await next();
 });
 
 app.route("/", routes);
+app.route("/admin", adminRoute);
 
 app.get("/docs", swaggerUI({ url: "/openapi.json" }));
 app.doc("/openapi.json", {

@@ -7,7 +7,7 @@ import { ErrorState } from "@/components/ErrorState";
 import { useApiError } from "@/hooks/useApiError";
 import { apiRequest } from "@/lib/api";
 import DetailsImageCard from "@/shared/DetailsImageCard";
-import type { TennisMatchDetailsData } from "@/types/api";
+import type { TennisMatchInfoData } from "@/types/api";
 import { getTimeUntilStart, safeParseDate } from "@/utils/timeUtils";
 import TennisInfo from "./TennisInfo";
 
@@ -19,16 +19,15 @@ const TennisDetailsPage = () => {
 
 	const { data, isLoading, error, isError, refetch } = useQuery({
 		queryKey: ["tennis", "match", Id],
-		queryFn: () =>
-			apiRequest<TennisMatchDetailsData>(`tennis/game/${Id}?language=en`),
+		queryFn: () => apiRequest<TennisMatchInfoData>(`tennis/game/${Id}`),
 	});
 
 	const { isNetworkError } = useApiError({ error, isError, refetch });
 
 	useEffect(() => {
-		if (data?.match.status === "not_started" && data.match.start_time) {
+		if (data?.status === "scheduled" && data.start_time) {
 			const updateCountdown = () => {
-				setCountdown(getTimeUntilStart(data.match.start_time));
+				setCountdown(getTimeUntilStart(data.start_time));
 			};
 
 			updateCountdown();
@@ -47,7 +46,7 @@ const TennisDetailsPage = () => {
 	const renderTabContent = () => {
 		switch (activeTab) {
 			case "info":
-				return <TennisInfo matchData={data?.match} />;
+				return <TennisInfo matchData={data} />;
 
 			case "videos":
 				return (
@@ -139,29 +138,25 @@ const TennisDetailsPage = () => {
 		);
 	}
 
-	const match = data.match;
+	const match = data;
 
-	const homeSetsWon = match.home_team.set_scores.filter(
-		(set, idx) =>
-			set.games_won > (match.away_team.set_scores[idx]?.games_won || 0),
+	const homeSetsWon = match.home.set_scores.filter(
+		(set, idx) => set.games_won > (match.away.set_scores[idx]?.games_won || 0),
 	).length;
 
-	const awaySetsWon = match.away_team.set_scores.filter(
-		(set, idx) =>
-			set.games_won > (match.home_team.set_scores[idx]?.games_won || 0),
+	const awaySetsWon = match.away.set_scores.filter(
+		(set, idx) => set.games_won > (match.home.set_scores[idx]?.games_won || 0),
 	).length;
 
 	let matchStatus: "live" | "finished" | "upcoming" = "upcoming";
-	if (match.status === "live") {
+	if (match.status === "inprogress") {
 		matchStatus = "live";
-	} else if (match.status === "closed" || match.status === "ended") {
+	} else if (match.status === "closed") {
 		matchStatus = "finished";
 	}
 
-	const competitionCountry =
-		search.country || match.venue?.country || "International";
-	const competitionName =
-		match.competition?.name || match.venue?.name || "Tennis Match";
+	const competitionCountry = search.country || "International";
+	const competitionName = match.competition?.name || "Tennis Match";
 
 	return (
 		<div className="space-y-3 pb-28 lg:pb-10">
@@ -172,21 +167,21 @@ const TennisDetailsPage = () => {
 					setActiveTab={setActiveTab}
 					competitionCountry={competitionCountry}
 					competitionName={competitionName}
-					hostTeamName={match.home_team.competitor.name}
+					hostTeamName={match.home.name}
 					hostTeamLogo="/Profile.png"
 					matchStatus={
 						matchStatus === "upcoming" && match.start_time
 							? format(new Date(match.start_time), "yyyy-MM-dd HH:mm")
 							: match.status === "closed"
 								? "Finished"
-								: match.status === "interrupted"
-									? "Interrupted"
+								: match.status === "inprogress"
+									? "Live"
 									: match.status
 					}
 					hostTeamScore={homeSetsWon}
 					guestTeamScore={awaySetsWon}
 					guestTeamLogo="/Profile.png"
-					guestTeamName={match.away_team.competitor.name}
+					guestTeamName={match.away.name}
 					isUpcoming={matchStatus === "upcoming"}
 					countdownText={countdown}
 					scheduledDate={

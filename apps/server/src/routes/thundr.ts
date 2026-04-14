@@ -34,6 +34,7 @@ async function verifyThundrSignature(
 	const serverSecret = (c as any).env?.THNDR_SERVER_SECRET;
 
 	if (!receivedSignature || !serverSecret) {
+		console.log("server secret");
 		return false;
 	}
 
@@ -47,7 +48,7 @@ async function verifyThundrSignature(
 }
 
 const playGameRoute = createRoute({
-	method: "get",
+	method: "post",
 	path: "/play/{gameId}",
 	tags: ["Thundr Casino"],
 	summary: "Launch a Thundr casino game",
@@ -108,7 +109,7 @@ thundrRoute.openapi(playGameRoute, async (c) => {
 
 	const db = drizzle(c.env.DB, { schema });
 
-	const sessionId = `thndr_${user.id}_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+	const sessionId = crypto.randomUUID();
 
 	await db.insert(schema.thundrSessions).values({
 		sessionId,
@@ -208,15 +209,15 @@ thundrRoute.openapi(validateSessionRoute, async (c) => {
 		);
 	}
 
-	const oneHourAgo = Date.now() - 60 * 60 * 1000;
-	if (session.createdAt.getTime() < oneHourAgo) {
-		return c.json(
-			ThundrSessionErrorResponseSchema.parse({
-				errors: [{ code: "SESSION_EXPIRED", isClientSafe: true }],
-			}),
-			403,
-		);
-	}
+	// const oneHourAgo = Date.now() - 60 * 60 * 1000;
+	// if (session.createdAt.getTime() < oneHourAgo) {
+	// 	return c.json(
+	// 		ThundrSessionErrorResponseSchema.parse({
+	// 			errors: [{ code: "SESSION_EXPIRED", isClientSafe: true }],
+	// 		}),
+	// 		403,
+	// 	);
+	// }
 
 	const user = await db.query.user.findFirst({
 		where: eq(schema.user.id, session.userId),
@@ -242,53 +243,8 @@ thundrRoute.openapi(validateSessionRoute, async (c) => {
 	);
 });
 
-const transactionRoute = createRoute({
-	method: "post",
-	path: "/transactions",
-	tags: ["Thundr Casino"],
-	summary: "Process Thundr transaction",
-	description:
-		"Handle BET, WIN, LOSE, DRAW, and ROLLBACK transactions from Thundr",
-	security: [],
-	request: {
-		body: {
-			content: {
-				"application/json": {
-					schema: ThundrTransactionRequestSchema,
-				},
-			},
-		},
-	},
-	responses: {
-		200: {
-			description: "Transaction processed successfully",
-			content: {
-				"application/json": {
-					schema: ThundrTransactionResponseSchema,
-				},
-			},
-		},
-		400: {
-			description: "Invalid request",
-			content: {
-				"application/json": {
-					schema: ThundrErrorSchema,
-				},
-			},
-		},
-		403: {
-			description: "Insufficient balance or session expired",
-			content: {
-				"application/json": {
-					schema: ThundrTransactionErrorResponseSchema,
-				},
-			},
-		},
-	},
-});
-
-thundrRoute.openapi(transactionRoute, async (c) => {
-	const rawBody = await c.req.raw.text();
+thundrRoute.post("/transactions", async (c) => {
+	const rawBody = await c.req.text();
 
 	const isValid = await verifyThundrSignature(c, rawBody);
 	if (!isValid) {
@@ -315,13 +271,12 @@ thundrRoute.openapi(transactionRoute, async (c) => {
 	}
 
 	const { data: tx } = result;
-	const oneHourAgo = Date.now() - 60 * 60 * 1000;
 
 	const session = await db.query.thundrSessions.findFirst({
 		where: eq(schema.thundrSessions.sessionId, tx.sessionId),
 	});
 
-	if (!session || session.createdAt.getTime() < oneHourAgo) {
+	if (!session) {
 		return c.json(
 			ThundrSessionErrorResponseSchema.parse({
 				errors: [{ code: "SESSION_EXPIRED", isClientSafe: true }],
@@ -340,7 +295,7 @@ thundrRoute.openapi(transactionRoute, async (c) => {
 				transactionId: existingTx.transactionId,
 				userId: existingTx.userId,
 				currency: "NGN",
-				amount: existingTx.amount,
+				amount: existingTx.amount * 100,
 				type: existingTx.type as "BET" | "WIN" | "LOSE" | "DRAW" | "ROLLBACK",
 			}),
 			200,
@@ -355,12 +310,12 @@ thundrRoute.openapi(transactionRoute, async (c) => {
 		.where(eq(schema.wallet.userId, session.userId))
 		.limit(1);
 
-	const currentBalance = wallet?.balance ?? 0;
-	let newBalance = currentBalance;
-	let txAmount = 0;
+	const currentBalanceKobo = wallet?.balance ?? 0;
+	let newBalanceKobo = currentBalanceKobo;
+	let txAmountKobo = 0;
 
 	if (tx.type === "BET") {
-		if (currentBalance < tx.amount) {
+		if (currentBalanceKobo < tx.amount) {
 			return c.json(
 				ThundrInsufficientBalanceErrorSchema.parse({
 					errors: [{ code: "INSUFFICIENT_BALANCE", isClientSafe: true }],
@@ -368,18 +323,18 @@ thundrRoute.openapi(transactionRoute, async (c) => {
 				403,
 			);
 		}
-		newBalance = currentBalance - tx.amount;
-		txAmount = tx.amount;
+		txAmountKobo = tx.amount;
+		newBalanceKobo = currentBalanceKobo - txAmountKobo;
 		await db
 			.update(schema.wallet)
-			.set({ balance: newBalance })
+			.set({ balance: newBalanceKobo })
 			.where(eq(schema.wallet.userId, session.userId));
 	} else if (tx.type === "WIN" || tx.type === "DRAW") {
-		newBalance = currentBalance + tx.amount;
-		txAmount = tx.amount;
+		txAmountKobo = tx.amount;
+		newBalanceKobo = currentBalanceKobo + txAmountKobo;
 		await db
 			.update(schema.wallet)
-			.set({ balance: newBalance })
+			.set({ balance: newBalanceKobo })
 			.where(eq(schema.wallet.userId, session.userId));
 	} else if (tx.type === "ROLLBACK") {
 		const [originalTx] = await db
@@ -391,11 +346,11 @@ thundrRoute.openapi(transactionRoute, async (c) => {
 			.limit(1);
 
 		if (originalTx && originalTx.type === "BET") {
-			newBalance = currentBalance + originalTx.amount;
-			txAmount = originalTx.amount;
+			txAmountKobo = Math.round(originalTx.amount * 100);
+			newBalanceKobo = currentBalanceKobo + txAmountKobo;
 			await db
 				.update(schema.wallet)
-				.set({ balance: newBalance })
+				.set({ balance: newBalanceKobo })
 				.where(eq(schema.wallet.userId, session.userId));
 		}
 	}
@@ -405,7 +360,7 @@ thundrRoute.openapi(transactionRoute, async (c) => {
 		transactionId: tx.transactionId,
 		userId: session.userId,
 		type: tx.type,
-		amount: txAmount,
+		amount: txAmountKobo / 100,
 		roundId: tx.roundId,
 		gameId: tx.gameId,
 		sessionId: tx.sessionId,
@@ -418,7 +373,7 @@ thundrRoute.openapi(transactionRoute, async (c) => {
 			transactionId: tx.transactionId,
 			userId: session.userId,
 			currency: "NGN",
-			amount: txAmount,
+			amount: txAmountKobo,
 			type: tx.type,
 		}),
 		200,
@@ -476,8 +431,7 @@ thundrRoute.openapi(getBalanceRoute, async (c) => {
 		where: eq(schema.thundrSessions.sessionId, sessionId),
 	});
 
-	const oneHourAgo = Date.now() - 60 * 60 * 1000;
-	if (!session || session.createdAt.getTime() < oneHourAgo) {
+	if (!session) {
 		return c.json(
 			ThundrSessionErrorResponseSchema.parse({
 				errors: [{ code: "SESSION_EXPIRED", isClientSafe: true }],

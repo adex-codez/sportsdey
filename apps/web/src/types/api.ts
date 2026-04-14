@@ -152,20 +152,15 @@ export interface BasketballGameStats {
 }
 
 // Tennis API Types
-export interface TennisCompetitor {
-	id: string;
-	name: string;
-	qualifier: "home" | "away";
-}
-
 export interface TennisSetScore {
 	set_number: number;
 	games_won: number;
 	tiebreak_score?: number;
 }
 
-export interface TennisTeam {
-	competitor: TennisCompetitor;
+export interface TennisPlayer {
+	id: string;
+	name: string;
 	set_scores: TennisSetScore[];
 }
 
@@ -173,8 +168,8 @@ export interface TennisMatch {
 	id: string;
 	start_time: string;
 	status: string;
-	home_team: TennisTeam;
-	away_team: TennisTeam;
+	home: TennisPlayer;
+	away: TennisPlayer;
 	winner_id?: string;
 }
 
@@ -182,9 +177,8 @@ export interface TennisCompetitionInfo {
 	id: string;
 	name: string;
 	parent_id?: string;
-	type: "singles" | "doubles" | "mixed";
-	gender: "men" | "women";
-	level?: string;
+	type?: string;
+	gender?: string;
 }
 
 export interface TennisCompetition {
@@ -198,29 +192,18 @@ export interface TennisScheduleData {
 	competitions: TennisCompetition[];
 }
 
-export interface TennisMatchDetails {
+export interface TennisMatchInfoData {
 	id: string;
 	start_time: string;
 	status: string;
-	venue: {
-		name: string;
-		country?: string;
-		country_code?: string;
-		city?: string;
-	};
-	competition?: {
+	home: TennisPlayer;
+	away: TennisPlayer;
+	winner_id?: string;
+	competition: {
 		id: string;
 		name: string;
 		type?: string;
-		gender?: string;
 	};
-	home_team: TennisTeam;
-	away_team: TennisTeam;
-	winner_id?: string;
-}
-
-export interface TennisMatchDetailsData {
-	match: TennisMatchDetails;
 }
 
 export interface BasketballVideo {

@@ -5,12 +5,13 @@ import { ErrorState } from "@/components/ErrorState";
 import { useApiError } from "@/hooks/useApiError";
 import { apiRequest } from "@/lib/api";
 import { getCountryFromCompetition } from "@/lib/countryUtils";
-import SportAccordionCard from "@/shared/BasketballAccordionComponentCard";
+import SportAccordionCard from "@/shared/SportAccordionCard";
 import TennisFixtureFilterHeaders from "@/shared/TennisFixtureFilterHeaders";
 import type { RootState } from "@/store";
 import { useAppSelector } from "@/store/hook";
 import type { TennisScheduleData } from "@/types/api";
 import type { League } from "@/types/basketball";
+import type { MatchCardProps, SetScore } from "@/types/sport";
 import { EmptyState } from "../EmptyState";
 
 const formatDate = (date: Date) => {
@@ -54,21 +55,13 @@ const TennisPage = () => {
 			(comp) => comp.matches,
 		);
 
-		const isLive = (status: string) => {
-			const lowerStatus = status.toLowerCase();
+		const isLive = (status: string) => status === "inprogress";
 
-			return lowerStatus === "live";
-		};
+		const isFinished = (status: string) =>
+			["closed", "ended", "interrupted"].includes(status);
 
-		const isFinished = (status: string) => {
-			const lowerStatus = status.toLowerCase();
-			return ["closed", "ended", "interrupted"].includes(lowerStatus);
-		};
-
-		const isUpcoming = (status: string) => {
-			const lowerStatus = status.toLowerCase();
-			return ["scheduled", "ns", "not_started"].includes(lowerStatus);
-		};
+		const isUpcoming = (status: string) =>
+			["scheduled", "ns", "not_started"].includes(status);
 
 		return {
 			all: allMatches.length,
@@ -79,15 +72,13 @@ const TennisPage = () => {
 	}, [scheduleData]);
 
 	const matchesFilter = (status: string) => {
-		const lowerStatus = status.toLowerCase();
-
 		switch (activeFilter) {
 			case "live":
-				return lowerStatus === "live";
+				return status === "inprogress";
 			case "finished":
-				return ["closed", "ended", "interrupted"].includes(lowerStatus);
+				return ["closed", "ended", "interrupted"].includes(status);
 			case "upcoming":
-				return ["scheduled", "ns", "not_started"].includes(lowerStatus);
+				return ["scheduled", "ns", "not_started"].includes(status);
 			case "all":
 			default:
 				return true;
@@ -108,7 +99,7 @@ const TennisPage = () => {
 					flag: flag,
 					matches: comp.matches
 						.filter((match) => matchesFilter(match.status))
-						.map((match) => {
+						.map((match): MatchCardProps => {
 							const formatTime = (dateStr: string) => {
 								try {
 									return new Date(dateStr).toLocaleTimeString("en-US", {
@@ -121,50 +112,40 @@ const TennisPage = () => {
 								}
 							};
 
+							const formatSetScores = (
+								scores: {
+									set_number: number;
+									games_won: number;
+									tiebreak_score?: number;
+								}[],
+							): SetScore[] =>
+								scores.map((set) => ({
+									games: set.games_won,
+									tiebreak: set.tiebreak_score,
+								}));
+
 							let displayStatus: string | undefined;
 							let displayTime: string | undefined;
 
-							if (
-								match.status === "not_started" ||
-								match.status === "scheduled" ||
-								match.status === "ns"
-							) {
+							if (match.status === "scheduled") {
 								displayTime = formatTime(match.start_time);
 								displayStatus = undefined;
-							} else if (match.status === "cancelled") {
-								displayStatus = "Cancelled";
-								displayTime = undefined;
-							} else if (
-								match.status === "closed" ||
-								match.status === "ended"
-							) {
+							} else if (match.status === "closed") {
 								displayStatus = "FT";
 								displayTime = undefined;
-							} else if (match.status === "interrupted") {
-								displayStatus = "INT";
-								displayTime = undefined;
-							} else if (match.status === "live") {
+							} else if (match.status === "inprogress") {
 								displayStatus = "Live";
-								displayTime = undefined;
-							} else {
-								displayStatus = match.status;
 								displayTime = undefined;
 							}
 
 							return {
-								id: match.id,
-								team1: match.home_team.competitor.name,
-								team2: match.away_team.competitor.name,
-								player1Sets: match.home_team.set_scores.map((set) => ({
-									games: set.games_won,
-									tiebreak: set.tiebreak_score,
-								})),
-								player2Sets: match.away_team.set_scores.map((set) => ({
-									games: set.games_won,
-									tiebreak: set.tiebreak_score,
-								})),
+								team1: match.home.name,
+								team2: match.away.name,
+								player1Sets: formatSetScores(match.home.set_scores),
+								player2Sets: formatSetScores(match.away.set_scores),
 								status: displayStatus,
 								time: displayTime,
+								id: match.id,
 							};
 						}),
 				};
@@ -223,11 +204,16 @@ const TennisPage = () => {
 				tennisLeagues.map((league) => (
 					<SportAccordionCard
 						key={league.id}
+						sport="tennis"
 						country={league.country}
 						league={league.leagueName}
 						flag={league.flag}
 						matches={league.matches}
 						imageUrl={league.imageUrl}
+						detailRoute="/tennis/$Id"
+						tournamentRoute="/tennis/tournament/$tournamentId"
+						tournamentId={league.id}
+						showTournamentLink={true}
 					/>
 				))
 			)}

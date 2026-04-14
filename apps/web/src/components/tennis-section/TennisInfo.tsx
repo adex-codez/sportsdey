@@ -1,9 +1,9 @@
-import type { TennisMatchDetails } from "@/types/api";
+import type { TennisMatchInfoData } from "@/types/api";
 import VenueGuide from "../basketball-section/VenueGuide";
 import TennisScoreTable from "./TennisScoreTable";
 
 interface TennisInfoProps {
-	matchData?: TennisMatchDetails;
+	matchData?: TennisMatchInfoData;
 }
 
 const TennisInfo = ({ matchData }: TennisInfoProps) => {
@@ -17,14 +17,14 @@ const TennisInfo = ({ matchData }: TennisInfoProps) => {
 
 	const players = [
 		{
-			name: matchData.home_team.competitor.name,
-			periodScores: matchData.home_team.set_scores.map((s) => s.games_won),
+			name: matchData.home.name,
+			periodScores: matchData.home.set_scores.map((s) => s.games_won),
 			pts: "",
 			s: "",
 		},
 		{
-			name: matchData.away_team.competitor.name,
-			periodScores: matchData.away_team.set_scores.map((s) => s.games_won),
+			name: matchData.away.name,
+			periodScores: matchData.away.set_scores.map((s) => s.games_won),
 			pts: "",
 			s: "",
 		},
@@ -36,7 +36,7 @@ const TennisInfo = ({ matchData }: TennisInfoProps) => {
 				<TennisScoreTable players={players} />
 			</div>
 			<div className="w-full">
-				<VenueGuide venueName={matchData.venue?.name || "Tennis Court"} />
+				<VenueGuide venueName="Tennis Court" />
 			</div>
 		</div>
 	);

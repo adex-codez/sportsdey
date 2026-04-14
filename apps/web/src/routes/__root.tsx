@@ -82,12 +82,14 @@ function RootDocument() {
 		"/tennis",
 		"/tennis/",
 		"/tennis/$Id",
+		"/tennis/tournament/$tournamentId",
 		"/news",
 		"/news/",
 		"/news/$slug",
 		"/news/$slug/og",
 		"/betting",
 		"/games",
+		"/game/$gameId",
 	]);
 	const shouldShowSidebar = sidebarAllowedRouteIds.has(activeRouteId);
 
@@ -154,7 +156,7 @@ function RootDocument() {
 													)}
 												>
 													{shouldShowSidebar && (
-														<aside className="no-scrollbar hidden h-full overflow-y-auto pr-4 lg:block">
+														<aside className="no-scrollbar hidden pr-4 lg:block lg:self-start lg:pb-6">
 															<Sidebar />
 														</aside>
 													)}
@@ -185,6 +187,7 @@ function RootDocument() {
 					key="tawk-script"
 					dangerouslySetInnerHTML={{
 						__html: `
+window.addEventListener('load', function() {
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 (function(){
 var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
@@ -194,6 +197,7 @@ s1.charset='UTF-8';
 s1.setAttribute('crossorigin','*');
 s0.parentNode.insertBefore(s1,s0);
 })();
+});
 `,
 					}}
 				/>

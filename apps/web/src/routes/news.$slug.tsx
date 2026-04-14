@@ -1,20 +1,33 @@
 import { PortableText } from "@portabletext/react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import BannerCarousel from "@/components/BannerCarousel";
 import type { BannerData } from "@/lib/banners-server";
 import { getBanners } from "@/lib/banners-server";
-import { getNewsBySlug } from "@/lib/news-server";
+import {
+	addCommentToNews,
+	getCommentsForNews,
+	getNewsBySlug,
+} from "@/lib/news-server";
 import { urlFor } from "@/lib/sanity";
 import { formatRelativeTime } from "@/lib/utils";
 import { ShareButton } from "@/components/ShareButton";
+import { useSession } from "@/lib/auth/client";
 
 interface NewsAuthor {
 	_id: string;
 	name: string;
 	slug: { current: string };
 	image: any;
+}
+
+interface NewsComment {
+	_id: string;
+	name: string;
+	message: string;
+	createdAt: string;
 }
 
 interface NewsItem {
@@ -43,7 +56,10 @@ export const Route = createFileRoute("/news/$slug")({
 			getNewsBySlug({ data: params.slug }),
 			getBanners(),
 		]);
-		return { news, banners };
+		const comments = news?._id
+			? await getCommentsForNews({ data: news._id })
+			: [];
+		return { news, banners, comments };
 	},
 	head: ({ loaderData }) => {
 		const siteUrl = import.meta.env.VITE_PUBLIC_URL || "http://localhost:3001";
@@ -104,10 +120,46 @@ export const Route = createFileRoute("/news/$slug")({
 });
 
 function RouteComponent() {
-	const { news, banners } = Route.useLoaderData() as {
+	const { news, banners, comments: initialComments } = Route.useLoaderData() as {
 		news: NewsItem | null;
 		banners: BannerData[];
+		comments: NewsComment[];
 	};
+	const navigate = useNavigate();
+	const { data: session } = useSession();
+	const newsId = news?._id ?? "";
+	const [comments, setComments] = useState<NewsComment[]>(initialComments || []);
+	const [commentText, setCommentText] = useState("");
+	const [commentError, setCommentError] = useState("");
+	const userProfile = useMemo(
+		() => ({
+			id: session?.user?.id ?? "",
+			name: session?.user?.name ?? session?.user?.email ?? "SportsDey user",
+			email: session?.user?.email ?? null,
+		}),
+		[session],
+	);
+	const commentMutation = useMutation({
+		mutationFn: async (message: string) =>
+			addCommentToNews({
+				data: {
+					newsId,
+					message,
+					user: userProfile,
+				},
+			}),
+		onSuccess: (newComment) => {
+			setComments((prev) => [newComment as NewsComment, ...prev]);
+			setCommentText("");
+			setCommentError("");
+		},
+		onError: (err: unknown) => {
+			setCommentError(
+				err instanceof Error ? err.message : "Unable to add comment right now.",
+			);
+		},
+		// keep name for UI? no
+	});
 	useEffect(() => {
 		// console.log(news);
 	}, []);
@@ -197,6 +249,120 @@ function RouteComponent() {
 					}}
 				/>
 			</div>
+			<section className="mt-10 space-y-4 rounded-xl border border-gray-200 p-4 dark:border-white/10">
+				<div className="flex items-center justify-between">
+					<h2 className="font-semibold text-lg text-gray-900 dark:text-white">
+						Comments
+					</h2>
+					<span className="text-sm text-gray-500">
+						{comments.length} {comments.length === 1 ? "comment" : "comments"}
+					</span>
+				</div>
+
+				<form
+					className="space-y-3"
+					onSubmit={(event) => {
+						event.preventDefault();
+						if (!session?.user) {
+							navigate({ to: "/auth/sign-in" });
+							return;
+						}
+						if (!newsId) {
+							setCommentError("Unable to find this news article.");
+							return;
+						}
+						const trimmed = commentText.trim();
+						if (!trimmed) {
+							setCommentError("Please write a comment before submitting.");
+							return;
+						}
+						commentMutation.mutate(trimmed);
+					}}
+				>
+					{session?.user ? (
+						<div className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-200">
+							<div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
+								{(session.user.name || session.user.email || "U")
+									.slice(0, 2)
+									.toUpperCase()}
+							</div>
+							<div>
+								<p className="font-medium leading-none">
+									{session.user.name || "SportsDey user"}
+								</p>
+								<p className="text-xs text-gray-500">{session.user.email}</p>
+							</div>
+						</div>
+					) : (
+						<div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+							<span>You need to be signed in to comment.</span>
+							<button
+								type="button"
+								onClick={() => navigate({ to: "/auth/sign-in" })}
+								className="text-primary underline"
+							>
+								Sign in
+							</button>
+						</div>
+					)}
+
+					<label className="flex flex-col gap-2">
+						<span className="text-sm font-medium text-gray-800 dark:text-white">
+							Add your comment
+						</span>
+						<textarea
+							className="min-h-[120px] w-full rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm outline-none transition focus:border-primary focus:bg-white dark:border-white/10 dark:bg-[#1e1f23] dark:text-white"
+							placeholder={
+								session?.user
+									? "Share your thoughts..."
+									: "Sign in to leave a comment."
+							}
+							value={commentText}
+							onChange={(event) => setCommentText(event.target.value)}
+							disabled={!session?.user || commentMutation.isPending}
+						/>
+					</label>
+					{commentError && (
+						<p className="text-sm text-red-500">{commentError}</p>
+					)}
+					<div className="flex justify-end">
+						<button
+							type="submit"
+							disabled={!session?.user || commentMutation.isPending}
+							className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition enabled:hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+						>
+							{commentMutation.isPending ? "Posting..." : "Post comment"}
+						</button>
+					</div>
+				</form>
+
+				<div className="divide-y divide-gray-200 dark:divide-white/10">
+					{comments.length === 0 ? (
+						<p className="py-4 text-sm text-gray-600 dark:text-gray-300">
+							No comments yet. Be the first to share your thoughts.
+						</p>
+					) : (
+						comments.map((comment) => (
+							<div key={comment._id} className="space-y-1 py-4">
+								<div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+									<div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
+										{comment.name.slice(0, 2).toUpperCase()}
+									</div>
+									<div>
+										<p className="font-medium leading-none">{comment.name}</p>
+										<p className="text-xs text-gray-500">
+											{formatRelativeTime(comment.createdAt)}
+										</p>
+									</div>
+								</div>
+								<p className="text-sm leading-relaxed text-gray-800 dark:text-gray-100">
+									{comment.message}
+								</p>
+							</div>
+						))
+					)}
+				</div>
+			</section>
 		</div>
 	);
 }

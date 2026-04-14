@@ -25,11 +25,13 @@ import { Route as BasketballIndexRouteImport } from './routes/basketball.index'
 import { Route as TennisIdRouteImport } from './routes/tennis/$Id'
 import { Route as NewsSlugRouteImport } from './routes/news.$slug'
 import { Route as IndexGameIdRouteImport } from './routes/index.$gameId'
+import { Route as GameGameIdRouteImport } from './routes/game.$gameId'
 import { Route as BasketballIdRouteImport } from './routes/basketball/$Id'
 import { Route as AuthorsSlugRouteImport } from './routes/authors.$slug'
 import { Route as AuthSignUpRouteImport } from './routes/auth/sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth/sign-in'
 import { Route as AuthLayoutRouteImport } from './routes/auth/_layout'
+import { Route as TennisTournamentTournamentIdRouteImport } from './routes/tennis.tournament.$tournamentId'
 import { Route as NewsSlugOgRouteImport } from './routes/news.$slug.og'
 import { Route as IndexTournamentTournamentIdRouteImport } from './routes/index.tournament.$tournamentId'
 import { Route as BasketballTournamentTournamentIdRouteImport } from './routes/basketball.tournament.$tournamentId'
@@ -114,6 +116,11 @@ const IndexGameIdRoute = IndexGameIdRouteImport.update({
   path: '/index/$gameId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GameGameIdRoute = GameGameIdRouteImport.update({
+  id: '/game/$gameId',
+  path: '/game/$gameId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BasketballIdRoute = BasketballIdRouteImport.update({
   id: '/$Id',
   path: '/$Id',
@@ -139,6 +146,12 @@ const AuthLayoutRoute = AuthLayoutRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TennisTournamentTournamentIdRoute =
+  TennisTournamentTournamentIdRouteImport.update({
+    id: '/tournament/$tournamentId',
+    path: '/tournament/$tournamentId',
+    getParentRoute: () => TennisRoute,
+  } as any)
 const NewsSlugOgRoute = NewsSlugOgRouteImport.update({
   id: '/og',
   path: '/og',
@@ -173,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/authors/$slug': typeof AuthorsSlugRoute
   '/basketball/$Id': typeof BasketballIdRoute
+  '/game/$gameId': typeof GameGameIdRoute
   '/index/$gameId': typeof IndexGameIdRoute
   '/news/$slug': typeof NewsSlugRouteWithChildren
   '/tennis/$Id': typeof TennisIdRoute
@@ -182,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/basketball/tournament/$tournamentId': typeof BasketballTournamentTournamentIdRoute
   '/index/tournament/$tournamentId': typeof IndexTournamentTournamentIdRoute
   '/news/$slug/og': typeof NewsSlugOgRoute
+  '/tennis/tournament/$tournamentId': typeof TennisTournamentTournamentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -196,6 +211,7 @@ export interface FileRoutesByTo {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/authors/$slug': typeof AuthorsSlugRoute
   '/basketball/$Id': typeof BasketballIdRoute
+  '/game/$gameId': typeof GameGameIdRoute
   '/index/$gameId': typeof IndexGameIdRoute
   '/news/$slug': typeof NewsSlugRouteWithChildren
   '/tennis/$Id': typeof TennisIdRoute
@@ -205,6 +221,7 @@ export interface FileRoutesByTo {
   '/basketball/tournament/$tournamentId': typeof BasketballTournamentTournamentIdRoute
   '/index/tournament/$tournamentId': typeof IndexTournamentTournamentIdRoute
   '/news/$slug/og': typeof NewsSlugOgRoute
+  '/tennis/tournament/$tournamentId': typeof TennisTournamentTournamentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -223,6 +240,7 @@ export interface FileRoutesById {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/authors/$slug': typeof AuthorsSlugRoute
   '/basketball/$Id': typeof BasketballIdRoute
+  '/game/$gameId': typeof GameGameIdRoute
   '/index/$gameId': typeof IndexGameIdRoute
   '/news/$slug': typeof NewsSlugRouteWithChildren
   '/tennis/$Id': typeof TennisIdRoute
@@ -232,6 +250,7 @@ export interface FileRoutesById {
   '/basketball/tournament/$tournamentId': typeof BasketballTournamentTournamentIdRoute
   '/index/tournament/$tournamentId': typeof IndexTournamentTournamentIdRoute
   '/news/$slug/og': typeof NewsSlugOgRoute
+  '/tennis/tournament/$tournamentId': typeof TennisTournamentTournamentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -251,6 +270,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/authors/$slug'
     | '/basketball/$Id'
+    | '/game/$gameId'
     | '/index/$gameId'
     | '/news/$slug'
     | '/tennis/$Id'
@@ -260,6 +280,7 @@ export interface FileRouteTypes {
     | '/basketball/tournament/$tournamentId'
     | '/index/tournament/$tournamentId'
     | '/news/$slug/og'
+    | '/tennis/tournament/$tournamentId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -274,6 +295,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/authors/$slug'
     | '/basketball/$Id'
+    | '/game/$gameId'
     | '/index/$gameId'
     | '/news/$slug'
     | '/tennis/$Id'
@@ -283,6 +305,7 @@ export interface FileRouteTypes {
     | '/basketball/tournament/$tournamentId'
     | '/index/tournament/$tournamentId'
     | '/news/$slug/og'
+    | '/tennis/tournament/$tournamentId'
   id:
     | '__root__'
     | '/'
@@ -300,6 +323,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/authors/$slug'
     | '/basketball/$Id'
+    | '/game/$gameId'
     | '/index/$gameId'
     | '/news/$slug'
     | '/tennis/$Id'
@@ -309,6 +333,7 @@ export interface FileRouteTypes {
     | '/basketball/tournament/$tournamentId'
     | '/index/tournament/$tournamentId'
     | '/news/$slug/og'
+    | '/tennis/tournament/$tournamentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -326,6 +351,7 @@ export interface RootRouteChildren {
   AuthSignInRoute: typeof AuthSignInRoute
   AuthSignUpRoute: typeof AuthSignUpRoute
   AuthorsSlugRoute: typeof AuthorsSlugRoute
+  GameGameIdRoute: typeof GameGameIdRoute
   IndexGameIdRoute: typeof IndexGameIdRoute
   IndexTournamentTournamentIdRoute: typeof IndexTournamentTournamentIdRoute
 }
@@ -444,6 +470,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexGameIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/game/$gameId': {
+      id: '/game/$gameId'
+      path: '/game/$gameId'
+      fullPath: '/game/$gameId'
+      preLoaderRoute: typeof GameGameIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/basketball/$Id': {
       id: '/basketball/$Id'
       path: '/$Id'
@@ -478,6 +511,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthLayoutRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/tennis/tournament/$tournamentId': {
+      id: '/tennis/tournament/$tournamentId'
+      path: '/tournament/$tournamentId'
+      fullPath: '/tennis/tournament/$tournamentId'
+      preLoaderRoute: typeof TennisTournamentTournamentIdRouteImport
+      parentRoute: typeof TennisRoute
     }
     '/news/$slug/og': {
       id: '/news/$slug/og'
@@ -546,11 +586,13 @@ const NewsRouteWithChildren = NewsRoute._addFileChildren(NewsRouteChildren)
 interface TennisRouteChildren {
   TennisIdRoute: typeof TennisIdRoute
   TennisIndexRoute: typeof TennisIndexRoute
+  TennisTournamentTournamentIdRoute: typeof TennisTournamentTournamentIdRoute
 }
 
 const TennisRouteChildren: TennisRouteChildren = {
   TennisIdRoute: TennisIdRoute,
   TennisIndexRoute: TennisIndexRoute,
+  TennisTournamentTournamentIdRoute: TennisTournamentTournamentIdRoute,
 }
 
 const TennisRouteWithChildren =
@@ -571,6 +613,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthSignInRoute: AuthSignInRoute,
   AuthSignUpRoute: AuthSignUpRoute,
   AuthorsSlugRoute: AuthorsSlugRoute,
+  GameGameIdRoute: GameGameIdRoute,
   IndexGameIdRoute: IndexGameIdRoute,
   IndexTournamentTournamentIdRoute: IndexTournamentTournamentIdRoute,
 }

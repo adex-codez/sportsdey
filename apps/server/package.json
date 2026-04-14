@@ -5,7 +5,7 @@
 	"scripts": {
 		"build": "wrangler deploy --dry-run",
 		"check-types": "tsc -b",
-		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
+		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server --external @better-auth/expo",
 		"dev": "wrangler dev --port=3000",
 		"start": "wrangler dev",
 		"deploy": "wrangler deploy",
@@ -14,14 +14,15 @@
 		"db:push:prod": "set NODE_ENV=production&& npx dotenv-cli -e .env.production -- drizzle-kit push",
 		"db:generate": "drizzle-kit generate",
 		"db:studio": "drizzle-kit studio",
-		"cf-typegen": "wrangler types --env-interface CloudflareBindings"
+		"cf-typegen": "wrangler types --env-interface CloudflareBindings",
+		"admin:create": "node --import tsx src/cli/create-admin.ts"
 	},
 	"dependencies": {
 		"@better-auth/expo": "^1.4.19",
 		"@hono/swagger-ui": "^0.5.2",
 		"@hono/zod-openapi": "^1.1.5",
 		"@hono/zod-validator": "^0.7.4",
-		"@sportsdey/db": "workspace:*",
+		"@noble/hashes": "^1.6.1",
 		"better-auth": "^1.4.19",
 		"better-auth-cloudflare": "^0.2.9",
 		"dotenv": "catalog:",
@@ -35,6 +36,7 @@
 		"@sportsdey/config": "workspace:*",
 		"@types/node": "^22.13.11",
 		"tsdown": "catalog:",
+		"tsx": "^4.19.0",
 		"typescript": "catalog:",
 		"wrangler": "catalog:"
 	}

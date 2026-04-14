@@ -1,243 +1,200 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
-import type { PropsWithChildren } from "react";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { useCurrentSport } from "@/hooks/use-current-sport";
-import { useFavorites } from "@/hooks/useFavorites";
 import { SPORTS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import gamesIcon from "@/logos/games.svg";
+import jackpotIcon from "@/logos/jackpot.svg";
+import newsIcon from "@/logos/news.svg";
+import quickbetsIcon from "@/logos/quick-bets.svg";
+import scoreIcon from "@/logos/score.svg";
+import smartbetsIcon from "@/logos/smartbet.svg";
+import superbetsIcon from "@/logos/superbet.svg";
+import walletIcon from "@/logos/wallet.svg";
 import { useActiveTab } from "./active-tab-context";
-import BettingWidget from "./betting-widget";
-import { Button } from "./ui/button";
 
-const SidebarItem = ({
-	children,
-	heading,
-	icon: Icon,
-	link,
-}: PropsWithChildren<{
-	heading: string;
-	icon?: React.ReactNode;
-	link?: string;
-}>) => {
-	const Content = (
-		<div className="overflow-hidden rounded-2xl bg-white dark:bg-[#202120]">
-			<div className="flex items-center justify-between px-6 py-4">
-				<p className="font-semibold text-primary text-xl dark:text-white">
-					{heading}
-				</p>
-				{Icon && Icon}
-			</div>
-			<hr className="dark:border-[#5A5F63]" />
-			{children}
-		</div>
-	);
-
-	if (link) {
-		return (
-			<Link to={link} className="block">
-				{Content}
-			</Link>
-		);
-	}
-
-	return <div>{Content}</div>;
+type NavItem = {
+	id: string;
+	label: string;
+	icon: string;
+	onClick: () => void;
+	isActive: boolean;
 };
 
 const Sidebar = () => {
+	const isStaging =
+		import.meta.env.MODE === "staging" ||
+		import.meta.env.VITE_ENVIRONMENT === "staging";
 	const { tab, setTab } = useActiveTab();
 	const navigate = useNavigate();
+	const location = useLocation();
+	const searchStr = location.search || "";
 	const currentSport = useCurrentSport();
-	const {
-		favoriteTeams,
-		favoriteLeagues,
-		totalFavoritesCount,
-		toggleFavoriteTeam,
-		toggleFavoriteLeague,
-	} = useFavorites();
+	const params = new URLSearchParams(searchStr);
+	const betType =
+		location.pathname.startsWith("/betting") && params.get("type")
+			? params.get("type")!
+			: "jackpots";
+
+	const goToScores = () => {
+		setTab("scores");
+		const targetSport = currentSport || SPORTS.FOOTBALL;
+		const target =
+			targetSport === SPORTS.TENNIS
+				? "/tennis"
+				: targetSport === SPORTS.BASKETBALL
+					? "/basketball"
+					: "/";
+		navigate({
+			to: target,
+			search: { league: undefined, sports: targetSport } as any,
+		});
+	};
+
+	const goToNews = () => {
+		setTab("news");
+		navigate({
+			to: "/news",
+			search: { sports: currentSport || SPORTS.FOOTBALL },
+		});
+	};
+
+	const goToGames = () => {
+		setTab("games");
+		navigate({ to: "/games" });
+	};
+
+	const goToWallet = () => navigate({ to: "/wallet" });
+	const goToBetting = (betType: string) =>
+		navigate({
+			to: "/betting",
+			search: { type: betType },
+		});
+
+	const menuItems: NavItem[] = [
+		{
+			id: "scores",
+			label: "Scores",
+			icon: scoreIcon,
+			onClick: goToScores,
+			isActive:
+				tab === "scores" ||
+				["/", "/basketball", "/tennis"].includes(location.pathname),
+		},
+		{
+			id: "news",
+			label: "News",
+			icon: newsIcon,
+			onClick: goToNews,
+			isActive: tab === "news" || location.pathname.startsWith("/news"),
+		},
+		...(isStaging || import.meta.env.DEV
+			? [
+					{
+						id: "casino",
+						label: "Casino",
+						icon: gamesIcon,
+						onClick: goToGames,
+						isActive: tab === "games" || location.pathname.startsWith("/games"),
+					},
+				]
+			: []),
+		{
+			id: "wallet",
+			label: "Wallet",
+			icon: walletIcon,
+			onClick: goToWallet,
+			isActive: location.pathname.startsWith("/wallet"),
+		},
+	];
+
+	const bettingItems: NavItem[] = [
+		{
+			id: "jackpots",
+			label: "Jackpots",
+			icon: jackpotIcon,
+			onClick: () => goToBetting("jackpots"),
+			isActive:
+				location.pathname.startsWith("/betting") &&
+				(betType === "jackpots" || !params.has("type")),
+		},
+		{
+			id: "super-bets",
+			label: "Super Bets",
+			icon: superbetsIcon,
+			onClick: () => goToBetting("super"),
+			isActive: location.pathname.startsWith("/betting") && betType === "super",
+		},
+		{
+			id: "smart-bets",
+			label: "Smart Bets",
+			icon: smartbetsIcon,
+			onClick: () => goToBetting("smart"),
+			isActive: location.pathname.startsWith("/betting") && betType === "smart",
+		},
+		{
+			id: "quick-bets",
+			label: "Quick Bets",
+			icon: quickbetsIcon,
+			onClick: () => goToBetting("quick"),
+			isActive: location.pathname.startsWith("/betting") && betType === "quick",
+		},
+	];
+
+	const renderNavButton = (item: NavItem) => (
+		<button
+			key={item.id}
+			onClick={item.onClick}
+			className={cn(
+				"flex w-full cursor-pointer flex-col items-center gap-1 rounded-full px-3 py-1 transition hover:-translate-y-[1px]",
+				item.isActive
+					? "bg-accent text-white shadow-[0_8px_20px_rgba(25,186,8,0.18)]"
+					: "bg-transparent",
+			)}
+		>
+			<img
+				src={item.icon}
+				alt={item.label}
+				className={cn(
+					"h-6 w-6 transition",
+					item.isActive ? "opacity-100 brightness-0 invert" : "opacity-70",
+					item.id === "scores" &&
+						(item.isActive
+							? "brightness-0 invert"
+							: "brightness-95% contrast-95% hue-rotate-[85deg] invert-[32%] saturate-[1200%] sepia-[78%]"),
+				)}
+			/>
+			<span
+				className={cn(
+					"font-semibold text-[#9EA1A7] text-[13px]",
+					item.isActive && "text-white",
+				)}
+			>
+				{item.label}
+			</span>
+		</button>
+	);
 
 	return (
-		<div className="space-y-8">
-			<SidebarItem heading="Menu">
-				<ul className="space-y-4 px-6 py-6">
-					<li
-						className={cn(
-							"cursor-pointer",
-							tab === "scores" ? "font-semibold text-accent" : null,
-						)}
-						onClick={() => {
-							setTab("scores");
-							const targetSport = currentSport || SPORTS.FOOTBALL;
-							const target =
-								targetSport === SPORTS.TENNIS
-									? "/tennis"
-									: targetSport === SPORTS.BASKETBALL
-										? "/basketball"
-										: "/";
-							navigate({
-								to: target,
-								search: { league: undefined, sports: targetSport } as any,
-							});
-						}}
-					>
-						Scores
-					</li>
+		<div className="mx-auto w-[110px] rounded-[26px] border border-[#F1F2F4] bg-white py-5 shadow-[0_6px_22px_rgba(0,0,0,0.12)] dark:border-[#2F3033] dark:bg-[#1C1D1F]">
+			<div className="space-y-4">
+				<div className="px-3">
+					<p className="text-center font-semibold text-[#202120] text-[15px] dark:text-white">
+						Menu
+					</p>
+					<div className="mt-3 space-y-2">{menuItems.map(renderNavButton)}</div>
+				</div>
 
-					<li
-						className={cn(
-							"cursor-pointer",
-							tab === "favourites" ? "font-semibold text-accent" : null,
-						)}
-						onClick={() => {
-							setTab("favourites");
-							navigate({ to: "/favorites", search: { sports: currentSport } });
-						}}
-					>
-						{" "}
-						Favourite ({totalFavoritesCount})
-					</li>
-					<li
-						className={cn(
-							"cursor-pointer",
-							tab === "news" ? "font-semibold text-accent" : null,
-						)}
-						onClick={() => {
-							setTab("news");
-							navigate({
-								to: "/news",
-								search: { sports: currentSport || SPORTS.FOOTBALL },
-							});
-						}}
-					>
-						News
-					</li>
-					<li
-						className={cn(
-							"cursor-pointer",
-							tab === "games" ? "font-semibold text-accent" : null,
-						)}
-						onClick={() => {
-							setTab("games");
-							navigate({ to: "/games" });
-						}}
-					>
-						Play Games
-					</li>
-				</ul>
-			</SidebarItem>
+				<div className="mx-3 h-px bg-[#E9E9E9] dark:bg-[#2F3033]" />
 
-			<div className="relative">
-				<BettingWidget />
+				<div className="px-3">
+					<p className="text-center font-semibold text-[#202120] text-[15px] dark:text-white">
+						Betting
+					</p>
+					<div className="mt-3 space-y-2">
+						{bettingItems.map(renderNavButton)}
+					</div>
+				</div>
 			</div>
-			<SidebarItem link="/favorites" heading="My Teams" icon={<ChevronRight />}>
-				<div>
-					{favoriteTeams.length === 0 ? (
-						<p className="px-6 py-6 text-sm">
-							{" "}
-							You have no teams selected as favourites. Tap the star icon next
-							to a team to add to favourites.
-						</p>
-					) : (
-						<ul className="space-y-3 px-6 py-4">
-							{favoriteTeams.map((team) => (
-								<li key={team.id} className="flex items-center justify-between">
-									<div className="flex items-center gap-3">
-										<img
-											src={team.logo || "/Profile.png"}
-											alt={team.name}
-											className="h-8 w-8 object-contain"
-										/>
-										<span
-											className="max-w-30 truncate font-medium text-sm"
-											title={team.name}
-										>
-											{team.name}
-										</span>
-									</div>
-									<button
-										onClick={() => toggleFavoriteTeam(team)}
-										className="text-yellow-400 hover:text-yellow-500"
-									>
-										★
-									</button>
-								</li>
-							))}
-						</ul>
-					)}
-				</div>
-			</SidebarItem>
-			{/* <SidebarItem heading="Convert Your betting code">
-				<div className="space-y-4 px-6 py-6">
-					<div className="w-ful space-y-2 rounded-2xl bg-white p-4 shadow-[2px_2px_23px_0_#0000000F]">
-						<p className="font-medium text-sm">Booking Code</p>
-						<input
-							className="h-5 w-full rounded-sm bg-[#F0F0F0] p-4 text-sm"
-							placeholder="Enter booking code"
-						/>
-					</div>
-					<div className="w-ful space-y-2 rounded-2xl bg-white p-4 shadow-[2px_2px_23px_0_#0000000F]">
-						<p className="font-medium text-sm">Convert code from</p>
-						<input
-							className="h-5 w-full rounded-sm bg-[#F0F0F0] p-4 text-sm"
-							placeholder="Enter booking code"
-						/>
-					</div>
-					<div className="w-ful space-y-2 rounded-2xl bg-white p-4 shadow-[2px_2px_23px_0_#0000000F]">
-						<p className="font-medium text-sm">Convert to</p>
-						<input
-							className="h-5 w-full rounded-sm bg-[#F0F0F0] p-4 text-sm"
-							placeholder="Enter booking code"
-						/>
-					</div>
-					<Button className="w-full bg-accent py-6 text-[#fafafa]">
-						Convert
-					</Button>
-				</div>
-			</SidebarItem> */}
-			<SidebarItem link="/account" heading="Profile" icon={<ChevronRight />} />
-			<SidebarItem
-				link="/favorites"
-				heading="My League"
-				icon={<ChevronRight />}
-			>
-				<div>
-					{favoriteLeagues.length === 0 ? (
-						<p className="px-6 py-6 text-sm">
-							{" "}
-							You have no leagues selected as favourites. Tap the star icon in
-							the league detail to add to favourites.
-						</p>
-					) : (
-						<ul className="space-y-3 px-6 py-4">
-							{favoriteLeagues.map((league) => (
-								<li
-									key={league.id}
-									className="flex items-center justify-between"
-								>
-									<div className="flex items-center gap-3">
-										<img
-											src={league.flag || "/International.png"}
-											alt={league.name}
-											className="h-8 w-8 rounded-full object-cover"
-										/>
-										<span
-											className="max-w-[120px] truncate font-medium text-sm"
-											title={league.name}
-										>
-											{league.name}
-										</span>
-									</div>
-									<button
-										onClick={() => toggleFavoriteLeague(league)}
-										className="text-yellow-400 hover:text-yellow-500"
-									>
-										★
-									</button>
-								</li>
-							))}
-						</ul>
-					)}
-				</div>
-			</SidebarItem>
 		</div>
 	);
 };

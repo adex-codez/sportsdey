@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { client } from "./sanity";
+import { serverClient } from "./sanity-server";
 
 const SANITY_TIMEOUT = 8000;
 
@@ -173,4 +174,64 @@ export const getNewsByAuthorTotal = createServerFn({ method: "GET" })
 			// Return 0 on error to prevent error boundary trigger
 			return 0;
 		}
+	});
+
+type CommentInput = {
+	newsId: string;
+	message: string;
+	user: {
+		id: string;
+		name?: string | null;
+		email?: string | null;
+	};
+};
+
+export const getCommentsForNews = createServerFn({ method: "GET" })
+	.inputValidator((newsId: string) => newsId)
+	.handler(async ({ data: newsId }) => {
+		const response = await fetchWithSanityTimeout(
+			`*[_type == "comment" && news._ref == $newsId] 
+			 | order(createdAt desc){
+				_id,
+				name,
+				message,
+				createdAt
+			}`,
+			{ newsId },
+		);
+		return response || [];
+	});
+
+export const addCommentToNews = createServerFn({ method: "POST" })
+	.inputValidator((data: CommentInput) => {
+		if (!data.newsId) throw new Error("newsId is required");
+		if (!data.message?.trim()) throw new Error("message is required");
+		if (!data.user?.id) throw new Error("user id is required");
+		return data;
+	})
+	.handler(async ({ data }) => {
+		if (!process.env.SANITY_WRITE_TOKEN) {
+			throw new Error("Sanity write client is not configured");
+		}
+
+		const now = new Date().toISOString();
+		const doc = await serverClient.create({
+			_type: "comment",
+			name: data.user.name || "SportsDey user",
+			email: data.user.email || undefined,
+			userId: data.user.id,
+			message: data.message.trim(),
+			news: {
+				_type: "reference",
+				_ref: data.newsId,
+			},
+			createdAt: now,
+		});
+
+		return {
+			_id: doc._id,
+			name: data.user.name || "SportsDey user",
+			message: data.message.trim(),
+			createdAt: now,
+		};
 	});

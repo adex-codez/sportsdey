@@ -21,6 +21,7 @@ import { SPORTS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import BasketballIcon from "@/logos/basketball.svg?react";
 import FootballIcon from "@/logos/football.svg?react";
+import TennisIcon from "@/logos/tennis.svg?react";
 import WorldIcon from "@/logos/world.svg?react";
 import CalendarBadge from "@/shared/CalendarBadge";
 import { useActiveTab } from "./active-tab-context";
@@ -35,6 +36,10 @@ type HeaderProps = {
 };
 
 export default function Header({ hideSportsNav = false }: HeaderProps) {
+	const isStaging =
+		import.meta.env.MODE === "staging" ||
+		import.meta.env.VITE_ENVIRONMENT === "staging";
+	const showPreviewUI = isStaging || import.meta.env.DEV;
 	const location = useLocation();
 	const isAuthRoute = location.pathname.startsWith("/auth");
 	const shouldHideSportsNav = hideSportsNav || isAuthRoute;
@@ -50,7 +55,7 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 			icon: BasketballIcon,
 			sport: SPORTS.BASKETBALL,
 		},
-		// { to: "/tennis", label: "Tennis", icon: TennisIcon, sport: SPORTS.TENNIS },
+		{ to: "/tennis", label: "Tennis", icon: TennisIcon, sport: SPORTS.TENNIS },
 		// { to: "/boxing", label: "Boxing", icon: BoxingIcon, sport: "boxing" },
 		// { to: "/ufc", label: "UFC", icon: BaseballIcon, sport: "ufc" },
 	] as const;
@@ -125,7 +130,7 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 					</Link>
 
 					<div className="flex items-center gap-3">
-						{!isAuthRoute && <UserMenu />}
+						{!isAuthRoute && showPreviewUI && <UserMenu />}
 						<ThemeToggle />
 						{isAuthRoute && (
 							<button
@@ -180,7 +185,7 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 					)}
 
 					<div className="flex items-center gap-2">
-						{!isAuthRoute && <UserMenu />}
+						{!isAuthRoute && showPreviewUI && <UserMenu />}
 						<ThemeToggle />
 						{isAuthRoute && (
 							<button

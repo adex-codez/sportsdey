@@ -348,13 +348,20 @@ casinoProviderRoute.openapi(authRoute, async (c) => {
 		.set({ used: true })
 		.where(eq(schema.gameLaunchTokens.token, user_token));
 
+	console.log("auth data", {
+		user_id: user.id,
+		username: user.name ?? user.email.split("@")[0],
+		balance: balance * 100,
+		currency: currency ?? "NGN",
+	});
+
 	return c.json(
 		{
 			code: 200,
 			data: {
 				user_id: user.id,
 				username: user.name ?? user.email.split("@")[0],
-				balance,
+				balance: balance * 100,
 				currency: currency ?? "NGN",
 			},
 		},
@@ -448,7 +455,10 @@ casinoProviderRoute.openapi(withdrawRoute, async (c) => {
 		.where(eq(schema.wallet.userId, user_id))
 		.limit(1);
 
-	if (!wallet || wallet.balance < amount) {
+	const balanceKobo = wallet?.balance ?? 0;
+	const oldBalanceKobo = balanceKobo;
+
+	if (!wallet || balanceKobo < amount) {
 		return c.json(
 			{
 				code: 402,
@@ -460,9 +470,10 @@ casinoProviderRoute.openapi(withdrawRoute, async (c) => {
 
 	const operatorTxId = `gtxn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
+	const newBalanceKobo = balanceKobo - amount / 10;
 	await db
 		.update(schema.wallet)
-		.set({ balance: wallet.balance - amount })
+		.set({ balance: newBalanceKobo })
 		.where(eq(schema.wallet.userId, user_id));
 
 	await db.insert(schema.gameTransactions).values({
@@ -475,12 +486,6 @@ casinoProviderRoute.openapi(withdrawRoute, async (c) => {
 		game,
 	});
 
-	const [updatedWallet] = await db
-		.select()
-		.from(schema.wallet)
-		.where(eq(schema.wallet.userId, user_id))
-		.limit(1);
-
 	return c.json(
 		{
 			code: 200,
@@ -488,8 +493,8 @@ casinoProviderRoute.openapi(withdrawRoute, async (c) => {
 				user_id,
 				provider,
 				provider_tx_id,
-				old_balance: wallet.balance,
-				new_balance: updatedWallet?.balance ?? 0,
+				old_balance: oldBalanceKobo,
+				new_balance: newBalanceKobo,
 				operator_tx_id: operatorTxId,
 				currency,
 			},
@@ -583,12 +588,14 @@ casinoProviderRoute.openapi(depositRoute, async (c) => {
 		.where(eq(schema.wallet.userId, user_id))
 		.limit(1);
 
-	const currentBalance = wallet?.balance ?? 0;
+	const balanceKobo = wallet?.balance ?? 0;
+	const oldBalanceKobo = balanceKobo;
 	const operatorTxId = `gtxn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
+	const newBalanceKobo = balanceKobo + amount;
 	await db
 		.update(schema.wallet)
-		.set({ balance: currentBalance + amount })
+		.set({ balance: newBalanceKobo / 10 })
 		.where(eq(schema.wallet.userId, user_id));
 
 	await db.insert(schema.gameTransactions).values({
@@ -601,12 +608,6 @@ casinoProviderRoute.openapi(depositRoute, async (c) => {
 		game,
 	});
 
-	const [updatedWallet] = await db
-		.select()
-		.from(schema.wallet)
-		.where(eq(schema.wallet.userId, user_id))
-		.limit(1);
-
 	return c.json(
 		{
 			code: 200,
@@ -617,8 +618,8 @@ casinoProviderRoute.openapi(depositRoute, async (c) => {
 				amount,
 				provider,
 				currency,
-				old_balance: currentBalance,
-				new_balance: updatedWallet?.balance ?? 0,
+				old_balance: oldBalanceKobo,
+				new_balance: newBalanceKobo,
 			},
 		},
 		200,
@@ -709,13 +710,15 @@ casinoProviderRoute.openapi(rollbackRoute, async (c) => {
 		.where(eq(schema.wallet.userId, user_id))
 		.limit(1);
 
-	const currentBalance = wallet?.balance ?? 0;
+	const balanceKobo = wallet?.balance ?? 0;
+	const oldBalanceKobo = balanceKobo;
 	const adjustment = existingTx.type === "BET" ? amount : -amount;
 	const operatorTxId = `gtxn_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 
+	const newBalanceKobo = balanceKobo + adjustment;
 	await db
 		.update(schema.wallet)
-		.set({ balance: currentBalance + adjustment })
+		.set({ balance: newBalanceKobo / 10 })
 		.where(eq(schema.wallet.userId, user_id));
 
 	await db.insert(schema.gameTransactions).values({
@@ -728,12 +731,6 @@ casinoProviderRoute.openapi(rollbackRoute, async (c) => {
 		game,
 	});
 
-	const [updatedWallet] = await db
-		.select()
-		.from(schema.wallet)
-		.where(eq(schema.wallet.userId, user_id))
-		.limit(1);
-
 	return c.json(
 		{
 			code: 200,
@@ -741,8 +738,8 @@ casinoProviderRoute.openapi(rollbackRoute, async (c) => {
 				user_id,
 				provider,
 				provider_tx_id: rollback_provider_tx_id,
-				old_balance: currentBalance,
-				new_balance: updatedWallet?.balance ?? 0,
+				old_balance: oldBalanceKobo,
+				new_balance: newBalanceKobo,
 				operator_tx_id: operatorTxId,
 				currency: "NGN",
 			},

@@ -18,6 +18,9 @@ export const user = sqliteTable("user", {
 		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
 		.$onUpdate(() => /* @__PURE__ */ new Date())
 		.notNull(),
+	verificationStatus: text("verification_status")
+		.default("not_verified")
+		.notNull(),
 });
 
 export const session = sqliteTable(
@@ -94,11 +97,14 @@ export const userRelations = relations(user, ({ many }) => ({
 	accounts: many(account),
 	wallets: many(wallet),
 	walletTransactions: many(walletTransaction),
+	gameWallets: many(gameWallet),
+	gameWalletTransactions: many(gameWalletTransaction),
 	gameLaunchTokens: many(gameLaunchTokens),
 	gameSessions: many(gameSessions),
 	gameTransactions: many(gameTransactions),
 	utilityTransactions: many(utilityTransaction),
 	withdrawalAccounts: many(withdrawalAccount),
+	userFiles: many(userFile),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -157,7 +163,8 @@ export const walletRelations = relations(wallet, ({ one, many }) => ({
 		fields: [wallet.userId],
 		references: [user.id],
 	}),
-	transactions: many(walletTransaction),
+	// Link via userId because wallet_transaction stores user_id (no wallet_id column)
+	transactions: many(walletTransaction, { relationName: "walletTransactions" }),
 }));
 
 export const walletTransactionRelations = relations(
@@ -166,6 +173,63 @@ export const walletTransactionRelations = relations(
 		user: one(user, {
 			fields: [walletTransaction.userId],
 			references: [user.id],
+		}),
+		wallet: one(wallet, {
+			fields: [walletTransaction.userId],
+			references: [wallet.userId],
+			relationName: "walletTransactions",
+		}),
+	}),
+);
+
+export const gameWallet = sqliteTable("game_wallet", {
+	id: text("id").primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" })
+		.unique(),
+	balance: integer("balance").notNull().default(0),
+	createdAt: integer("created_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.notNull(),
+	updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.$onUpdate(() => /* @__PURE__ */ new Date())
+		.notNull(),
+});
+
+export const gameWalletTransaction = sqliteTable("game_wallet_transaction", {
+	id: text("id").primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	amount: integer("amount").notNull(),
+	type: text("type").notNull(),
+	reference: text("reference").notNull().unique(),
+	status: text("status").notNull(),
+	createdAt: integer("created_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.notNull(),
+});
+
+export const gameWalletRelations = relations(gameWallet, ({ one, many }) => ({
+	user: one(user, {
+		fields: [gameWallet.userId],
+		references: [user.id],
+	}),
+	transactions: many(gameWalletTransaction),
+}));
+
+export const gameWalletTransactionRelations = relations(
+	gameWalletTransaction,
+	({ one }) => ({
+		user: one(user, {
+			fields: [gameWalletTransaction.userId],
+			references: [user.id],
+		}),
+		gameWallet: one(gameWallet, {
+			fields: [gameWalletTransaction.userId],
+			references: [gameWallet.userId],
 		}),
 	}),
 );
@@ -348,3 +412,63 @@ export const thundrTransactionsRelations = relations(
 		}),
 	}),
 );
+
+export const pocketsTransactions = sqliteTable("pockets_transactions", {
+	id: text("id").primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	type: text("type").notNull(),
+	amount: integer("amount").notNull(),
+	currency: text("currency").notNull(),
+	createdAt: integer("created_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.notNull(),
+});
+
+export const pocketsTransactionsRelations = relations(
+	pocketsTransactions,
+	({ one }) => ({
+		user: one(user, {
+			fields: [pocketsTransactions.userId],
+			references: [user.id],
+		}),
+	}),
+);
+
+export const filePurpose = {
+	PROFILE_PIC: "profile_pic",
+	VERIFICATION_DOCUMENT: "verification_document",
+	ID_CARD_FRONT: "id_card_front",
+	ID_CARD_BACK: "id_card_back",
+	PROOF_OF_ADDRESS: "proof_of_address",
+	OTHER: "other",
+} as const;
+
+export type FilePurpose = (typeof filePurpose)[keyof typeof filePurpose];
+
+export const userFile = sqliteTable("user_file", {
+	id: text("id").primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => user.id, { onDelete: "cascade" }),
+	fileName: text("file_name").notNull(),
+	originalName: text("original_name").notNull(),
+	purpose: text("purpose").notNull(),
+	r2Key: text("r2_key").notNull(),
+	url: text("url").notNull(),
+	mimeType: text("mime_type").notNull(),
+	size: integer("size").notNull(),
+	createdAt: integer("created_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.notNull(),
+});
+
+export const userFileRelations = relations(userFile, ({ one }) => ({
+	user: one(user, {
+		fields: [userFile.userId],
+		references: [user.id],
+	}),
+}));
+
+export * from "./schema/admin";

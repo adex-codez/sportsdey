@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import BannerCarousel from "@/components/BannerCarousel";
@@ -13,6 +13,7 @@ export const Route = createFileRoute("/betting")({
 function RouteComponent() {
 	const [isIframeLoading, setIsIframeLoading] = useState(true);
 	const [theme, setTheme] = useState("sportsdeyLite");
+	const { type = "jackpots" } = useSearch({ from: "/betting" });
 	const banners = Route.useLoaderData() || [];
 	useEffect(() => {
 		// Detect initial theme
@@ -32,6 +33,13 @@ function RouteComponent() {
 
 		return () => observer.disconnect();
 	}, []);
+
+	useEffect(() => {
+		// Trigger loading state when type changes so opacity transition runs
+		setIsIframeLoading(true);
+		const timeout = setTimeout(() => setIsIframeLoading(false), 5000);
+		return () => clearTimeout(timeout);
+	}, [type, theme]);
 
 	useEffect(() => {
 		const timer = setTimeout(() => setIsIframeLoading(false), 5000);
@@ -68,7 +76,9 @@ function RouteComponent() {
 			<iframe
 				id="bettingWidget"
 				title="lobby widget"
-				src={`https://bet.sportsdey.com/?view=fullPage&theme=${theme}&ticketOpenMode=embedded`}
+				src={`https://bet.sportsdey.com/?view=fullPage&theme=${theme}&ticketOpenMode=embedded&type=${encodeURIComponent(
+					type,
+				)}`}
 				className={cn(
 					"rounded-2xl transition-opacity duration-500",
 					isIframeLoading ? "opacity-0" : "opacity-100",

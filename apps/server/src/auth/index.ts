@@ -24,7 +24,9 @@ export const createAuth = (env: CloudflareBindings) => {
 				"https://stagingweb.sportsdey.com",
 				"https://sportsdey.com",
 				"sportsdey-mobile://",
-				"exp://172.20.10.9:8081",
+				"exp://**",
+				"https://admin.sportsdey.com",
+				"https://staging-admin.sportsdey.com",
 				toOrigin(env.BETTER_AUTH_URL),
 				toOrigin(env.CORS_ORIGIN),
 			].filter(Boolean),
@@ -35,7 +37,7 @@ export const createAuth = (env: CloudflareBindings) => {
 		basePath: "/auth",
 		database: drizzleAdapter(db, { provider: "sqlite" }),
 		emailAndPassword: { enabled: true },
-		plugins: [expo()],
+		// plugins: [expo()],
 		socialProviders: {
 			google: {
 				clientId: env.GOOGLE_CLIENT_ID || "",
@@ -68,6 +70,11 @@ export const createAuth = (env: CloudflareBindings) => {
 					required: false,
 					fieldName: "mobile_number",
 				},
+				verificationStatus: {
+					type: "string",
+					required: false,
+					fieldName: "verification_status",
+				},
 			},
 			deleteUser: {
 				enabled: true,
@@ -82,7 +89,13 @@ export const createAuth = (env: CloudflareBindings) => {
 		trustedOrigins,
 		advanced: {
 			crossSubDomainCookies: {
-				enabled: env.NODE_ENV !== "development",
+				enabled: env.NODE_ENV === "production" || env.NODE_ENV === "staging",
+			},
+			cookiePrefix: "ba",
+			cookieOptions: {
+				sameSite: "lax",
+				secure: env.NODE_ENV !== "development",
+				path: "/",
 			},
 		},
 	});

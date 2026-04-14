@@ -1,78 +1,32 @@
-export type SportRadarTennisResponse = {
-	generated_at: string;
-	summaries: Array<{
-		sport_event: {
-			id: string;
-			start_time: string;
-			sport_event_context: {
-				competition: {
-					id: string;
-					name: string;
-					type?: string;
-					gender?: string;
-				};
-			};
-			competitors: Array<{
-				id: string;
-				name: string;
-				qualifier: "home" | "away";
-			}>;
-		};
-		sport_event_status: {
-			status: string;
-			home_score?: number;
-			away_score?: number;
-			period_scores?: Array<{
-				home_score: number;
-				away_score: number;
-				type: string;
-				number: number;
-				home_tiebreak_score?: number;
-				away_tiebreak_score?: number;
-			}>;
-			winner_id?: string;
-		};
+export type ApiTennisFixturesResponse = {
+	success: number;
+	result: Array<{
+		event_key: string;
+		event_date: string;
+		event_time: string;
+		event_first_player: string;
+		first_player_key: string;
+		event_second_player: string;
+		second_player_key: string;
+		event_final_result: string;
+		event_game_result: string;
+		event_serve: string | null;
+		event_winner: string | null;
+		event_status: string;
+		event_type_type: string;
+		tournament_name: string;
+		tournament_key: string;
+		tournament_round: string;
+		tournament_season: string;
+		event_live: string;
+		event_qualification: string;
+		event_first_player_logo: string | null;
+		event_second_player_logo: string | null;
+		pointbypoint: Array<any>;
+		scores: Array<{
+			score_first: string;
+			score_second: string;
+			score_set: string;
+		}>;
 	}>;
-};
-
-export type SportRadarTennisGameResponse = {
-	generated_at: string;
-	sport_event: {
-		id: string;
-		start_time: string;
-		sport_event_context: {
-			competition: {
-				id: string;
-				name: string;
-				type?: string;
-				gender?: string;
-			};
-		};
-		competitors: Array<{
-			id: string;
-			name: string;
-			qualifier: "home" | "away";
-		}>;
-		venue: {
-			id: string;
-			name: string;
-			country_code?: string;
-			country?: string;
-			city?: string;
-		};
-	};
-	sport_event_status: {
-		status: string;
-		home_score?: number;
-		away_score?: number;
-		period_scores?: Array<{
-			home_score: number;
-			away_score: number;
-			type: string;
-			number: number;
-			home_tiebreak_score?: number;
-			away_tiebreak_score?: number;
-		}>;
-		winner_id?: string;
-	};
 };
