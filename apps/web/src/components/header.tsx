@@ -179,6 +179,7 @@ export default function Header({ hideSportsNav = false }: HeaderProps) {
 						</div>
 					)}
 
+					<ThemeToggle />
 					{/*<div className="flex items-center gap-2">
 						{!isAuthRoute && <UserMenu />}
 						<ThemeToggle />
