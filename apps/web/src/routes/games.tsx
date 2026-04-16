@@ -1,12 +1,60 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import SolitaireLogo from "../logos/solitaire.svg?react";
+import BlocksLogo from "../logos/blocks.svg?react";
+import TwentyOneLogo from "../logos/twentyone.svg?react";
+import BlackjackLogo from "../logos/blackjack.svg?react";
+import SlotsLogo from "../logos/slots.svg?react";
+import PlinkoLogo from "../logos/plinko.svg?react";
 
 export const Route = createFileRoute("/games")({
 	component: GamesPage,
 });
 
 const GAMES = [
+	{
+		code: "solitaire",
+		name: "Solitaire",
+		subtitle: "classic card game",
+		icon: SolitaireLogo,
+		gradient: "linear-gradient(to bottom, #1e3a5f, #2d5a87, #4a90d9)",
+	},
+	{
+		code: "blocks",
+		name: "Blocks",
+		subtitle: "puzzle game",
+		icon: BlocksLogo,
+		gradient: "linear-gradient(to bottom, #ff6b35, #f7931e, #ffcc00)",
+	},
+	{
+		code: "twentyone",
+		name: "Twenty One",
+		subtitle: "card game",
+		icon: TwentyOneLogo,
+		gradient: "linear-gradient(to bottom, #1a1a2e, #16213e, #0f3460)",
+	},
+	{
+		code: "blackjack",
+		name: "Blackjack",
+		subtitle: "card game",
+		icon: BlackjackLogo,
+		gradient: "linear-gradient(to bottom, #2d2d2d, #4a4a4a, #6b6b6b)",
+	},
+	{
+		code: "slots",
+		name: "Slots",
+		subtitle: "slot machine",
+		icon: SlotsLogo,
+		gradient: "linear-gradient(to bottom, #7b1fa2, #9c27b0, #ba68c8)",
+	},
+	{
+		code: "plinko",
+		name: "Plinko",
+		subtitle: "lucky drop",
+		icon: PlinkoLogo,
+		gradient: "linear-gradient(to bottom, #00897b, #26a69a, #4db6ac)",
+	},
 	{
 		code: "XCAPEHB",
 		name: "Xcape",
@@ -46,10 +94,7 @@ function GamesPage() {
 		try {
 			let launchUrl: string;
 
-			const isLagosRush = game.code === "LAGOSRUSH";
-			const url = isLagosRush
-				? `${import.meta.env.VITE_SERVER_URL}lagos-rush/launcher`
-				: `${import.meta.env.VITE_SERVER_URL}casino/play/${game.code}`;
+			const url = `${import.meta.env.VITE_SERVER_URL}thndr/play/${game.code}`;
 
 			const response = await fetch(url, {
 				method: "POST",
@@ -121,12 +166,21 @@ function GamesPage() {
 								</div>
 							)}
 
-							<img
-								src={game.image}
-								alt={game.name}
-								className="absolute inset-0 h-full w-full object-contain p-2 transition-opacity"
-								style={{ opacity: loadingGame === game.code ? 0.35 : 1 }}
-							/>
+							{game.icon ? (
+								<div
+									className="absolute inset-0 flex items-center justify-center p-4"
+									style={{ opacity: loadingGame === game.code ? 0.35 : 1 }}
+								>
+									{game.icon && <game.icon className="h-full w-full object-contain" />}
+								</div>
+							) : (
+								<img
+									src={game.image}
+									alt={game.name}
+									className="absolute inset-0 h-full w-full object-contain p-2 transition-opacity"
+									style={{ opacity: loadingGame === game.code ? 0.35 : 1 }}
+								/>
+							)}
 							<p
 								className="text-center font-normal text-[27px] text-white"
 								style={{ fontFamily: "Luckiest Guy" }}

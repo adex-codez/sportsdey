@@ -94,7 +94,10 @@ const Sidebar = () => {
 						label: "Casino",
 						icon: gamesIcon,
 						onClick: goToGames,
-						isActive: tab === "games" || location.pathname.startsWith("/games"),
+						isActive:
+							tab === "games" ||
+							location.pathname.startsWith("/games") ||
+							location.pathname.startsWith("/game/"),
 					},
 				]
 			: []),
@@ -157,6 +160,7 @@ const Sidebar = () => {
 				className={cn(
 					"h-6 w-6 transition",
 					item.isActive ? "opacity-100 brightness-0 invert" : "opacity-70",
+					item.id === "wallet" && "bg-gray-400",
 					item.id === "scores" &&
 						(item.isActive
 							? "brightness-0 invert"

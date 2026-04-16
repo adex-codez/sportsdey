@@ -9,6 +9,7 @@ import {
 	getAdminByEmail,
 	getAdminById,
 	getSessionToken,
+	setSessionCookie,
 	validateAdminSession,
 	verifyPassword,
 } from "@/auth/admin";

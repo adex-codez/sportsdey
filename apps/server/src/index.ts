@@ -9,6 +9,15 @@ import type { CloudflareBindings } from "./types";
 
 const app = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
 
+let authCache: ReturnType<typeof createAuth> | null = null;
+
+function getAuth(env: CloudflareBindings) {
+	if (!authCache) {
+		authCache = createAuth(env);
+	}
+	return authCache;
+}
+
 app.openAPIRegistry.registerComponent("securitySchemes", "BearerAuth", {
 	type: "http",
 	scheme: "bearer",
@@ -37,6 +46,8 @@ app.use("*", async (c, next) => {
 			"https://admin.sportsdey.com",
 			"https://staging-admin.sportsdey.com",
 		]);
+
+		console.log(allowedOrigins.has(origin) ? origin : "");
 
 		if (allowedOrigins.has(origin)) {
 			return c.text(null, 204, {
@@ -69,6 +80,7 @@ app.use(
 				"https://admin.sportsdey.com",
 				"https://staging-admin.sportsdey.com",
 			]);
+			console.log(allowedOrigins.has(origin) ? origin : "");
 			return allowedOrigins.has(origin) ? origin : "";
 		},
 		allowMethods: ["GET", "POST", "OPTIONS"],
@@ -88,7 +100,7 @@ app.on(["GET", "POST"], "/auth/*", async (c) => {
 			),
 		),
 	);
-	const auth = createAuth(c.env);
+	const auth = getAuth(c.env);
 	return auth.handler(c.req.raw);
 });
 
@@ -104,7 +116,7 @@ app.use("*", async (c, next) => {
 	) {
 		return next();
 	}
-	const auth = createAuth(c.env);
+	const auth = getAuth(c.env);
 	const sessionResult = await auth.api.getSession({
 		headers: c.req.raw.headers,
 	});

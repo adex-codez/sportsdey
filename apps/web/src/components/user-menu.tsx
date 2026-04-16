@@ -89,7 +89,7 @@ export function UserMenu() {
 							onClick={() => setIsOpen(false)}
 							aria-label="Close user menu"
 						/>
-						<div className="absolute top-full right-0 z-50 mt-2 w-64 rounded-2xl bg-white p-3 shadow-lg dark:bg-[#202120]">
+						<div className="absolute top-full right-0 z-50 mt-2 w-64 rounded-2xl p-3 shadow-lg bg-[#202120]">
 							<nav aria-label="User menu options">
 								<ul className="space-y-2">
 									{walletMenuItems.map(({ label, icon: Icon, path }) => (
@@ -97,9 +97,9 @@ export function UserMenu() {
 											<button
 												type="button"
 												onClick={() => handleMenuNavigation(path)}
-												className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-primary dark:text-white"
+												className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[#F2EEFB]"
 											>
-												<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEF0ED]">
+												<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full ">
 													<Icon width={18} height={18} className="block" />
 												</span>
 												<span className="font-medium text-sm">{label}</span>
@@ -110,16 +110,16 @@ export function UserMenu() {
 										<button
 											type="button"
 											onClick={handleSignOut}
-											className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[#FD4585]"
+											className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left"
 										>
-											<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F8E9FE]">
+											<span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
 												<WalletLogoutIcon
 													width={18}
 													height={18}
 													className="block"
 												/>
 											</span>
-											<span className="font-medium text-sm">
+											<span className="font-medium text-sm text-[#FF216E]">
 												{walletLogoutItem.label}
 											</span>
 										</button>
