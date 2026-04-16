@@ -110,7 +110,7 @@ const Sidebar = () => {
 					>
 						News
 					</li>
-					<li
+					{/*<li
 						className={cn(
 							"cursor-pointer",
 							tab === "games" ? "font-semibold text-accent" : null,
@@ -121,7 +121,7 @@ const Sidebar = () => {
 						}}
 					>
 						Play Games
-					</li>
+					</li>*/}
 				</ul>
 			</SidebarItem>
 
