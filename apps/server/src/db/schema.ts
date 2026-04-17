@@ -108,6 +108,8 @@ export const userRelations = relations(user, ({ many }) => ({
 	utilityTransactions: many(utilityTransaction),
 	withdrawalAccounts: many(withdrawalAccount),
 	userFiles: many(userFile),
+	slotitegrationSessions: many(slotitegrationSessions),
+	slotitegrationTransactions: many(slotitegrationTransactions),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -439,6 +441,71 @@ export const pocketsTransactionsRelations = relations(
 	}),
 );
 
+export const slotitegrationSessions = sqliteTable(
+	"slotitegration_sessions",
+	{
+		sessionId: text("session_id").primaryKey(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		currency: text("currency").notNull().default("NGN"),
+		status: text("status").default("active").notNull(),
+		createdAt: integer("created_at", { mode: "timestamp_ms" })
+			.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+			.notNull(),
+		updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+			.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+			.$onUpdate(() => /* @__PURE__ */ new Date())
+			.notNull(),
+	},
+	(table) => [index("slotitegration_session_userId_idx").on(table.userId)],
+);
+
+export const slotitegrationSessionsRelations = relations(
+	slotitegrationSessions,
+	({ one }) => ({
+		user: one(user, {
+			fields: [slotitegrationSessions.userId],
+			references: [user.id],
+		}),
+	}),
+);
+
+export const slotitegrationTransactions = sqliteTable(
+	"slotitegration_transactions",
+	{
+		id: text("id").primaryKey(),
+		transactionId: text("transaction_id").notNull().unique(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		type: text("type").notNull(),
+		amount: integer("amount").notNull(),
+		currency: text("currency").notNull(),
+		roundId: text("round_id"),
+		gameId: text("game_id"),
+		sessionId: text("session_id").notNull(),
+		originalTransactionId: text("original_transaction_id"),
+		createdAt: integer("created_at", { mode: "timestamp_ms" })
+			.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+			.notNull(),
+	},
+	(table) => [
+		index("slotitegration_tx_userId_idx").on(table.userId),
+		index("slotitegration_tx_transactionId_idx").on(table.transactionId),
+	],
+);
+
+export const slotitegrationTransactionsRelations = relations(
+	slotitegrationTransactions,
+	({ one }) => ({
+		user: one(user, {
+			fields: [slotitegrationTransactions.userId],
+			references: [user.id],
+		}),
+	}),
+);
+
 export const filePurpose = {
 	PROFILE_PIC: "profile_pic",
 	VERIFICATION_DOCUMENT: "verification_document",
@@ -473,5 +540,20 @@ export const userFileRelations = relations(userFile, ({ one }) => ({
 		references: [user.id],
 	}),
 }));
+
+export const game = sqliteTable("game", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull(),
+	code: text("code").notNull().unique(),
+	imageUrl: text("image_url"),
+	enabled: integer("enabled", { mode: "boolean" }).default(true).notNull(),
+	createdAt: integer("created_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.notNull(),
+	updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+		.default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+		.$onUpdate(() => /* @__PURE__ */ new Date())
+		.notNull(),
+});
 
 export * from "./schema/admin";

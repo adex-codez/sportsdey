@@ -42,6 +42,8 @@ declare namespace Cloudflare {
 		LAGOS_RUSH_BASE_URL: string;
 		POCKETS_SECRET_KEY: string;
 		API_SPORTS_KEY: string;
+		SLOTITEGRATION_MERCHANT_ID: string;
+		SLOTITEGRATION_MERCHANT_KEY: string;
 	}
 }
 export interface CloudflareBindings extends Cloudflare.Env {}
