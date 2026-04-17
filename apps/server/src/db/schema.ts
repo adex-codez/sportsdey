@@ -21,6 +21,9 @@ export const user = sqliteTable("user", {
 	verificationStatus: text("verification_status")
 		.default("not_verified")
 		.notNull(),
+	suspended: integer("suspended", { mode: "boolean" })
+		.default(false)
+		.notNull(),
 });
 
 export const session = sqliteTable(

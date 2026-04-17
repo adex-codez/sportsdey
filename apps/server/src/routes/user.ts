@@ -44,6 +44,7 @@ const UserResponseSchema = z.object({
 		.string()
 		.nullable()
 		.openapi({ description: "User's mobile number" }),
+	suspended: z.boolean().openapi({ description: "Suspension status" }),
 	createdAt: z.string().openapi({ description: "Creation timestamp" }),
 	updatedAt: z.string().openapi({ description: "Last update timestamp" }),
 });
@@ -170,6 +171,7 @@ userRoute.openapi(getUserRoute, async (c) => {
 		image: existingUser.image,
 		country: existingUser.country,
 		mobileNumber: existingUser.mobileNumber,
+		suspended: existingUser.suspended,
 		createdAt: existingUser.createdAt,
 		updatedAt: existingUser.updatedAt,
 		verificationStatus: existingUser.verificationStatus,
@@ -241,6 +243,7 @@ userRoute.openapi(updateUserRoute, async (c) => {
 		image: updatedUser.image,
 		country: updatedUser.country,
 		mobileNumber: updatedUser.mobileNumber,
+		suspended: updatedUser.suspended,
 		createdAt: updatedUser.createdAt,
 		updatedAt: updatedUser.updatedAt,
 	};
@@ -300,6 +303,7 @@ userRoute.get("/all", async (c) => {
 			email: schema.user.email,
 			wallet: schema.wallet.balance,
 			status: schema.user.verificationStatus,
+			suspended: schema.user.suspended,
 			registeredDate: schema.user.createdAt,
 		})
 		.from(schema.user)
@@ -351,6 +355,7 @@ userRoute.get("/all", async (c) => {
 		email: u.email,
 		wallet: u.wallet ?? 0,
 		status: u.status,
+		suspended: u.suspended,
 		registeredDate: u.registeredDate,
 	}));
 
@@ -517,6 +522,157 @@ userRoute.openapi(
 				},
 			},
 			201,
+		);
+	},
+);
+
+const ToggleSuspendedSchema = z.object({
+	userId: z.string().min(1).openapi({
+		description: "User ID to toggle suspension",
+		example: "user_123",
+	}),
+});
+
+const ToggleSuspendedResponseSchema = z.object({
+	success: z.literal(true),
+	data: z.object({
+		id: z.string(),
+		suspended: z.boolean(),
+	}),
+});
+
+userRoute.openapi(
+	createRoute({
+		method: "patch",
+		path: "/{userId}/suspended",
+		tags: ["User"],
+		summary: "Toggle user suspension",
+		description: "Toggle a user's suspended state (admin only)",
+		security: [{ BearerAuth: [] }],
+		request: {
+			params: z.object({
+				userId: z.string(),
+			}),
+		},
+		responses: {
+			200: {
+				description: "User suspension toggled successfully",
+				content: {
+					"application/json": {
+						schema: ToggleSuspendedResponseSchema,
+					},
+				},
+			},
+			400: {
+				description: "Invalid request",
+				content: {
+					"application/json": {
+						schema: z.object({
+							success: z.literal(false),
+							error: z.string(),
+						}),
+					},
+				},
+			},
+			401: {
+				description: "Unauthorized - admin not authenticated",
+				content: {
+					"application/json": {
+						schema: z.object({
+							success: z.literal(false),
+							error: z.string(),
+						}),
+					},
+				},
+			},
+			403: {
+				description: "Forbidden - super admin or admin only",
+				content: {
+					"application/json": {
+						schema: z.object({
+							success: z.literal(false),
+							error: z.string(),
+						}),
+					},
+				},
+			},
+			404: {
+				description: "User not found",
+				content: {
+					"application/json": {
+						schema: z.object({
+							success: z.literal(false),
+							error: z.string(),
+						}),
+					},
+				},
+			},
+		},
+	}),
+	async (c) => {
+		const token = getSessionToken(c.req.raw.headers);
+		if (!token) {
+			return c.json(
+				{ success: false as const, error: "Unauthorized" },
+				401,
+			);
+		}
+
+		const session = await validateAdminSession(c.env, token);
+		if (!session) {
+			return c.json(
+				{ success: false as const, error: "Forbidden - admin only" },
+				403,
+			);
+		}
+
+		if (session.role !== "super_admin" && session.role !== "admin") {
+			return c.json(
+				{ success: false as const, error: "Forbidden - super admin or admin only" },
+				403,
+			);
+		}
+
+		const userId = c.req.param("userId");
+		if (!userId) {
+			return c.json(
+				{ success: false as const, error: "User ID is required" },
+				400,
+			);
+		}
+
+		const db = drizzle(c.env.DB, { schema });
+
+		const [existingUser] = await db
+			.select()
+			.from(schema.user)
+			.where(eq(schema.user.id, userId))
+			.limit(1);
+
+		if (!existingUser) {
+			return c.json(
+				{ success: false as const, error: "User not found" },
+				404,
+			);
+		}
+
+		const newSuspendedState = !existingUser.suspended;
+
+		const [updatedUser] = await db
+			.update(schema.user)
+			.set({ suspended: newSuspendedState })
+			.where(eq(schema.user.id, userId))
+			.returning();
+
+		return c.json(
+			{
+				success: true as const,
+				data: {
+					id: updatedUser.id,
+					suspended: updatedUser.suspended,
+				},
+			},
+			200,
 		);
 	},
 );
