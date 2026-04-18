@@ -4,6 +4,7 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { createAuth } from "./auth";
 import adminRoute from "./routes/admin";
+import cmsRoute from "./routes/cms";
 import routes from "./routes/route";
 import type { CloudflareBindings } from "./types";
 
@@ -129,6 +130,7 @@ app.use("*", async (c, next) => {
 
 app.route("/", routes);
 app.route("/admin", adminRoute);
+// app.route("/cms", cmsRoute);
 
 app.get("/docs", swaggerUI({ url: "/openapi.json" }));
 app.doc("/openapi.json", {

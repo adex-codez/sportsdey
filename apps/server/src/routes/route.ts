@@ -29,7 +29,7 @@ routes.route("/casino", casinoRoute);
 routes.route("/lagos-rush", lagosRushRoute);
 routes.route("/pockets", pocketsRoute);
 routes.route("/thndr", thundrRoute);
-routes.route("/slotegrator", slotegratorRoute);
+// routes.route("/slotegrator", slotegratorRoute);
 routes.route("/account", casinoProviderRoute);
 routes.route("/bills", monnifyRoute);
 routes.route("/files", filesRoute);
