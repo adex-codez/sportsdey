@@ -4,7 +4,7 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { createAuth } from "./auth";
 import adminRoute from "./routes/admin";
-import cmsRoute from "./routes/cms";
+// import cmsRoute from "./routes/cms";
 import routes from "./routes/route";
 import type { CloudflareBindings } from "./types";
 

@@ -10,7 +10,7 @@ import monnifyRoute from "./monnify";
 import newsRoute from "./news";
 import notificationsRoute from "./notifications";
 import pocketsRoute from "./pockets";
-import slotegratorRoute from "./slotegrator";
+// import slotegratorRoute from "./slotegrator";
 import tennisRoute from "./tennis";
 import thundrRoute from "./thundr";
 import userRoute from "./user";
